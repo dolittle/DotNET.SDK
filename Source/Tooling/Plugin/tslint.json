@@ -1,3 +1,0 @@
-{
-    "extends": "@dolittle/typescript.build/TSConfig/tslint.json"
-}
