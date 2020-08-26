@@ -73,27 +73,39 @@ namespace Dolittle.Events
         /// <inheritdoc/>
         public CommittedEvent ToSDK(Contracts.CommittedEvent source)
         {
-            var artifact = ToSDK(source.Type);
-            var @event = _serializer.JsonToEvent(artifact, source.Content);
-            if (source.External)
+            var eventType = ToSDK(source.Type);
+            try
             {
-                return new CommittedExternalEvent(
-                    source.EventLogSequenceNumber,
-                    source.Occurred.ToDateTimeOffset(),
-                    source.EventSourceId.To<EventSourceId>(),
-                    source.ExecutionContext.ToExecutionContext(),
-                    source.ExternalEventLogSequenceNumber,
-                    source.ExternalEventReceived.ToDateTimeOffset(),
-                    @event);
+                var @event = _serializer.JsonToEvent(eventType, source.Content);
+                if (source.External)
+                {
+                    return new CommittedExternalEvent(
+                        source.EventLogSequenceNumber,
+                        source.Occurred.ToDateTimeOffset(),
+                        source.EventSourceId.To<EventSourceId>(),
+                        source.ExecutionContext.ToExecutionContext(),
+                        source.ExternalEventLogSequenceNumber,
+                        source.ExternalEventReceived.ToDateTimeOffset(),
+                        @event);
+                }
+                else
+                {
+                    return new CommittedEvent(
+                        source.EventLogSequenceNumber,
+                        source.Occurred.ToDateTimeOffset(),
+                        source.EventSourceId.To<EventSourceId>(),
+                        source.ExecutionContext.ToExecutionContext(),
+                        @event);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return new CommittedEvent(
+                throw new CouldNotDeserializeEvent(
+                    source.Type.Id.To<ArtifactId>(),
+                    eventType,
+                    source.Content,
                     source.EventLogSequenceNumber,
-                    source.Occurred.ToDateTimeOffset(),
-                    source.EventSourceId.To<EventSourceId>(),
-                    source.ExecutionContext.ToExecutionContext(),
-                    @event);
+                    ex);
             }
         }
 
@@ -109,16 +121,28 @@ namespace Dolittle.Events
 
             var events = source.Events.Select(eventSource =>
             {
-                var artifact = ToSDK(eventSource.Type);
-                var @event = _serializer.JsonToEvent(artifact, eventSource.Content);
-                return new CommittedAggregateEvent(
-                    eventSource.EventLogSequenceNumber,
-                    eventSource.Occurred.ToDateTimeOffset(),
-                    source.EventSourceId.To<EventSourceId>(),
-                    aggregateRoot,
-                    aggregateRootVersion++,
-                    eventSource.ExecutionContext.ToExecutionContext(),
-                    @event);
+                var eventType = ToSDK(eventSource.Type);
+                try
+                {
+                    var @event = _serializer.JsonToEvent(eventType, eventSource.Content);
+                    return new CommittedAggregateEvent(
+                        eventSource.EventLogSequenceNumber,
+                        eventSource.Occurred.ToDateTimeOffset(),
+                        source.EventSourceId.To<EventSourceId>(),
+                        aggregateRoot,
+                        aggregateRootVersion++,
+                        eventSource.ExecutionContext.ToExecutionContext(),
+                        @event);
+                }
+                catch (Exception ex)
+                {
+                    throw new CouldNotDeserializeEvent(
+                        eventSource.Type.Id.To<ArtifactId>(),
+                        eventType,
+                        eventSource.Content,
+                        eventSource.EventLogSequenceNumber,
+                        ex);
+                }
             }).ToList();
 
             return new CommittedAggregateEvents(

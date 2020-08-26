@@ -66,7 +66,14 @@ namespace Dolittle.Events
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
             var response = await _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
             ThrowIfFailure(response.Failure);
-            return _eventConverter.ToSDK(response.Events);
+            try
+            {
+                return _eventConverter.ToSDK(response.Events);
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
+            }
         }
 
         /// <inheritdoc/>
@@ -80,7 +87,14 @@ namespace Dolittle.Events
             };
             var response = await _eventStoreClient.CommitForAggregateAsync(request, cancellationToken: cancellationToken);
             ThrowIfFailure(response.Failure);
-            return _eventConverter.ToSDK(response.Events);
+            try
+            {
+                return _eventConverter.ToSDK(response.Events);
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
+            }
         }
 
         /// <inheritdoc/>
@@ -98,7 +112,14 @@ namespace Dolittle.Events
             };
             var response = await _eventStoreClient.FetchForAggregateAsync(request, cancellationToken: cancellationToken);
             ThrowIfFailure(response.Failure);
-            return _eventConverter.ToSDK(response.Events);
+            try
+            {
+                return _eventConverter.ToSDK(response.Events);
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
+            }
         }
 
         /// <inheritdoc/>

@@ -135,28 +135,34 @@ namespace Dolittle.Events.Handling.Internal
         {
             try
             {
-                var comitted = _converter.ToSDK(request.Event.Event);
-                if (comitted.Event is TEventType typedEvent)
-                {
-                    await _handler.Handle(typedEvent, comitted.DeriveContext()).ConfigureAwait(false);
-                    return new EventHandlerResponse();
-                }
-
-                throw new EventHandlerDoesNotHandleEvent(typeof(TEventType));
-            }
-            finally
-            {
+                var committed = _converter.ToSDK(request.Event.Event);
                 try
                 {
-                    var comitted = _converter.ToSDK(request.Event.Event);
-                    var correlationId = comitted.ExecutionContext.CorrelationId;
-                    var eventType = comitted.Event.GetType();
-                    _completion.EventHandlerCompletedForEvent(correlationId, Identifier, eventType);
+                    if (committed.Event is TEventType typedEvent)
+                    {
+                        await _handler.Handle(typedEvent, committed.DeriveContext()).ConfigureAwait(false);
+                        return new EventHandlerResponse();
+                    }
+
+                    throw new EventHandlerDoesNotHandleEvent(typeof(TEventType));
                 }
-                catch (Exception ex)
+                finally
                 {
-                    _logger.Warning(ex, "Error notifying waiters of event handler completion");
+                    try
+                    {
+                        var correlationId = committed.ExecutionContext.CorrelationId;
+                        var eventType = committed.Event.GetType();
+                        _completion.EventHandlerCompletedForEvent(correlationId, Identifier, eventType);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Warning(ex, "Error notifying waiters of event handler completion");
+                    }
                 }
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(request.Event.ScopeId.To<ScopeId>(), ex);
             }
         }
     }

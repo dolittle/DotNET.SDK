@@ -5,10 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Events.Processing.Internal;
 using Dolittle.Logging;
-using Dolittle.Protobuf.Contracts;
+using Dolittle.Protobuf;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.Services;
 using Google.Protobuf;
+using Failure = Dolittle.Protobuf.Contracts.Failure;
 
 namespace Dolittle.Events.Filters.Internal
 {
@@ -57,13 +58,20 @@ namespace Dolittle.Events.Filters.Internal
         /// <inheritdoc/>
         protected override Task<TFilterResponse> Handle(FilterEventRequest request, CancellationToken cancellationToken)
         {
-            var committed = _converter.ToSDK(request.Event);
-            if (committed.Event is TEventType typedEvent)
+            try
             {
-                return Filter(typedEvent, committed.DeriveContext());
-            }
+                var committed = _converter.ToSDK(request.Event);
+                if (committed.Event is TEventType typedEvent)
+                {
+                    return Filter(typedEvent, committed.DeriveContext());
+                }
 
-            throw new EventTypeIsIncorrectForFilter(typeof(TEventType), committed.Event.GetType());
+                throw new EventTypeIsIncorrectForFilter(typeof(TEventType), committed.Event.GetType());
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(request.ScopeId.To<ScopeId>(), ex);
+            }
         }
 
         /// <summary>
