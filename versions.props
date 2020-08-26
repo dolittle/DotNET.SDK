@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <ContractsVersion>5.*</ContractsVersion>
+        <FundamentalsVersion>5.*</FundamentalsVersion>
+        <ReadModelsMongo>5.*</ReadModelsMongo>
+    </PropertyGroup>
+</Project>

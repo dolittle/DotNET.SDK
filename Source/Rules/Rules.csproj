@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../default.props" />
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK.Rules</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Dolittle.Collections" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.DependencyInversion" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.Types" Version="$(FundamentalsVersion)" />
+    </ItemGroup>
+
+</Project>

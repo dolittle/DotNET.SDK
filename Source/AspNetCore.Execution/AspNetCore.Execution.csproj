@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../default.props" />
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.SDK.AspNetCore.Execution</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dolittle.ApplicationModel" Version="$(FundamentalsVersion)" />
+    <PackageReference Include="Dolittle.Security" Version="$(FundamentalsVersion)" />
+    <PackageReference Include="Dolittle.Execution" Version="$(FundamentalsVersion)" />
+  </ItemGroup>
+</Project>

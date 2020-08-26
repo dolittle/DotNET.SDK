@@ -1,0 +1,27 @@
+version: 1.0.{build}
+pull_requests:  
+  do_not_increment_build_number: true
+branches:  
+  only:
+  - master
+nuget:  
+  disable_publish_on_pr: true    
+build_script:
+- cmd: .\Build\build.cmd AppVeyor
+test: off
+artifacts:
+- path: Artifacts\NuGet\*
+  name: NuGet
+install:
+- cmd: git submodule update --init --recursive
+deploy:  
+- provider: NuGet
+  server: https://www.myget.org/F/dolittle/api/v2/package
+  symbol_server: https://www.myget.org/F/dolittle/symbols/api/v2/package
+  api_key:
+    secure: uLYRBfBvfoBvNnzdVHF40xCrbGe5qkQaLOjBaTHwgCwdHulAchwcg1vRmae6QjXo
+  skip_symbols: false
+  on:
+    branch: master
+
+

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../default.props" />
+
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../**/*.csproj" Exclude="../AggregatedPackage/SDK.csproj;../AspNetCore*/*.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Dolittle.Serialization.Json" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.Concepts.Serialization.Json" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.Concepts.Serialization.Protobuf" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.Configuration.Files" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.DependencyInversion.Booting" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.ResourceTypes.Configuration" Version="$(FundamentalsVersion)" />
+        <PackageReference Include="Dolittle.Services.Clients" Version="$(FundamentalsVersion)" />
+    </ItemGroup>
+</Project>
+

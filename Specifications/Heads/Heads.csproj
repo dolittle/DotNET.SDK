@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../specs.props"></Import>
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.Heads.Specs</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\Heads\Heads.csproj" />
+  </ItemGroup>
+</Project>
