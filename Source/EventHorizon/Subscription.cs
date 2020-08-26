@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.ApplicationModel;
 using Dolittle.Events;
 using Dolittle.Tenancy;
 
@@ -19,7 +20,7 @@ namespace Dolittle.EventHorizon
         /// <summary>
         /// Gets or sets the <see cref="Microservice" /> to receive events from.
         /// </summary>
-        public ApplicationModel.Microservice Microservice { get; set; }
+        public Microservice Microservice { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="TenantId" /> tenant to receive events from.

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.ApplicationModel;
 using Dolittle.Events;
 using Dolittle.Tenancy;
 
@@ -21,7 +22,7 @@ namespace Dolittle.EventHorizon
         /// <param name="producerTenant">The <see cref="TenantId" /> to subscribe to.</param>
         /// <param name="publicStream">The <see cref="StreamId" /> to subscribe to.</param>
         /// <param name="partition">The <see cref="PartitionId" /> in the stream to subscribe to.</param>
-        public FailedToSubscribeToEventHorizon(string failureReason, TenantId subscriber, ApplicationModel.Microservice producerMicroservice, TenantId producerTenant, StreamId publicStream, PartitionId partition)
+        public FailedToSubscribeToEventHorizon(string failureReason, TenantId subscriber, Microservice producerMicroservice, TenantId producerTenant, StreamId publicStream, PartitionId partition)
             : base($"Tenant {subscriber} could not subscribe to partition {partition} in public stream {publicStream} of tenant {producerTenant} in microservice {producerMicroservice}. {failureReason}")
         {
         }
