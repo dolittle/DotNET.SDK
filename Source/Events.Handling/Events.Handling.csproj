@@ -11,8 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Microservice.Configuration\Microservice.Configuration.csproj" />
-        <ProjectReference Include="..\Artifacts.Configuration\Artifacts.Configuration.csproj" />
         <ProjectReference Include="..\Events\Events.csproj" />
         <ProjectReference Include="..\Events.Processing\Events.Processing.csproj" />
     </ItemGroup>
