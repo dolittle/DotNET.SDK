@@ -28,6 +28,14 @@ namespace Dolittle.SDK.Artifacts
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
         /// </summary>
+        /// <param name="artifact">The <see cref="Artifact" /> that the <see cref="Type" /> is associated to.</param>
+        /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="Artifact" />.</typeparam>
+        /// <returns>The <see cref="ArtifactsBuilder" /> for building <see cref="IArtifacts" />.</returns>
+        public ArtifactsBuilder Associate<T>(Artifact artifact) => Associate(typeof(T), artifact);
+
+        /// <summary>
+        /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
+        /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="Artifact" />.</param>
         /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
         /// <returns>The <see cref="ArtifactsBuilder" /> for building <see cref="IArtifacts" />.</returns>
