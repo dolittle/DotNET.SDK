@@ -7,7 +7,7 @@ using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Dolittle.SDK.Artifacts.for_ArtifactTypeMap.given
+namespace Dolittle.SDK.Artifacts.for_Artifacts.given
 {
     public class no_associations
     {
