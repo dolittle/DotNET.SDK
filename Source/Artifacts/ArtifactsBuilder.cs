@@ -44,11 +44,28 @@ namespace Dolittle.SDK.Artifacts
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
         /// </summary>
+        /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
+        /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="Artifact" />.</typeparam>
+        /// <returns>The <see cref="ArtifactsBuilder" /> for building <see cref="IArtifacts" />.</returns>
+        public ArtifactsBuilder Associate<T>(ArtifactId artifactId) => Associate<T>(new Artifact(artifactId));
+
+        /// <summary>
+        /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
+        /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="Artifact" />.</param>
         /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="Artifact" />.</param>
         /// <returns>The <see cref="ArtifactsBuilder" /> for building <see cref="IArtifacts" />.</returns>
         public ArtifactsBuilder Associate(Type type, ArtifactId artifactId, Generation generation) => Associate(type, new Artifact(artifactId, generation));
+
+        /// <summary>
+        /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
+        /// </summary>
+        /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
+        /// <param name="generation">The <see cref="Generation" /> of the <see cref="Artifact" />.</param>
+        /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="Artifact" />.</typeparam>
+        /// <returns>The <see cref="ArtifactsBuilder" /> for building <see cref="IArtifacts" />.</returns>
+        public ArtifactsBuilder Associate<T>(ArtifactId artifactId, Generation generation) => Associate<T>(new Artifact(artifactId, generation));
 
         /// <summary>
         /// Build an <see cref="IArtifacts" /> instance.
