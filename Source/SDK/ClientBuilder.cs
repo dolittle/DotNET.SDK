@@ -1,7 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading;
+using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
@@ -13,11 +15,12 @@ namespace Dolittle.SDK
     /// </summary>
     public class ClientBuilder
     {
+        readonly ArtifactsBuilder _artifactsBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         uint _port = 50053;
-        Version _version;
-        Environment _environment;
+        Microservices.Version _version;
+        Microservices.Environment _environment;
         CancellationToken _cancellation;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
@@ -30,14 +33,16 @@ namespace Dolittle.SDK
         /// Initializes a new instance of the <see cref="ClientBuilder"/> class.
         /// </summary>
         /// <param name="microserviceId">The <see cref="MicroserviceId"/> of the microservice.</param>
-        /// <param name="version">The <see cref="Version"/> of the microservice.</param>
-        /// <param name="environment">The <see cref="Environment"/> of the microservice.</param>
-        public ClientBuilder(MicroserviceId microserviceId, Version version, Environment environment)
+        /// <param name="version">The <see cref="Microservices.Version"/> of the microservice.</param>
+        /// <param name="environment">The <see cref="Microservices.Environment"/> of the microservice.</param>
+        public ClientBuilder(MicroserviceId microserviceId, Microservices.Version version, Microservices.Environment environment)
         {
             _microserviceId = microserviceId;
             _version = version;
             _environment = environment;
             _cancellation = default;
+
+            _artifactsBuilder = new ArtifactsBuilder();
         }
 
         /// <summary>
@@ -45,7 +50,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="version">The version of the microservice.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithVersion(Version version)
+        public ClientBuilder WithVersion(Microservices.Version version)
         {
             _version = version;
             return this;
@@ -56,10 +61,21 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="environment">The environment in which the microservice is running.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEnvironment(Environment environment)
+        public ClientBuilder WithEnvironment(Microservices.Environment environment)
         {
              _environment = environment;
              return this;
+        }
+
+        /// <summary>
+        /// Sets the event types through the <see cref="ArtifactsBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventTypes(Action<ArtifactsBuilder> callback)
+        {
+            callback(_artifactsBuilder);
+            return this;
         }
 
         /// <summary>
