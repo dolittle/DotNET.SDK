@@ -19,8 +19,13 @@ namespace Dolittle.SDK.Artifacts.for_ArtifactTypeMap
 
         Because of = () => artifacts.Associate(associated_type, associated_artifact);
 
-        It should_hold_the_associated_artifact_by_generic_type = () => artifacts.GetFor<string>().ShouldEqual(associated_artifact);
-        It should_hold_the_associated_artifact_by_type = () => artifacts.GetFor(typeof(string)).ShouldEqual(associated_artifact);
-        It should_hold_the_associated_type_by_artifact = () => artifacts.GetTypeFor(associated_artifact).ShouldEqual(associated_type);
+        It should_hold_a_associated_artifact_by_generic_type = () => artifacts.HasFor<string>().ShouldBeTrue();
+        It should_hold_the_correct_associated_artifact_by_generic_type = () => artifacts.GetFor<string>().ShouldEqual(associated_artifact);
+        It should_hold_the_associated_artifact_by_type = () => artifacts.HasFor(typeof(string)).ShouldBeTrue();
+        It should_hold_the_correct_associated_artifact_by_type = () => artifacts.GetFor(typeof(string)).ShouldEqual(associated_artifact);
+        It should_hold_the_associated_type_by_artifact = () => artifacts.HasTypeFor(associated_artifact).ShouldBeTrue();
+        It should_hold_the_correct_associated_type_by_artifact = () => artifacts.GetTypeFor(associated_artifact).ShouldEqual(associated_type);
+        It should_hold_the_associated_type_by_artifact_id = () => artifacts.HasTypeFor(associated_artifact.Id).ShouldBeTrue();
+        It should_hold_the_correct_associated_type_by_artifact_id = () => artifacts.GetTypeFor(associated_artifact.Id).ShouldEqual(associated_type);
     }
 }
