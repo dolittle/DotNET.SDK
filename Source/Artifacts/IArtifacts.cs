@@ -14,15 +14,15 @@ namespace Dolittle.SDK.Artifacts
         /// Check if there is a type associated with an <see cref="Artifact" />.
         /// </summary>
         /// <typeparam name="T">CLR type of the artifact.</typeparam>
-        /// <returns><see cref="Artifact"/>.</returns>
-        Artifact HasFor<T>();
+        /// <returns><see cref="bool"/>.</returns>
+        bool HasFor<T>();
 
         /// <summary>
         /// Check if there is a type associated with an <see cref="Artifact" />.
         /// </summary>
         /// <param name="type">CLR type of the artifact.</param>
-        /// <returns><see cref="Artifact"/>.</returns>
-        Artifact HasFor(Type type);
+        /// <returns><see cref="bool"/>.</returns>
+        bool HasFor(Type type);
 
         /// <summary>
         /// Get an <see cref="Artifact"/> from a given type.
@@ -42,15 +42,15 @@ namespace Dolittle.SDK.Artifacts
         /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
         /// </summary>
         /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
-        /// <returns><see cref="Type"/>.</returns>
-        Type HasTypeFor(Artifact artifact);
+        /// <returns><see cref="bool"/>.</returns>
+        bool HasTypeFor(Artifact artifact);
 
         /// <summary>
         /// Get a CLR <see cref="Type"/> for a specific <see cref="ArtifactId"/>.
         /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
+        /// <param name="artifactId"><see cref="Artifact"/> to get for.</param>
         /// <returns><see cref="Type"/>.</returns>
-        Type HasTypeFor(ArtifactId artifact);
+        bool HasTypeFor(ArtifactId artifactId);
 
         /// <summary>
         /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
@@ -62,9 +62,9 @@ namespace Dolittle.SDK.Artifacts
         /// <summary>
         /// Get a CLR <see cref="Type"/> for a specific <see cref="ArtifactId"/>.
         /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
+        /// <param name="artifactId"><see cref="Artifact"/> to get for.</param>
         /// <returns><see cref="Type"/>.</returns>
-        Type GetTypeFor(ArtifactId artifact);
+        Type GetTypeFor(ArtifactId artifactId);
 
         /// <summary>
         /// Register an relationship between an <see cref="Artifact"/> and a <see cref="Type"/>.

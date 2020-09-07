@@ -4,6 +4,10 @@
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Artifacts</AssemblyName>
   </PropertyGroup>
+    
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="4.4.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Concepts/Concepts.csproj" />

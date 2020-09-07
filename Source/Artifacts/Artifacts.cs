@@ -1,0 +1,114 @@
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Subjects;
+
+namespace Dolittle.SDK.Artifacts
+{
+    /// <summary>
+    /// Represents an implementation of <see cref="IArtifacts" />.
+    /// </summary>
+    public class Artifacts : IArtifacts, IDisposable
+    {
+        readonly ReplaySubject<ArtifactAssociation> _registered;
+        readonly BehaviorSubject<IDictionary<Type, Artifact>> _associations;
+        bool _disposed;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Artifacts"/> class.
+        /// </summary>
+        /// <param name="associations">The <see cref="IDictionary{TKey, TValue}"> artifact associations </see>.</param>
+        public Artifacts(IDictionary<Type, Artifact> associations)
+        {
+            _registered = new ReplaySubject<ArtifactAssociation>();
+            _associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
+
+            foreach ((var type, var artifact) in associations)
+            {
+                _registered.OnNext(new ArtifactAssociation(type, artifact));
+            }
+
+            _registered.Subscribe(AddAssociation);
+        }
+
+        /// <inheritdoc />
+        public void Associate(Type type, Artifact artifact)
+            => _registered.OnNext(new ArtifactAssociation(type, artifact));
+
+        /// <inheritdoc />
+        public void Associate(Type type, ArtifactId artifactId)
+            => Associate(type, new Artifact(artifactId, Generation.First));
+
+        /// <inheritdoc />
+        public void Associate(Type type, ArtifactId artifactId, Generation generation)
+            => Associate(type, new Artifact(artifactId, generation));
+
+        /// <inheritdoc />
+        public Artifact GetFor<T>() => GetFor(typeof(T));
+
+        /// <inheritdoc />
+        public Artifact GetFor(Type type)
+        {
+            if (_associations.Value.TryGetValue(type, out var artifact)) throw new UnknownArtifact(type);
+            return artifact;
+        }
+
+        /// <inheritdoc />
+        public Type GetTypeFor(Artifact artifact)
+        {
+            var type = _associations.Value.FirstOrDefault(_ => _.Value == artifact).Key;
+            if (type == default) throw new UnknownType(artifact);
+            return type;
+        }
+
+        /// <inheritdoc />
+        public Type GetTypeFor(ArtifactId artifactId) => GetTypeFor(new Artifact(artifactId));
+
+        /// <inheritdoc />
+        public bool HasFor<T>() => HasFor(typeof(T));
+
+        /// <inheritdoc />
+        public bool HasFor(Type type) => _associations.Value.ContainsKey(type);
+
+        /// <inheritdoc />
+        public bool HasTypeFor(Artifact artifact) => _associations.Value.Any(_ => _.Value == artifact);
+
+        /// <inheritdoc />
+        public bool HasTypeFor(ArtifactId artifactId) => HasTypeFor(new Artifact(artifactId));
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the object.
+        /// </summary>
+        /// <param name="disposing">Whether to dispose managed state.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                _associations.Dispose();
+                _registered.Dispose();
+            }
+
+            _disposed = true;
+        }
+
+        void AddAssociation(ArtifactAssociation association)
+        {
+            var map = new Dictionary<Type, Artifact>(_associations.Value)
+            {
+                { association.Type, association.Artifact }
+            };
+            _associations.OnNext(map);
+        }
+    }
+}

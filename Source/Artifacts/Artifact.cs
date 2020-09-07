@@ -9,8 +9,18 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Represents the concept of an artifact.
     /// </summary>
-    public abstract class Artifact : Value<Artifact>
+    public class Artifact : Value<Artifact>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Artifact"/> class.
+        /// </summary>
+        /// <param name="id"><see cref="ArtifactId">Id</see> of the <see cref="Artifact"/>.</param>
+        public Artifact(ArtifactId id)
+        {
+            Id = id;
+            Generation = Generation.First;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Artifact"/> class.
         /// </summary>
