@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../default.props" />
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.SDK.Security</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Concepts/Concepts.csproj" />
+  </ItemGroup>
+</Project>

@@ -3,5 +3,6 @@
         <ContractsVersion>5.*</ContractsVersion>
         <FundamentalsVersion>5.*</FundamentalsVersion>
         <ReadModelsMongo>5.*</ReadModelsMongo>
+        <MicrosoftExtensionsVersion>3.1.2</MicrosoftExtensionsVersion>
     </PropertyGroup>
 </Project>

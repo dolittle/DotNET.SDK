@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../default.props" />
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK.Events.Filters</AssemblyName>
+    </PropertyGroup>
+    <ItemGroup>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Events\Events.csproj" />
+        <ProjectReference Include="..\Events.Processing\Events.Processing.csproj" />
+    </ItemGroup>
+    
+</Project>
