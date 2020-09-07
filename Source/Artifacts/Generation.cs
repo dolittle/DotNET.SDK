@@ -11,28 +11,14 @@ namespace Dolittle.SDK.Artifacts
     public class Generation : ConceptAs<uint>
     {
         /// <summary>
-        /// A readonly static representation of the Initial <see cref="Generation" /> i.e. with a generation value of 0.
+        /// Gets the first generation representation.
         /// </summary>
-        public static readonly Generation Initial = 0;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Generation"/> class.
-        /// </summary>
-        /// <remarks>
-        /// It gets initialized with the <see cref="Initial"/> value.
-        /// </remarks>
-        public Generation() => Value = 0;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Generation"/> class.
-        /// </summary>
-        /// <param name="value">The generation to initialize with.</param>
-        public Generation(uint value) => Value = value;
+        public static readonly Generation First = new Generation { Value = 1 };
 
         /// <summary>
         /// Implicit convertion from Uint to Generation.
         /// </summary>
         /// <param name="value">Value to initialize the <see cref="Generation" /> instance with.</param>
-        public static implicit operator Generation(uint value) => new Generation(value);
+        public static implicit operator Generation(uint value) => new Generation { Value = value };
     }
 }
