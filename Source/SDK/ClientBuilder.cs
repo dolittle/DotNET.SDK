@@ -42,7 +42,7 @@ namespace Dolittle.SDK
             _environment = environment;
             _cancellation = default;
 
-            _artifactsBuilder = new ArtifactsBuilder();
+            _artifactsBuilder = new ArtifactsBuilder(_loggerFactory);
         }
 
         /// <summary>
@@ -122,7 +122,9 @@ namespace Dolittle.SDK
         public Client Build()
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager);
+
+            var artifacts = _artifactsBuilder.Build();
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, artifacts);
         }
     }
 }

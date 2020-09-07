@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Artifacts
 {
@@ -12,6 +13,18 @@ namespace Dolittle.SDK.Artifacts
     public class ArtifactsBuilder
     {
         readonly IDictionary<Type, Artifact> _associations = new Dictionary<Type, Artifact>();
+        readonly ILoggerFactory _loggerFactory;
+        readonly ILogger<ArtifactsBuilder> _logger;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArtifactsBuilder"/> class.
+        /// </summary>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
+        public ArtifactsBuilder(ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<ArtifactsBuilder>();
+        }
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
@@ -71,6 +84,6 @@ namespace Dolittle.SDK.Artifacts
         /// Build an <see cref="IArtifacts" /> instance.
         /// </summary>
         /// <returns>The <see cref="IArtifacts" /> with associations.</returns>
-        public IArtifacts Build() => new Artifacts(_associations);
+        public IArtifacts Build() => new Artifacts(_associations, _loggerFactory.CreateLogger<Artifacts>());
     }
 }

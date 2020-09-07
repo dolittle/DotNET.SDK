@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Artifacts
 {
@@ -15,16 +16,19 @@ namespace Dolittle.SDK.Artifacts
     {
         readonly ReplaySubject<ArtifactAssociation> _registered;
         readonly BehaviorSubject<IDictionary<Type, Artifact>> _associations;
+        readonly ILogger<Artifacts> _logger;
         bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Artifacts"/> class.
         /// </summary>
         /// <param name="associations">The <see cref="IDictionary{TKey, TValue}"> artifact associations </see>.</param>
-        public Artifacts(IDictionary<Type, Artifact> associations)
+        /// <param name="logger">The <see cref="ILogger" />.</param>
+        public Artifacts(IDictionary<Type, Artifact> associations, ILogger<Artifacts> logger)
         {
             _registered = new ReplaySubject<ArtifactAssociation>();
             _associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
+            _logger = logger;
 
             foreach ((var type, var artifact) in associations)
             {
@@ -52,7 +56,7 @@ namespace Dolittle.SDK.Artifacts
         /// <inheritdoc />
         public Artifact GetFor(Type type)
         {
-            if (_associations.Value.TryGetValue(type, out var artifact)) throw new UnknownArtifact(type);
+            if (!_associations.Value.TryGetValue(type, out var artifact)) throw new UnknownArtifact(type);
             return artifact;
         }
 
@@ -104,9 +108,10 @@ namespace Dolittle.SDK.Artifacts
 
         void AddAssociation(ArtifactAssociation association)
         {
+            _logger.LogDebug("Adding association between {Type} and {Artifact}", association.Type, association.Artifact);
             var map = new Dictionary<Type, Artifact>(_associations.Value)
             {
-                { association.Type, association.Artifact }
+                [association.Type] = association.Artifact
             };
             _associations.OnNext(map);
         }
