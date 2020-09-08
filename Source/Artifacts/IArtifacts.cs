@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reactive.Subjects;
 
 namespace Dolittle.SDK.Artifacts
 {
@@ -13,9 +12,9 @@ namespace Dolittle.SDK.Artifacts
     public interface IArtifacts
     {
         /// <summary>
-        /// Gets the <see cref="BehaviorSubject{T}" /> of associated artifacts.
+        /// Gets the <see cref="IObservable{T}" /> of associated artifacts.
         /// </summary>
-        BehaviorSubject<IDictionary<Type, Artifact>> Associations { get; }
+        IObservable<IDictionary<Type, Artifact>> Associations { get; }
 
         /// <summary>
         /// Check if there is a type associated with an <see cref="Artifact" />.
