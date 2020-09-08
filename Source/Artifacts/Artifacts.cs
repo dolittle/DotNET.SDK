@@ -22,6 +22,15 @@ namespace Dolittle.SDK.Artifacts
         /// <summary>
         /// Initializes a new instance of the <see cref="Artifacts"/> class.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger" />.</param>
+        public Artifacts(ILogger<Artifacts> logger)
+            : this(new Dictionary<Type, Artifact>(), logger)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Artifacts"/> class.
+        /// </summary>
         /// <param name="associations">The <see cref="IDictionary{TKey, TValue}"> artifact associations </see>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public Artifacts(IDictionary<Type, Artifact> associations, ILogger<Artifacts> logger)
@@ -30,25 +39,14 @@ namespace Dolittle.SDK.Artifacts
             _associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
             _logger = logger;
 
-            foreach ((var type, var artifact) in associations)
-            {
-                _registered.OnNext(new ArtifactAssociation(type, artifact));
-            }
-
             _registered.Subscribe(AddAssociation);
+
+            foreach ((var type, var artifact) in associations) Associate(type, artifact);
         }
 
         /// <inheritdoc />
         public void Associate(Type type, Artifact artifact)
             => _registered.OnNext(new ArtifactAssociation(type, artifact));
-
-        /// <inheritdoc />
-        public void Associate(Type type, ArtifactId artifactId)
-            => Associate(type, new Artifact(artifactId, Generation.First));
-
-        /// <inheritdoc />
-        public void Associate(Type type, ArtifactId artifactId, Generation generation)
-            => Associate(type, new Artifact(artifactId, generation));
 
         /// <inheritdoc />
         public Artifact GetFor<T>() => GetFor(typeof(T));
@@ -69,9 +67,6 @@ namespace Dolittle.SDK.Artifacts
         }
 
         /// <inheritdoc />
-        public Type GetTypeFor(ArtifactId artifactId) => GetTypeFor(new Artifact(artifactId));
-
-        /// <inheritdoc />
         public bool HasFor<T>() => HasFor(typeof(T));
 
         /// <inheritdoc />
@@ -79,9 +74,6 @@ namespace Dolittle.SDK.Artifacts
 
         /// <inheritdoc />
         public bool HasTypeFor(Artifact artifact) => _associations.Value.Any(_ => _.Value == artifact);
-
-        /// <inheritdoc />
-        public bool HasTypeFor(ArtifactId artifactId) => HasTypeFor(new Artifact(artifactId));
 
         /// <inheritdoc/>
         public void Dispose()

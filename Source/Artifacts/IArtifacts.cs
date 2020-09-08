@@ -46,13 +46,6 @@ namespace Dolittle.SDK.Artifacts
         bool HasTypeFor(Artifact artifact);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="ArtifactId"/>.
-        /// </summary>
-        /// <param name="artifactId"><see cref="Artifact"/> to get for.</param>
-        /// <returns><see cref="Type"/>.</returns>
-        bool HasTypeFor(ArtifactId artifactId);
-
-        /// <summary>
         /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
         /// </summary>
         /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
@@ -60,32 +53,10 @@ namespace Dolittle.SDK.Artifacts
         Type GetTypeFor(Artifact artifact);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="ArtifactId"/>.
-        /// </summary>
-        /// <param name="artifactId"><see cref="Artifact"/> to get for.</param>
-        /// <returns><see cref="Type"/>.</returns>
-        Type GetTypeFor(ArtifactId artifactId);
-
-        /// <summary>
         /// Register an relationship between an <see cref="Artifact"/> and a <see cref="Type"/>.
         /// </summary>
         /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
         /// <param name="artifact"><see cref="Artifact"/> to register.</param>
         void Associate(Type type, Artifact artifact);
-
-        /// <summary>
-        /// Register an relationship between a <see cref="Artifact"/> and a <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-        /// <param name="artifactId"><see cref="ArtifactId"/> to register.</param>
-        void Associate(Type type, ArtifactId artifactId);
-
-        /// <summary>
-        /// Register an relationship between a <see cref="Artifact"/> and a <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-        /// <param name="artifactId"><see cref="ArtifactId"/> to register.</param>
-        /// <param name="generation"><see cref="Generation"/> of the <see cref="Artifact" />.</param>
-        void Associate(Type type, ArtifactId artifactId, Generation generation);
     }
 }
