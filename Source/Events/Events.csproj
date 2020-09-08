@@ -4,6 +4,16 @@
         <AssemblyName>Dolittle.SDK.Events</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="../Artifacts/Artifacts.csproj" />
+        <ProjectReference Include="../Concepts/Concepts.csproj" />
+        <ProjectReference Include="../Execution/Execution.csproj" />
+        <ProjectReference Include="../Heads/Heads.csproj" />
+        <ProjectReference Include="../Collections/Collections.csproj" />
+        <ProjectReference Include="../Rules/Rules.csproj" />
+        <ProjectReference Include="../Transactions/Transactions.csproj" />
     </ItemGroup>
 </Project>
