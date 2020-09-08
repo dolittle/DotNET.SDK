@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represents an <see cref="ArtifactsBuilder" /> that can build <see cref="EventType" /> artifacts.
+    /// Represents an <see cref="ArtifactsBuilder{TArtifact, TArtifactId}" /> that can build <see cref="EventType" /> artifacts.
     /// </summary>
-    public class EventTypesBuilder : ArtifactsBuilder
+    public class EventTypesBuilder : ArtifactsBuilder<EventType, EventTypeId>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventTypesBuilder"/> class.
@@ -22,7 +22,7 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        public override ArtifactsBuilder Associate(Type type, ArtifactId artifactId, Generation generation)
+        public override ArtifactsBuilder<EventType, EventTypeId> Associate(Type type, EventTypeId artifactId, Generation generation)
             => Associate(type, new EventType(artifactId, generation));
     }
 }
