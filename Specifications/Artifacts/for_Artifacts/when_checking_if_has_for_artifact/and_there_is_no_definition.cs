@@ -10,7 +10,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts.when_checking_if_has_for_artifact
         static Artifact artifact;
         static bool result;
 
-        Establish context = () => artifact = new Artifact("cb2b8c0e-0ff5-4458-bbde-e305303faefb");
+        Establish context = () => artifact = new given.artifact_type("cb2b8c0e-0ff5-4458-bbde-e305303faefb");
 
         Because of = () => result = artifacts.HasTypeFor(artifact);
 

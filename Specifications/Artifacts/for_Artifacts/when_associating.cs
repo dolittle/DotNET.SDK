@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts
 
         Establish context = () =>
         {
-            associated_artifact = new Artifact(Guid.NewGuid());
+            associated_artifact = new given.artifact_type("9376771f-47ba-48fc-8598-127205921b2c");
             associated_type = typeof(string);
         };
 
@@ -25,7 +25,5 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts
         It should_hold_the_correct_associated_artifact_by_type = () => artifacts.GetFor(typeof(string)).ShouldEqual(associated_artifact);
         It should_hold_the_associated_type_by_artifact = () => artifacts.HasTypeFor(associated_artifact).ShouldBeTrue();
         It should_hold_the_correct_associated_type_by_artifact = () => artifacts.GetTypeFor(associated_artifact).ShouldEqual(associated_type);
-        It should_hold_the_associated_type_by_artifact_id = () => artifacts.HasTypeFor(associated_artifact.Id).ShouldBeTrue();
-        It should_hold_the_correct_associated_type_by_artifact_id = () => artifacts.GetTypeFor(associated_artifact.Id).ShouldEqual(associated_type);
     }
 }
