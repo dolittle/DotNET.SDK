@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Dolittle.Protobuf.Contracts;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Concepts;
+using Dolittle.SDK.Services;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 
@@ -91,7 +92,11 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// <param name="pingTimeout">The ping timeout.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the client.</param>
         /// <returns>A client.</returns>
-        protected abstract IObservable<TRegisterResponse> CreateClient(TRegisterArguments registerArguments, Func<TRequest, Task<TResponse>> callback, uint pingTimeout, CancellationToken cancellation);
+        protected abstract IReverseCallClient<TRegisterArguments, TRegisterResponse, TRequest, TResponse> CreateClient(
+            TRegisterArguments registerArguments,
+            Func<TRequest, Task<TResponse>> callback,
+            uint pingTimeout,
+            CancellationToken cancellation);
 
         /// <summary>
         /// Gets a <see cref="Failure" /> from a <typeparamref name="TRegisterResponse"/>.
