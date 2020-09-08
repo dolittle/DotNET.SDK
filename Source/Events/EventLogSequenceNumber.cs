@@ -19,6 +19,6 @@ namespace Dolittle.SDK.Events
         /// Implicitly convert a <see cref="uint"/> to an <see cref="EventLogSequenceNumber"/>.
         /// </summary>
         /// <param name="number">The number.</param>
-        public static implicit operator EventLogSequenceNumber(ulong number) => new EventLogSequenceNumber { Value = number };
+        public static implicit operator EventLogSequenceNumber(ulong number) => new EventLogSequenceNumber { Value = number };
     }
 }

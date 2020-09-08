@@ -2,12 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Protobuf.Contracts;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
@@ -38,6 +38,19 @@ namespace Dolittle.SDK.Events.Filters.Internal
             _eventTypes = eventTypes;
         }
 
+        /// <inheritdoc/>
+        public override Task<TResponse> Handle(FilterEventRequest request, CancellationToken cancellation)
+        {
+            var pbEvent = request.Event;
+            if (pbEvent == default) throw new MissingEventInformation("No event in FilterEventRequest");
+            var eventContext = CreateEventContext(pbEvent);
+            var eventType = GetEventTypeOrThrow(pbEvent);
+            var clrEventType = _eventTypes.GetTypeFor(eventType);
+            var @event = JsonSerializer.Deserialize(pbEvent.Content, clrEventType);
+
+            return Filter(@event, eventContext);
+        }
+
         /// <summary>
         /// Filters an event.
         /// </summary>
@@ -51,19 +64,6 @@ namespace Dolittle.SDK.Events.Filters.Internal
 
         /// <inheritdoc/>
         protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request) => request.RetryProcessingState;
-
-        /// <inheritdoc/>
-        protected override Task<TResponse> Handle(FilterEventRequest request)
-        {
-            var pbEvent = request.Event;
-            if (pbEvent == default) throw new MissingEventInformation("No event in FilterEventRequest");
-            var eventContext = CreateEventContext(pbEvent);
-            var eventType = GetEventTypeOrThrow(pbEvent);
-            var clrEventType = _eventTypes.GetTypeFor(eventType);
-            var @event = JsonSerializer.Deserialize(pbEvent.Content, clrEventType);
-
-            return Filter(@event, eventContext);
-        }
 
         EventContext CreateEventContext(PbCommittedEvent pbEvent)
         {
@@ -81,7 +81,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             return pbEvent.EventSourceId.To<EventSourceId>();
         }
 
-        ExecutionContext GetExecutionContextOrThrow(PbCommittedEvent pbEvent)
+        Execution.ExecutionContext GetExecutionContextOrThrow(PbCommittedEvent pbEvent)
         {
             if (pbEvent.ExecutionContext == default) throw new MissingEventInformation("ExecutionContext");
             return pbEvent.ExecutionContext.ToExecutionContext();
@@ -96,7 +96,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
         EventType GetEventTypeOrThrow(PbCommittedEvent pbEvent)
         {
             if (pbEvent.Type == default) throw new MissingEventInformation("ExecutionContext");
-            return pbEvent.Type.To<EventType, EventTypeId>();
+            return pbEvent.Type.To<EventType>();
         }
     }
 }

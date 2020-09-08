@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Events.Filters
     /// </summary>
     /// <param name="event">The event.</param>
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
-    public delegate Task<bool> PartitionedFilterEventCallback(object @event, EventContext eventContext);
+    public delegate Task<PartitionedFilterResult> PartitionedFilterEventCallback(object @event, EventContext eventContext);
 
     /// <summary>
     /// Filters an event.
@@ -32,6 +32,6 @@ namespace Dolittle.SDK.Events.Filters
     /// </summary>
     /// <param name="event">The event.</param>
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
-    public delegate Task<bool> PartitionedFilterEventCallback<T>(T @event, EventContext eventContext)
+    public delegate Task<PartitionedFilterResult> PartitionedFilterEventCallback<T>(T @event, EventContext eventContext)
         where T : class;
 }

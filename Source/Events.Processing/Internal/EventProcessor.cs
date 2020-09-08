@@ -22,7 +22,7 @@ namespace Dolittle.SDK.Events.Processing.Internal
     /// <typeparam name="TRegisterResponse">The <see cref="System.Type" /> of the registration response.</typeparam>
     /// <typeparam name="TRequest">The <see cref="System.Type" /> of the request.</typeparam>
     /// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
-    public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse> : IEventProcessor<TRegisterResponse>
+    public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse> : IEventProcessor<TRegisterResponse>, IReverseCallHandler<TRequest, TResponse>
         where TIdentifier : ConceptAs<Guid>
         where TRegisterArguments : class
         where TRegisterResponse : class
@@ -83,6 +83,9 @@ namespace Dolittle.SDK.Events.Processing.Internal
         public IObservable<TRegisterResponse> RegisterWithPolicy(RetryPolicy policy, CancellationToken cancellation)
             => Register(cancellation);
 
+        /// <inheritdoc/>
+        public abstract Task<TResponse> Handle(TRequest request, CancellationToken cancellation);
+
         /// <summary>
         /// Creates a client.
         /// </summary>
@@ -93,7 +96,7 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// <returns>A client.</returns>
         protected abstract IReverseCallClient<TRegisterArguments, TRegisterResponse, TRequest, TResponse> CreateClient(
             TRegisterArguments registerArguments,
-            Func<TRequest, Task<TResponse>> callback,
+            Func<TRequest, CancellationToken, Task<TResponse>> callback,
             uint pingTimeout,
             CancellationToken cancellation);
 
@@ -118,20 +121,13 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// <returns>The <typeparamref name="TResponse"/>.</returns>
         protected abstract TResponse CreateResponseFromFailure(ProcessorFailure failure);
 
-        /// <summary>
-        /// Handles the <typeparamref name="TRequest" />.
-        /// </summary>
-        /// <param name="request">The <typeparamref name="TRequest"/> to handle.</param>
-        /// <returns>A <see cref="Task{TResult}" /> that resolves to a <typeparamref name="TResponse"/>.</returns>
-        protected abstract Task<TResponse> Handle(TRequest request);
-
-        async Task<TResponse> CatchingHandle(TRequest request)
+        async Task<TResponse> CatchingHandle(TRequest request, CancellationToken cancellation)
         {
             RetryProcessingState retryProcessingState = null;
             try
             {
                 retryProcessingState = GetRetryProcessingStateFromRequest(request);
-                return await Handle(request).ConfigureAwait(false);
+                return await Handle(request, cancellation).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

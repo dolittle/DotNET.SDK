@@ -6,6 +6,7 @@ using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK
@@ -123,7 +124,12 @@ namespace Dolittle.SDK
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
             var eventTypes = _eventTypesBuilder.Build();
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes);
+            var reverseCallClientCreator = new ReverseCallClientCreator(
+                TimeSpan.FromSeconds(5),
+                new MethodCaller(_host, (int)_port),
+                executionContextManager,
+                _loggerFactory);
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, reverseCallClientCreator, eventTypes);
         }
     }
 }
