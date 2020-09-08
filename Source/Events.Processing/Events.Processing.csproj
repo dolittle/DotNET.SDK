@@ -3,7 +3,11 @@
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events.Processing</AssemblyName>
     </PropertyGroup>
+
     <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="System.Reactive" Version="4.4.1" />
     </ItemGroup>
 
     <ItemGroup>
