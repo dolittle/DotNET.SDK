@@ -16,9 +16,8 @@ namespace Dolittle.SDK.Artifacts
         /// </summary>
         /// <param name="id"><see cref="ArtifactId">Id</see> of the <see cref="Artifact"/>.</param>
         protected Artifact(ArtifactId id)
+            : this(id, Generation.First)
         {
-            Id = id;
-            Generation = Generation.First;
         }
 
         /// <summary>

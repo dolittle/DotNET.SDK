@@ -13,6 +13,7 @@ namespace Dolittle.SDK.Artifacts
     public abstract class ArtifactsBuilder
     {
         readonly IDictionary<Type, Artifact> _associations = new Dictionary<Type, Artifact>();
+        readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactsBuilder"/> class.
@@ -20,13 +21,8 @@ namespace Dolittle.SDK.Artifacts
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         protected ArtifactsBuilder(ILoggerFactory loggerFactory)
         {
-            LoggerFactory = loggerFactory;
+            _loggerFactory = loggerFactory;
         }
-
-        /// <summary>
-        /// Gets the <see cref="ILoggerFactory" />.
-        /// </summary>
-        protected ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
@@ -81,7 +77,7 @@ namespace Dolittle.SDK.Artifacts
         /// Build an <see cref="IArtifacts" /> instance.
         /// </summary>
         /// <returns>The <see cref="IArtifacts" /> with associations.</returns>
-        public IArtifacts Build() => new Artifacts(_associations, LoggerFactory.CreateLogger<Artifacts>());
+        public IArtifacts Build() => new Artifacts(_associations, _loggerFactory.CreateLogger<Artifacts>());
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
