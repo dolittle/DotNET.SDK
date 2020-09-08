@@ -14,8 +14,8 @@ namespace Dolittle.SDK.Artifacts
     /// </summary>
     public class Artifacts : IArtifacts, IDisposable
     {
-        readonly ReplaySubject<ArtifactAssociation> _registered;
-        readonly BehaviorSubject<IDictionary<Type, Artifact>> _associations;
+        readonly Subject<ArtifactAssociation> _registered;
+
         readonly ILogger<Artifacts> _logger;
         bool _disposed;
 
@@ -35,14 +35,17 @@ namespace Dolittle.SDK.Artifacts
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public Artifacts(IDictionary<Type, Artifact> associations, ILogger<Artifacts> logger)
         {
-            _registered = new ReplaySubject<ArtifactAssociation>();
-            _associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
+            _registered = new Subject<ArtifactAssociation>();
+            Associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
             _logger = logger;
 
             _registered.Subscribe(AddAssociation);
 
             foreach ((var type, var artifact) in associations) Associate(type, artifact);
         }
+
+        /// <inheritdoc/>
+        public BehaviorSubject<IDictionary<Type, Artifact>> Associations { get; }
 
         /// <inheritdoc />
         public void Associate(Type type, Artifact artifact)
@@ -54,14 +57,14 @@ namespace Dolittle.SDK.Artifacts
         /// <inheritdoc />
         public Artifact GetFor(Type type)
         {
-            if (!_associations.Value.TryGetValue(type, out var artifact)) throw new UnknownArtifact(type);
+            if (!Associations.Value.TryGetValue(type, out var artifact)) throw new UnknownArtifact(type);
             return artifact;
         }
 
         /// <inheritdoc />
         public Type GetTypeFor(Artifact artifact)
         {
-            var type = _associations.Value.FirstOrDefault(_ => _.Value == artifact).Key;
+            var type = Associations.Value.FirstOrDefault(_ => _.Value == artifact).Key;
             if (type == default) throw new UnknownType(artifact);
             return type;
         }
@@ -70,10 +73,10 @@ namespace Dolittle.SDK.Artifacts
         public bool HasFor<T>() => HasFor(typeof(T));
 
         /// <inheritdoc />
-        public bool HasFor(Type type) => _associations.Value.ContainsKey(type);
+        public bool HasFor(Type type) => Associations.Value.ContainsKey(type);
 
         /// <inheritdoc />
-        public bool HasTypeFor(Artifact artifact) => _associations.Value.Any(_ => _.Value == artifact);
+        public bool HasTypeFor(Artifact artifact) => Associations.Value.Any(_ => _.Value == artifact);
 
         /// <inheritdoc/>
         public void Dispose()
@@ -91,7 +94,7 @@ namespace Dolittle.SDK.Artifacts
             if (_disposed) return;
             if (disposing)
             {
-                _associations.Dispose();
+                Associations.Dispose();
                 _registered.Dispose();
             }
 
@@ -101,11 +104,11 @@ namespace Dolittle.SDK.Artifacts
         void AddAssociation(ArtifactAssociation association)
         {
             _logger.LogDebug("Adding association between {Type} and {Artifact}", association.Type, association.Artifact);
-            var map = new Dictionary<Type, Artifact>(_associations.Value)
+            var map = new Dictionary<Type, Artifact>(Associations.Value)
             {
                 [association.Type] = association.Artifact
             };
-            _associations.OnNext(map);
+            Associations.OnNext(map);
         }
     }
 }

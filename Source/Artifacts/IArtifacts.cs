@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Reactive.Subjects;
 
 namespace Dolittle.SDK.Artifacts
 {
@@ -10,6 +12,11 @@ namespace Dolittle.SDK.Artifacts
     /// </summary>
     public interface IArtifacts
     {
+        /// <summary>
+        /// Gets the <see cref="BehaviorSubject{T}" /> of associated artifacts.
+        /// </summary>
+        BehaviorSubject<IDictionary<Type, Artifact>> Associations { get; }
+
         /// <summary>
         /// Check if there is a type associated with an <see cref="Artifact" />.
         /// </summary>
