@@ -16,7 +16,7 @@ namespace Dolittle.SDK
     /// </summary>
     public class ClientBuilder
     {
-        readonly EventTypes _eventTypes;
+        readonly EventTypesAssociator _eventTypesAssociator;
         readonly MicroserviceId _microserviceId;
         readonly IArtifacts _artifacts;
         string _host = "localhost";
@@ -45,7 +45,7 @@ namespace Dolittle.SDK
             _cancellation = default;
 
             _artifacts = new Artifacts.Artifacts(_loggerFactory.CreateLogger<Artifacts.Artifacts>());
-            _eventTypes = new EventTypes(_artifacts);
+            _eventTypesAssociator = new EventTypesAssociator(_artifacts);
         }
 
         /// <summary>
@@ -71,13 +71,13 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the event types through the <see cref="EventTypes" />.
+        /// Sets the event types through the <see cref="EventTypesAssociator" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventTypes(Action<EventTypes> callback)
+        public ClientBuilder WithEventTypes(Action<EventTypesAssociator> callback)
         {
-            callback(_eventTypes);
+            callback(_eventTypesAssociator);
             return this;
         }
 

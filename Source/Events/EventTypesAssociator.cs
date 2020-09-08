@@ -7,21 +7,21 @@ using Dolittle.SDK.Artifacts;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represents an <see cref="ArtifactsAssociations{TArtifact, TArtifactId}" /> that can build <see cref="EventType" /> artifacts.
+    /// Represents an <see cref="ArtifactsAssociatorFor{TArtifact, TArtifactId}" /> that can build <see cref="EventType" /> artifacts.
     /// </summary>
-    public class EventTypes : ArtifactsAssociations<EventType, EventTypeId>
+    public class EventTypesAssociator : ArtifactsAssociatorFor<EventType, EventTypeId>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventTypes"/> class.
+        /// Initializes a new instance of the <see cref="EventTypesAssociator"/> class.
         /// </summary>
         /// <param name="artifacts">The <see cref="IArtifacts" />.</param>
-        public EventTypes(IArtifacts artifacts)
+        public EventTypesAssociator(IArtifacts artifacts)
             : base(artifacts)
         {
         }
 
         /// <inheritdoc/>
-        public override ArtifactsAssociations<EventType, EventTypeId> Associate(Type type, EventTypeId artifactId, Generation generation)
+        public override ArtifactsAssociatorFor<EventType, EventTypeId> Associate(Type type, EventTypeId artifactId, Generation generation)
             => Associate(type, new EventType(artifactId, generation));
     }
 }
