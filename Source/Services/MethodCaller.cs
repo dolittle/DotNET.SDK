@@ -45,8 +45,7 @@ namespace Dolittle.SDK.Services
             where TClientMessage : IMessage
             where TServerMessage : IMessage
         {
-            var client = method.Client(CreateChannel());
-            var call = method.Method(client, CreateCallOptions(token));
+            var call = method.Call(CreateChannel(), CreateCallOptions(token));
             SendMessagesToServer(requests, call.RequestStream);
             return ReceiveMessagesFromServer(call.ResponseStream, token);
         }
