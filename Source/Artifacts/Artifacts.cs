@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,7 @@ namespace Dolittle.SDK.Artifacts
     /// </summary>
     public class Artifacts : IArtifacts, IDisposable
     {
+        readonly IDictionary<Artifact, Type> _artifactToTypeMap;
         readonly Subject<ArtifactAssociation> _registered;
         readonly BehaviorSubject<IDictionary<Type, Artifact>> _associations;
         readonly ILogger<Artifacts> _logger;
@@ -24,8 +26,13 @@ namespace Dolittle.SDK.Artifacts
         /// </summary>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public Artifacts(ILogger<Artifacts> logger)
-            : this(new Dictionary<Type, Artifact>(), logger)
         {
+            _logger = logger;
+            _artifactToTypeMap = new Dictionary<Artifact, Type>();
+            _registered = new Subject<ArtifactAssociation>();
+            _associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
+
+            _registered.Subscribe(AddAssociation);
         }
 
         /// <summary>
@@ -34,13 +41,8 @@ namespace Dolittle.SDK.Artifacts
         /// <param name="associations">The <see cref="IDictionary{TKey, TValue}"> artifact associations </see>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public Artifacts(IDictionary<Type, Artifact> associations, ILogger<Artifacts> logger)
+            : this(logger)
         {
-            _registered = new Subject<ArtifactAssociation>();
-            _associations = new BehaviorSubject<IDictionary<Type, Artifact>>(new Dictionary<Type, Artifact>());
-            _logger = logger;
-
-            _registered.Subscribe(AddAssociation);
-
             foreach ((var type, var artifact) in associations) Associate(type, artifact);
         }
 
@@ -103,11 +105,23 @@ namespace Dolittle.SDK.Artifacts
 
         void AddAssociation(ArtifactAssociation association)
         {
-            _logger.LogDebug("Adding association between {Type} and {Artifact}", association.Type, association.Artifact);
-            var map = new Dictionary<Type, Artifact>(_associations.Value)
+            var previousAssociations = _associations.Value;
+            if (previousAssociations.ContainsKey(association.Type))
+            {
+                throw new CannotHaveMultipleArtifactsAssociatedWithType(association.Type);
+            }
+
+            if (_artifactToTypeMap.ContainsKey(association.Artifact))
+            {
+                throw new CannotHaveMultipleTypesAssociatedWithArtifact(association.Artifact);
+            }
+
+            var map = new Dictionary<Type, Artifact>(previousAssociations)
             {
                 [association.Type] = association.Artifact
             };
+            _logger.LogDebug("Associating {Type} to {Artifact}", association.Type, association.Artifact);
+            _artifactToTypeMap[association.Artifact] = association.Type;
             _associations.OnNext(map);
         }
     }

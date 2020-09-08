@@ -8,13 +8,13 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Exception that gets thrown when a <see cref="Type" /> is associated with multiple <see cref="Artifact" />.
     /// </summary>
-    public class TypeCannotHaveMultipleArtifactAssociations : Exception
+    public class CannotHaveMultipleArtifactsAssociatedWithType : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TypeCannotHaveMultipleArtifactAssociations"/> class.
+        /// Initializes a new instance of the <see cref="CannotHaveMultipleArtifactsAssociatedWithType"/> class.
         /// </summary>
         /// <param name="type">The <see cref="Type" /> that is associated with multiple <see cref="Artifact" />.</param>
-        public TypeCannotHaveMultipleArtifactAssociations(Type type)
+        public CannotHaveMultipleArtifactsAssociatedWithType(Type type)
             : base($"{type} cannot be associated with multiple artifacts")
         {
         }
