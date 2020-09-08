@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../default.props" />
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.SDK.Protobuf</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
+    <PackageReference Include="Google.Protobuf" Version="$(ProtobufVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="../Execution/Execution.csproj" />
+  </ItemGroup>
+</Project>
