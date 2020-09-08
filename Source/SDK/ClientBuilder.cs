@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
@@ -15,8 +16,9 @@ namespace Dolittle.SDK
     /// </summary>
     public class ClientBuilder
     {
-        readonly ArtifactsBuilder _artifactsBuilder;
+        readonly EventTypes _eventTypes;
         readonly MicroserviceId _microserviceId;
+        readonly IArtifacts _artifacts;
         string _host = "localhost";
         uint _port = 50053;
         Microservices.Version _version;
@@ -42,7 +44,8 @@ namespace Dolittle.SDK
             _environment = environment;
             _cancellation = default;
 
-            _artifactsBuilder = new ArtifactsBuilder(_loggerFactory);
+            _artifacts = new Artifacts.Artifacts(_loggerFactory.CreateLogger<Artifacts.Artifacts>());
+            _eventTypes = new EventTypes(_artifacts);
         }
 
         /// <summary>
@@ -68,13 +71,13 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the event types through the <see cref="ArtifactsBuilder" />.
+        /// Sets the event types through the <see cref="EventTypes" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventTypes(Action<ArtifactsBuilder> callback)
+        public ClientBuilder WithEventTypes(Action<EventTypes> callback)
         {
-            callback(_artifactsBuilder);
+            callback(_eventTypes);
             return this;
         }
 
@@ -123,8 +126,7 @@ namespace Dolittle.SDK
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
 
-            var artifacts = _artifactsBuilder.Build();
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, artifacts);
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, _artifacts);
         }
     }
 }
