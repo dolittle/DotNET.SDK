@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Heads;
-using Dolittle.Domain;
 using Dolittle.Lifecycle;
 using Dolittle.Protobuf;
 using Dolittle.Services.Contracts;

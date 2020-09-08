@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Dolittle.SDK.Collections;
-using Dolittle.Reflection;
+using Dolittle.SDK.Reflection;
 using Dolittle.SDK.Rules;
 using Dolittle.SDK.Transactions;
 

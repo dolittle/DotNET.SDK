@@ -15,5 +15,6 @@
         <ProjectReference Include="../Collections/Collections.csproj" />
         <ProjectReference Include="../Rules/Rules.csproj" />
         <ProjectReference Include="../Transactions/Transactions.csproj" />
+        <ProjectReference Include="../Reflection/Reflection.csproj" />
     </ItemGroup>
 </Project>
