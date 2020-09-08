@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Collections;
 
 namespace Dolittle.SDK.Events
@@ -29,9 +30,11 @@ namespace Dolittle.SDK.Events
         /// Appends an event to the uncommitted sequence.
         /// </summary>
         /// <param name="eventSource">The <see cref="EventSourceId"/> of the <see cref="UncommittedEvent"/> to append.</param>
-        /// <param name="event">The <see cref="IEvent"/> of the <see cref="UncommittedEvent"/> to append.</param>
-        public void Append(EventSourceId eventSource, IEvent @event)
-            => Append(new UncommittedEvent(eventSource, @event));
+        /// <param name="artifact">The <see cref="Artifact"/> of the <see cref="UncommittedEvent"/> to append.</param>
+        /// <param name="content">The content of the <see cref="UncommittedEvent"/> to append.</param>
+        /// <param name="public">Wether the <see cref="UncommittedEvent"/> to append is public or not.</param>
+        public void Append(EventSourceId eventSource, Artifact artifact, object content, bool @public)
+            => Append(new UncommittedEvent(eventSource, artifact, content, @public));
 
         /// <summary>
         /// Appends an event to the uncommitted sequence.

@@ -26,13 +26,6 @@ namespace Dolittle.SDK.Events
         CommittedEvents ToSDK(IEnumerable<Contracts.CommittedEvent> source);
 
         /// <summary>
-        /// Convert from <see cref="Contracts.CommittedAggregateEvents"/> to <see cref="CommittedAggregateEvents"/>.
-        /// </summary>
-        /// <param name="source"><see cref="Contracts.CommittedAggregateEvents"/>.</param>
-        /// <returns>Converted <see cref="CommittedAggregateEvents"/>.</returns>
-        CommittedAggregateEvents ToSDK(Contracts.CommittedAggregateEvents source);
-
-        /// <summary>
         /// Convert from <see cref="UncommittedEvent" /> to <see cref="Contracts.UncommittedEvent" />.
         /// </summary>
         /// <param name="event"><see cref="UncommittedEvent" />.</param>
@@ -45,12 +38,5 @@ namespace Dolittle.SDK.Events
         /// <param name="events"><see cref="UncommittedEvent" />.</param>
         /// <returns>Converted see <see cref="IEnumerable{T}"/> of type <see cref="Contracts.CommittedEvent"/>.</returns>
         IEnumerable<Contracts.UncommittedEvent> ToProtobuf(UncommittedEvents events);
-
-        /// <summary>
-        /// Convert from <see cref="UncommittedAggregateEvents" /> to <see cref="Contracts.UncommittedAggregateEvents" />.
-        /// </summary>
-        /// <param name="uncommittedEvents"><see cref="UncommittedAggregateEvents" />.</param>
-        /// <returns>Converted <see cref="Contracts.UncommittedAggregateEvents" />.</returns>
-        Contracts.UncommittedAggregateEvents ToProtobuf(UncommittedAggregateEvents uncommittedEvents);
     }
 }

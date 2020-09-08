@@ -6,8 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Execution;
-using Dolittle.Lifecycle;
-using Dolittle.Protobuf;
+using Dolittle.SDK.Protobuf;
 using Dolittle.Services.Contracts;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 using Contracts = Dolittle.Runtime.Events.Contracts;
@@ -18,7 +17,6 @@ namespace Dolittle.SDK.Events
     /// <summary>
     /// Represents an implementation of <see cref="IEventStore" />.
     /// </summary>
-    // [SingletonPerTenant]
     public class EventStore : IEventStore
     {
         readonly EventStoreClient _eventStoreClient;
@@ -50,34 +48,9 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        public Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        async public Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
-            return CommitInternal(uncommittedEvents, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommittedEvents> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
-        {
-            var events = new UncommittedEvents();
-            events.Append(uncommittedEvent);
-            return CommitInternal(events, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommittedEvents> Commit(dynamic content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
-        {
-            var @event = new UncommittedEvent(eventSourceId, )
-        }
-
-        async Task<CommittedEvents> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken) {
-            _logger.LogDebug("Committing events");
-            var request = new Contracts.CommitEventsRequest
-            {
-                CallContext = GetCurrentCallContext(),
-            };
-            request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            var response = await _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
-            ThrowIfFailure(response.Failure);
+            var response = await CommitInternal(uncommittedEvents, cancellationToken);
             try
             {
                 return _eventConverter.ToSDK(response.Events);
@@ -86,6 +59,66 @@ namespace Dolittle.SDK.Events
             {
                 throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
             }
+        }
+
+        /// <inheritdoc/>
+        async public Task<CommittedEvent> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
+        {
+            var uncommittedEvents = new UncommittedEvents();
+            uncommittedEvents.Append(uncommittedEvent);
+            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            try
+            {
+                return _eventConverter.ToSDK(response.Events[0]);
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
+            }
+        }
+
+        /// <inheritdoc/>
+        async public Task<CommittedEvent> Commit(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default)
+        {
+            var uncommittedEvents = new UncommittedEvents();
+            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, artifact, content, false));
+            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            try
+            {
+                return _eventConverter.ToSDK(response.Events[0]);
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
+            }
+        }
+
+        /// <inheritdoc/>
+        async public Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default)
+        {
+            var uncommittedEvents = new UncommittedEvents();
+            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, artifact, content, false));
+            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            try
+            {
+                return _eventConverter.ToSDK(response.Events[0]);
+            }
+            catch (CouldNotDeserializeEvent ex)
+            {
+                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
+            }
+        }
+
+        async Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken) {
+            _logger.LogDebug("Committing events");
+            var request = new Contracts.CommitEventsRequest
+            {
+                CallContext = GetCurrentCallContext(),
+            };
+            request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
+            var response = await _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
+            ThrowIfFailure(response.Failure);
+            return response;
         }
 
         CallRequestContext GetCurrentCallContext()

@@ -3,6 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Events
 {
@@ -31,11 +32,23 @@ namespace Dolittle.SDK.Events
         Task<CommittedEvent> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Commits a single event with the given content.
+        /// Commits a single Event with the given content.
         /// </summary>
-        /// <param name="content">The content of the event.</param>
+        /// <param name="content">The content of the Event.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="artifact">The <see cref="Artifact"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommittedEvent> Commit(dynamic content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+        Task<CommittedEvent> Commit(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single public Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="artifact">The <see cref="Artifact"/> the Event is associated with.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default);
+    }
 }
