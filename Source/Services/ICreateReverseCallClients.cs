@@ -29,7 +29,7 @@ namespace Dolittle.SDK.Services
         IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClient, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
             TConnectArguments arguments,
             IReverseCallHandler<TRequest, TResponse> handler,
-            IAmADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method,
+            ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method,
             IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> converter)
             where TClient : ClientBase<TClient>
             where TClientMessage : IMessage

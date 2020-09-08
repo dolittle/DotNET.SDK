@@ -36,7 +36,7 @@ namespace Dolittle.SDK.Services
         where TRequest : class
         where TResponse : class
     {
-        readonly IAmADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> _method;
+        readonly ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> _method;
         readonly IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> _converter;
         readonly TimeSpan _pingInterval;
         readonly IPerformMethodCalls _caller;
@@ -58,7 +58,7 @@ namespace Dolittle.SDK.Services
         public ReverseCallClient(
             TConnectArguments arguments,
             IReverseCallHandler<TRequest, TResponse> handler,
-            IAmADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method,
+            ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method,
             IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> converter,
             TimeSpan pingInterval,
             IPerformMethodCalls caller,
