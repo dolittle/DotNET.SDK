@@ -87,7 +87,7 @@ namespace Dolittle.SDK.Services
             => Observable.Create<TConnectResponse>((observer, token) =>
                 {
                     var toServerMessages = new Subject<TClientMessage>();
-                    var toClientMessages = _caller.Call(_method, toServerMessages, token);
+                    var toClientMessages = new Subject<TServerMessage>();
 
                     var connectArguments = Arguments;
                     var connectContext = CreateReverseCallArgumentsContext();
@@ -120,6 +120,7 @@ namespace Dolittle.SDK.Services
                     var errorsAndCompletion = toClientMessages.Where(_ => false).Select(_converter.GetConnectResponseFrom);
                     connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
 
+                    _caller.Call(_method, toServerMessages).Subscribe(toClientMessages, token);
                     return Task.CompletedTask;
                 });
 

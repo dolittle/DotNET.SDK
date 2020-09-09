@@ -11,19 +11,22 @@ namespace Dolittle.SDK.Artifacts.given.Streams
 {
     public class Writer : IClientStreamWriter<ClientMessage>
     {
+        readonly TaskCompletionSource<bool> _completed;
         readonly IList<ClientMessage> _messageStore;
-        bool _completed = false;
 
         public Writer(IList<ClientMessage> messageStore)
         {
+            _completed = new TaskCompletionSource<bool>();
             _messageStore = messageStore;
         }
 
         public WriteOptions WriteOptions { get; set; }
 
+        public Task Completed => _completed.Task;
+
         public Task WriteAsync(ClientMessage message)
         {
-            if (_completed)
+            if (_completed.Task.IsCompleted)
             {
                 #pragma warning disable DL0008
                 throw new InvalidOperationException("Can't write the message because the call is complete.");
@@ -36,8 +39,8 @@ namespace Dolittle.SDK.Artifacts.given.Streams
 
         public Task CompleteAsync()
         {
-            _completed = true;
-            return Task.CompletedTask;
+            _completed.SetResult(true);
+            return _completed.Task;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Dolittle.SDK.Artifacts.given
 {
     public class Method : ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>
     {
+        readonly List<(Channel, CallOptions)> _calls = new List<(Channel, CallOptions)>();
         readonly List<ClientMessage> _clientToServerMessages = new List<ClientMessage>();
         readonly List<ServerMessage> _serverToClientMessages;
 
@@ -24,13 +25,20 @@ namespace Dolittle.SDK.Artifacts.given
 
         public IEnumerable<ServerMessage> ServerToClientMessages => _serverToClientMessages;
 
+        public IEnumerable<(Channel channel, CallOptions options)> Calls => _calls;
+
         public AsyncDuplexStreamingCall<ClientMessage, ServerMessage> Call(Channel channel, CallOptions callOptions)
-            => new AsyncDuplexStreamingCall<ClientMessage, ServerMessage>(
-                new Writer(_clientToServerMessages),
-                new Reader(_serverToClientMessages),
+        {
+            _calls.Add((channel, callOptions));
+            var writer = new Writer(_clientToServerMessages);
+            var reader = new Reader(_serverToClientMessages, writer.Completed);
+            return new AsyncDuplexStreamingCall<ClientMessage, ServerMessage>(
+                writer,
+                reader,
                 Task.FromResult(new Metadata()),
                 () => new Status(StatusCode.OK, "OK"),
                 () => new Metadata(),
                 () => { });
+        }
     }
 }

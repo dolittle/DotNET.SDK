@@ -3,7 +3,6 @@
 
 using System;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
@@ -40,14 +39,15 @@ namespace Dolittle.SDK.Services
         }
 
         /// <inheritdoc/>
-        public IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests, CancellationToken token)
+        public IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests)
             where TClientMessage : IMessage
             where TServerMessage : IMessage
-        {
-            var call = method.Call(CreateChannel(), CreateCallOptions(token));
-            SendMessagesToServer(requests, call.RequestStream);
-            return ReceiveMessagesFromServer(call.ResponseStream, token);
-        }
+            => Observable.Create<TServerMessage>((observer, token) =>
+                {
+                    var call = method.Call(CreateChannel(), CreateCallOptions(token));
+                    SendMessagesToServer(requests, call.RequestStream);
+                    return ReceiveAllMessagesFromServer(observer, call.ResponseStream, token);
+                });
 
         Channel CreateChannel() => new Channel(_host, _port, _channelCredentials, _channelOptions);
 
@@ -57,31 +57,24 @@ namespace Dolittle.SDK.Services
             => messages
                 .Select(message => Observable.FromAsync(() => writer.WriteAsync(message)))
                 .Concat()
-                .Concat(Observable.FromAsync(() => writer.CompleteAsync()));
+                .Concat(Observable.FromAsync(() => writer.CompleteAsync()))
+                .Subscribe();
 
-        IObservable<T> ReceiveMessagesFromServer<T>(IAsyncStreamReader<T> reader, CancellationToken token)
+        async Task ReceiveAllMessagesFromServer<T>(IObserver<T> observer, IAsyncStreamReader<T> reader, CancellationToken token)
         {
-            var messages = new Subject<T>();
-
-            Task.Run(
-                async () =>
+            try
+            {
+                while (await reader.MoveNext(token).ConfigureAwait(false))
                 {
-                    try
-                    {
-                        while (await reader.MoveNext(token).ConfigureAwait(false))
-                        {
-                            messages.OnNext(reader.Current);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        messages.OnError(ex);
-                    }
+                    observer.OnNext(reader.Current);
+                }
+            }
+            catch (Exception ex)
+            {
+                observer.OnError(ex);
+            }
 
-                    messages.OnCompleted();
-                });
-
-            return messages;
+            observer.OnCompleted();
         }
     }
 }

@@ -12,19 +12,30 @@ namespace Dolittle.SDK.Artifacts.given.Streams
     public class Reader : IAsyncStreamReader<ServerMessage>
     {
         readonly IList<ServerMessage> _messages;
+        readonly Task _completed;
         int _offset = -1;
 
-        public Reader(IEnumerable<ServerMessage> messages)
+        public Reader(IEnumerable<ServerMessage> messages, Task completed)
         {
             _messages = new List<ServerMessage>(messages);
+            _completed = completed;
         }
 
-        public ServerMessage Current { get; private set; }
+        public ServerMessage Current { get; private set; }
 
-        public Task<bool> MoveNext(CancellationToken cancellationToken)
+        public async Task<bool> MoveNext(CancellationToken cancellationToken)
         {
             _offset += 1;
-            return Task.FromResult(_offset < _messages.Count);
+            if (_offset < _messages.Count)
+            {
+                Current = _messages[_offset];
+                return true;
+            }
+            else
+            {
+                await _completed.ConfigureAwait(false);
+                return false;
+            }
         }
     }
 }
