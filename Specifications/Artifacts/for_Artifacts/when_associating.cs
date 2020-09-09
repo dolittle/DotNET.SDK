@@ -8,7 +8,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts
 {
     public class when_associating : given.no_associations
     {
-        static Artifact associated_artifact;
+        static given.artifact_type associated_artifact;
         static Type associated_type;
 
         Establish context = () =>

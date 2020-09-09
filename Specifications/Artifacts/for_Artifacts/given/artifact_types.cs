@@ -1,14 +1,15 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Machine.Specifications;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Artifacts.for_Artifacts.given
 {
-    public class no_associations
+    public class artifact_types : Artifacts<artifact_type>
     {
-        protected static artifact_types artifacts;
-
-        Establish context = () => artifacts = new artifact_types();
+        public artifact_types()
+            : base(Moq.Mock.Of<ILogger<Artifacts<artifact_type>>>())
+        {
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts.when_getting_for_type
 {
     public class and_there_is_a_definition : given.one_association
     {
-        static Artifact result;
+        static given.artifact_type result;
 
         Because of = () => result = artifacts.GetFor(associated_type);
 
