@@ -8,5 +8,6 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="../Artifacts/Artifacts.csproj" />
+        <ProjectReference Include="../Concepts/Concepts.csproj" />
     </ItemGroup>
 </Project>
