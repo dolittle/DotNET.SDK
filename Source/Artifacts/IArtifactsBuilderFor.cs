@@ -8,11 +8,11 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Defines a system that can build artifacts.
     /// </summary>
-    /// <typeparam name="TArtifacts">The <see cref="IArtifacts{TArtifact}" />.</typeparam>
-    /// <typeparam name="TArtifact">The <see cref="Artifact" />.</typeparam>
-    /// <typeparam name="TArtifactIdentifier">The unique identifier for the <see cref="Artifact" />.</typeparam>
-    /// <typeparam name="TBuilder">The builder.</typeparam>
-    public interface IArtifactsBuilderFor<TArtifacts, TArtifact, TArtifactIdentifier, out TBuilder>
+    /// <typeparam name="TArtifacts">The <see cref="Type" /> of the <see cref="IArtifacts{TArtifact}" />.</typeparam>
+    /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact" />.</typeparam>
+    /// <typeparam name="TArtifactIdentifier">The <see cref="Type" /> of the unique identifier for the <see cref="Artifact" />.</typeparam>
+    /// <typeparam name="TBuilder">The <see cref="Type" /> of the <see cref="IArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactIdentifier, TBuilder}" /> builder.</typeparam>
+    public interface IArtifactsBuilderFor<TArtifacts, TArtifact, TArtifactIdentifier, TBuilder>
         where TArtifacts : IArtifacts<TArtifact>
         where TArtifact : Artifact
         where TArtifactIdentifier : ArtifactId
