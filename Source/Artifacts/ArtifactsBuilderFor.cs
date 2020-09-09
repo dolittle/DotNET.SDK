@@ -22,10 +22,7 @@ namespace Dolittle.SDK.Artifacts
         /// Initializes a new instance of the <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}"/> class.
         /// </summary>
         /// <param name="artifacts">The <see cref="IArtifacts{TArtifact}" />.</param>
-        protected ArtifactsBuilderFor(TArtifacts artifacts)
-        {
-            Artifacts = artifacts;
-        }
+        protected ArtifactsBuilderFor(TArtifacts artifacts) => Artifacts = artifacts;
 
         /// <summary>
         /// Gets the <see cref="IArtifacts{TArtifact}" />.
@@ -33,25 +30,17 @@ namespace Dolittle.SDK.Artifacts
         protected TArtifacts Artifacts { get; }
 
         /// <summary>
-        /// Build an instance of <see cref="IArtifacts{TArtifact}" /> for <typeparamref name="TArtifact"/> artifact.
+        /// Build an instance of <typeparamref name="TArtifacts" /> for <typeparamref name="TArtifact"/> artifact.
         /// </summary>
-        /// <returns>An instance of <see cref="IArtifacts{TArtifact}" />.</returns>
+        /// <returns>An instance of <typeparamref name="TArtifacts" />.</returns>
         public TArtifacts Build() => Artifacts;
-
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> to associate with an <see cref="Artifact" />.</param>
-        /// <param name="artifact">The <see cref="Artifact" /> that the <see cref="Type" /> is associated to.</param>
-        /// <returns>The <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> for building <see cref="IArtifacts{TArtifact}" />.</returns>
-        public abstract TBuilder Associate(Type type, TArtifact artifact);
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
         /// </summary>
         /// <param name="artifact">The <see cref="Artifact" /> that the <see cref="Type" /> is associated to.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="Artifact" />.</typeparam>
-        /// <returns>The <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> for building <see cref="IArtifacts{TArtifact}" />.</returns>
+        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
         public TBuilder Associate<T>(TArtifact artifact)
             => Associate(typeof(T), artifact);
 
@@ -60,8 +49,8 @@ namespace Dolittle.SDK.Artifacts
         /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="Artifact" />.</param>
         /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
-        /// <returns>The <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> for building <see cref="IArtifacts{TArtifact}" />.</returns>
-        public TBuilder Associate(Type type, TArtifactIdentifier artifactId)
+        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        public virtual TBuilder Associate(Type type, TArtifactIdentifier artifactId)
             => Associate(type, artifactId, Generation.First);
 
         /// <summary>
@@ -69,9 +58,9 @@ namespace Dolittle.SDK.Artifacts
         /// </summary>
         /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="Artifact" />.</typeparam>
-        /// <returns>The <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> for building <see cref="IArtifacts{TArtifact}" />.</returns>
+        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
         public TBuilder Associate<T>(TArtifactIdentifier artifactId)
-            => Associate<T>(artifactId, Generation.First);
+            => Associate(typeof(T), artifactId);
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
@@ -79,9 +68,17 @@ namespace Dolittle.SDK.Artifacts
         /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="Artifact" />.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="Artifact" />.</typeparam>
-        /// <returns>The <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> for building <see cref="IArtifacts{TArtifact}" />.</returns>
+        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
         public TBuilder Associate<T>(TArtifactIdentifier artifactId, Generation generation)
             => Associate(typeof(T), artifactId, generation);
+
+        /// <summary>
+        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact" />.
+        /// </summary>
+        /// <param name="type">The <see cref="Type" /> to associate with an <typeparamref name="TArtifact" />.</param>
+        /// <param name="artifact">The <typeparamref name="TArtifact" /> that the <see cref="Type" /> is associated to.</param>
+        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        public abstract TBuilder Associate(Type type, TArtifact artifact);
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact" />.
@@ -89,7 +86,7 @@ namespace Dolittle.SDK.Artifacts
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="Artifact" />.</param>
         /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="Artifact" />.</param>
-        /// <returns>The <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> for building <see cref="IArtifacts{TArtifact}" />.</returns>
+        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
         public abstract TBuilder Associate(Type type, TArtifactIdentifier artifactId, Generation generation);
     }
 }
