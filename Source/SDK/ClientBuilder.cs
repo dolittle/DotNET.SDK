@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
@@ -16,9 +15,8 @@ namespace Dolittle.SDK
     /// </summary>
     public class ClientBuilder
     {
-        readonly EventTypesAssociator _eventTypesAssociator;
+        readonly EventTypesBuilder _eventTypesBuilder;
         readonly MicroserviceId _microserviceId;
-        readonly IArtifacts _artifacts;
         string _host = "localhost";
         uint _port = 50053;
         Microservices.Version _version;
@@ -44,8 +42,7 @@ namespace Dolittle.SDK
             _environment = environment;
             _cancellation = default;
 
-            _artifacts = new Artifacts.Artifacts(_loggerFactory.CreateLogger<Artifacts.Artifacts>());
-            _eventTypesAssociator = new EventTypesAssociator(_artifacts);
+            _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
         }
 
         /// <summary>
@@ -71,13 +68,13 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the event types through the <see cref="EventTypesAssociator" />.
+        /// Sets the event types through the <see cref="EventTypesBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventTypes(Action<EventTypesAssociator> callback)
+        public ClientBuilder WithEventTypes(Action<EventTypesBuilder> callback)
         {
-            callback(_eventTypesAssociator);
+            callback(_eventTypesBuilder);
             return this;
         }
 
@@ -125,8 +122,8 @@ namespace Dolittle.SDK
         public Client Build()
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
-
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, _artifacts);
+            var eventTypes = _eventTypesBuilder.Build();
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes);
         }
     }
 }

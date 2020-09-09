@@ -1,7 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
@@ -20,14 +20,14 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         /// <param name="executionContextManager">The <see cref="IExecutionContextManager" />.</param>
-        /// <param name="artifacts">The <see cref="IArtifacts" />.</param>
+        /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         public Client(
             ILogger logger,
             IExecutionContextManager executionContextManager,
-            IArtifacts artifacts)
+            EventTypes eventTypes)
         {
             _logger = logger;
-            Artifacts = artifacts;
+            Artifacts = eventTypes;
             ExecutionContextManager = executionContextManager;
         }
 
@@ -37,9 +37,9 @@ namespace Dolittle.SDK
         public IExecutionContextManager ExecutionContextManager { get; }
 
         /// <summary>
-        /// Gets the <see cref="IArtifacts" />.
+        /// Gets the <see cref="EventTypes" />.
         /// </summary>
-        public IArtifacts Artifacts { get; }
+        public EventTypes Artifacts { get; }
 
         /// <summary>
         /// Create a client builder for a Miroservice.
