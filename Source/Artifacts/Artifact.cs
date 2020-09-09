@@ -7,7 +7,7 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.Artifacts
 {
     /// <summary>
-    /// Represents the concept of an artifact.
+    /// Represents the base representation of an artifact.
     /// </summary>
     public abstract class Artifact : Value<Artifact>
     {
@@ -15,8 +15,17 @@ namespace Dolittle.SDK.Artifacts
         /// Initializes a new instance of the <see cref="Artifact"/> class.
         /// </summary>
         /// <param name="id"><see cref="ArtifactId">Id</see> of the <see cref="Artifact"/>.</param>
+        protected Artifact(ArtifactId id)
+            : this(id, Generation.First)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Artifact"/> class.
+        /// </summary>
+        /// <param name="id"><see cref="ArtifactId">Id</see> of the <see cref="Artifact"/>.</param>
         /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact"/>.</param>
-        public Artifact(ArtifactId id, Generation generation)
+        protected Artifact(ArtifactId id, Generation generation)
         {
             Id = id;
             Generation = generation;
