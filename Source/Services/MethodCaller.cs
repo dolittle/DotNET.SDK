@@ -40,8 +40,7 @@ namespace Dolittle.SDK.Services
         }
 
         /// <inheritdoc/>
-        public IObservable<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests, CancellationToken token)
-            where TClient : ClientBase<TClient>
+        public IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests, CancellationToken token)
             where TClientMessage : IMessage
             where TServerMessage : IMessage
         {
