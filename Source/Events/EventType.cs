@@ -6,7 +6,7 @@ using Dolittle.SDK.Artifacts;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represens the an event type <see cref="Artifact" />.
+    /// Represents the type of an event.
     /// </summary>
     public class EventType : Artifact
     {
