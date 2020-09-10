@@ -10,31 +10,31 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.Security
 {
     /// <summary>
-    /// Represents a set of <see cref="Artifact">Claims</see>.
+    /// Represents a set of <see cref="Claim">Claims</see>.
     /// </summary>
-    public class Claims : IEnumerable<Artifact>, IEquatable<Claims>
+    public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     {
         /// <summary>
         /// Gets the empty representation of <see cref="Claims"/>.
         /// </summary>
-        public static readonly Claims Empty = new Claims(Array.Empty<Artifact>());
+        public static readonly Claims Empty = new Claims(Array.Empty<Claim>());
 
-        readonly List<Artifact> _claims = new List<Artifact>();
+        readonly List<Claim> _claims = new List<Claim>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Claims"/> class.
         /// </summary>
         /// <param name="claims">The claims to populate.</param>
-        public Claims(IEnumerable<Artifact> claims)
+        public Claims(IEnumerable<Claim> claims)
         {
-            _claims.AddRange(claims ?? Enumerable.Empty<Artifact>());
+            _claims.AddRange(claims ?? Enumerable.Empty<Claim>());
         }
 
         /// <summary>
         /// Uses the same equality as the Equals method.
         /// </summary>
-        /// <param name="leftHandSide">Left hand side <see cref="Artifact"/>.</param>
-        /// <param name="rightHandSide">Right hand side <see cref="Artifact"/>.</param>
+        /// <param name="leftHandSide">Left hand side <see cref="Claim"/>.</param>
+        /// <param name="rightHandSide">Right hand side <see cref="Claim"/>.</param>
         /// <returns>True if equals, false otherwise.</returns>
         public static bool operator ==(Claims leftHandSide, Claims rightHandSide)
         {
@@ -49,8 +49,8 @@ namespace Dolittle.SDK.Security
         /// <summary>
         /// Uses the same equality as the Equals method.
         /// </summary>
-        /// <param name="leftHandSide">Left hand side <see cref="Artifact"/>.</param>
-        /// <param name="rightHandSide">Right hand side <see cref="Artifact"/>.</param>
+        /// <param name="leftHandSide">Left hand side <see cref="Claim"/>.</param>
+        /// <param name="rightHandSide">Right hand side <see cref="Claim"/>.</param>
         /// <returns>true if not equals, false otherwise.</returns>
         public static bool operator !=(Claims leftHandSide, Claims rightHandSide)
         {
@@ -93,8 +93,8 @@ namespace Dolittle.SDK.Security
         /// <summary>
         /// Gets an enumerator to iterate over the claims.
         /// </summary>
-        /// <returns><see cref="IEnumerator{T}"/> of <see cref="Artifact"/>.</returns>
-        public IEnumerator<Artifact> GetEnumerator()
+        /// <returns><see cref="IEnumerator{T}"/> of <see cref="Claim"/>.</returns>
+        public IEnumerator<Claim> GetEnumerator()
         {
             return _claims.GetEnumerator();
         }
@@ -102,7 +102,7 @@ namespace Dolittle.SDK.Security
         /// <summary>
         /// Gets an enumerator to iterate over the claims.
         /// </summary>
-        /// <returns><see cref="IEnumerator"/> of <see cref="Artifact"/>.</returns>
+        /// <returns><see cref="IEnumerator"/> of <see cref="Claim"/>.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _claims.GetEnumerator();
