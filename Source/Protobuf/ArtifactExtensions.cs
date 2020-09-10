@@ -31,8 +31,12 @@ namespace Dolittle.SDK.Protobuf
             where TArtifact : Artifact
             where TArtifactId : ArtifactId, new()
         {
+            var artifactIdType = typeof(TArtifact).GetProperty("Value").PropertyType;
             var constructor = typeof(TArtifact).GetConstructor(new[] { typeof(TArtifactId), typeof(Generation) });
-            var instance = constructor.Invoke(new object[] { artifact.Id.To<TArtifactId>(), new Generation { Value = artifact.Generation } });
+            var artifactId = artifact.Id.To<TArtifactId>();
+            Generation generation = artifact.Generation;
+            var instance = constructor.Invoke(new object[] { artifactId, generation });
+            if (instance == default) throw new CouldNotConvertProtobufArtifact(typeof(TArtifact), artifact);
             return instance as TArtifact;
         }
 
@@ -41,7 +45,7 @@ namespace Dolittle.SDK.Protobuf
         /// </summary>
         /// <param name="artifact"><see cref="PbArtifact"/> to convert.</param>
         /// <returns>The a tuple with <see cref="ArtifactId" /> and <see cref="Generation" />.</returns>
-        public static (ArtifactId id, Generation generation) ToArtifact(this PbArtifact artifact)
+        public static (ArtifactId Id, Generation Generation) ToArtifact(this PbArtifact artifact)
             => (artifact.Id.To<ArtifactId>(), artifact.Generation);
     }
 }

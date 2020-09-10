@@ -40,7 +40,7 @@ namespace Dolittle.SDK.Protobuf
         /// <param name="id">The <see cref="Uuid"/> to convert.</param>
         /// <typeparam name="T">Type to convert to.</typeparam>
         /// <returns>The converted <see cref="ConceptAs{T}"/>.</returns>
-        public static Guid To<T>(this Uuid id)
+        public static T To<T>(this Uuid id)
             where T : ConceptAs<Guid>, new()
             => new T { Value = id.ToGuid() };
     }
