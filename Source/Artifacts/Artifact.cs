@@ -40,5 +40,8 @@ namespace Dolittle.SDK.Artifacts
         /// Gets the <see cref="Generation">generation</see> of the <see cref="Artifact"/>.
         /// </summary>
         public Generation Generation { get; }
+
+        /// <inheritdoc/>
+        public override string ToString() => $"{GetType().Name}(\"{Id}\", {Generation})";
     }
 }
