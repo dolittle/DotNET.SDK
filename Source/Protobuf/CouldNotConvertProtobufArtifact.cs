@@ -8,17 +8,18 @@ using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 namespace Dolittle.SDK.Protobuf
 {
     /// <summary>
-    /// Exception that gets thrown when a protobuf artifact could not be converted to an <see cref="Artifact" /> of a specific type.
+    /// Exception that gets thrown when a protobuf artifact could not be converted to an <see cref="IArtifact" /> of a specific type.
     /// </summary>
     public class CouldNotConvertProtobufArtifact : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CouldNotConvertProtobufArtifact"/> class.
         /// </summary>
-        /// <param name="expectedArtifactType">The <see cref="Type" /> of <see cref="Artifact" /> the protobuf artifact should be converted to.</param>
+        /// <param name="expectedArtifactType">The <see cref="Type" /> of <see cref="IArtifact" /> the protobuf artifact should be converted to.</param>
         /// <param name="artifact">The <see cref="PbArtifact" />.</param>
-        public CouldNotConvertProtobufArtifact(Type expectedArtifactType, PbArtifact artifact)
-            : base($"Could not convert artifact ({artifact.Id?.ToGuid()}, {artifact.Generation}) to artifact of type {expectedArtifactType}")
+        /// <param name="details">The details of the exception.</param>
+        public CouldNotConvertProtobufArtifact(Type expectedArtifactType, PbArtifact artifact, string details)
+            : base($"Could not convert artifact ({artifact.Id?.ToGuid()}, {artifact.Generation}) to artifact of type {expectedArtifactType}. {details}")
         {
         }
     }
