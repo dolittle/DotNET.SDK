@@ -8,6 +8,7 @@ using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Dolittle.Services.Contracts;
+using Dolittle.SDK.Services;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ namespace Dolittle.SDK.Events
     /// </summary>
     public class EventStore : IEventStore
     {
-        readonly EventStoreClient _eventStoreClient;
+        readonly IPerformMethodCalls _caller;
         readonly IArtifactTypeMap _artifactMap;
         readonly IEventConverter _eventConverter;
         readonly IExecutionContextManager _executionContextManager;
@@ -28,20 +29,21 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStore"/> class.
         /// </summary>
-        /// <param name="eventStoreClient">The event store grpc client.</param>
+        /// <param name="caller">The caller for unary calls.</param>
         /// <param name="artifactMap">The <see cref="IArtifactTypeMap" />.</param>
         /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
         /// <param name="executionContextManager">An <see cref="IExecutionContextManager"/> for getting execution context from.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStore(
-            EventStoreClient eventStoreClient,
+            IPerformMethodCalls caller,
             IArtifactTypeMap artifactMap,
             IEventConverter eventConverter,
             IExecutionContextManager executionContextManager,
             ILogger<EventStore> logger)
         {
+            _caller = caller;
             _artifactMap = artifactMap;
-            _eventStoreClient = eventStoreClient;
+            // _eventStoreClient = eventStoreClient;
             _eventConverter = eventConverter;
             _executionContextManager = executionContextManager;
             _logger = logger;
@@ -116,7 +118,8 @@ namespace Dolittle.SDK.Events
                 CallContext = GetCurrentCallContext(),
             };
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            var response = await _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
+            var response = await _caller.Call();
+            _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
             ThrowIfFailure(response.Failure);
             return response;
         }

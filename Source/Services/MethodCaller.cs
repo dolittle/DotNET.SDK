@@ -84,5 +84,14 @@ namespace Dolittle.SDK.Services
 
             return messages;
         }
+
+        /// <inheritdoc/>
+        public Task<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallAnUnaryCallMethod<TClient, TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+            where TClient : ClientBase<TClient>
+            where TClientMessage : IMessage
+            where TServerMessage : IMessage
+        {
+            return method.Call(request, CreateChannel(), CreateCallOptions(token));
+        }
     }
 }
