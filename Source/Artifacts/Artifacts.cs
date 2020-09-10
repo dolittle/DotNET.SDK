@@ -61,9 +61,9 @@ namespace Dolittle.SDK.Artifacts
 
         void AddAssociation(Type type, TArtifact artifact)
         {
+            _logger.LogTrace("Associating {Type} to {Artifact}", type, artifact);
             ThrowIfMultipleTypesAssociatedWithArtifact(artifact);
             ThrowIfMultipleArtifactsAssociatedWithType(type);
-            _logger.LogDebug("Associating {Type} to {Artifact}", type, artifact);
             _typeToArtifactMap[type] = artifact;
             _artifactToTypeMap[artifact] = type;
         }
