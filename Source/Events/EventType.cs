@@ -24,7 +24,7 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="id">The <see cref="EventTypeId">unique identifer</see> of the <see cref="EventType"/>.</param>
         /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact"/>.</param>
-        public EventType(ArtifactId id, Generation generation)
+        public EventType(EventTypeId id, Generation generation)
             : base(id, generation)
         {
         }
