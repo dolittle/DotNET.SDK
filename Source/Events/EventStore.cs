@@ -21,6 +21,7 @@ namespace Dolittle.SDK.Events
     public class EventStore : IEventStore
     {
         readonly IPerformMethodCalls _caller;
+        readonly EventStoreCommitMethod _method = new EventStoreCommitMethod();
         readonly IArtifactTypeMap _artifactMap;
         readonly IEventConverter _eventConverter;
         readonly IExecutionContextManager _executionContextManager;
@@ -43,7 +44,6 @@ namespace Dolittle.SDK.Events
         {
             _caller = caller;
             _artifactMap = artifactMap;
-            // _eventStoreClient = eventStoreClient;
             _eventConverter = eventConverter;
             _executionContextManager = executionContextManager;
             _logger = logger;
@@ -118,8 +118,7 @@ namespace Dolittle.SDK.Events
                 CallContext = GetCurrentCallContext(),
             };
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            var response = await _caller.Call();
-            _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
+            var response = await _caller.Call(_method, request, cancellationToken);
             ThrowIfFailure(response.Failure);
             return response;
         }
