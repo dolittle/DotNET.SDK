@@ -16,13 +16,13 @@ namespace Dolittle.SDK.Artifacts
     {
         readonly IDictionary<TArtifact, Type> _artifactToTypeMap;
         readonly IDictionary<Type, TArtifact> _typeToArtifactMap;
-        readonly ILogger<Artifacts<TArtifact>> _logger;
+        readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Artifacts{TArtifact}"/> class.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        protected Artifacts(ILogger<Artifacts<TArtifact>> logger)
+        protected Artifacts(ILogger logger)
         {
             _logger = logger;
             _artifactToTypeMap = new Dictionary<TArtifact, Type>();
