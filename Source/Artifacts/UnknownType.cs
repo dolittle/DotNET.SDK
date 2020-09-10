@@ -6,17 +6,15 @@ using System;
 namespace Dolittle.SDK.Artifacts
 {
     /// <summary>
-    /// Exception that gets thrown when an <see cref="Artifact{TId}" /> has a missing association.
+    /// Exception that gets thrown when an <see cref="IArtifact" /> has a missing association.
     /// </summary>
-    /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-    public class UnknownType<TId> : Exception
-        where TId : ArtifactId
+    public class UnknownType : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnknownType{TId}"/> class.
+        /// Initializes a new instance of the <see cref="UnknownType"/> class.
         /// </summary>
-        /// <param name="artifact">The <see cref="Artifact{TId}" /> that has a missing association.</param>
-        public UnknownType(Artifact<TId> artifact)
+        /// <param name="artifact">The <see cref="IArtifact" /> that has a missing association.</param>
+        public UnknownType(IArtifact artifact)
             : base($"{artifact} does not have a type associated")
         {
         }

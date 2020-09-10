@@ -6,14 +6,14 @@ using System;
 namespace Dolittle.SDK.Artifacts
 {
     /// <summary>
-    /// Represents a system that registers <see cref="Type" /> to <see cref="Artifact{TId}" /> associations to an <see cref="IArtifacts{TArtifact, TArtifactId}" /> instance.
+    /// Represents a system that registers <see cref="Type" /> to <see cref="Artifact{TId}" /> associations to an <see cref="IArtifacts{TArtifact}" /> instance.
     /// </summary>
-    /// <typeparam name="TArtifacts">The <see cref="Type" /> of <see cref="IArtifacts{TArtifact, TArtifactId}" /> to build.</typeparam>
+    /// <typeparam name="TArtifacts">The <see cref="Type" /> of <see cref="IArtifacts{TArtifact}" /> to build.</typeparam>
     /// <typeparam name="TArtifact">The <see cref="Type" /> of <see cref="Artifact{TId}" /> to associate.</typeparam>
     /// <typeparam name="TArtifactId">The <see cref="Type" /> of <see cref="ArtifactId" /> that identifies the <typeparamref name="TArtifact"/>.</typeparam>
     /// <typeparam name="TBuilder">The <see cref="Type" /> of <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" />.</typeparam>
     public abstract class ArtifactsBuilderFor<TArtifacts, TArtifact, TArtifactId, TBuilder> : IArtifactsBuilderFor<TArtifacts, TArtifact, TArtifactId, TBuilder>
-        where TArtifacts : IArtifacts<TArtifact, TArtifactId>
+        where TArtifacts : IArtifacts<TArtifact>
         where TArtifact : Artifact<TArtifactId>
         where TArtifactId : ArtifactId
         where TBuilder : IArtifactsBuilderFor<TArtifacts, TArtifact, TArtifactId, TBuilder>
@@ -21,11 +21,11 @@ namespace Dolittle.SDK.Artifacts
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}"/> class.
         /// </summary>
-        /// <param name="artifacts">The <see cref="IArtifacts{TArtifact, TArtifactId}" />.</param>
+        /// <param name="artifacts">The <see cref="IArtifacts{TArtifact}" />.</param>
         protected ArtifactsBuilderFor(TArtifacts artifacts) => Artifacts = artifacts;
 
         /// <summary>
-        /// Gets the <see cref="IArtifacts{TArtifact, TArtifactId}" />.
+        /// Gets the <see cref="IArtifacts{TArtifact}" />.
         /// </summary>
         protected TArtifacts Artifacts { get; }
 

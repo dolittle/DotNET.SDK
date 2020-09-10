@@ -8,7 +8,7 @@ namespace Dolittle.SDK.Events
     /// <summary>
     /// Defines a system that knows about <see cref="EventType" />.
     /// </summary>
-    public interface IEventTypes : IArtifacts<EventType, EventTypeId>
+    public interface IEventTypes : IArtifacts<EventType>
     {
     }
 }

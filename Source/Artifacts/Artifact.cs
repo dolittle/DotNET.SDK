@@ -10,7 +10,7 @@ namespace Dolittle.SDK.Artifacts
     /// Represents the base representation of an artifact.
     /// </summary>
     /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-    public abstract class Artifact<TId> : Value<Artifact<TId>>
+    public abstract class Artifact<TId> : Value<Artifact<TId>>, IArtifact
         where TId : ArtifactId
     {
         /// <summary>
@@ -38,10 +38,11 @@ namespace Dolittle.SDK.Artifacts
         /// </summary>
         public TId Id { get; }
 
-        /// <summary>
-        /// Gets the <see cref="Generation">generation</see> of the <see cref="Artifact{TId}"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public Generation Generation { get; }
+
+        /// <inheritdoc/>
+        ArtifactId IArtifact.Id => Id;
 
         /// <inheritdoc/>
         public override string ToString() => $"{GetType().Name}(\"{Id}\", {Generation})";
