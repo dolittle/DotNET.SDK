@@ -41,9 +41,9 @@ namespace Dolittle.SDK.Artifacts
         TArtifact GetFor(Type type);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
+        /// Check if there is an <typeparamref name="TArtifact"/> associated with a <see cref="Type" />.
         /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
+        /// <param name="artifact">The <typeparamref name="TArtifact"/>.</param>
         /// <returns><see cref="bool"/>.</returns>
         bool HasTypeFor(TArtifact artifact);
 
