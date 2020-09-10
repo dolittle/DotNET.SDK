@@ -6,9 +6,9 @@ using Dolittle.SDK.Artifacts;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represens the an event type <see cref="Artifact" />.
+    /// Represents the type of an event.
     /// </summary>
-    public class EventType : Artifact
+    public class EventType : Artifact<EventTypeId>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventType"/> class.
@@ -23,7 +23,7 @@ namespace Dolittle.SDK.Events
         /// Initializes a new instance of the <see cref="EventType"/> class.
         /// </summary>
         /// <param name="id">The <see cref="EventTypeId">unique identifer</see> of the <see cref="EventType"/>.</param>
-        /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact"/>.</param>
+        /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="EventType"/>.</param>
         public EventType(EventTypeId id, Generation generation)
             : base(id, generation)
         {

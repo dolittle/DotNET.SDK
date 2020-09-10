@@ -6,12 +6,10 @@
   </PropertyGroup>
     
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="4.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Concepts/Concepts.csproj" />
   </ItemGroup>
 </Project>
-

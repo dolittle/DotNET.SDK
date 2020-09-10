@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../specs.props"/>
+
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK.Protobuf.Specs</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Source\Protobuf\Protobuf.csproj" />
+    </ItemGroup>
+
+
+</Project>

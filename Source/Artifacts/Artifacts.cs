@@ -10,19 +10,19 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Represents an implementation of <see cref="IArtifacts{TArtifact}" />.
     /// </summary>
-    /// <typeparam name="TArtifact">The <see cref="Type" /> of <see cref="Artifact" />.</typeparam>
+    /// <typeparam name="TArtifact">The <see cref="Type" /> of <see cref="IArtifact" />.</typeparam>
     public abstract class Artifacts<TArtifact> : IArtifacts<TArtifact>
-        where TArtifact : Artifact
+        where TArtifact : IArtifact
     {
         readonly IDictionary<TArtifact, Type> _artifactToTypeMap;
         readonly IDictionary<Type, TArtifact> _typeToArtifactMap;
-        readonly ILogger<Artifacts<TArtifact>> _logger;
+        readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Artifacts{TArtifact}"/> class.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        protected Artifacts(ILogger<Artifacts<TArtifact>> logger)
+        protected Artifacts(ILogger logger)
         {
             _logger = logger;
             _artifactToTypeMap = new Dictionary<TArtifact, Type>();
@@ -34,7 +34,9 @@ namespace Dolittle.SDK.Artifacts
             => AddAssociation(type, artifact);
 
         /// <inheritdoc />
-        public TArtifact GetFor<T>() => GetFor(typeof(T));
+        public TArtifact GetFor<T>()
+            where T : class
+            => GetFor(typeof(T));
 
         /// <inheritdoc />
         public TArtifact GetFor(Type type)
@@ -51,7 +53,9 @@ namespace Dolittle.SDK.Artifacts
         }
 
         /// <inheritdoc />
-        public bool HasFor<T>() => HasFor(typeof(T));
+        public bool HasFor<T>()
+            where T : class
+            => HasFor(typeof(T));
 
         /// <inheritdoc />
         public bool HasFor(Type type) => _typeToArtifactMap.ContainsKey(type);
@@ -61,21 +65,21 @@ namespace Dolittle.SDK.Artifacts
 
         void AddAssociation(Type type, TArtifact artifact)
         {
-            ThrowIfMultipleTypesAssociatedWithArtifact(artifact);
-            ThrowIfMultipleArtifactsAssociatedWithType(type);
-            _logger.LogDebug("Associating {Type} to {Artifact}", type, artifact);
+            _logger.LogTrace("Associating {Type} to {Artifact}", type, artifact);
+            ThrowIfMultipleTypesAssociatedWithArtifact(artifact, type);
+            ThrowIfMultipleArtifactsAssociatedWithType(type, artifact);
             _typeToArtifactMap[type] = artifact;
             _artifactToTypeMap[artifact] = type;
         }
 
-        void ThrowIfMultipleTypesAssociatedWithArtifact(TArtifact artifact)
+        void ThrowIfMultipleTypesAssociatedWithArtifact(TArtifact artifact, Type type)
         {
-            if (_artifactToTypeMap.ContainsKey(artifact)) throw new CannotHaveMultipleTypesAssociatedWithArtifact(artifact);
+            if (_artifactToTypeMap.ContainsKey(artifact)) throw new CannotHaveMultipleTypesAssociatedWithArtifact(artifact, type, _artifactToTypeMap[artifact]);
         }
 
-        void ThrowIfMultipleArtifactsAssociatedWithType(Type type)
+        void ThrowIfMultipleArtifactsAssociatedWithType(Type type, TArtifact artifact)
         {
-            if (_typeToArtifactMap.ContainsKey(type)) throw new CannotHaveMultipleArtifactsAssociatedWithType(type);
+            if (_typeToArtifactMap.ContainsKey(type)) throw new CannotHaveMultipleArtifactsAssociatedWithType(type, artifact, _typeToArtifactMap[type]);
         }
     }
 }

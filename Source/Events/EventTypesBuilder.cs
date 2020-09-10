@@ -10,7 +10,7 @@ namespace Dolittle.SDK.Events
     /// <summary>
     /// Represents an <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}" /> that can build <see cref="EventType" /> artifacts.
     /// </summary>
-    public class EventTypesBuilder : ArtifactsBuilderFor<EventTypes, EventType, EventTypeId, EventTypesBuilder>
+    public class EventTypesBuilder : ArtifactsBuilderFor<IEventTypes, EventType, EventTypeId, EventTypesBuilder>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventTypesBuilder"/> class.
