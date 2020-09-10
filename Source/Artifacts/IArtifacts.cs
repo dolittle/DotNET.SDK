@@ -6,38 +6,42 @@ using System;
 namespace Dolittle.SDK.Artifacts
 {
     /// <summary>
-    /// Defines a system that knows about <see cref="Artifact"/>.
+    /// Defines a system that knows about <see cref="Artifact{TId}"/>.
     /// </summary>
-    /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact" />.</typeparam>
-    public interface IArtifacts<TArtifact>
-        where TArtifact : Artifact
+    /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
+    /// <typeparam name="TArtifactId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
+    public interface IArtifacts<TArtifact, TArtifactId>
+        where TArtifact : Artifact<TArtifactId>
+        where TArtifactId : ArtifactId
     {
         /// <summary>
-        /// Check if there is a type associated with an <see cref="Artifact" />.
+        /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
         /// </summary>
         /// <typeparam name="T">CLR type of the artifact.</typeparam>
         /// <returns><see cref="bool"/>.</returns>
-        bool HasFor<T>();
+        bool HasFor<T>()
+            where T : class;
 
         /// <summary>
-        /// Check if there is a type associated with an <see cref="Artifact" />.
+        /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
         /// </summary>
         /// <param name="type">CLR type of the artifact.</param>
         /// <returns><see cref="bool"/>.</returns>
         bool HasFor(Type type);
 
         /// <summary>
-        /// Get an <see cref="Artifact"/> from a given type.
+        /// Get an <see cref="Artifact{TId}"/> from a given type.
         /// </summary>
         /// <typeparam name="T">CLR type of the artifact.</typeparam>
-        /// <returns><see cref="Artifact"/>.</returns>
-        TArtifact GetFor<T>();
+        /// <returns><see cref="Artifact{TId}"/>.</returns>
+        TArtifact GetFor<T>()
+            where T : class;
 
         /// <summary>
-        /// Get an <see cref="Artifact"/> from a given type.
+        /// Get an <see cref="Artifact{TId}"/> from a given type.
         /// </summary>
         /// <param name="type">CLR type of the artifact.</param>
-        /// <returns><see cref="Artifact"/>.</returns>
+        /// <returns><see cref="Artifact{TId}"/>.</returns>
         TArtifact GetFor(Type type);
 
         /// <summary>
@@ -48,17 +52,17 @@ namespace Dolittle.SDK.Artifacts
         bool HasTypeFor(TArtifact artifact);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
+        /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact{TId}"/>.
         /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
+        /// <param name="artifact"><see cref="Artifact{TId}"/> to get for.</param>
         /// <returns><see cref="Type"/>.</returns>
         Type GetTypeFor(TArtifact artifact);
 
         /// <summary>
-        /// Register an relationship between an <see cref="Artifact"/> and a <see cref="Type"/>.
+        /// Register an relationship between an <see cref="Artifact{TId}"/> and a <see cref="Type"/>.
         /// </summary>
         /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-        /// <param name="artifact"><see cref="Artifact"/> to register.</param>
+        /// <param name="artifact"><see cref="Artifact{TId}"/> to register.</param>
         void Associate(Type type, TArtifact artifact);
     }
 }
