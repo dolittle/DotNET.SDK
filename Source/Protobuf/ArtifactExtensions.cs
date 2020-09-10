@@ -5,7 +5,7 @@ using System;
 using Dolittle.SDK.Artifacts;
 using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 
-namespace Dolittle.SDK.Protobuf.Events
+namespace Dolittle.SDK.Protobuf
 {
     /// <summary>
     /// Conversion extensions for converting between <see cref="Artifact"/> and <see cref="PbArtifact"/>.
@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Protobuf.Events
             => new PbArtifact { Id = artifact.Id.ToProtobuf(), Generation = artifact.Generation.Value };
 
         /// <summary>
-        /// Convert a <see cref="PbArtifact"/> to a <see cref="Artifact"/>.
+        /// Convert a <see cref="PbArtifact"/> to a <typeparamref name="TArtifact"/> .
         /// </summary>
         /// <param name="artifact"><see cref="PbArtifact"/> to convert.</param>
         /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact" />.</typeparam>
