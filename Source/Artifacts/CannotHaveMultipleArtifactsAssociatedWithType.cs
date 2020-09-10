@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Artifacts
         /// <param name="artifact">The <see cref="Artifact" /> the <see cref="Type" /> is attempted being associated to.</param>
         /// <param name="associatedArtifact">The already associated <see cref="Artifact" />.</param>
         public CannotHaveMultipleArtifactsAssociatedWithType(Type type, Artifact artifact, Artifact associatedArtifact)
-            : base($"{type} cannot be associated with {artifact} because it is already associated with {associatedArtifact}. A type cannot be associated with multiple artifacts")
+            : base($"{type} cannot be associated with {artifact} because it is already associated with {associatedArtifact}")
         {
         }
     }
