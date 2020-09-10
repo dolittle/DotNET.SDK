@@ -62,20 +62,20 @@ namespace Dolittle.SDK.Artifacts
         void AddAssociation(Type type, TArtifact artifact)
         {
             _logger.LogTrace("Associating {Type} to {Artifact}", type, artifact);
-            ThrowIfMultipleTypesAssociatedWithArtifact(artifact);
-            ThrowIfMultipleArtifactsAssociatedWithType(type);
+            ThrowIfMultipleTypesAssociatedWithArtifact(artifact, type);
+            ThrowIfMultipleArtifactsAssociatedWithType(type, artifact);
             _typeToArtifactMap[type] = artifact;
             _artifactToTypeMap[artifact] = type;
         }
 
-        void ThrowIfMultipleTypesAssociatedWithArtifact(TArtifact artifact)
+        void ThrowIfMultipleTypesAssociatedWithArtifact(TArtifact artifact, Type type)
         {
-            if (_artifactToTypeMap.ContainsKey(artifact)) throw new CannotHaveMultipleTypesAssociatedWithArtifact(artifact);
+            if (_artifactToTypeMap.ContainsKey(artifact)) throw new CannotHaveMultipleTypesAssociatedWithArtifact(artifact, type, _artifactToTypeMap[artifact]);
         }
 
-        void ThrowIfMultipleArtifactsAssociatedWithType(Type type)
+        void ThrowIfMultipleArtifactsAssociatedWithType(Type type, TArtifact artifact)
         {
-            if (_typeToArtifactMap.ContainsKey(type)) throw new CannotHaveMultipleArtifactsAssociatedWithType(type);
+            if (_typeToArtifactMap.ContainsKey(type)) throw new CannotHaveMultipleArtifactsAssociatedWithType(type, artifact, _typeToArtifactMap[type]);
         }
     }
 }
