@@ -8,12 +8,12 @@ using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 
 namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.when_converting_to_generic_artifact
 {
-    public class and_artifact_id_type_parameter_is_wrong
+    public class and_artifact_id_type_does_not_have_default_parameterless_constructor
     {
         static Guid id;
         static Generation generation;
         static PbArtifact artifact;
-        static given.artifact_type_with_custom_artifact_id result;
+        static Exception result;
 
         Establish context = () =>
         {
@@ -22,10 +22,8 @@ namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.when_converting_to_generi
             artifact = new PbArtifact { Id = id.ToProtobuf(), Generation = generation };
         };
 
-        Because of = () => result = artifact.To<given.artifact_type_with_custom_artifact_id, ArtifactId>();
+        Because of = () => result = Catch.Exception(() => artifact.To<given.artifact_type_with_custom_artifact_id_without_parameterless_constructor>());
 
-        It should_have_the_same_id = () => result.Id.Value.ShouldEqual(id);
-        It should_have_the_same_id_type = () => result.Id.GetType().ShouldEqual(typeof(given.custom_artifact_id));
-        It should_have_the_same_generation = () => result.Generation.ShouldEqual(generation);
+        It should_fail_because_missing_parameterless_constructor = () => result.ShouldBeOfExactType<ArtifactIdDoesNotHaveDefaultParameterlessConstructor>();
     }
 }
