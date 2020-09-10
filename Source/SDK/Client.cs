@@ -24,7 +24,7 @@ namespace Dolittle.SDK
         public Client(
             ILogger logger,
             IExecutionContextManager executionContextManager,
-            EventTypes eventTypes)
+            IEventTypes eventTypes)
         {
             _logger = logger;
             EventTypes = eventTypes;
@@ -37,9 +37,9 @@ namespace Dolittle.SDK
         public IExecutionContextManager ExecutionContextManager { get; }
 
         /// <summary>
-        /// Gets the <see cref="Events.EventTypes" />.
+        /// Gets the <see cref="IEventTypes" />.
         /// </summary>
-        public EventTypes EventTypes { get; }
+        public IEventTypes EventTypes { get; }
 
         /// <summary>
         /// Create a client builder for a Miroservice.

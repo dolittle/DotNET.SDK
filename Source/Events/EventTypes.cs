@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represents a system that knows about<see cref="EventType" />.
+    /// Represents an implementation of <see cref="IEventTypes" />.
     /// </summary>
-    public class EventTypes : Artifacts<EventType>
+    public class EventTypes : Artifacts<EventType>, IEventTypes
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventTypes"/> class.
