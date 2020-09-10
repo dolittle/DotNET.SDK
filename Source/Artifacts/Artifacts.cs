@@ -10,9 +10,9 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Represents an implementation of <see cref="IArtifacts{TArtifact}" />.
     /// </summary>
-    /// <typeparam name="TArtifact">The <see cref="Type" /> of <see cref="Artifact" />.</typeparam>
+    /// <typeparam name="TArtifact">The <see cref="Type" /> of <see cref="IArtifact" />.</typeparam>
     public abstract class Artifacts<TArtifact> : IArtifacts<TArtifact>
-        where TArtifact : Artifact
+        where TArtifact : IArtifact
     {
         readonly IDictionary<TArtifact, Type> _artifactToTypeMap;
         readonly IDictionary<Type, TArtifact> _typeToArtifactMap;
@@ -34,7 +34,9 @@ namespace Dolittle.SDK.Artifacts
             => AddAssociation(type, artifact);
 
         /// <inheritdoc />
-        public TArtifact GetFor<T>() => GetFor(typeof(T));
+        public TArtifact GetFor<T>()
+            where T : class
+            => GetFor(typeof(T));
 
         /// <inheritdoc />
         public TArtifact GetFor(Type type)
@@ -51,7 +53,9 @@ namespace Dolittle.SDK.Artifacts
         }
 
         /// <inheritdoc />
-        public bool HasFor<T>() => HasFor(typeof(T));
+        public bool HasFor<T>()
+            where T : class
+            => HasFor(typeof(T));
 
         /// <inheritdoc />
         public bool HasFor(Type type) => _typeToArtifactMap.ContainsKey(type);

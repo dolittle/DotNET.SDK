@@ -9,37 +9,40 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Represents the base representation of an artifact.
     /// </summary>
-    public abstract class Artifact : Value<Artifact>
+    /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
+    public abstract class Artifact<TId> : Value<Artifact<TId>>, IArtifact
+        where TId : ArtifactId
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Artifact"/> class.
+        /// Initializes a new instance of the <see cref="Artifact{TId}"/> class.
         /// </summary>
-        /// <param name="id"><see cref="ArtifactId">Id</see> of the <see cref="Artifact"/>.</param>
-        protected Artifact(ArtifactId id)
+        /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
+        protected Artifact(TId id)
             : this(id, Generation.First)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Artifact"/> class.
+        /// Initializes a new instance of the <see cref="Artifact{TId}"/> class.
         /// </summary>
-        /// <param name="id"><see cref="ArtifactId">Id</see> of the <see cref="Artifact"/>.</param>
-        /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact"/>.</param>
-        protected Artifact(ArtifactId id, Generation generation)
+        /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
+        /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.</param>
+        protected Artifact(TId id, Generation generation)
         {
             Id = id;
             Generation = generation;
         }
 
         /// <summary>
-        /// Gets the <see cref="Guid">unique identifier</see> of the <see cref="Artifact"/>.
+        /// Gets the <typeparamref name="TId" >unique identifier</typeparamref> of the <see cref="Artifact{TId}"/>.
         /// </summary>
-        public ArtifactId Id { get; }
+        public TId Id { get; }
 
-        /// <summary>
-        /// Gets the <see cref="Generation">generation</see> of the <see cref="Artifact"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public Generation Generation { get; }
+
+        /// <inheritdoc/>
+        ArtifactId IArtifact.Id => Id;
 
         /// <inheritdoc/>
         public override string ToString() => $"{GetType().Name}(\"{Id}\", {Generation})";
