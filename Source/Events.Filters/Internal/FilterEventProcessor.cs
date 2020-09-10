@@ -1,16 +1,16 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Events.Processing.Internal;
-using Dolittle.Runtime.Events.Processing.Contracts;
-using Dolittle.SDK.Services;
-using System;
+using System.Text.Json;
 using System.Threading.Tasks;
-using System.Threading;
 using Dolittle.Protobuf.Contracts;
-using Microsoft.Extensions.Logging;
+using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Events.Processing.Internal;
+using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
+using Microsoft.Extensions.Logging;
+using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 
 namespace Dolittle.SDK.Events.Filters.Internal
 {
@@ -23,6 +23,8 @@ namespace Dolittle.SDK.Events.Filters.Internal
         where TRegisterArguments : class
         where TResponse : class
     {
+        readonly EventTypes _eventTypes;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}"/> class.
         /// </summary>
@@ -33,25 +35,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
         protected FilterEventProcessor(string kind, FilterId filterId, EventTypes eventTypes, ILogger logger)
             : base(kind, filterId, logger)
         {
-        }
-
-        /// <inheritdoc/>
-        protected override Failure GetFailureFromRegisterResponse(FilterRegistrationResponse response) => response.Failure;
-
-        /// <inheritdoc/>
-        protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request) => request.RetryProcessingState;
-
-        /// <inheritdoc/>
-        protected override Task<FilterResponse> Handle(FilterEventRequest request)
-        {
-            var pbEvent = request.Event;
-            if (pbEvent == default) throw new MissingEventInformation("No event in FilterEventRequest");
-
-            EventLogSequenceNumber sequenceNumber = pbEvent.EventLogSequenceNumber;
-            var eventSourceId = pbEvent.EventSourceId.To<EventSourceId>();
-            var executionContext = pbEvent.ExecutionContext?.ToExecutionContext();
-            var occurred = pbEvent.Occurred?.ToDateTimeOffset();
-            var type = pbEvent.Type.ToEventType();
+            _eventTypes = eventTypes;
         }
 
         /// <summary>
@@ -61,5 +45,58 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="context">The <see cref="EventContext" />.</param>
         /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns a <typeparamref name="TResponse"/>.</returns>
         protected abstract Task<TResponse> Filter(object @event, EventContext context);
+
+        /// <inheritdoc/>
+        protected override Failure GetFailureFromRegisterResponse(FilterRegistrationResponse response) => response.Failure;
+
+        /// <inheritdoc/>
+        protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request) => request.RetryProcessingState;
+
+        /// <inheritdoc/>
+        protected override Task<TResponse> Handle(FilterEventRequest request)
+        {
+            var pbEvent = request.Event;
+            if (pbEvent == default) throw new MissingEventInformation("No event in FilterEventRequest");
+            var eventContext = CreateEventContext(pbEvent);
+            var eventType = GetEventTypeOrThrow(pbEvent);
+            var clrEventType = _eventTypes.GetTypeFor(eventType);
+            var @event = JsonSerializer.Deserialize(pbEvent.Content, clrEventType);
+
+            return Filter(@event, eventContext);
+        }
+
+        EventContext CreateEventContext(PbCommittedEvent pbEvent)
+        {
+            var sequenceNumber = pbEvent.EventLogSequenceNumber;
+            var eventSourceId = GetEventSourceIdOrThrow(pbEvent);
+            var executionContext = GetExecutionContextOrThrow(pbEvent);
+            var occurred = GetOccurredOrThrow(pbEvent);
+
+            return new EventContext(sequenceNumber, eventSourceId, occurred, executionContext);
+        }
+
+        EventSourceId GetEventSourceIdOrThrow(PbCommittedEvent pbEvent)
+        {
+            if (pbEvent.EventSourceId == default) throw new MissingEventInformation("EventSourceId");
+            return pbEvent.EventSourceId.To<EventSourceId>();
+        }
+
+        ExecutionContext GetExecutionContextOrThrow(PbCommittedEvent pbEvent)
+        {
+            if (pbEvent.ExecutionContext == default) throw new MissingEventInformation("ExecutionContext");
+            return pbEvent.ExecutionContext.ToExecutionContext();
+        }
+
+        System.DateTimeOffset GetOccurredOrThrow(PbCommittedEvent pbEvent)
+        {
+            if (pbEvent.Occurred == default) throw new MissingEventInformation("Occurred");
+            return pbEvent.Occurred.ToDateTimeOffset();
+        }
+
+        EventType GetEventTypeOrThrow(PbCommittedEvent pbEvent)
+        {
+            if (pbEvent.Type == default) throw new MissingEventInformation("ExecutionContext");
+            return pbEvent.Type.To<EventType, EventTypeId>();
+        }
     }
 }
