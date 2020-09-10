@@ -9,25 +9,25 @@ using PbClaim = Dolittle.Security.Contracts.Claim;
 namespace Dolittle.SDK.Protobuf
 {
     /// <summary>
-    /// Conversion extensions for converting between <see cref="Claim"/> and <see cref="PbClaim"/>.
+    /// Conversion extensions for converting between <see cref="Artifact"/> and <see cref="PbClaim"/>.
     /// </summary>
     public static class ClaimExtensions
     {
         /// <summary>
-        /// Convert a <see cref="Claim"/> to a <see cref="PbClaim"/>.
+        /// Convert a <see cref="Artifact"/> to a <see cref="PbClaim"/>.
         /// </summary>
-        /// <param name="claim"><see cref="Claim"/> to convert.</param>
+        /// <param name="claim"><see cref="Artifact"/> to convert.</param>
         /// <returns>The converted <see cref="PbClaim"/>.</returns>
-        public static PbClaim ToProtobuf(this Claim claim)
+        public static PbClaim ToProtobuf(this Artifact claim)
             => new PbClaim { Key = claim.Name, Value = claim.Value, ValueType = claim.ValueType };
 
         /// <summary>
-        /// Convert a <see cref="PbClaim"/> to a <see cref="Claim"/>.
+        /// Convert a <see cref="PbClaim"/> to a <see cref="Artifact"/>.
         /// </summary>
         /// <param name="claim"><see cref="PbClaim"/> to convert.</param>
-        /// <returns>The converted <see cref="Claim"/>.</returns>
-        public static Claim ToClaim(this PbClaim claim)
-            => new Claim(claim.Key, claim.Value, claim.ValueType);
+        /// <returns>The converted <see cref="Artifact"/>.</returns>
+        public static Artifact ToClaim(this PbClaim claim)
+            => new Artifact(claim.Key, claim.Value, claim.ValueType);
 
         /// <summary>
         /// Convert from <see cref="Claims"/> to an <see cref="IEnumerable{T}"/> of <see cref="PbClaim"/>.

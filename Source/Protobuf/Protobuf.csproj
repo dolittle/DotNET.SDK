@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../Artifacts/Artifacts.csproj" />
     <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="../Events/Events.csproj" />
     <ProjectReference Include="../Execution/Execution.csproj" />
   </ItemGroup>
 </Project>

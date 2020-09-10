@@ -37,12 +37,11 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// </summary>
         /// <param name="kind">The kind of the event processor.</param>
         /// <param name="identifier">The <typeparamref name="TIdentifier"/> identifier of the event processor.</param>
-        /// <param name="pingTimeout">The default ping timeout in seconds.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        protected EventProcessor(string kind, TIdentifier identifier, uint pingTimeout, ILogger logger)
+        protected EventProcessor(string kind, TIdentifier identifier, ILogger logger)
         {
+            _pingTimeout = 1;
             _kind = kind;
-            _pingTimeout = pingTimeout;
             Identifier = identifier;
             Logger = logger;
         }
