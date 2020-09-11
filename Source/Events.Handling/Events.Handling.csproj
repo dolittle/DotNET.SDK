@@ -4,11 +4,15 @@
         <AssemblyName>Dolittle.SDK.Events.Handling</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Events\Events.csproj" />
         <ProjectReference Include="..\Events.Processing\Events.Processing.csproj" />
+        <ProjectReference Include="..\Protobuf\Protobuf.csproj" />
     </ItemGroup>
     
 </Project>

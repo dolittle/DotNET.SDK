@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
+using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Dolittle.Services.Contracts;
@@ -32,7 +33,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="filterEventCallback">The <see cref="FilterEventCallback" />.</param>
         /// <param name="client">The <see cref="FiltersClient" />.</param>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
-        /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
+        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventFilterProcessor(
             FilterId filterId,
@@ -40,9 +41,9 @@ namespace Dolittle.SDK.Events.Filters.Internal
             FilterEventCallback filterEventCallback,
             FiltersClient client,
             ICreateReverseCallClients reverseCallClientsCreator,
-            EventTypes eventTypes,
-            ILogger<EventFilterProcessor> logger)
-            : base("Filter", filterId, eventTypes, logger)
+            IEventProcessingRequestConverter processingRequestConverter,
+            ILogger logger)
+            : base("Filter", filterId, processingRequestConverter, logger)
         {
             _scopeId = scopeId;
             _filterEventCallback = filterEventCallback;

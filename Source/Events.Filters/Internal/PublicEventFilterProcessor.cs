@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
+using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Dolittle.Services.Contracts;
@@ -30,16 +31,16 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
         /// <param name="client">The <see cref="FiltersClient" />.</param>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
-        /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
+        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public PublicEventFilterProcessor(
             FilterId filterId,
             PartitionedFilterEventCallback filterEventCallback,
             FiltersClient client,
             ICreateReverseCallClients reverseCallClientsCreator,
-            EventTypes eventTypes,
-            ILogger<EventFilterProcessor> logger)
-            : base("Public Filter", filterId, eventTypes, logger)
+            IEventProcessingRequestConverter processingRequestConverter,
+            ILogger logger)
+            : base("Public Filter", filterId, processingRequestConverter, logger)
         {
             _filterEventCallback = filterEventCallback;
             _client = client;

@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Protobuf.Contracts;
@@ -23,30 +22,30 @@ namespace Dolittle.SDK.Events.Filters.Internal
         where TRegisterArguments : class
         where TResponse : class
     {
-        readonly EventTypes _eventTypes;
+        readonly IEventProcessingRequestConverter _processingRequestConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}"/> class.
         /// </summary>
         /// <param name="kind">The kind of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" />.</param>
         /// <param name="filterId">The <see cref="FilterId" />.</param>
-        /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
+        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        protected FilterEventProcessor(string kind, FilterId filterId, EventTypes eventTypes, ILogger logger)
+        protected FilterEventProcessor(
+            string kind,
+            FilterId filterId,
+            IEventProcessingRequestConverter processingRequestConverter,
+            ILogger logger)
             : base(kind, filterId, logger)
         {
-            _eventTypes = eventTypes;
+            _processingRequestConverter = processingRequestConverter;
         }
 
         /// <inheritdoc/>
         public override Task<TResponse> Handle(FilterEventRequest request, CancellationToken cancellation)
         {
-            var pbEvent = request.Event;
-            if (pbEvent == default) throw new MissingEventInformation("No event in FilterEventRequest");
-            var eventContext = CreateEventContext(pbEvent);
-            var eventType = GetEventTypeOrThrow(pbEvent);
-            var clrEventType = _eventTypes.GetTypeFor(eventType);
-            var @event = JsonSerializer.Deserialize(pbEvent.Content, clrEventType);
+            var eventContext = _processingRequestConverter.GetEventContext(request.Event);
+            var @event = _processingRequestConverter.GetCLREvent(request.Event);
 
             return Filter(@event, eventContext);
         }
