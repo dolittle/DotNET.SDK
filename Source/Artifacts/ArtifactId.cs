@@ -19,6 +19,13 @@ namespace Dolittle.SDK.Artifacts
         public static implicit operator ArtifactId(Guid id) => new ArtifactId { Value = id };
 
         /// <summary>
+        /// Implicitly converts from a <see cref="string"/> to an <see cref="ArtifactId"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <returns>The converted <see cref="ArtifactId"/>.</returns>
+        public static implicit operator ArtifactId(string id) => new ArtifactId { Value = Guid.Parse(id) };
+
+        /// <summary>
         /// Create a new <see cref="ArtifactId"/>.
         /// </summary>
         /// <returns><see cref="ArtifactId">New artifact identifier</see>.</returns>
