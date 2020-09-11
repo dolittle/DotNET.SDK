@@ -1,15 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Threading;
 using Dolittle.SDK.Services.given.ReverseCall;
-using Grpc.Core;
 using Machine.Specifications;
-using Moq;
-using It = Machine.Specifications.It;
 
 namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming_method
 {
@@ -17,9 +12,9 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming
     {
         static ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method;
         static MethodCaller caller;
-        static Exception thrownException;
         static IList<ClientMessage> clientToServerMessages;
-        static Exception exception;
+        static IList<ServerMessage> serverToClientMessages;
+        static IEnumerable<ServerMessage> receivedServerMessages;
 
         Establish context = () =>
         {
@@ -29,19 +24,22 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming
                     new ClientMessage(),
                 });
 
-            thrownException = new Exception("Something went wrong");
+            serverToClientMessages = new List<ServerMessage>(new[]
+                {
+                    new ServerMessage(),
+                    new ServerMessage(),
+                    new ServerMessage(),
+                });
 
-            var serverStreamReader = new Mock<IAsyncStreamReader<ServerMessage>>();
-            serverStreamReader.Setup(_ => _.MoveNext(Moq.It.IsAny<CancellationToken>())).Throws(thrownException);
-
-            method = ADuplexStreamingMethodFrom(clientStreamWriter, serverStreamReader.Object);
+            method = ADuplexStreamingMethodFrom(clientStreamWriter, AStreamReaderFrom(serverToClientMessages));
 
             caller = new MethodCaller("host", 1000);
         };
 
-        Because of = () => exception = caller.Call(method, clientToServerMessages.ToObservable()).CatchError();
+        Because of = () => receivedServerMessages = caller.Call(method, clientToServerMessages.ToObservable()).ToArray().Wait();
 
         It should_make_the_call_with_the_correct_host_and_port = () => providedChannel.ResolvedTarget.ShouldEqual("host:1000");
-        It should_return_an_error = () => exception.ShouldEqual(thrownException);
+        It should_send_all_the_client_messages = () => writtenClientMessages.ShouldContainOnly(clientToServerMessages);
+        It should_receive_all_the_server_messages = () => receivedServerMessages.ShouldContainOnly(serverToClientMessages);
     }
 }

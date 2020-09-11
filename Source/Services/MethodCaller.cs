@@ -44,21 +44,28 @@ namespace Dolittle.SDK.Services
             where TServerMessage : IMessage
             => Observable.Create<TServerMessage>((observer, token) =>
                 {
-                    var call = method.Call(CreateChannel(), CreateCallOptions(token));
-                    SendMessagesToServer(requests, call.RequestStream);
-                    return ReceiveAllMessagesFromServer(observer, call.ResponseStream, token);
+                    var tcs = CancellationTokenSource.CreateLinkedTokenSource(token);
+                    var call = method.Call(CreateChannel(), CreateCallOptions(tcs.Token));
+                    SendMessagesToServer(observer, requests, call.RequestStream, tcs);
+                    return ReceiveAllMessagesFromServer(observer, call.ResponseStream, tcs.Token);
                 });
 
         Channel CreateChannel() => new Channel(_host, _port, _channelCredentials, _channelOptions);
 
         CallOptions CreateCallOptions(CancellationToken token) => new CallOptions(cancellationToken: token);
 
-        void SendMessagesToServer<T>(IObservable<T> messages, IClientStreamWriter<T> writer)
+        void SendMessagesToServer<TClientMessage, TServerMessage>(IObserver<TClientMessage> observer, IObservable<TServerMessage> messages, IClientStreamWriter<TServerMessage> writer, CancellationTokenSource tcs)
             => messages
                 .Select(message => Observable.FromAsync(() => writer.WriteAsync(message)))
                 .Concat()
                 .Concat(Observable.FromAsync(() => writer.CompleteAsync()))
-                .Subscribe();
+                .Subscribe(
+                    _ => { },
+                    error =>
+                    {
+                        observer.OnError(error);
+                        tcs.Cancel();
+                    });
 
         async Task ReceiveAllMessagesFromServer<T>(IObserver<T> observer, IAsyncStreamReader<T> reader, CancellationToken token)
         {
@@ -72,6 +79,7 @@ namespace Dolittle.SDK.Services
             catch (Exception ex)
             {
                 observer.OnError(ex);
+                return;
             }
 
             observer.OnCompleted();

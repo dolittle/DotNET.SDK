@@ -4,42 +4,35 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Threading;
 using Dolittle.SDK.Services.given.ReverseCall;
-using Grpc.Core;
 using Machine.Specifications;
-using Moq;
-using It = Machine.Specifications.It;
 
 namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming_method
 {
-    public class and_server_reader_throws_an_error : given.a_duplex_streaming_method_and_streams
+    public class and_client_sends_an_error : given.a_duplex_streaming_method_and_streams
     {
         static ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method;
         static MethodCaller caller;
         static Exception thrownException;
-        static IList<ClientMessage> clientToServerMessages;
+        static IList<ServerMessage> serverToClientMessages;
         static Exception exception;
 
         Establish context = () =>
         {
-            clientToServerMessages = new List<ClientMessage>(new[]
+            serverToClientMessages = new List<ServerMessage>(new[]
                 {
-                    new ClientMessage(),
-                    new ClientMessage(),
+                    new ServerMessage(),
+                    new ServerMessage(),
                 });
 
             thrownException = new Exception("Something went wrong");
 
-            var serverStreamReader = new Mock<IAsyncStreamReader<ServerMessage>>();
-            serverStreamReader.Setup(_ => _.MoveNext(Moq.It.IsAny<CancellationToken>())).Throws(thrownException);
-
-            method = ADuplexStreamingMethodFrom(clientStreamWriter, serverStreamReader.Object);
+            method = ADuplexStreamingMethodFrom(clientStreamWriter, AStreamReaderFrom(serverToClientMessages));
 
             caller = new MethodCaller("host", 1000);
         };
 
-        Because of = () => exception = caller.Call(method, clientToServerMessages.ToObservable()).CatchError();
+        Because of = () => exception = caller.Call(method, Observable.Throw<ClientMessage>(thrownException)).CatchError();
 
         It should_make_the_call_with_the_correct_host_and_port = () => providedChannel.ResolvedTarget.ShouldEqual("host:1000");
         It should_return_an_error = () => exception.ShouldEqual(thrownException);
