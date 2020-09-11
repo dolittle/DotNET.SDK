@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Events.Processing
         /// </summary>
         /// <param name="details">The details on what is missing.</param>
         public MissingEventInformation(string details)
-            : base($"Missing information on event: ${details}")
+            : base($"Missing information on event: {details}")
         {
         }
     }

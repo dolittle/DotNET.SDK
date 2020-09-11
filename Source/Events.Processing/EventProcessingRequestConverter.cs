@@ -69,10 +69,10 @@ namespace Dolittle.SDK.Events.Processing
         /// <inheritdoc/>
         public EventContext GetEventContext(PbStreamEvent @event)
             => new EventContext(
-                @event.Event.EventLogSequenceNumber,
-                GetEventSourceIdOrThrow(@event.Event.EventSourceId),
-                GetOccurredOrThrow(@event.Event.Occurred),
-                GetExecutionContextOrThrow(@event.Event.ExecutionContext));
+                @event.Event?.EventLogSequenceNumber ?? default,
+                GetEventSourceIdOrThrow(@event.Event?.EventSourceId),
+                GetOccurredOrThrow(@event.Event?.Occurred),
+                GetExecutionContextOrThrow(@event.Event?.ExecutionContext));
 
         PbCommittedEvent GetEventOrThrow(PbCommittedEvent @event)
         {
