@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Artifacts.for_MethodCaller.when_subscribing
 
         Establish context = () => client = ReverseCallClientWith(new ConnectArguments(), Enumerable.Empty<ServerMessage>());
 
-        Because of = () => exception = Catch.Exception(() => client.Wait());
+        Because of = () => exception = client.CatchError();
 
         It should_have_sent_one_message = () => messagesSentToServer.Count().ShouldEqual(1);
         It should_return_an_error = () => exception.ShouldBeOfExactType<DidNotReceiveConnectResponse>();
