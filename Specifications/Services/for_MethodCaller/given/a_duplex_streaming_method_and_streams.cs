@@ -4,13 +4,13 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Grpc.Core;
 using Machine.Specifications;
 using Moq;
 using It = Moq.It;
 
-namespace Dolittle.SDK.Artifacts.for_MethodCaller.given
+namespace Dolittle.SDK.Services.for_MethodCaller.given
 {
     public class a_duplex_streaming_method_and_streams : a_duplex_streaming_method
     {

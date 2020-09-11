@@ -4,11 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
-using Dolittle.SDK.Services;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Artifacts.for_MethodCaller.when_calling_a_duplex_streaming_method
+namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming_method
 {
     public class and_server_reader_throws_an_error : given.a_duplex_streaming_method_and_streams
     {

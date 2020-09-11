@@ -3,7 +3,7 @@
 
 using Dolittle.Services.Contracts;
 
-namespace Dolittle.SDK.Artifacts.given.ReverseCall
+namespace Dolittle.SDK.Services.given.ReverseCall
 {
     public class Response
     {

@@ -1,11 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Artifacts.given.ReverseCall;
-using Dolittle.SDK.Services;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Dolittle.Services.Contracts;
 
-namespace Dolittle.SDK.Artifacts.given
+namespace Dolittle.SDK.Services.given
 {
     public class Converter : IConvertReverseCallMessages<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>
     {

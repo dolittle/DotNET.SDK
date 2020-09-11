@@ -4,13 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using Dolittle.SDK.Artifacts.given;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
-using Dolittle.SDK.Services;
+using Dolittle.SDK.Services.given;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Dolittle.SDK.Artifacts.for_MethodCaller.given
+namespace Dolittle.SDK.Services.for_MethodCaller.given
 {
     public class a_reverse_call_client : a_method_caller
     {

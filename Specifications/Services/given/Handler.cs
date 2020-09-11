@@ -3,10 +3,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
-using Dolittle.SDK.Services;
+using Dolittle.SDK.Services.given.ReverseCall;
 
-namespace Dolittle.SDK.Artifacts.given
+namespace Dolittle.SDK.Services.given
 {
     public class Handler : IReverseCallHandler<Request, Response>
     {

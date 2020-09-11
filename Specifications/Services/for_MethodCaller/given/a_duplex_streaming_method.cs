@@ -2,15 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
-using Dolittle.SDK.Services;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Grpc.Core;
 using Machine.Specifications;
 using Moq;
 using It = Moq.It;
 using Status = Grpc.Core.Status;
 
-namespace Dolittle.SDK.Artifacts.for_MethodCaller.given
+namespace Dolittle.SDK.Services.for_MethodCaller.given
 {
     public class a_duplex_streaming_method
     {

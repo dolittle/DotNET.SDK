@@ -2,15 +2,14 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
 using Dolittle.SDK.Execution;
-using Dolittle.SDK.Services;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Artifacts.for_Artifacts
+namespace Dolittle.SDK.Services.for_Artifacts
 {
     public class when_creating
     {

@@ -5,7 +5,7 @@ using System;
 using System.Reactive.Linq;
 using System.Threading;
 
-namespace Dolittle.SDK.Artifacts
+namespace Dolittle.SDK.Services
 {
     public static class ObservableExtensions
     {

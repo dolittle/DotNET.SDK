@@ -4,10 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using Dolittle.SDK.Artifacts.given.ReverseCall;
+using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Artifacts.for_MethodCaller.when_subscribing
+namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
 {
     public class and_server_sends_connect_response : given.a_reverse_call_client
     {
