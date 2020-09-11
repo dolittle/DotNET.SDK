@@ -36,13 +36,4 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// <returns>An <see cref="IObservable{T}" /> representing the connection to the runtime.</returns>
         IObservable<TRegisterResponse> RegisterForeverWithPolicy(RetryPolicy policy, CancellationToken cancellation);
     }
-
-#pragma warning disable SA1649
-    /// <summary>
-    /// Something.
-    /// </summary>
-    public class RetryPolicy
-    {
-    }
-#pragma warning restore
 }
