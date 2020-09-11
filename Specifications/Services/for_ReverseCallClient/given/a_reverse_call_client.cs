@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using Dolittle.SDK.Artifacts.given;
 using Dolittle.SDK.Artifacts.given.ReverseCall;
@@ -16,10 +15,6 @@ namespace Dolittle.SDK.Artifacts.for_MethodCaller.given
     public class a_reverse_call_client : a_method_caller
     {
         protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> client;
-
-        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
-            ConnectArguments arguments)
-            => ReverseCallClientWith(arguments, Enumerable.Empty<ServerMessage>());
 
         protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
             ConnectArguments arguments,

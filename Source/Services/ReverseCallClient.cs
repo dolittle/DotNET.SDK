@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -111,7 +112,20 @@ namespace Dolittle.SDK.Services
 
                     var toServerMessages = pongs.Merge(responses).StartWith(connectMessage);
 
-                    var connectResponse = toClientMessages.Take(1).Select(_converter.GetConnectResponseFrom);
+                    var connectResponse = toClientMessages
+                        .Take(1)
+                        .Select(_ =>
+                            {
+                                var response = _converter.GetConnectResponseFrom(_);
+                                if (response == null)
+                                {
+                                    return Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse());
+                                }
+
+                                return Notification.CreateOnNext(response);
+                            })
+                        .DefaultIfEmpty(Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse()))
+                        .Dematerialize();
                     var errorsAndCompletion = toClientMessages.Where(_ => false).Select(_converter.GetConnectResponseFrom);
 
                     connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
