@@ -84,17 +84,9 @@ namespace Dolittle.SDK.Services
             => _observable.Subscribe(observer);
 
         IObservable<TConnectResponse> CreateObservable()
-            => Observable.Create<TConnectResponse>((observer, token) =>
+            => Observable.Create<TConnectResponse>((observer) =>
                 {
-                    var toServerMessages = new Subject<TClientMessage>();
                     var toClientMessages = new Subject<TServerMessage>();
-
-                    var connectArguments = Arguments;
-                    var connectContext = CreateReverseCallArgumentsContext();
-                    _converter.SetConnectArgumentsContextIn(connectContext, connectArguments);
-                    var connectMessage = _converter.CreateMessageFrom(connectArguments);
-
-                    toServerMessages.OnNext(connectMessage);
 
                     var validMessages = toClientMessages.Skip(1).Where(MessageIsPingOrRequest).Timeout(_pingInterval * 3);
                     var pings = validMessages.Where(MessageIsPing);
@@ -105,23 +97,25 @@ namespace Dolittle.SDK.Services
                         .Select(_ => new Pong())
                         .Select(_converter.CreateMessageFrom);
 
-                    var responses = new Subject<TResponse>();
-                    requests
+                    var responses = requests
                         .Select(_converter.GetRequestFrom)
                         .Where(RequestIsValid)
-                        .Subscribe((request) =>
-                            Task.Run(() => HandleRequest(request, responses, token), token));
+                        .Select(request => Observable.FromAsync((token) => HandleRequest(request, token)))
+                        .Merge()
+                        .Select(_converter.CreateMessageFrom);
 
-                    pongs
-                        .Merge(responses.Select(_converter.CreateMessageFrom))
-                        .Subscribe(toServerMessages);
+                    var connectArguments = Arguments;
+                    var connectContext = CreateReverseCallArgumentsContext();
+                    _converter.SetConnectArgumentsContextIn(connectContext, connectArguments);
+                    var connectMessage = _converter.CreateMessageFrom(connectArguments);
 
-                    var connectResponse = toClientMessages.FirstAsync().Select(_converter.GetConnectResponseFrom);
+                    var toServerMessages = pongs.Merge(responses).StartWith(connectMessage);
+
+                    var connectResponse = toClientMessages.Take(1).Select(_converter.GetConnectResponseFrom);
                     var errorsAndCompletion = toClientMessages.Where(_ => false).Select(_converter.GetConnectResponseFrom);
-                    connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
 
-                    _caller.Call(_method, toServerMessages).Subscribe(toClientMessages, token);
-                    return Task.CompletedTask;
+                    connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
+                    return _caller.Call(_method, toServerMessages).Subscribe(toClientMessages);
                 });
 
         ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
@@ -166,7 +160,7 @@ namespace Dolittle.SDK.Services
             return true;
         }
 
-        async Task HandleRequest(TRequest request, Subject<TResponse> responses, CancellationToken token)
+        async Task<TResponse> HandleRequest(TRequest request, CancellationToken token)
         {
             var requestContext = _converter.GetRequestContextFrom(request);
             var executionContext = requestContext.ExecutionContext.ToExecutionContext();
@@ -181,7 +175,7 @@ namespace Dolittle.SDK.Services
             var responseContext = new ReverseCallResponseContext { CallId = requestContext.CallId };
             _converter.SetResponseContextIn(responseContext, response);
 
-            responses.OnNext(response);
+            return response;
         }
     }
 }
