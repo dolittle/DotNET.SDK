@@ -45,12 +45,12 @@ namespace Dolittle.SDK.Protobuf
             }
             catch (MissingMethodException)
             {
-                throw new ArtifactIdDoesNotHaveDefaultParameterlessConstructor(typeof(TArtifact), artifact, idType);
+                throw new ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor(typeof(TArtifact), artifact, idType);
             }
 
             Generation generation = artifact.Generation;
             var constructor = typeof(TArtifact).GetConstructor(new[] { idType, generationType });
-            if (constructor == default) throw new ArtifactDoesNotHaveConstructorWithIdAndGeneration(typeof(TArtifact), artifact);
+            if (constructor == default) throw new ArtifactTypeDoesNotHaveConstructorWithIdAndGeneration(typeof(TArtifact), artifact);
 
             var instance = constructor.Invoke(new object[] { artifactId, generation });
             if (instance == default) throw new CouldNotConvertProtobufArtifact(typeof(TArtifact), artifact, "Could not create instance of artifact");

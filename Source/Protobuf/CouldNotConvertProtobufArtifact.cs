@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Protobuf
         /// <param name="artifact">The <see cref="PbArtifact" />.</param>
         /// <param name="details">The details of the exception.</param>
         public CouldNotConvertProtobufArtifact(Type expectedArtifactType, PbArtifact artifact, string details)
-            : base($"Could not convert artifact ({artifact.Id?.ToGuid()}, {artifact.Generation}) to artifact of type {expectedArtifactType}. {details}")
+            : base($"Could not convert artifact ({artifact.Id?.ToGuid()}, {artifact.Generation}) to an artifact of type {expectedArtifactType}. {details}")
         {
         }
     }

@@ -24,6 +24,6 @@ namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.when_converting_to_generi
 
         Because of = () => result = Catch.Exception(() => artifact.To<given.artifact_type_with_custom_artifact_id_without_parameterless_constructor>());
 
-        It should_fail_because_missing_parameterless_constructor = () => result.ShouldBeOfExactType<ArtifactIdDoesNotHaveDefaultParameterlessConstructor>();
+        It should_fail_because_missing_parameterless_constructor = () => result.ShouldBeOfExactType<ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor>();
     }
 }

@@ -8,18 +8,18 @@ using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 namespace Dolittle.SDK.Protobuf
 {
     /// <summary>
-    /// Exception that gets thrown when an <see cref="ArtifactId" /> does not have a default parameterless constructor.
+    /// Exception that gets thrown when the <see cref="Type" /> of an <see cref="ArtifactId" /> does not have a default parameterless constructor.
     /// </summary>
-    public class ArtifactIdDoesNotHaveDefaultParameterlessConstructor : CouldNotConvertProtobufArtifact
+    public class ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor : CouldNotConvertProtobufArtifact
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ArtifactIdDoesNotHaveDefaultParameterlessConstructor"/> class.
+        /// Initializes a new instance of the <see cref="ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor"/> class.
         /// </summary>
         /// <param name="expectedArtifactType">The <see cref="Type" /> of <see cref="IArtifact" /> the protobuf artifact should be converted to.</param>
         /// <param name="artifact">The <see cref="PbArtifact" />.</param>
         /// <param name="artifactIdType">The <see cref="Type" /> of the <see cref="ArtifactId" />.</param>
-        public ArtifactIdDoesNotHaveDefaultParameterlessConstructor(Type expectedArtifactType, PbArtifact artifact, Type artifactIdType)
-            : base(expectedArtifactType, artifact, $"Artifact identifer type {artifactIdType} does not have a default parameterless constructor")
+        public ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor(Type expectedArtifactType, PbArtifact artifact, Type artifactIdType)
+            : base(expectedArtifactType, artifact, $"{artifactIdType} does not have a default parameterless constructor")
         {
         }
     }
