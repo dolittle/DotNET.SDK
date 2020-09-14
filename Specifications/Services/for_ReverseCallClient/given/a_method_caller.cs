@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 using Moq;
@@ -21,11 +24,21 @@ namespace Dolittle.SDK.Services.for_MethodCaller.given
         {
             var mock = new Mock<IPerformMethodCalls>();
             mock.Setup(_ => _.Call(It.IsAny<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(), It.IsAny<IObservable<ClientMessage>>()))
-                .Returns((ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method, IObservable<ClientMessage> clientToServerMessages) =>
+                .Returns((ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method, IObservable<ClientMessage> clientToServerMessages)
+                    => Observable.Create<ServerMessage>(observer =>
                     {
-                        clientToServerMessages.Subscribe(_messages.Add);
-                        return serverToClientMessages;
-                    });
+                        var cts = new CancellationTokenSource();
+                        serverToClientMessages.Subscribe(observer, cts.Token);
+                        clientToServerMessages.Subscribe(
+                            message => _messages.Add(message),
+                            error =>
+                            {
+                                observer.OnError(error);
+                                cts.Cancel();
+                            },
+                            cts.Token);
+                        return Disposable.Create(cts.Cancel);
+                    }));
 
             return mock.Object;
         }

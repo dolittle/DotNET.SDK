@@ -18,13 +18,24 @@ namespace Dolittle.SDK.Services.for_MethodCaller.given
         protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
             ConnectArguments arguments,
             IEnumerable<ServerMessage> serverToClientMessages)
+            => ReverseCallClientWith(arguments, serverToClientMessages.ToObservable());
+
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
+            ConnectArguments arguments,
+            IObservable<ServerMessage> serverToClientMessages)
+            => ReverseCallClientWith(arguments, TimeSpan.FromSeconds(1), serverToClientMessages);
+
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
+            ConnectArguments arguments,
+            TimeSpan pingInterval,
+            IObservable<ServerMessage> serverToClientMessages)
             => new ReverseCallClient<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>(
                 arguments,
                 Mock.Of<IReverseCallHandler<Request, Response>>(),
                 Mock.Of<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(),
                 new Converter(),
-                TimeSpan.FromSeconds(1),
-                MethodCallerThatRepliesWith(serverToClientMessages.ToObservable()),
+                pingInterval,
+                MethodCallerThatRepliesWith(serverToClientMessages),
                 executionContextManager,
                 Mock.Of<ILogger>());
     }

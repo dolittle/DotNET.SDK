@@ -126,7 +126,11 @@ namespace Dolittle.SDK.Services
                             })
                         .DefaultIfEmpty(Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse()))
                         .Dematerialize();
-                    var errorsAndCompletion = toClientMessages.Where(_ => false).Select(_converter.GetConnectResponseFrom);
+
+                    var errorsAndCompletion = toClientMessages
+                        .Where(_ => false)
+                        .Select(_converter.GetConnectResponseFrom)
+                        .Catch((TimeoutException _) => Observable.Throw<TConnectResponse>(new PingTimedOut(_pingInterval)));
 
                     connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
                     return _caller.Call(_method, toServerMessages).Subscribe(toClientMessages);
