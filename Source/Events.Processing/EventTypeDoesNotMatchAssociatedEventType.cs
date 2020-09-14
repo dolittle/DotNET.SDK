@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Events.Processing
         /// <param name="associatedEventType">The associated <see cref="EventType" />.</param>
         /// <param name="type">The <see cref="Type" /> of the event.</param>
         public EventTypeDoesNotMatchAssociatedEventType(EventType eventType, EventType associatedEventType, Type type)
-            : base($"Trying to convert event for prcessing to {type}, but {eventType} in the processing request does not match the associated artifact {associatedEventType}")
+            : base($"Trying to convert event for processing to {type}, but {eventType} in the processing request does not match the associated artifact {associatedEventType}")
         {
         }
     }
