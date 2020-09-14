@@ -21,7 +21,6 @@ namespace Dolittle.SDK.Events.Filters.Internal
     public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegistrationRequest, PartitionedFilterResponse>
     {
         readonly PartitionedFilterEventCallback _filterEventCallback;
-        readonly FiltersClient _client;
         readonly ICreateReverseCallClients _reverseCallClientsCreator;
 
         /// <summary>
@@ -29,21 +28,18 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// </summary>
         /// <param name="filterId">The <see cref="FilterId" />.</param>
         /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
-        /// <param name="client">The <see cref="FiltersClient" />.</param>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
         /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public PublicEventFilterProcessor(
             FilterId filterId,
             PartitionedFilterEventCallback filterEventCallback,
-            FiltersClient client,
             ICreateReverseCallClients reverseCallClientsCreator,
             IEventProcessingRequestConverter processingRequestConverter,
             ILogger logger)
             : base("Public Filter", filterId, processingRequestConverter, logger)
         {
             _filterEventCallback = filterEventCallback;
-            _client = client;
             _reverseCallClientsCreator = reverseCallClientsCreator;
         }
 
@@ -63,7 +59,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             => _reverseCallClientsCreator.Create(
                 RegisterArguments,
                 this,
-                new DuplexStreamingMethodCaller(_client),
+                new DuplexStreamingMethodCaller(),
                 new ReverseCallMessageConverter());
 
         /// <inheritdoc/>
@@ -79,15 +75,8 @@ namespace Dolittle.SDK.Events.Filters.Internal
 
         class DuplexStreamingMethodCaller : ICanCallADuplexStreamingMethod<FiltersClient, PublicFilterClientToRuntimeMessage, FilterRuntimeToClientMessage>
         {
-            readonly FiltersClient _client;
-
-            public DuplexStreamingMethodCaller(FiltersClient client)
-            {
-                _client = client;
-            }
-
             public AsyncDuplexStreamingCall<PublicFilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
-                => _client.ConnectPublic(callOptions);
+                => new FiltersClient(channel).ConnectPublic(callOptions);
         }
 
         class ReverseCallMessageConverter : IConvertReverseCallMessages<PublicFilterClientToRuntimeMessage, FilterRuntimeToClientMessage, PublicFilterRegistrationRequest, FilterRegistrationResponse, FilterEventRequest, PartitionedFilterResponse>

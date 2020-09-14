@@ -7,9 +7,7 @@ using Dolittle.Protobuf.Contracts;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
-using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
-using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 
 namespace Dolittle.SDK.Events.Filters.Internal
 {
@@ -63,39 +61,5 @@ namespace Dolittle.SDK.Events.Filters.Internal
 
         /// <inheritdoc/>
         protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request) => request.RetryProcessingState;
-
-        EventContext CreateEventContext(PbCommittedEvent pbEvent)
-        {
-            var sequenceNumber = pbEvent.EventLogSequenceNumber;
-            var eventSourceId = GetEventSourceIdOrThrow(pbEvent);
-            var executionContext = GetExecutionContextOrThrow(pbEvent);
-            var occurred = GetOccurredOrThrow(pbEvent);
-
-            return new EventContext(sequenceNumber, eventSourceId, occurred, executionContext);
-        }
-
-        EventSourceId GetEventSourceIdOrThrow(PbCommittedEvent pbEvent)
-        {
-            if (pbEvent.EventSourceId == default) throw new MissingEventInformation("EventSourceId");
-            return pbEvent.EventSourceId.To<EventSourceId>();
-        }
-
-        Execution.ExecutionContext GetExecutionContextOrThrow(PbCommittedEvent pbEvent)
-        {
-            if (pbEvent.ExecutionContext == default) throw new MissingEventInformation("ExecutionContext");
-            return pbEvent.ExecutionContext.ToExecutionContext();
-        }
-
-        System.DateTimeOffset GetOccurredOrThrow(PbCommittedEvent pbEvent)
-        {
-            if (pbEvent.Occurred == default) throw new MissingEventInformation("Occurred");
-            return pbEvent.Occurred.ToDateTimeOffset();
-        }
-
-        EventType GetEventTypeOrThrow(PbCommittedEvent pbEvent)
-        {
-            if (pbEvent.Type == default) throw new MissingEventInformation("ExecutionContext");
-            return pbEvent.Type.To<EventType>();
-        }
     }
 }

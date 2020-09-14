@@ -24,7 +24,6 @@ namespace Dolittle.SDK.Events.Handling.Internal
     public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse>
     {
         readonly IEventHandler _eventHandler;
-        readonly EventHandlersClient _client;
         readonly ICreateReverseCallClients _reverseCallClientsCreator;
         readonly IEventProcessingRequestConverter _processingRequestConverter;
         EventHandlerRegistrationRequest _registrationRequest;
@@ -33,20 +32,17 @@ namespace Dolittle.SDK.Events.Handling.Internal
         /// Initializes a new instance of the <see cref="EventHandlerProcessor"/> class.
         /// </summary>
         /// <param name="eventHandler">The <see cref="IEventHandler" />.</param>
-        /// <param name="client">The <see cref="EventHandlersClient" />.</param>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
         /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventHandlerProcessor(
             IEventHandler eventHandler,
-            EventHandlersClient client,
             ICreateReverseCallClients reverseCallClientsCreator,
             IEventProcessingRequestConverter processingRequestConverter,
             ILogger logger)
             : base("EventHandler", eventHandler.EventHandlerId, logger)
         {
             _eventHandler = eventHandler;
-            _client = client;
             _reverseCallClientsCreator = reverseCallClientsCreator;
             _processingRequestConverter = processingRequestConverter;
         }
@@ -91,7 +87,7 @@ namespace Dolittle.SDK.Events.Handling.Internal
             => _reverseCallClientsCreator.Create(
                 RegisterArguments,
                 this,
-                new DuplexStreamingMethodCaller(_client),
+                new DuplexStreamingMethodCaller(),
                 new ReverseCallMessageConverter());
 
         /// <inheritdoc/>
@@ -106,15 +102,8 @@ namespace Dolittle.SDK.Events.Handling.Internal
 
         class DuplexStreamingMethodCaller : ICanCallADuplexStreamingMethod<EventHandlersClient, EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage>
         {
-            readonly EventHandlersClient _client;
-
-            public DuplexStreamingMethodCaller(EventHandlersClient client)
-            {
-                _client = client;
-            }
-
             public AsyncDuplexStreamingCall<EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
-                => _client.Connect(callOptions);
+                => new EventHandlersClient(channel).Connect(callOptions);
         }
 
         class ReverseCallMessageConverter : IConvertReverseCallMessages<EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage, EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse>

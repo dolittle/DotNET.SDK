@@ -22,7 +22,6 @@ namespace Dolittle.SDK.Events.Filters.Internal
     {
         readonly ScopeId _scopeId;
         readonly FilterEventCallback _filterEventCallback;
-        readonly FiltersClient _client;
         readonly ICreateReverseCallClients _reverseCallClientsCreator;
 
         /// <summary>
@@ -31,7 +30,6 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="filterId">The <see cref="FilterId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="filterEventCallback">The <see cref="FilterEventCallback" />.</param>
-        /// <param name="client">The <see cref="FiltersClient" />.</param>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
         /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
@@ -39,7 +37,6 @@ namespace Dolittle.SDK.Events.Filters.Internal
             FilterId filterId,
             ScopeId scopeId,
             FilterEventCallback filterEventCallback,
-            FiltersClient client,
             ICreateReverseCallClients reverseCallClientsCreator,
             IEventProcessingRequestConverter processingRequestConverter,
             ILogger logger)
@@ -47,7 +44,6 @@ namespace Dolittle.SDK.Events.Filters.Internal
         {
             _scopeId = scopeId;
             _filterEventCallback = filterEventCallback;
-            _client = client;
             _reverseCallClientsCreator = reverseCallClientsCreator;
         }
 
@@ -68,7 +64,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             => _reverseCallClientsCreator.Create(
                 RegisterArguments,
                 this,
-                new DuplexStreamingMethodCaller(_client),
+                new DuplexStreamingMethodCaller(),
                 new ReverseCallMessageConverter());
 
         /// <inheritdoc/>
@@ -86,15 +82,8 @@ namespace Dolittle.SDK.Events.Filters.Internal
 
         class DuplexStreamingMethodCaller : ICanCallADuplexStreamingMethod<FiltersClient, FilterClientToRuntimeMessage, FilterRuntimeToClientMessage>
         {
-            readonly FiltersClient _client;
-
-            public DuplexStreamingMethodCaller(FiltersClient client)
-            {
-                _client = client;
-            }
-
             public AsyncDuplexStreamingCall<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
-                => _client.Connect(callOptions);
+                => new FiltersClient(channel).Connect(callOptions);
         }
 
         class ReverseCallMessageConverter : IConvertReverseCallMessages<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage, FilterRegistrationRequest, FilterRegistrationResponse, FilterEventRequest, FilterResponse>
