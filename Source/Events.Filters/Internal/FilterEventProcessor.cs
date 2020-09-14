@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
     /// </summary>
     /// <typeparam name="TRegisterArguments">The <see cref="System.Type" /> of the registration arguments.</typeparam>
     /// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
-    public abstract class FilterEventProcessor<TRegisterArguments, TResponse> : EventProcessor<FilterId, TRegisterArguments, FilterRegistrationResponse, FilterEventRequest, TResponse>
+    public abstract class FilterEventProcessor<TRegisterArguments, TResponse> : EventProcessor<FilterId, TRegisterArguments, FilterRegistrationResponse, FilterEventRequest, TResponse>, IFilterProcessor
         where TRegisterArguments : class
         where TResponse : class
     {
