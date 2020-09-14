@@ -91,10 +91,12 @@ namespace Dolittle.SDK.Events.Handling.Internal
                 new ReverseCallMessageConverter());
 
         /// <inheritdoc/>
-        protected override Failure GetFailureFromRegisterResponse(EventHandlerRegistrationResponse response) => response.Failure;
+        protected override Failure GetFailureFromRegisterResponse(EventHandlerRegistrationResponse response)
+            => response.Failure;
 
         /// <inheritdoc/>
-        protected override RetryProcessingState GetRetryProcessingStateFromRequest(HandleEventRequest request) => request.RetryProcessingState;
+        protected override RetryProcessingState GetRetryProcessingStateFromRequest(HandleEventRequest request)
+            => request.RetryProcessingState;
 
         /// <inheritdoc/>
         protected override EventHandlerResponse CreateResponseFromFailure(ProcessorFailure failure)

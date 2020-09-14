@@ -73,12 +73,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
 
         /// <inheritdoc/>
         protected override async Task<FilterResponse> Filter(object @event, EventContext context)
-        {
-            var shouldInclude = await _filterEventCallback(@event, context).ConfigureAwait(false);
-            var response = new FilterResponse { IsIncluded = shouldInclude };
-
-            return response;
-        }
+            => new FilterResponse { IsIncluded = await _filterEventCallback(@event, context).ConfigureAwait(false) };
 
         class DuplexStreamingMethodCaller : ICanCallADuplexStreamingMethod<FiltersClient, FilterClientToRuntimeMessage, FilterRuntimeToClientMessage>
         {

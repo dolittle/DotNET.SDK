@@ -57,9 +57,11 @@ namespace Dolittle.SDK.Events.Filters.Internal
         protected abstract Task<TResponse> Filter(object @event, EventContext context);
 
         /// <inheritdoc/>
-        protected override Failure GetFailureFromRegisterResponse(FilterRegistrationResponse response) => response.Failure;
+        protected override Failure GetFailureFromRegisterResponse(FilterRegistrationResponse response)
+            => response.Failure;
 
         /// <inheritdoc/>
-        protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request) => request.RetryProcessingState;
+        protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request)
+            => request.RetryProcessingState;
     }
 }
