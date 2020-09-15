@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -11,7 +12,6 @@ using Dolittle.SDK.Protobuf;
 using Dolittle.Services.Contracts;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Services
@@ -19,16 +19,14 @@ namespace Dolittle.SDK.Services
     /// <summary>
     /// An implementation of <see cref="IReverseCallClient{TConnectArguments, TConnectResponse, TRequest, TResponse}"/>.
     /// </summary>
-    /// <typeparam name="TClient">The type of generated gRPC client to use.</typeparam>
     /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
     /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
     /// <typeparam name="TConnectArguments">Type of the arguments that are sent along with the initial Connect call.</typeparam>
     /// <typeparam name="TConnectResponse">Type of the response that is received after the initial Connect call.</typeparam>
     /// <typeparam name="TRequest">Type of the requests sent from the server to the client.</typeparam>
     /// <typeparam name="TResponse">Type of the responses received from the client.</typeparam>
-    public class ReverseCallClient<TClient, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>
+    public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>
         : IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse>
-        where TClient : ClientBase<TClient>
         where TClientMessage : IMessage
         where TServerMessage : IMessage
         where TConnectArguments : class
@@ -36,7 +34,7 @@ namespace Dolittle.SDK.Services
         where TRequest : class
         where TResponse : class
     {
-        readonly ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> _method;
+        readonly ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> _method;
         readonly IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> _converter;
         readonly TimeSpan _pingInterval;
         readonly IPerformMethodCalls _caller;
@@ -45,7 +43,7 @@ namespace Dolittle.SDK.Services
         readonly IObservable<TConnectResponse> _observable;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReverseCallClient{TClient, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/> class.
+        /// Initializes a new instance of the <see cref="ReverseCallClient{TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/> class.
         /// </summary>
         /// <param name="arguments">The <typeparamref name="TConnectArguments"/> to send to the server to start the reverse call protocol.</param>
         /// <param name="handler">The handler that will handle requests from the server.</param>
@@ -58,7 +56,7 @@ namespace Dolittle.SDK.Services
         public ReverseCallClient(
             TConnectArguments arguments,
             IReverseCallHandler<TRequest, TResponse> handler,
-            ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method,
+            ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method,
             IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> converter,
             TimeSpan pingInterval,
             IPerformMethodCalls caller,
@@ -87,17 +85,9 @@ namespace Dolittle.SDK.Services
             => _observable.Subscribe(observer);
 
         IObservable<TConnectResponse> CreateObservable()
-            => Observable.Create<TConnectResponse>((observer, token) =>
+            => Observable.Create<TConnectResponse>((observer) =>
                 {
-                    var toServerMessages = new Subject<TClientMessage>();
-                    var toClientMessages = _caller.Call(_method, toServerMessages, token);
-
-                    var connectArguments = Arguments;
-                    var connectContext = CreateReverseCallArgumentsContext();
-                    _converter.SetConnectArgumentsContextIn(connectContext, connectArguments);
-                    var connectMessage = _converter.CreateMessageFrom(connectArguments);
-
-                    toServerMessages.OnNext(connectMessage);
+                    var toClientMessages = new Subject<TServerMessage>();
 
                     var validMessages = toClientMessages.Skip(1).Where(MessageIsPingOrRequest).Timeout(_pingInterval * 3);
                     var pings = validMessages.Where(MessageIsPing);
@@ -108,22 +98,42 @@ namespace Dolittle.SDK.Services
                         .Select(_ => new Pong())
                         .Select(_converter.CreateMessageFrom);
 
-                    var responses = new Subject<TResponse>();
-                    requests
+                    var responses = requests
                         .Select(_converter.GetRequestFrom)
                         .Where(RequestIsValid)
-                        .Subscribe((request) =>
-                            Task.Run(() => HandleRequest(request, responses, token), token));
+                        .Select(request => Observable.FromAsync((token) => HandleRequest(request, token)))
+                        .Merge()
+                        .Select(_converter.CreateMessageFrom);
 
-                    pongs
-                        .Merge(responses.Select(_converter.CreateMessageFrom))
-                        .Subscribe(toServerMessages);
+                    var connectArguments = Arguments;
+                    var connectContext = CreateReverseCallArgumentsContext();
+                    _converter.SetConnectArgumentsContextIn(connectContext, connectArguments);
+                    var connectMessage = _converter.CreateMessageFrom(connectArguments);
 
-                    var connectResponse = toClientMessages.FirstAsync().Select(_converter.GetConnectResponseFrom);
-                    var errorsAndCompletion = toClientMessages.Where(_ => false).Select(_converter.GetConnectResponseFrom);
+                    var toServerMessages = pongs.Merge(responses).StartWith(connectMessage);
+
+                    var connectResponse = toClientMessages
+                        .Take(1)
+                        .Select(_ =>
+                            {
+                                var response = _converter.GetConnectResponseFrom(_);
+                                if (response == null)
+                                {
+                                    return Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse());
+                                }
+
+                                return Notification.CreateOnNext(response);
+                            })
+                        .DefaultIfEmpty(Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse()))
+                        .Dematerialize();
+
+                    var errorsAndCompletion = toClientMessages
+                        .Where(_ => false)
+                        .Select(_converter.GetConnectResponseFrom)
+                        .Catch((TimeoutException _) => Observable.Throw<TConnectResponse>(new PingTimedOut(_pingInterval)));
+
                     connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
-
-                    return Task.CompletedTask;
+                    return _caller.Call(_method, toServerMessages).Subscribe(toClientMessages);
                 });
 
         ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
@@ -168,7 +178,7 @@ namespace Dolittle.SDK.Services
             return true;
         }
 
-        async Task HandleRequest(TRequest request, Subject<TResponse> responses, CancellationToken token)
+        async Task<TResponse> HandleRequest(TRequest request, CancellationToken token)
         {
             var requestContext = _converter.GetRequestContextFrom(request);
             var executionContext = requestContext.ExecutionContext.ToExecutionContext();
@@ -183,7 +193,7 @@ namespace Dolittle.SDK.Services
             var responseContext = new ReverseCallResponseContext { CallId = requestContext.CallId };
             _converter.SetResponseContextIn(responseContext, response);
 
-            responses.OnNext(response);
+            return response;
         }
     }
 }
