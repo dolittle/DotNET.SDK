@@ -8,14 +8,14 @@ namespace Dolittle.SDK.Events
     /// <summary>
     /// Exception that gets thrown when an Event is being used with an Event Source with a different <see cref="EventSourceId"/> than it was applied to.
     /// </summary>
-    public class EventWasAppliedToOtherEventSource : ArgumentException
+    public class EventWasAppliedToOtherEventSources : ArgumentException
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventWasAppliedToOtherEventSource"/> class.
+        /// Initializes a new instance of the <see cref="EventWasAppliedToOtherEventSources"/> class.
         /// </summary>
         /// <param name="eventEventSource">The <see cref="EventSourceId"/> the Event was applied to.</param>
         /// <param name="eventSource"><see cref="EventSourceId"/> of the Event Source.</param>
-        public EventWasAppliedToOtherEventSource(EventSourceId eventEventSource, EventSourceId eventSource)
+        public EventWasAppliedToOtherEventSources(EventSourceId eventEventSource, EventSourceId eventSource)
             : base($"Event Source '{eventEventSource}' from event does not match with '{eventSource}'.")
         {
         }

@@ -1,6 +1,5 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Events
 {
@@ -13,9 +12,9 @@ namespace Dolittle.SDK.Events
         /// Initializes a new instance of the <see cref="UncommittedEvent"/> class.
         /// </summary>
         /// <param name="eventSource">The <see cref="EventSourceId" /> of the Event.</param>
-        /// <param name="eventType"></param>
-        /// <param name="content"></param>
-        /// <param name="isPublic"></param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="isPublic">Whether the event is public or not.</param>
         public UncommittedEvent(EventSourceId eventSource, EventType eventType, object content, bool isPublic)
         {
             EventSource = eventSource;
@@ -40,7 +39,7 @@ namespace Dolittle.SDK.Events
         public object Content { get; }
 
         /// <summary>
-        /// Gets whether the event is public or not.
+        /// Gets a value indicating whether the Event is public or not.
         /// </summary>
         public bool IsPublic { get; }
     }

@@ -1,17 +1,14 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
-using Dolittle.Services.Contracts;
 using Dolittle.SDK.Services;
-using static Dolittle.Runtime.Events.Contracts.EventStore;
-using Contracts = Dolittle.Runtime.Events.Contracts;
+using Dolittle.Services.Contracts;
 using Microsoft.Extensions.Logging;
+using Contracts = Dolittle.Runtime.Events.Contracts;
 
 namespace Dolittle.SDK.Events
 {
@@ -50,9 +47,9 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        async public Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
-            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
             try
             {
                 return _eventConverter.ToSDK(response.Events);
@@ -64,11 +61,11 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        async public Task<CommittedEvent> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
+        public async Task<CommittedEvent> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = new UncommittedEvents();
             uncommittedEvents.Append(uncommittedEvent);
-            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
             try
             {
                 return _eventConverter.ToSDK(response.Events[0]);
@@ -80,11 +77,11 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        async public Task<CommittedEvent> Commit(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
+        public async Task<CommittedEvent> Commit(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = new UncommittedEvents();
             uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, false));
-            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
             try
             {
                 return _eventConverter.ToSDK(response.Events[0]);
@@ -96,11 +93,11 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        async public Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
+        public async Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = new UncommittedEvents();
             uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, false));
-            var response = await CommitInternal(uncommittedEvents, cancellationToken);
+            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
             try
             {
                 return _eventConverter.ToSDK(response.Events[0]);
@@ -111,14 +108,15 @@ namespace Dolittle.SDK.Events
             }
         }
 
-        async Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken) {
+        async Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        {
             _logger.LogDebug("Committing events");
             var request = new Contracts.CommitEventsRequest
             {
                 CallContext = GetCurrentCallContext(),
             };
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            var response = await _caller.Call(_method, request, cancellationToken);
+            var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
             ThrowIfFailure(response.Failure);
             return response;
         }

@@ -3,7 +3,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Collections;
 
 namespace Dolittle.SDK.Events

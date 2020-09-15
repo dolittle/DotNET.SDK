@@ -1,10 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using static Dolittle.Runtime.Events.Contracts.EventStore;
 using Dolittle.Runtime.Events.Contracts;
 using Dolittle.SDK.Services;
 using Grpc.Core;
+using static Dolittle.Runtime.Events.Contracts.EventStore;
 
 namespace Dolittle.SDK.Events
 {
@@ -13,7 +13,6 @@ namespace Dolittle.SDK.Events
     /// </summary>
     public class EventStoreCommitMethod : ICanCallAnUnaryMethod<EventStoreClient, CommitEventsRequest, CommitEventsResponse>
     {
-
         /// <inheritdoc/>
         public AsyncUnaryCall<CommitEventsResponse> Call(CommitEventsRequest message, Channel channel, CallOptions callOptions)
         {

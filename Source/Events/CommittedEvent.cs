@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Execution;
 
 namespace Dolittle.SDK.Events
@@ -80,12 +79,12 @@ namespace Dolittle.SDK.Events
         public object Content { get; }
 
         /// <summary>
-        /// Whether the Event is public or not.
+        /// Gets a value indicating whether the Event is public or not.
         /// </summary>
         public bool IsPublic { get; }
 
         /// <summary>
-        /// Whether the Event is from an external Microservice or not.
+        /// Gets a value indicating whether the Event is from an external Microservice or not.
         /// </summary>
         public bool IsExternal { get; }
 

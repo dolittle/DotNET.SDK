@@ -4,9 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dolittle.SDK.Artifacts;
+using System.Text.Json;
 using Dolittle.SDK.Protobuf;
-using Dolittle.Serialization.Json;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
 namespace Dolittle.SDK.Events
@@ -16,62 +15,56 @@ namespace Dolittle.SDK.Events
     /// </summary>
     public class EventConverter : IEventConverter
     {
-        readonly IArtifactTypeMap _artifactTypeMap;
-        readonly ISerializer _serializer;
+        readonly IEventTypes _eventTypes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventConverter"/> class.
         /// </summary>
-        /// <param name="artifactTypeMap"><see cref="IArtifactTypeMap"/> for mapping types and artifacts.</param>
-        /// <param name="serializer"><see cref="ISerializer"/> for serialization.</param>
-        public EventConverter(
-            IArtifactTypeMap artifactTypeMap,
-            ISerializer serializer)
+        /// <param name="eventTypes"><see cref="IEventTypes"/> for mapping types and artifacts.</param>
+        public EventConverter(IEventTypes eventTypes)
         {
-            _artifactTypeMap = artifactTypeMap;
-            _serializer = serializer;
+            _eventTypes = eventTypes;
         }
 
         /// <inheritdoc/>
         public Contracts.UncommittedEvent ToProtobuf(UncommittedEvent @event)
             => new Contracts.UncommittedEvent
             {
-                Artifact = ToProtobuf(@event.Event.GetType()),
+                Artifact = @event.EventType.ToProtobuf(),
                 EventSourceId = @event.EventSource.ToProtobuf(),
-                Public = IsPublicEvent(@event.Event),
-                Content = _serializer.EventToJson(@event.Event),
+                Public = @event.IsPublic,
+                Content = JsonSerializer.Serialize(@event.Content),
             };
 
         /// <inheritdoc/>
         public IEnumerable<Contracts.UncommittedEvent> ToProtobuf(UncommittedEvents events)
-            => events.Select(_ => ToProtobuf(_));
+            => events.Select(ToProtobuf);
 
         /// <inheritdoc/>
         public CommittedEvent ToSDK(Contracts.CommittedEvent source)
         {
-            var eventType = source.Type;
+            var eventType = source.Type.To<EventType>();
+            var clrEventType = _eventTypes.GetTypeFor(eventType);
             try
             {
-                var content = _serializer.JsonToEvent(eventType, source.Content);
+                var content = JsonSerializer.Deserialize(source.Content, clrEventType);
                 return new CommittedEvent(
                     source.EventLogSequenceNumber,
                     source.Occurred.ToDateTimeOffset(),
                     source.EventSourceId.To<EventSourceId>(),
                     source.ExecutionContext.ToExecutionContext(),
-                    // artifact stuff, pls fix so it has toSDK()
-                    source.Type,
+                    eventType,
                     content,
                     source.Public,
                     source.External,
                     source.ExternalEventLogSequenceNumber,
-                    source.ExternalEventReceived.ToDateTimeOffset()
-                    );
+                    source.ExternalEventReceived.ToDateTimeOffset());
             }
             catch (Exception ex)
             {
                 throw new CouldNotDeserializeEvent(
-                    source.Type.Id.To<ArtifactId>(),
-                    eventType,
+                    source.Type.Id.To<EventTypeId>(),
+                    clrEventType,
                     source.Content,
                     source.EventLogSequenceNumber,
                     ex);
@@ -81,21 +74,5 @@ namespace Dolittle.SDK.Events
         /// <inheritdoc/>
         public CommittedEvents ToSDK(IEnumerable<Contracts.CommittedEvent> source)
             => new CommittedEvents(source.Select(ToSDK).ToList());
-
-        Artifacts.Contracts.Artifact ToProtobuf(Type artifact)
-        {
-            var mapped = _artifactTypeMap.GetArtifactFor(artifact);
-            return new Artifacts.Contracts.Artifact
-            {
-                Id = mapped.Id.ToProtobuf(),
-                Generation = mapped.Generation,
-            };
-        }
-
-        Type ToSDK(Artifacts.Contracts.Artifact artifact)
-            => _artifactTypeMap.GetTypeFor(new Artifact(artifact.Id.To<ArtifactId>(), artifact.Generation));
-
-        bool IsPublicEvent(IEvent @event)
-            => typeof(IPublicEvent).IsAssignableFrom(@event.GetType());
     }
 }
