@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Dolittle.SDK.Protobuf;
+using Newtonsoft.Json;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
 namespace Dolittle.SDK.Events
@@ -33,7 +33,7 @@ namespace Dolittle.SDK.Events
                 Artifact = @event.EventType.ToProtobuf(),
                 EventSourceId = @event.EventSource.ToProtobuf(),
                 Public = @event.IsPublic,
-                Content = JsonSerializer.Serialize(@event.Content),
+                Content = JsonConvert.SerializeObject(@event.Content),
             };
 
         /// <inheritdoc/>
@@ -47,7 +47,7 @@ namespace Dolittle.SDK.Events
             var clrEventType = _eventTypes.GetTypeFor(eventType);
             try
             {
-                var content = JsonSerializer.Deserialize(source.Content, clrEventType);
+                var content = JsonConvert.DeserializeObject(source.Content, clrEventType);
                 return new CommittedEvent(
                     source.EventLogSequenceNumber,
                     source.Occurred.ToDateTimeOffset(),
@@ -58,7 +58,7 @@ namespace Dolittle.SDK.Events
                     source.Public,
                     source.External,
                     source.ExternalEventLogSequenceNumber,
-                    source.ExternalEventReceived.ToDateTimeOffset());
+                    source.ExternalEventReceived != null ? source.ExternalEventReceived.ToDateTimeOffset() : DateTimeOffset.UtcNow);
             }
             catch (Exception ex)
             {

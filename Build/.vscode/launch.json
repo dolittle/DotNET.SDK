@@ -5,7 +5,7 @@
             "name": ".NET Core Launch (console)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-dotnet",
             "program": "${workspaceFolder}/Samples/Basic/bin/Debug/netcoreapp3.1/Basic.dll",
             "args": [],
             "cwd": "${workspaceFolder}",

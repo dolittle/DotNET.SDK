@@ -67,7 +67,8 @@ namespace Dolittle.SDK.Events
         {
             var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType);
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response.Events[0]);
+            var committedEvent = _eventConverter.ToSDK(response.Events[0]);
+            return committedEvent;
         }
 
         /// <inheritdoc/>

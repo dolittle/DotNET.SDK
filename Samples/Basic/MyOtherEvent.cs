@@ -8,10 +8,10 @@ namespace Basic
 {
     class MyOtherEvent
     {
-        public MyOtherEvent(string aString)
+        public MyOtherEvent(MyString aString)
         {
             AString = aString;
         }
-        public string AString { get; }
+        public MyString AString { get; }
     }
 }
