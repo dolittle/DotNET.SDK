@@ -50,6 +50,15 @@ namespace Dolittle.SDK.Services
             return ReceiveMessagesFromServer(call.ResponseStream, token);
         }
 
+        /// <inheritdoc/>
+        public Task<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallAnUnaryMethod<TClient, TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+            where TClient : ClientBase<TClient>
+            where TClientMessage : IMessage
+            where TServerMessage : IMessage
+        {
+            return method.Call(request, CreateChannel(), CreateCallOptions(token)).ResponseAsync;
+        }
+
         Channel CreateChannel() => new Channel(_host, _port, _channelCredentials, _channelOptions);
 
         CallOptions CreateCallOptions(CancellationToken token) => new CallOptions(cancellationToken: token);
@@ -83,15 +92,6 @@ namespace Dolittle.SDK.Services
                 });
 
             return messages;
-        }
-
-        /// <inheritdoc/>
-        public Task<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallAnUnaryMethod<TClient, TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
-            where TClient : ClientBase<TClient>
-            where TClientMessage : IMessage
-            where TServerMessage : IMessage
-        {
-            return method.Call(request, CreateChannel(), CreateCallOptions(token)).ResponseAsync;
         }
     }
 }

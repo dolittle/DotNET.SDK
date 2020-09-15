@@ -45,7 +45,7 @@ namespace Dolittle.SDK.Protobuf
         /// Implicitly convert <see cref="Contracts.Failure" /> to <see cref="Failure" />.
         /// </summary>
         /// <param name="failure"><see cref="Contracts.Failure" /> to convert.</param>
-        public static implicit operator Failure(Contracts.Failure failure) => 
+        public static implicit operator Failure(Contracts.Failure failure) =>
             new Failure(failure.Id.To<FailureId>(), failure.Reason);
     }
 }
