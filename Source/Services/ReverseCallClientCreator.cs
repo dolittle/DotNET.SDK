@@ -38,7 +38,10 @@ namespace Dolittle.SDK.Services
         }
 
         /// <inheritdoc/>
-        public IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(TConnectArguments arguments, IReverseCallHandler<TRequest, TResponse> handler, ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> converter)
+        public IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
+            TConnectArguments arguments,
+            IReverseCallHandler<TRequest, TResponse> handler,
+            IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol)
             where TClientMessage : IMessage
             where TServerMessage : IMessage
             where TConnectArguments : class
@@ -48,8 +51,7 @@ namespace Dolittle.SDK.Services
             => new ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
                 arguments,
                 handler,
-                method,
-                converter,
+                protocol,
                 _pingInterval,
                 _caller,
                 _executionContextManager,

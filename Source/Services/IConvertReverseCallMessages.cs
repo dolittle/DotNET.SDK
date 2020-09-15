@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.Services.Contracts;
+using Google.Protobuf;
 
 namespace Dolittle.SDK.Services
 {
@@ -15,6 +16,12 @@ namespace Dolittle.SDK.Services
     /// <typeparam name="TRequest">Type of the requests sent from the server to the client.</typeparam>
     /// <typeparam name="TResponse">Type of the responses received from the client.</typeparam>
     public interface IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>
+        where TClientMessage : IMessage
+        where TServerMessage : IMessage
+        where TConnectArguments : class
+        where TConnectResponse : class
+        where TRequest : class
+        where TResponse : class
     {
         /// <summary>
         /// Sets the <see cref="ReverseCallArgumentsContext"/> in a .
