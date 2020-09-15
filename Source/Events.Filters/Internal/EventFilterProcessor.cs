@@ -32,40 +32,32 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="filterEventCallback">The <see cref="FilterEventCallback" />.</param>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
         /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
-        /// <param name="logger">The <see cref="ILogger" />.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public EventFilterProcessor(
             FilterId filterId,
             ScopeId scopeId,
             FilterEventCallback filterEventCallback,
             ICreateReverseCallClients reverseCallClientsCreator,
             IEventProcessingRequestConverter processingRequestConverter,
-            ILogger logger)
-            : base("Filter", filterId, processingRequestConverter, logger)
+            ILoggerFactory loggerFactory)
+            : base(
+                "Filter",
+                filterId,
+                reverseCallClientsCreator.Create(
+                    new FilterRegistrationRequest
+                    {
+                        FilterId = filterId.ToProtobuf(),
+                        ScopeId = scopeId.ToProtobuf()
+                    },
+                    this,
+                    new EventFilterProtocol()),
+                processingRequestConverter,
+                loggerFactory)
         {
             _scopeId = scopeId;
             _filterEventCallback = filterEventCallback;
             _reverseCallClientsCreator = reverseCallClientsCreator;
         }
-
-        /// <inheritdoc/>
-        protected override FilterRegistrationRequest RegisterArguments
-            => new FilterRegistrationRequest
-                {
-                    FilterId = Identifier.ToProtobuf(),
-                    ScopeId = _scopeId.ToProtobuf()
-                };
-
-        /// <inheritdoc/>
-        protected override IReverseCallClient<FilterRegistrationRequest, FilterRegistrationResponse, FilterEventRequest, FilterResponse> CreateClient(
-            FilterRegistrationRequest registerArguments,
-            Func<FilterEventRequest, CancellationToken, Task<FilterResponse>> callback,
-            uint pingTimeout,
-            CancellationToken cancellation)
-            => _reverseCallClientsCreator.Create(
-                RegisterArguments,
-                this,
-                new DuplexStreamingMethodCaller(),
-                new ReverseCallMessageConverter());
 
         /// <inheritdoc/>
         protected override FilterResponse CreateResponseFromFailure(ProcessorFailure failure)
@@ -74,41 +66,5 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <inheritdoc/>
         protected override async Task<FilterResponse> Filter(object @event, EventContext context)
             => new FilterResponse { IsIncluded = await _filterEventCallback(@event, context).ConfigureAwait(false) };
-
-        class DuplexStreamingMethodCaller : ICanCallADuplexStreamingMethod<FiltersClient, FilterClientToRuntimeMessage, FilterRuntimeToClientMessage>
-        {
-            public AsyncDuplexStreamingCall<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
-                => new FiltersClient(channel).Connect(callOptions);
-        }
-
-        class ReverseCallMessageConverter : IConvertReverseCallMessages<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage, FilterRegistrationRequest, FilterRegistrationResponse, FilterEventRequest, FilterResponse>
-        {
-            public FilterClientToRuntimeMessage CreateMessageFrom(FilterRegistrationRequest arguments)
-                => new FilterClientToRuntimeMessage { RegistrationRequest = arguments };
-
-            public FilterClientToRuntimeMessage CreateMessageFrom(Pong pong)
-                => new FilterClientToRuntimeMessage { Pong = pong };
-
-            public FilterClientToRuntimeMessage CreateMessageFrom(FilterResponse response)
-                => new FilterClientToRuntimeMessage { FilterResult = response };
-
-            public FilterRegistrationResponse GetConnectResponseFrom(FilterRuntimeToClientMessage message)
-                => message.RegistrationResponse;
-
-            public Ping GetPingFrom(FilterRuntimeToClientMessage message)
-                => message.Ping;
-
-            public ReverseCallRequestContext GetRequestContextFrom(FilterEventRequest message)
-                => message.CallContext;
-
-            public FilterEventRequest GetRequestFrom(FilterRuntimeToClientMessage message)
-                => message.FilterRequest;
-
-            public void SetConnectArgumentsContextIn(ReverseCallArgumentsContext context, FilterRegistrationRequest arguments)
-                => arguments.CallContext = context;
-
-            public void SetResponseContextIn(ReverseCallResponseContext context, FilterResponse response)
-                => response.CallContext = context;
-        }
     }
 }

@@ -15,14 +15,14 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Events.Processing.Internal
 {
     /// <summary>
-    /// Represents a base implementation of <see cref="IEventProcessor{TRegisterResponse}" />.
+    /// Represents a base implementation of <see cref="IEventProcessor{TIdentifier, TRegisterResponse}" />.
     /// </summary>
     /// <typeparam name="TIdentifier">A <see cref="System.Type" /> extending <see cref="ConceptAs{T}" /> <see cref="Guid" />.</typeparam>
     /// <typeparam name="TRegisterArguments">The <see cref="System.Type" /> of the registration arguments.</typeparam>
     /// <typeparam name="TRegisterResponse">The <see cref="System.Type" /> of the registration response.</typeparam>
     /// <typeparam name="TRequest">The <see cref="System.Type" /> of the request.</typeparam>
     /// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
-    public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse> : IEventProcessor<TRegisterResponse>, IReverseCallHandler<TRequest, TResponse>
+    public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse> : IEventProcessor<TIdentifier, TRegisterResponse>, IReverseCallHandler<TRequest, TResponse>
         where TIdentifier : ConceptAs<Guid>
         where TRegisterArguments : class
         where TRegisterResponse : class
@@ -30,61 +30,73 @@ namespace Dolittle.SDK.Events.Processing.Internal
         where TResponse : class
     {
         readonly string _kind;
-        readonly uint _pingTimeout;
+        readonly IReverseCallClient<TRegisterArguments, TRegisterResponse, TRequest, TResponse> _reverseCallClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse}"/> class.
         /// </summary>
         /// <param name="kind">The kind of the event processor.</param>
         /// <param name="identifier">The <typeparamref name="TIdentifier"/> identifier of the event processor.</param>
+        /// <param name="reverseCallClient">The reverse call client that will be used to connect to the server.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        protected EventProcessor(string kind, TIdentifier identifier, ILogger logger)
+        protected EventProcessor(
+            string kind,
+            TIdentifier identifier,
+            IReverseCallClient<TRegisterArguments, TRegisterResponse, TRequest, TResponse> reverseCallClient,
+            ILogger logger)
         {
-            _pingTimeout = 1;
             _kind = kind;
             Identifier = identifier;
             Logger = logger;
         }
 
-        /// <summary>
-        /// Gets the <typeparamref name="TIdentifier"/> identifier.
-        /// </summary>
-        protected TIdentifier Identifier { get; }
+        /// <inheritdoc/>
+        public TIdentifier Identifier { get; }
 
         /// <summary>
         /// Gets the <see cref="ILogger" />.
         /// </summary>
         protected ILogger Logger { get; }
 
-        /// <summary>
-        /// Gets the <typeparamref name="TRegisterArguments"/> for this <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse}" />.
-        /// </summary>
-        protected abstract TRegisterArguments RegisterArguments { get; }
-
-        /// <inheritdoc />
-        public IObservable<TRegisterResponse> Register(CancellationToken cancellation)
+        /// <inheritdoc/>
+        public IDisposable Subscribe(IObserver<TRegisterResponse> observer)
         {
-            var client = CreateClient(RegisterArguments, CatchingHandle, _pingTimeout, cancellation);
-            return Observable.Create<TRegisterResponse>(subscriber => () =>
-                {
-                    Logger.LogDebug("Registering {Kind} {Identifier} with the Runtime", _kind, Identifier);
-                    client.Subscribe(
-                        registerResponse => OnNext(registerResponse, subscriber),
-                        exception => OnError(exception, subscriber),
-                        () => OnCompleted(subscriber));
-                });
+            Logger.LogDebug("Registering {Kind} {Identifier} with the Runtime", _kind, Identifier);
+            return _reverseCallClient.Subscribe(
+                registerResponse => OnNext(registerResponse, observer),
+                error => OnError(error, observer),
+                () => OnCompleted(observer));
         }
 
-        /// <inheritdoc />
-        public IObservable<TRegisterResponse> RegisterForeverWithPolicy(RetryPolicy policy, CancellationToken cancellation)
-            => Register(cancellation);
-
-        /// <inheritdoc />
-        public IObservable<TRegisterResponse> RegisterWithPolicy(RetryPolicy policy, CancellationToken cancellation)
-            => Register(cancellation);
-
         /// <inheritdoc/>
-        public abstract Task<TResponse> Handle(TRequest request, CancellationToken cancellation);
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellation)
+        {
+            RetryProcessingState retryProcessingState = null;
+            try
+            {
+                retryProcessingState = GetRetryProcessingStateFromRequest(request);
+                return await Process(request, cancellation).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                var retryAttempt = retryProcessingState != default ? retryProcessingState.RetryCount : 1;
+                var retrySeconds = Math.Min(5 * retryAttempt, 60);
+                var retryTimeout = new Duration
+                {
+                    Seconds = retrySeconds
+                };
+                var failure = new ProcessorFailure
+                {
+                    Reason = ex.Message,
+                    Retry = true,
+                    RetryTimeout = retryTimeout
+                };
+
+                Logger.LogWarning("Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", _kind, Identifier, retrySeconds);
+
+                return CreateResponseFromFailure(failure);
+            }
+        }
 
         /// <summary>
         /// Creates a client.
@@ -121,56 +133,12 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// <returns>The <typeparamref name="TResponse"/>.</returns>
         protected abstract TResponse CreateResponseFromFailure(ProcessorFailure failure);
 
-        async Task<TResponse> CatchingHandle(TRequest request, CancellationToken cancellation)
-        {
-            RetryProcessingState retryProcessingState = null;
-            try
-            {
-                retryProcessingState = GetRetryProcessingStateFromRequest(request);
-                return await Handle(request, cancellation).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                var retryAttempt = retryProcessingState != default ? retryProcessingState.RetryCount : 1;
-                var retrySeconds = Math.Min(5 * retryAttempt, 60);
-                var retryTimeout = new Duration
-                {
-                    Seconds = retrySeconds
-                };
-                var failure = new ProcessorFailure
-                {
-                    Reason = ex.Message,
-                    Retry = true,
-                    RetryTimeout = retryTimeout
-                };
-
-                Logger.LogWarning("Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", _kind, Identifier, retrySeconds);
-
-                return CreateResponseFromFailure(failure);
-            }
-        }
-
-        void OnNext(TRegisterResponse registerResponse, IObserver<TRegisterResponse> subscriber)
-        {
-            var failure = GetFailureFromRegisterResponse(registerResponse);
-            switch (failure)
-            {
-                case Failure _ when failure == default:
-                    subscriber.OnError(new RegistrationFailed(_kind, Identifier, failure));
-                    break;
-                default:
-                    Logger.LogDebug("{Kind} {Identifier} registered with the Runtime, start handling requests.", _kind, Identifier);
-                    subscriber.OnNext(registerResponse);
-                    break;
-            }
-        }
-
-        void OnError(Exception exception, IObserver<TRegisterResponse> subscriber) => subscriber.OnError(exception);
-
-        void OnCompleted(IObserver<TRegisterResponse> subscriber)
-        {
-            Logger.LogDebug("Registering {Kind} {identifier} handling of requests completed.");
-            subscriber.OnCompleted();
-        }
+        /// <summary>
+        /// Method that will be called to process an event processing request from the server.
+        /// </summary>
+        /// <param name="request">The <typeparamref name="TRequest"/> to process.</param>
+        /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
+        /// <returns>A <see cref="Task" /> that, when resolved, returns a <typeparamref name="TResponse"/>.</returns>
+        protected abstract Task<TResponse> Process(TRequest request, CancellationToken cancellation);
     }
 }
