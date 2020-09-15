@@ -8,7 +8,7 @@ using Dolittle.SDK.Services.given.ReverseCall;
 using Dolittle.Services.Contracts;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
+namespace Dolittle.SDK.Services.for_ReverseCallClient.when_connected
 {
     public class and_server_sends_a_ping : given.a_reverse_call_client
     {
@@ -28,7 +28,7 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
                 new ServerMessage { Ping = new Ping() },
             };
 
-            client = ReverseCallClientWith(arguments, serverToClientMessages);
+            client = reverse_call_client_with(arguments, serverToClientMessages);
         };
 
         Because of = () => receivedResponses = client.ToArray().Wait();

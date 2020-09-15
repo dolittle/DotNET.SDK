@@ -11,7 +11,7 @@ using Machine.Specifications;
 using Moq;
 using It = Moq.It;
 
-namespace Dolittle.SDK.Services.for_MethodCaller.given
+namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 {
     public class a_method_caller : an_execution_context_manager
     {
@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Services.for_MethodCaller.given
 
         Establish context = () => messagesSentToServer = _messages = new List<ClientMessage>();
 
-        protected static IPerformMethodCalls MethodCallerThatRepliesWith(IObservable<ServerMessage> serverToClientMessages)
+        protected static IPerformMethodCalls method_caller_that_replies_with(IObservable<ServerMessage> serverToClientMessages)
         {
             var mock = new Mock<IPerformMethodCalls>();
             mock.Setup(_ => _.Call(It.IsAny<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(), It.IsAny<IObservable<ClientMessage>>()))

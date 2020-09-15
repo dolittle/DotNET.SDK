@@ -35,6 +35,6 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming
 
         It should_make_the_call_with_the_correct_host_and_port = () => providedChannel.ResolvedTarget.ShouldEqual("host:1337");
         It should_send_all_the_client_messages = () => writtenClientMessages.ShouldContainOnly(clientToServerMessages);
-        It should_receive_all_the_server_messages = () => receivedServerMessages.ShouldBeEmpty();
+        It should_not_receive_any_messages_from_server = () => receivedServerMessages.ShouldBeEmpty();
     }
 }

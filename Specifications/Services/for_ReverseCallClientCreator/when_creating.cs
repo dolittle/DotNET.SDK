@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Services.for_Artifacts
+namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
 {
     public class when_creating
     {

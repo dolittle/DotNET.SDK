@@ -9,23 +9,23 @@ using Dolittle.SDK.Services.given.ReverseCall;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Dolittle.SDK.Services.for_MethodCaller.given
+namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 {
     public class a_reverse_call_client : a_method_caller
     {
         protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> client;
 
-        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> reverse_call_client_with(
             ConnectArguments arguments,
             IEnumerable<ServerMessage> serverToClientMessages)
-            => ReverseCallClientWith(arguments, serverToClientMessages.ToObservable());
+            => reverse_call_client_with(arguments, serverToClientMessages.ToObservable());
 
-        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> reverse_call_client_with(
             ConnectArguments arguments,
             IObservable<ServerMessage> serverToClientMessages)
-            => ReverseCallClientWith(arguments, TimeSpan.FromSeconds(1), serverToClientMessages);
+            => reverse_call_client_with(arguments, TimeSpan.FromSeconds(1), serverToClientMessages);
 
-        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> ReverseCallClientWith(
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> reverse_call_client_with(
             ConnectArguments arguments,
             TimeSpan pingInterval,
             IObservable<ServerMessage> serverToClientMessages)
@@ -35,7 +35,7 @@ namespace Dolittle.SDK.Services.for_MethodCaller.given
                 Mock.Of<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(),
                 new Converter(),
                 pingInterval,
-                MethodCallerThatRepliesWith(serverToClientMessages),
+                method_caller_that_replies_with(serverToClientMessages),
                 executionContextManager,
                 Mock.Of<ILogger>());
     }

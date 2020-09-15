@@ -9,7 +9,7 @@ namespace Dolittle.SDK.Services
 {
     public static class ObservableExtensions
     {
-        public static Exception CatchError<T>(this IObservable<T> observable)
+        public static Exception SubscribeAndCatchError<T>(this IObservable<T> observable)
         {
             Exception exception = null;
 

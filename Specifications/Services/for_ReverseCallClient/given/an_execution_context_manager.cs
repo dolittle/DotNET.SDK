@@ -9,7 +9,7 @@ using Dolittle.SDK.Tenancy;
 using Machine.Specifications;
 using Moq;
 
-namespace Dolittle.SDK.Services.for_MethodCaller.given
+namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 {
     public class an_execution_context_manager
     {

@@ -8,7 +8,7 @@ using Dolittle.SDK.Services.given.ReverseCall;
 using Dolittle.Services.Contracts;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
+namespace Dolittle.SDK.Services.for_ReverseCallClient.when_connected
 {
     public class and_server_sends_two_pings_before_deadline_and_one_ping_after : given.a_reverse_call_client
     {
@@ -27,10 +27,10 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
                 .Merge(new[] { new ServerMessage { Ping = new Ping() } }.ToObservable().Delay(TimeSpan.FromMilliseconds(20)))
                 .Merge(new[] { new ServerMessage { Ping = new Ping() } }.ToObservable().Delay(TimeSpan.FromMilliseconds(80)));
 
-            client = ReverseCallClientWith(arguments, TimeSpan.FromMilliseconds(10), serverToClientMessages);
+            client = reverse_call_client_with(arguments, TimeSpan.FromMilliseconds(10), serverToClientMessages);
         };
 
-        Because of = () => exception = client.CatchError();
+        Because of = () => exception = client.SubscribeAndCatchError();
 
         It should_return_an_error = () => exception.ShouldBeOfExactType<PingTimedOut>();
         It should_have_sent_three_messages = () => messagesSentToServer.Count().ShouldEqual(3);

@@ -7,7 +7,7 @@ using System.Reactive.Linq;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
+namespace Dolittle.SDK.Services.for_ReverseCallClient.when_connected
 {
     public class and_server_does_not_send_a_ping_before_the_deadline : given.a_reverse_call_client
     {
@@ -23,13 +23,13 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_subscribing
 
             var serverToClientMessages = messages.ToObservable().Merge(Observable.Empty<ServerMessage>().Delay(TimeSpan.FromMilliseconds(50)));
 
-            client = ReverseCallClientWith(arguments, TimeSpan.FromMilliseconds(10), serverToClientMessages);
+            client = reverse_call_client_with(arguments, TimeSpan.FromMilliseconds(10), serverToClientMessages);
         };
 
-        Because of = () => exception = client.CatchError();
+        Because of = () => exception = client.SubscribeAndCatchError();
 
-        It should_return_an_error = () => exception.ShouldBeOfExactType<PingTimedOut>();
         It should_send_one_message = () => messagesSentToServer.Count().ShouldEqual(1);
         It should_send_the_arguments_as_the_first_message = () => messagesSentToServer.First().ShouldMatch(_ => _.Arguments == arguments);
+        It should_return_an_error = () => exception.ShouldBeOfExactType<PingTimedOut>();
     }
 }
