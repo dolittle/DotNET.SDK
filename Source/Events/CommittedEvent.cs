@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Events
         /// <param name="occurred">The <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the Event.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext"/> in which the Event was committed.</param>
-        /// <param name="artifact">The <see cref="Artifact"/> the Event is associated with.</param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="content">The content of the Event.</param>
         /// <param name="isPublic">Whether the event is public or not.</param>
         /// <param name="isExternal">Whether the event is from an external Microservice or not.</param>
@@ -30,7 +30,7 @@ namespace Dolittle.SDK.Events
             DateTimeOffset occurred,
             EventSourceId eventSourceId,
             ExecutionContext executionContext,
-            Artifact artifact,
+            EventType eventType,
             object content,
             bool isPublic,
             bool isExternal,
@@ -40,7 +40,7 @@ namespace Dolittle.SDK.Events
             EventLogSequenceNumber = eventLogSequenceNumber;
             Occurred = occurred;
             ExecutionContext = executionContext;
-            Artifact = artifact;
+            EventType = eventType;
             Content = content;
             IsPublic = isPublic;
             IsExternal = isExternal;
@@ -70,9 +70,9 @@ namespace Dolittle.SDK.Events
         public ExecutionContext ExecutionContext { get; }
 
         /// <summary>
-        /// Gets the <see cref="Artifact"/> in which the Event is associated with.
+        /// Gets the <see cref="EventType"/> in which the Event is associated with.
         /// </summary>
-        public Artifact Artifact { get; }
+        public EventType EventType { get; }
 
         /// <summary>
         /// Gets the content of the Event.

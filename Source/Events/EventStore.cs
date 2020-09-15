@@ -80,10 +80,10 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        async public Task<CommittedEvent> Commit(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default)
+        async public Task<CommittedEvent> Commit(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = new UncommittedEvents();
-            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, artifact, content, false));
+            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, false));
             var response = await CommitInternal(uncommittedEvents, cancellationToken);
             try
             {
@@ -96,10 +96,10 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        async public Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default)
+        async public Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = new UncommittedEvents();
-            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, artifact, content, false));
+            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, false));
             var response = await CommitInternal(uncommittedEvents, cancellationToken);
             try
             {

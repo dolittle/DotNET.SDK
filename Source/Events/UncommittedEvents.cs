@@ -30,11 +30,11 @@ namespace Dolittle.SDK.Events
         /// Appends an event to the uncommitted sequence.
         /// </summary>
         /// <param name="eventSource">The <see cref="EventSourceId"/> of the <see cref="UncommittedEvent"/> to append.</param>
-        /// <param name="artifact">The <see cref="Artifact"/> of the <see cref="UncommittedEvent"/> to append.</param>
+        /// <param name="eventType">The <see cref="EventType"/> of the <see cref="UncommittedEvent"/> to append.</param>
         /// <param name="content">The content of the <see cref="UncommittedEvent"/> to append.</param>
         /// <param name="public">Wether the <see cref="UncommittedEvent"/> to append is public or not.</param>
-        public void Append(EventSourceId eventSource, Artifact artifact, object content, bool @public)
-            => Append(new UncommittedEvent(eventSource, artifact, content, @public));
+        public void Append(EventSourceId eventSource, EventType eventType, object content, bool @public)
+            => Append(new UncommittedEvent(eventSource, eventType, content, @public));
 
         /// <summary>
         /// Appends an event to the uncommitted sequence.

@@ -13,13 +13,13 @@ namespace Dolittle.SDK.Events
         /// Initializes a new instance of the <see cref="UncommittedEvent"/> class.
         /// </summary>
         /// <param name="eventSource">The <see cref="EventSourceId" /> of the Event.</param>
-        /// <param name="artifact"></param>
+        /// <param name="eventType"></param>
         /// <param name="content"></param>
         /// <param name="isPublic"></param>
-        public UncommittedEvent(EventSourceId eventSource, Artifact artifact, object content, bool isPublic)
+        public UncommittedEvent(EventSourceId eventSource, EventType eventType, object content, bool isPublic)
         {
             EventSource = eventSource;
-            Artifact = artifact;
+            EventType = eventType;
             Content = content;
             IsPublic = isPublic;
         }
@@ -32,7 +32,7 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Gets the Artifact this event is associated with.
         /// </summary>
-        public Artifact Artifact { get; }
+        public EventType EventType { get; }
 
         /// <summary>
         /// Gets the content of the event.

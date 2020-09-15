@@ -36,19 +36,19 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="content">The content of the Event.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="artifact">The <see cref="Artifact"/> the Event is associated with.</param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommittedEvent> Commit(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default);
+        Task<CommittedEvent> Commit(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single public Event with the given content.
         /// </summary>
         /// <param name="content">The content of the Event.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="artifact">The <see cref="Artifact"/> the Event is associated with.</param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, Artifact artifact, object content, CancellationToken cancellationToken = default);
+        Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default);
     }
 }
