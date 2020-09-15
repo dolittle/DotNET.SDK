@@ -6,12 +6,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/Samples/SimpleWeb/bin/Debug/netcoreapp1.1/SimpleWeb.dll",
+            "program": "${workspaceFolder}/Samples/Basic/bin/Debug/netcoreapp3.1/Basic.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/Samples/SimpleWeb",
-            "externalConsole": false,
+            "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            "internalConsoleOptions": "openOnSessionStart"
+            "console": "internalConsole"
         },
         {
             "name": ".NET Core Attach",
