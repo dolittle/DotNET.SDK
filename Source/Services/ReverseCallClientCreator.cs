@@ -4,7 +4,6 @@
 using System;
 using Dolittle.SDK.Execution;
 using Google.Protobuf;
-using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Services
@@ -39,15 +38,14 @@ namespace Dolittle.SDK.Services
         }
 
         /// <inheritdoc/>
-        public IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClient, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(TConnectArguments arguments, IReverseCallHandler<TRequest, TResponse> handler, ICanCallADuplexStreamingMethod<TClient, TClientMessage, TServerMessage> method, IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> converter)
-            where TClient : ClientBase<TClient>
+        public IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(TConnectArguments arguments, IReverseCallHandler<TRequest, TResponse> handler, ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> converter)
             where TClientMessage : IMessage
             where TServerMessage : IMessage
             where TConnectArguments : class
             where TConnectResponse : class
             where TRequest : class
             where TResponse : class
-            => new ReverseCallClient<TClient, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
+            => new ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
                 arguments,
                 handler,
                 method,
@@ -55,6 +53,6 @@ namespace Dolittle.SDK.Services
                 _pingInterval,
                 _caller,
                 _executionContextManager,
-                _loggerFactory.CreateLogger<ReverseCallClient<TClient, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>>());
+                _loggerFactory.CreateLogger<ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>>());
     }
 }
