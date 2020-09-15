@@ -6,86 +6,61 @@ using System;
 namespace Dolittle.SDK.Artifacts
 {
     /// <summary>
-    /// Defines a system for working with <see cref="Artifact"/>.
+    /// Defines a system that knows about <see cref="Artifact{TId}"/>.
     /// </summary>
-    public interface IArtifacts
+    /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="IArtifact" />.</typeparam>
+    public interface IArtifacts<TArtifact>
+        where TArtifact : IArtifact
     {
         /// <summary>
-        /// Check if there is a type associated with an <see cref="Artifact" />.
+        /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
         /// </summary>
         /// <typeparam name="T">CLR type of the artifact.</typeparam>
-        /// <returns><see cref="Artifact"/>.</returns>
-        Artifact HasFor<T>();
+        /// <returns><see cref="bool"/>.</returns>
+        bool HasFor<T>()
+            where T : class;
 
         /// <summary>
-        /// Check if there is a type associated with an <see cref="Artifact" />.
+        /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
         /// </summary>
         /// <param name="type">CLR type of the artifact.</param>
-        /// <returns><see cref="Artifact"/>.</returns>
-        Artifact HasFor(Type type);
+        /// <returns><see cref="bool"/>.</returns>
+        bool HasFor(Type type);
 
         /// <summary>
-        /// Get an <see cref="Artifact"/> from a given type.
+        /// Get an <see cref="Artifact{TId}"/> from a given type.
         /// </summary>
         /// <typeparam name="T">CLR type of the artifact.</typeparam>
-        /// <returns><see cref="Artifact"/>.</returns>
-        Artifact GetFor<T>();
+        /// <returns><see cref="Artifact{TId}"/>.</returns>
+        TArtifact GetFor<T>()
+            where T : class;
 
         /// <summary>
-        /// Get an <see cref="Artifact"/> from a given type.
+        /// Get an <see cref="Artifact{TId}"/> from a given type.
         /// </summary>
         /// <param name="type">CLR type of the artifact.</param>
-        /// <returns><see cref="Artifact"/>.</returns>
-        Artifact GetFor(Type type);
+        /// <returns><see cref="Artifact{TId}"/>.</returns>
+        TArtifact GetFor(Type type);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
+        /// Check if there is an <typeparamref name="TArtifact"/> associated with a <see cref="Type" />.
         /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
-        /// <returns><see cref="Type"/>.</returns>
-        Type HasTypeFor(Artifact artifact);
+        /// <param name="artifact">The <typeparamref name="TArtifact"/>.</param>
+        /// <returns><see cref="bool"/>.</returns>
+        bool HasTypeFor(TArtifact artifact);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="ArtifactId"/>.
+        /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact{TId}"/>.
         /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
+        /// <param name="artifact"><see cref="Artifact{TId}"/> to get for.</param>
         /// <returns><see cref="Type"/>.</returns>
-        Type HasTypeFor(ArtifactId artifact);
+        Type GetTypeFor(TArtifact artifact);
 
         /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact"/>.
-        /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
-        /// <returns><see cref="Type"/>.</returns>
-        Type GetTypeFor(Artifact artifact);
-
-        /// <summary>
-        /// Get a CLR <see cref="Type"/> for a specific <see cref="ArtifactId"/>.
-        /// </summary>
-        /// <param name="artifact"><see cref="Artifact"/> to get for.</param>
-        /// <returns><see cref="Type"/>.</returns>
-        Type GetTypeFor(ArtifactId artifact);
-
-        /// <summary>
-        /// Register an relationship between an <see cref="Artifact"/> and a <see cref="Type"/>.
+        /// Register an relationship between an <see cref="Artifact{TId}"/> and a <see cref="Type"/>.
         /// </summary>
         /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-        /// <param name="artifact"><see cref="Artifact"/> to register.</param>
-        void Associate(Type type, Artifact artifact);
-
-        /// <summary>
-        /// Register an relationship between a <see cref="Artifact"/> and a <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-        /// <param name="artifactId"><see cref="ArtifactId"/> to register.</param>
-        void Associate(Type type, ArtifactId artifactId);
-
-        /// <summary>
-        /// Register an relationship between a <see cref="Artifact"/> and a <see cref="Type"/>.
-        /// </summary>
-        /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-        /// <param name="artifactId"><see cref="ArtifactId"/> to register.</param>
-        /// <param name="generation"><see cref="Generation"/> of the <see cref="Artifact" />.</param>
-        void Associate(Type type, ArtifactId artifactId, Generation generation);
+        /// <param name="artifact"><see cref="Artifact{TId}"/> to register.</param>
+        void Associate(Type type, TArtifact artifact);
     }
 }
