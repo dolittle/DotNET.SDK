@@ -11,23 +11,23 @@ namespace Dolittle.SDK.Events.Filters.Internal
     /// <summary>
     /// Represents the reverse call protocol for registering event filters with the runtime.
     /// </summary>
-    public class EventFilterProtocol : IAmAFilterProtocol<FilterClientToRuntimeMessage, FilterRegistrationRequest, FilterResponse>
+    public class PublicEventFilterProtocol : IAmAFilterProtocol<PublicFilterClientToRuntimeMessage, PublicFilterRegistrationRequest, PartitionedFilterResponse>
     {
         /// <inheritdoc/>
-        public AsyncDuplexStreamingCall<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
-                => new FiltersClient(channel).Connect(callOptions);
+        public AsyncDuplexStreamingCall<PublicFilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
+                => new FiltersClient(channel).ConnectPublic(callOptions);
 
         /// <inheritdoc/>
-        public FilterClientToRuntimeMessage CreateMessageFrom(FilterRegistrationRequest arguments)
-                => new FilterClientToRuntimeMessage { RegistrationRequest = arguments };
+        public PublicFilterClientToRuntimeMessage CreateMessageFrom(PublicFilterRegistrationRequest arguments)
+                => new PublicFilterClientToRuntimeMessage { RegistrationRequest = arguments };
 
         /// <inheritdoc/>
-        public FilterClientToRuntimeMessage CreateMessageFrom(Pong pong)
-            => new FilterClientToRuntimeMessage { Pong = pong };
+        public PublicFilterClientToRuntimeMessage CreateMessageFrom(Pong pong)
+            => new PublicFilterClientToRuntimeMessage { Pong = pong };
 
         /// <inheritdoc/>
-        public FilterClientToRuntimeMessage CreateMessageFrom(FilterResponse response)
-            => new FilterClientToRuntimeMessage { FilterResult = response };
+        public PublicFilterClientToRuntimeMessage CreateMessageFrom(PartitionedFilterResponse response)
+            => new PublicFilterClientToRuntimeMessage { FilterResult = response };
 
         /// <inheritdoc/>
         public FilterRegistrationResponse GetConnectResponseFrom(FilterRuntimeToClientMessage message)
@@ -46,11 +46,11 @@ namespace Dolittle.SDK.Events.Filters.Internal
             => message.FilterRequest;
 
         /// <inheritdoc/>
-        public void SetConnectArgumentsContextIn(ReverseCallArgumentsContext context, FilterRegistrationRequest arguments)
+        public void SetConnectArgumentsContextIn(ReverseCallArgumentsContext context, PublicFilterRegistrationRequest arguments)
             => arguments.CallContext = context;
 
         /// <inheritdoc/>
-        public void SetResponseContextIn(ReverseCallResponseContext context, FilterResponse response)
+        public void SetResponseContextIn(ReverseCallResponseContext context, PartitionedFilterResponse response)
             => response.CallContext = context;
     }
 }
