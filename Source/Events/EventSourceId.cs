@@ -37,6 +37,12 @@ namespace Dolittle.SDK.Events
         public static implicit operator EventSourceId(Guid eventId) => new EventSourceId { Value = eventId };
 
         /// <summary>
+        /// Implicitly convert from a <see cref="string"/> to an <see cref="EventSourceId"/>.
+        /// </summary>
+        /// <param name="eventId">EventSourceId as <see cref="string"/>.</param>
+        public static implicit operator EventSourceId(string eventId) => new EventSourceId { Value = Guid.Parse(eventId) };
+
+        /// <summary>
         /// Creates a new instance of <see cref="EventSourceId"/> with a unique id.
         /// </summary>
         /// <returns>A new <see cref="EventSourceId"/>.</returns>

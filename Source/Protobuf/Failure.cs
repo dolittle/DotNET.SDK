@@ -46,6 +46,8 @@ namespace Dolittle.SDK.Protobuf
         /// </summary>
         /// <param name="failure"><see cref="Contracts.Failure" /> to convert.</param>
         public static implicit operator Failure(Contracts.Failure failure) =>
-            new Failure(failure.Id.To<FailureId>(), failure.Reason);
+            failure != null ?
+                new Failure(failure.Id.To<FailureId>(), failure.Reason)
+                : null;
     }
 }

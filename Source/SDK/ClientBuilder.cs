@@ -6,6 +6,7 @@ using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK
@@ -123,7 +124,10 @@ namespace Dolittle.SDK
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
             var eventTypes = _eventTypesBuilder.Build();
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes);
+            var methodCaller = new MethodCaller(_host, _port);
+            var eventConverter = new EventConverter(eventTypes);
+            var eventStore = new EventStore(methodCaller, eventConverter, executionContextManager, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes, eventStore);
         }
     }
 }

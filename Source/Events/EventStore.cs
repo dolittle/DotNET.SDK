@@ -19,30 +19,30 @@ namespace Dolittle.SDK.Events
     {
         readonly IPerformMethodCalls _caller;
         readonly EventStoreCommitMethod _method = new EventStoreCommitMethod();
-        readonly IEventTypes _eventTypes;
         readonly IEventConverter _eventConverter;
         readonly IExecutionContextManager _executionContextManager;
-        readonly ILogger<EventStore> _logger;
+        readonly IEventTypes _eventTypes;
+        readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStore"/> class.
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
-        /// <param name="evetTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
         /// <param name="executionContextManager">An <see cref="IExecutionContextManager"/> for getting execution context from.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStore(
             IPerformMethodCalls caller,
-            IEventTypes evetTypes,
             IEventConverter eventConverter,
             IExecutionContextManager executionContextManager,
-            ILogger<EventStore> logger)
+            IEventTypes eventTypes,
+            ILogger logger)
         {
             _caller = caller;
-            _eventTypes = evetTypes;
             _eventConverter = eventConverter;
             _executionContextManager = executionContextManager;
+            _eventTypes = eventTypes;
             _logger = logger;
         }
 
@@ -50,14 +50,7 @@ namespace Dolittle.SDK.Events
         public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
+            return _eventConverter.ToSDK(response.Events);
         }
 
         /// <inheritdoc/>
@@ -66,46 +59,37 @@ namespace Dolittle.SDK.Events
             var uncommittedEvents = new UncommittedEvents();
             uncommittedEvents.Append(uncommittedEvent);
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events[0]);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
+            return _eventConverter.ToSDK(response.Events[0]);
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvent> Commit(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
+        public async Task<CommittedEvent> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
         {
-            var uncommittedEvents = new UncommittedEvents();
-            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, false));
+            var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType);
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events[0]);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
+            return _eventConverter.ToSDK(response.Events[0]);
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvent> CommitPublic(EventSourceId eventSourceId, EventType eventType, object content, CancellationToken cancellationToken = default)
+        public Task<CommittedEvent> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
         {
-            var uncommittedEvents = new UncommittedEvents();
-            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, false));
+            var eventType = _eventTypes.GetFor(content.GetType());
+            return Commit(content, eventSourceId, eventType, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<CommittedEvent> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+        {
+            var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType, true);
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events[0]);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
+            return _eventConverter.ToSDK(response.Events[0]);
+        }
+
+        /// <inheritdoc/>
+        public Task<CommittedEvent> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        {
+            var eventType = _eventTypes.GetFor(content.GetType());
+            return CommitPublic(content, eventSourceId, eventType, cancellationToken);
         }
 
         async Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
@@ -121,10 +105,18 @@ namespace Dolittle.SDK.Events
             return response;
         }
 
+        UncommittedEvents ToUncommittedEvents(object content, EventSourceId eventSourceId, EventType eventType, bool isPublic = false)
+        {
+            var uncommittedEvents = new UncommittedEvents();
+            uncommittedEvents.Append(new UncommittedEvent(eventSourceId, eventType, content, isPublic));
+            return uncommittedEvents;
+        }
+
         CallRequestContext GetCurrentCallContext()
             => new CallRequestContext
             {
-                HeadId = _head.Id.ToProtobuf(),
+                // in the future this should be set to something more meaningfull
+                HeadId = HeadId.NotSet.Value.ToProtobuf(),
                 ExecutionContext = _executionContextManager.Current.ToProtobuf(),
             };
 
