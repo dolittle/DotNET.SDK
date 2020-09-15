@@ -8,7 +8,7 @@ using Dolittle.SDK.Collections;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represents a sequence of <see cref="IEvent"/>s that have been committed to the Event Store.
+    /// Represents a sequence of Events that have been committed to the Event Store.
     /// </summary>
     public class CommittedEvents : IReadOnlyList<CommittedEvent>
     {

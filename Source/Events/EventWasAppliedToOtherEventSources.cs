@@ -6,7 +6,7 @@ using System;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Exception that gets thrown when an <see cref="IEvent"/> is being used with an Event Source with a different <see cref="EventSourceId"/> than it was applied to.
+    /// Exception that gets thrown when an Event is being used with an Event Source with a different <see cref="EventSourceId"/> than it was applied to.
     /// </summary>
     public class EventWasAppliedToOtherEventSource : ArgumentException
     {

@@ -22,7 +22,7 @@ namespace Dolittle.SDK.Events
     {
         readonly IPerformMethodCalls _caller;
         readonly EventStoreCommitMethod _method = new EventStoreCommitMethod();
-        readonly IArtifactTypeMap _artifactMap;
+        readonly IEventTypes _eventTypes;
         readonly IEventConverter _eventConverter;
         readonly IExecutionContextManager _executionContextManager;
         readonly ILogger<EventStore> _logger;
@@ -31,19 +31,19 @@ namespace Dolittle.SDK.Events
         /// Initializes a new instance of the <see cref="EventStore"/> class.
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
-        /// <param name="artifactMap">The <see cref="IArtifactTypeMap" />.</param>
+        /// <param name="evetTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
         /// <param name="executionContextManager">An <see cref="IExecutionContextManager"/> for getting execution context from.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStore(
             IPerformMethodCalls caller,
-            IArtifactTypeMap artifactMap,
+            IEventTypes evetTypes,
             IEventConverter eventConverter,
             IExecutionContextManager executionContextManager,
             ILogger<EventStore> logger)
         {
             _caller = caller;
-            _artifactMap = artifactMap;
+            _eventTypes = evetTypes;
             _eventConverter = eventConverter;
             _executionContextManager = executionContextManager;
             _logger = logger;

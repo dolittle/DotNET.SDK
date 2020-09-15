@@ -7,7 +7,7 @@ using Dolittle.SDK.Artifacts;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Exception that gets thrown when an <see cref="IEvent"/> couldn't be deserialized.
+    /// Exception that gets thrown when an Event couldn't be deserialized.
     /// </summary>s
     public class CouldNotDeserializeEvent : Exception
     {

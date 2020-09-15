@@ -6,7 +6,7 @@ using System;
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Exception that gets thrown when an <see cref="IEvent"/> is null.
+    /// Exception that gets thrown when an Event is null.
     /// </summary>
     public class EventCanNotBeNull : Exception
     {
