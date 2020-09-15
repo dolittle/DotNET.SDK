@@ -47,46 +47,43 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        public async Task<CommitEventsResponse> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response.Events);
+            return _eventConverter.ToSDK(response);
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvent> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
+        public Task<CommitEventsResponse> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = new UncommittedEvents();
             uncommittedEvents.Append(uncommittedEvent);
-            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response.Events[0]);
+            return Commit(uncommittedEvents, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvent> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+        public Task<CommitEventsResponse> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType);
-            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response.Events[0]);
+            return Commit(uncommittedEvents, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<CommittedEvent> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        public Task<CommitEventsResponse> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
         {
             var eventType = _eventTypes.GetFor(content.GetType());
             return Commit(content, eventSourceId, eventType, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvent> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+        public Task<CommitEventsResponse> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
         {
             var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType, true);
-            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response.Events[0]);
+            return Commit(uncommittedEvents, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<CommittedEvent> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        public Task<CommitEventsResponse> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
         {
             var eventType = _eventTypes.GetFor(content.GetType());
             return CommitPublic(content, eventSourceId, eventType, cancellationToken);
@@ -101,7 +98,6 @@ namespace Dolittle.SDK.Events
             };
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
             var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
-            ThrowIfFailure(response.Failure);
             return response;
         }
 
@@ -119,10 +115,5 @@ namespace Dolittle.SDK.Events
                 HeadId = HeadId.NotSet.Value.ToProtobuf(),
                 ExecutionContext = _executionContextManager.Current.ToProtobuf(),
             };
-
-        void ThrowIfFailure(Failure failure)
-        {
-            if (failure != null) throw new EventStoreOperationFailed(failure.Reason);
-        }
     }
 }

@@ -26,8 +26,8 @@ namespace Basic
             var myEventTask = client.EventStore.Commit(myEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
             var myOtherTask = client.EventStore.Commit(myOtherEvent, "35901e38-55fb-4cd8-9d49-bfe556ea0030");
             Task.WaitAll(myEventTask, myOtherTask);
-            Console.WriteLine(myEventTask.Result.Content);
-            Console.WriteLine(myOtherTask.Result.Content);
+            Console.WriteLine(myEventTask.Result.Events);
+            Console.WriteLine(myOtherTask.Result.Events);
         }
     }
 }

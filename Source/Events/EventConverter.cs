@@ -74,5 +74,9 @@ namespace Dolittle.SDK.Events
         /// <inheritdoc/>
         public CommittedEvents ToSDK(IEnumerable<Contracts.CommittedEvent> source)
             => new CommittedEvents(source.Select(ToSDK).ToList());
+
+        /// <inheritdoc/>
+        public CommitEventsResponse ToSDK(Contracts.CommitEventsResponse source)
+            => new CommitEventsResponse(source.Failure, ToSDK(source.Events));
     }
 }
