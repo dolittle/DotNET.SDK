@@ -29,8 +29,8 @@ namespace Dolittle.SDK
             IEventStore eventStore)
         {
             _logger = logger;
-            EventTypes = eventTypes;
             ExecutionContextManager = executionContextManager;
+            EventTypes = eventTypes;
             EventStore = eventStore;
         }
 

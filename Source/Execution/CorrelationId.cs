@@ -39,6 +39,13 @@ namespace Dolittle.SDK.Execution
         public static implicit operator CorrelationId(Guid value) => new CorrelationId(value);
 
         /// <summary>
+        /// Implicitly converts from a <see cref="string"/> to a <see cref="CorrelationId"/>.
+        /// </summary>
+        /// <param name="correlationId"><see cref="string"/> representing the correlation id.</param>
+        public static implicit operator CorrelationId(string correlationId)
+            => new CorrelationId { Value = Guid.Parse(correlationId) };
+
+        /// <summary>
         /// Creates a new <see cref="CorrelationId" /> with a generated Guid value.
         /// </summary>
         /// <returns>A <see cref="CorrelationId" /> initialised with a random Guid value.</returns>

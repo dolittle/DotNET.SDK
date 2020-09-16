@@ -32,8 +32,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
             => new ReverseCallClient<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>(
                 arguments,
                 Mock.Of<IReverseCallHandler<Request, Response>>(),
-                Mock.Of<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(),
-                new Converter(),
+                new Protocol(),
                 pingInterval,
                 method_caller_that_replies_with(serverToClientMessages),
                 executionContextManager,

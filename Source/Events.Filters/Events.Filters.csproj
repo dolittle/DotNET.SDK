@@ -4,11 +4,14 @@
         <AssemblyName>Dolittle.SDK.Events.Filters</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Events\Events.csproj" />
         <ProjectReference Include="..\Events.Processing\Events.Processing.csproj" />
+        <ProjectReference Include="..\Protobuf\Protobuf.csproj" />
     </ItemGroup>
     
 </Project>
