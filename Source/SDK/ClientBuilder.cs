@@ -22,7 +22,7 @@ namespace Dolittle.SDK
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
-        uint _port = 50053;
+        ushort _port = 50053;
         Microservices.Version _version;
         Microservices.Environment _environment;
         CancellationToken _cancellation;
@@ -139,21 +139,19 @@ namespace Dolittle.SDK
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
             var eventTypes = _eventTypesBuilder.Build();
+            var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 TimeSpan.FromSeconds(5),
-                new MethodCaller(
-                    _host,
-                    (int)_port),
+                methodCaller,
                 executionContextManager,
                 _loggerFactory);
             var eventProcessingRequestConverter = new EventProcessingRequestConverter(eventTypes);
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, _loggerFactory, _cancellation);
 
-            return new Client(
-                _loggerFactory.CreateLogger<Client>(),
-                executionContextManager,
-                eventTypes);
+            var eventConverter = new EventConverter(eventTypes);
+            var eventStore = new EventStore(methodCaller, eventConverter, executionContextManager, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes, eventStore);
         }
     }
 }

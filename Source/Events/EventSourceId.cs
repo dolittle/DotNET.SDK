@@ -1,4 +1,4 @@
-﻿// Copyright (c) Dolittle. All rights reserved.
+// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -35,6 +35,12 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="eventId">EventSourceId as <see cref="Guid"/>.</param>
         public static implicit operator EventSourceId(Guid eventId) => new EventSourceId { Value = eventId };
+
+        /// <summary>
+        /// Implicitly convert from a <see cref="string"/> to an <see cref="EventSourceId"/>.
+        /// </summary>
+        /// <param name="eventId">EventSourceId as <see cref="string"/>.</param>
+        public static implicit operator EventSourceId(string eventId) => new EventSourceId { Value = Guid.Parse(eventId) };
 
         /// <summary>
         /// Creates a new instance of <see cref="EventSourceId"/> with a unique id.

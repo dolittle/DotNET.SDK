@@ -21,14 +21,17 @@ namespace Dolittle.SDK
         /// <param name="logger">The <see cref="ILogger" />.</param>
         /// <param name="executionContextManager">The <see cref="IExecutionContextManager" />.</param>
         /// <param name="eventTypes">The <see cref="Events.EventTypes" />.</param>
+        /// <param name="eventStore">The <see cref="Events.EventStore" />.</param>
         public Client(
             ILogger logger,
             IExecutionContextManager executionContextManager,
-            IEventTypes eventTypes)
+            IEventTypes eventTypes,
+            IEventStore eventStore)
         {
             _logger = logger;
             ExecutionContextManager = executionContextManager;
             EventTypes = eventTypes;
+            EventStore = eventStore;
         }
 
         /// <summary>
@@ -40,6 +43,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="IEventTypes" />.
         /// </summary>
         public IEventTypes EventTypes { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEventStore" />.
+        /// </summary>
+        public IEventStore EventStore { get; }
 
         /// <summary>
         /// Create a client builder for a Miroservice.
