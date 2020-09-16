@@ -147,18 +147,13 @@ namespace Dolittle.SDK
                 executionContextManager,
                 _loggerFactory);
             var eventProcessingRequestConverter = new EventProcessingRequestConverter(eventTypes);
-            var filters = _eventFiltersBuilder.Build(reverseCallClientsCreator, eventProcessingRequestConverter, _loggerFactory, _cancellation);
-            var reverseCallClientCreator = new ReverseCallClientCreator(
-                TimeSpan.FromSeconds(5),
-                new MethodCaller(_host, (int)_port),
-                executionContextManager,
-                _loggerFactory);
+            var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
+            _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, _loggerFactory, _cancellation);
+
             return new Client(
                 _loggerFactory.CreateLogger<Client>(),
                 executionContextManager,
-                reverseCallClientCreator,
-                eventTypes,
-                filters);
+                eventTypes);
         }
     }
 }

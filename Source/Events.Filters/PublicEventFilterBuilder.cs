@@ -1,8 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
+using Dolittle.SDK.Events.Filters.Internal;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Filters
@@ -12,6 +13,7 @@ namespace Dolittle.SDK.Events.Filters
     /// </summary>
     public class PublicEventFilterBuilder
     {
+        static readonly PublicEventFilterProtocol _protocol = new PublicEventFilterProtocol();
         PartitionedFilterEventCallback _callback;
 
         /// <summary>
@@ -33,24 +35,21 @@ namespace Dolittle.SDK.Events.Filters
             => _callback = callback;
 
         /// <summary>
-        /// Build an instance of <see cref="IFilterProcessor" />.
+        /// Builds and register an instance of <see cref="PublicEventFilterProcessor" />.
         /// </summary>
-        /// <param name="reverseCallClientCreator">The <see cref="ICreateReverseCallClients" />.</param>
+        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <returns>The <see cref="IFilterProcessor" /> instance.</returns>
-        public IFilterProcessor Build(
-            ICreateReverseCallClients reverseCallClientCreator,
+        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        public void BuildAndRegister(
+            IEventProcessors eventProcessors,
             IEventProcessingRequestConverter eventProcessingRequestConverter,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellation)
         {
             ThrowIfCallbackIsMissing();
-            return new Internal.PublicEventFilterProcessor(
-                FilterId,
-                _callback,
-                reverseCallClientCreator,
-                eventProcessingRequestConverter,
-                loggerFactory.CreateLogger<Internal.EventFilterProcessor>());
+            var filter = new PublicEventFilterProcessor(FilterId, _callback, eventProcessingRequestConverter, loggerFactory);
+            eventProcessors.Register(filter, _protocol, cancellation);
         }
 
         void ThrowIfCallbackIsMissing()

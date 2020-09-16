@@ -1,8 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
+using Dolittle.SDK.Events.Filters.Internal;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Filters
@@ -12,6 +13,8 @@ namespace Dolittle.SDK.Events.Filters
     /// </summary>
     public class UnpartitionedEventFilterBuilder : IBuildNonPublicFilter
     {
+        static readonly UnpartitionedEventFilterProtocol _protocol = new UnpartitionedEventFilterProtocol();
+
         FilterEventCallback _callback;
 
         /// <summary>
@@ -22,21 +25,17 @@ namespace Dolittle.SDK.Events.Filters
             => _callback = callback;
 
         /// <inheritdoc/>
-        public IFilterProcessor Build(
+        public void BuildAndRegister(
             FilterId filterId,
             ScopeId scopeId,
-            ICreateReverseCallClients reverseCallClientCreator,
+            IEventProcessors eventProcessors,
             IEventProcessingRequestConverter eventProcessingRequestConverter,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellation)
         {
             ThrowIfCallbackIsMissing(filterId, scopeId);
-            return new Internal.EventFilterProcessor(
-                filterId,
-                scopeId,
-                _callback,
-                reverseCallClientCreator,
-                eventProcessingRequestConverter,
-                loggerFactory.CreateLogger<Internal.EventFilterProcessor>());
+            var filter = new UnpartitionedEventFilterProcessor(filterId, scopeId, _callback, eventProcessingRequestConverter, loggerFactory);
+            eventProcessors.Register(filter, _protocol, cancellation);
         }
 
         void ThrowIfCallbackIsMissing(FilterId filterId, ScopeId scopeId)

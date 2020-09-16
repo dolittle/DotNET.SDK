@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Filters.Internal
@@ -11,31 +12,40 @@ namespace Dolittle.SDK.Events.Filters.Internal
     /// <summary>
     /// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter non-partitioned private events.
     /// </summary>
-    public class EventFilterProcessor : FilterEventProcessor<FilterRegistrationRequest, FilterResponse>
+    public class UnpartitionedEventFilterProcessor : FilterEventProcessor<FilterRegistrationRequest, FilterResponse>
     {
         readonly FilterEventCallback _filterEventCallback;
+        readonly FilterId _filterId;
+        readonly ScopeId _scopeId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventFilterProcessor"/> class.
+        /// Initializes a new instance of the <see cref="UnpartitionedEventFilterProcessor"/> class.
         /// </summary>
         /// <param name="filterId">The <see cref="FilterId" />.</param>
+        /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="filterEventCallback">The <see cref="FilterEventCallback" />.</param>
         /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        public EventFilterProcessor(
+        public UnpartitionedEventFilterProcessor(
             FilterId filterId,
+            ScopeId scopeId,
             FilterEventCallback filterEventCallback,
             IEventProcessingRequestConverter processingRequestConverter,
             ILoggerFactory loggerFactory)
-            : base(Kind, filterId, processingRequestConverter, loggerFactory)
+            : base("Unpartitioned Filter", filterId, processingRequestConverter, loggerFactory)
         {
+            _filterId = filterId;
+            _scopeId = scopeId;
             _filterEventCallback = filterEventCallback;
         }
 
-        /// <summary>
-        /// Gets the <see cref="EventProcessorKind" />.
-        /// </summary>
-        public static EventProcessorKind Kind => "Filter";
+        /// <inheritdoc/>
+        public override FilterRegistrationRequest RegistrationRequest
+            => new FilterRegistrationRequest
+                {
+                    FilterId = _filterId.ToProtobuf(),
+                    ScopeId = _scopeId.ToProtobuf(),
+                };
 
         /// <inheritdoc/>
         protected override FilterResponse CreateResponseFromFailure(ProcessorFailure failure)

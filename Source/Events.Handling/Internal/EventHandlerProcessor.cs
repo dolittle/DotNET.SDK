@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
@@ -12,9 +13,9 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Events.Handling.Internal
 {
     /// <summary>
-    /// Represents a <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse}" /> that can handle events.
+    /// Represents a <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRequest, TResponse}" /> that can handle events.
     /// </summary>
-    public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse>
+    public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>
     {
         readonly IEventHandler _eventHandler;
         readonly IEventProcessingRequestConverter _processingRequestConverter;
@@ -29,16 +30,27 @@ namespace Dolittle.SDK.Events.Handling.Internal
             IEventHandler eventHandler,
             IEventProcessingRequestConverter processingRequestConverter,
             ILogger logger)
-            : base(Kind, eventHandler.EventHandlerId, logger)
+            : base("EventHandler", eventHandler.Identifier, logger)
         {
             _eventHandler = eventHandler;
             _processingRequestConverter = processingRequestConverter;
         }
 
-        /// <summary>
-        /// Gets the <see cref="EventProcessorKind" />.
-        /// </summary>
-        public static EventProcessorKind Kind => "EventHandler";
+        /// <inheritdoc/>
+        public override EventHandlerRegistrationRequest RegistrationRequest
+            {
+                get
+                {
+                    var registrationRequest = new EventHandlerRegistrationRequest
+                    {
+                        EventHandlerId = _eventHandler.Identifier.ToProtobuf(),
+                        ScopeId = _eventHandler.ScopeId.ToProtobuf(),
+                        Partitioned = _eventHandler.Partitioned
+                    };
+                    registrationRequest.Types_.AddRange(_eventHandler.HandledEvents.Select(_ => _.ToProtobuf()).ToArray());
+                    return registrationRequest;
+                }
+            }
 
         /// <inheritdoc/>
         protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, CancellationToken cancellation)

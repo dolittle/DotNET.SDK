@@ -12,9 +12,9 @@ namespace Dolittle.SDK.Events.Handling
     public interface IEventHandler
     {
         /// <summary>
-        /// Gets the unique identifier for event handler - <see cref="Handling.EventHandlerId" />.
+        /// Gets the unique identifier for event handler - <see cref="EventHandlerId" />.
         /// </summary>
-        EventHandlerId EventHandlerId { get; }
+        EventHandlerId Identifier { get; }
 
         /// <summary>
         /// Gets the scope the event handler is in.

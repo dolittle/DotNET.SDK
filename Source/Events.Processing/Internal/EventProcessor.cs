@@ -16,20 +16,18 @@ namespace Dolittle.SDK.Events.Processing.Internal
     /// </summary>
     /// <typeparam name="TIdentifier">A <see cref="System.Type" /> extending <see cref="ConceptAs{T}" /> <see cref="Guid" />.</typeparam>
     /// <typeparam name="TRegisterArguments">The <see cref="System.Type" /> of the registration arguments.</typeparam>
-    /// <typeparam name="TRegisterResponse">The <see cref="System.Type" /> of the registration response.</typeparam>
     /// <typeparam name="TRequest">The <see cref="System.Type" /> of the request.</typeparam>
     /// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
-    public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse> : IEventProcessor<TIdentifier, TRegisterResponse, TRequest, TResponse>
+    public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, TResponse> : IEventProcessor<TIdentifier, TRegisterArguments, TRequest, TResponse>
         where TIdentifier : ConceptAs<Guid>
         where TRegisterArguments : class
-        where TRegisterResponse : class
         where TRequest : class
         where TResponse : class
     {
-        readonly EventProcessorKind _kind;
+        readonly ILogger _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse}"/> class.
+        /// Initializes a new instance of the <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRequest, TResponse}"/> class.
         /// </summary>
         /// <param name="kind">The kind of the event processor.</param>
         /// <param name="identifier">The <typeparamref name="TIdentifier"/> identifier of the event processor.</param>
@@ -39,18 +37,19 @@ namespace Dolittle.SDK.Events.Processing.Internal
             TIdentifier identifier,
             ILogger logger)
         {
-            _kind = kind;
+            Kind = kind;
             Identifier = identifier;
-            Logger = logger;
+            _logger = logger;
         }
+
+        /// <inheritdoc/>
+        public EventProcessorKind Kind { get; }
 
         /// <inheritdoc/>
         public TIdentifier Identifier { get; }
 
-        /// <summary>
-        /// Gets the <see cref="ILogger" />.
-        /// </summary>
-        protected ILogger Logger { get; }
+        /// <inheritdoc/>
+        public abstract TRegisterArguments RegistrationRequest { get; }
 
         /// <inheritdoc/>
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellation)
@@ -76,7 +75,7 @@ namespace Dolittle.SDK.Events.Processing.Internal
                     RetryTimeout = retryTimeout
                 };
 
-                Logger.LogWarning("Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", _kind, Identifier, retrySeconds);
+                _logger.LogWarning("Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", Kind, Identifier, retrySeconds);
 
                 return CreateResponseFromFailure(failure);
             }

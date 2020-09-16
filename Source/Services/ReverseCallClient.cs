@@ -118,6 +118,12 @@ namespace Dolittle.SDK.Services
                                     return Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse());
                                 }
 
+                                var failure = _protocol.GetFailureFromConnectResponse(response);
+                                if (failure != null)
+                                {
+                                    return Notification.CreateOnError<TConnectResponse>(new ReverseCallConnectionFailed(failure));
+                                }
+
                                 return Notification.CreateOnNext(response);
                             })
                         .DefaultIfEmpty(Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse()))

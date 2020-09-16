@@ -11,11 +11,11 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Events.Filters.Internal
 {
     /// <summary>
-    /// Represents an <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRegisterResponse, TRequest, TResponse}" /> for an event filter.
+    /// Represents an <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRequest, TResponse}" /> for an event filter.
     /// </summary>
     /// <typeparam name="TRegisterArguments">The <see cref="System.Type" /> of the registration arguments.</typeparam>
     /// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
-    public abstract class FilterEventProcessor<TRegisterArguments, TResponse> : EventProcessor<FilterId, TRegisterArguments, FilterRegistrationResponse, FilterEventRequest, TResponse>, IFilterProcessor
+    public abstract class FilterEventProcessor<TRegisterArguments, TResponse> : EventProcessor<FilterId, TRegisterArguments, FilterEventRequest, TResponse>, IFilterProcessor<TRegisterArguments, TResponse>
         where TRegisterArguments : class
         where TResponse : class
     {
@@ -33,7 +33,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             FilterId filterId,
             IEventProcessingRequestConverter processingRequestConverter,
             ILoggerFactory loggerfactory)
-            : base(kind, filterId, loggerfactory.CreateLogger<EventProcessor<FilterId, TRegisterArguments, FilterRegistrationResponse, FilterEventRequest, TResponse>>())
+            : base(kind, filterId, loggerfactory.CreateLogger<EventProcessor<FilterId, TRegisterArguments, FilterEventRequest, TResponse>>())
         {
             _processingRequestConverter = processingRequestConverter;
         }

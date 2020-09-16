@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Filters
@@ -47,32 +46,27 @@ namespace Dolittle.SDK.Events.Filters
         }
 
         /// <summary>
-        /// Builds all the event filters.
+        /// Builds and registers all the event filters.
         /// </summary>
-        /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
+        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        /// <returns>An instance of <see cref="IFilters" /> with all the event filters registered.</returns>
-        public IFilters Build(
-            ICreateReverseCallClients reverseCallClientsCreator,
+        public void BuildAndRegister(
+            IEventProcessors eventProcessors,
             IEventProcessingRequestConverter eventProcessingRequestConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
-            var filters = new Filters(loggerFactory.CreateLogger<IFilters>());
-
             foreach (var filterBuilder in _privateFilterBuilders)
             {
-                filters.Register(filterBuilder.Build(reverseCallClientsCreator, eventProcessingRequestConverter, loggerFactory), cancellation);
+                filterBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, loggerFactory, cancellation);
             }
 
             foreach (var filterBuilder in _publicFilterBuilders)
             {
-                filters.Register(filterBuilder.Build(reverseCallClientsCreator, eventProcessingRequestConverter, loggerFactory), cancellation);
+                filterBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, loggerFactory, cancellation);
             }
-
-            return filters;
         }
     }
 }

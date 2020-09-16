@@ -1,8 +1,8 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Filters
@@ -13,19 +13,20 @@ namespace Dolittle.SDK.Events.Filters
     public interface IBuildNonPublicFilter
     {
         /// <summary>
-        /// Build an instance of <see cref="IFilterProcessor" />.
+        /// Builds and register an instance of a private filter.
         /// </summary>
-        /// <param name="filterId">Unique identifier for the filter.</param>
+        /// <param name="filterId">The <see cref="FilterId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-        /// <param name="reverseCallClientCreator">The <see cref="ICreateReverseCallClients" />.</param>
+        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <returns>The <see cref="IFilterProcessor" /> instance.</returns>
-        IFilterProcessor Build(
+        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        void BuildAndRegister(
             FilterId filterId,
             ScopeId scopeId,
-            ICreateReverseCallClients reverseCallClientCreator,
+            IEventProcessors eventProcessors,
             IEventProcessingRequestConverter eventProcessingRequestConverter,
-            ILoggerFactory loggerFactory);
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellation);
     }
 }

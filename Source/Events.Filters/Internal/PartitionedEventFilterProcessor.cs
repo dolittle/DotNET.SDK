@@ -15,28 +15,37 @@ namespace Dolittle.SDK.Events.Filters.Internal
     public class PartitionedEventFilterProcessor : FilterEventProcessor<PartitionedFilterRegistrationRequest, PartitionedFilterResponse>
     {
         readonly PartitionedFilterEventCallback _filterEventCallback;
+        readonly FilterId _filterId;
+        readonly ScopeId _scopeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PartitionedEventFilterProcessor"/> class.
         /// </summary>
         /// <param name="filterId">The <see cref="FilterId" />.</param>
+        /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
         /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public PartitionedEventFilterProcessor(
             FilterId filterId,
+            ScopeId scopeId,
             PartitionedFilterEventCallback filterEventCallback,
             IEventProcessingRequestConverter processingRequestConverter,
             ILoggerFactory loggerFactory)
-            : base(Kind, filterId, processingRequestConverter, loggerFactory)
+            : base("Partitioned Filter", filterId, processingRequestConverter, loggerFactory)
         {
             _filterEventCallback = filterEventCallback;
+            _filterId = filterId;
+            _scopeId = scopeId;
         }
 
-        /// <summary>
-        /// Gets the <see cref="EventProcessorKind" />.
-        /// </summary>
-        public static EventProcessorKind Kind => "Partitioned Filter";
+        /// <inheritdoc/>
+        public override PartitionedFilterRegistrationRequest RegistrationRequest
+            => new PartitionedFilterRegistrationRequest
+            {
+                FilterId = _filterId.ToProtobuf(),
+                ScopeId = _scopeId.ToProtobuf(),
+            };
 
         /// <inheritdoc/>
         protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)

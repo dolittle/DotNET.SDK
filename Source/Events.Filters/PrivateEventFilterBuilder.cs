@@ -1,8 +1,8 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Filters
@@ -62,19 +62,20 @@ namespace Dolittle.SDK.Events.Filters
         }
 
         /// <summary>
-        /// Build an instance of <see cref="IFilterProcessor" />.
+        /// Builds and register an instance of a private filter.
         /// </summary>
-        /// <param name="reverseCallClientCreator">The <see cref="ICreateReverseCallClients" />.</param>
+        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <returns>The <see cref="IFilterProcessor" /> instance.</returns>
-        public IFilterProcessor Build(
-            ICreateReverseCallClients reverseCallClientCreator,
+        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        public void BuildAndRegister(
+            IEventProcessors eventProcessors,
             IEventProcessingRequestConverter eventProcessingRequestConverter,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellation)
         {
-            if (_innerBuilder == default) throw new FilterDefinitionIncomplete(FilterId, ScopeId, "Call Partitioned() or Handle(...)");
-            return _innerBuilder.Build(FilterId, ScopeId, reverseCallClientCreator, eventProcessingRequestConverter, loggerFactory);
+            if (_innerBuilder == default) throw new FilterDefinitionIncomplete(FilterId, ScopeId, "Call Partitioned() or Handle(...) before building private filter");
+            _innerBuilder.BuildAndRegister(FilterId, ScopeId, eventProcessors, eventProcessingRequestConverter, loggerFactory, cancellation);
         }
     }
 }

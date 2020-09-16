@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.Protobuf.Contracts;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Services;
 using Dolittle.Services.Contracts;
@@ -33,6 +34,10 @@ namespace Dolittle.SDK.Events.Handling.Internal
         /// <inheritdoc/>
         public EventHandlerRegistrationResponse GetConnectResponseFrom(EventHandlerRuntimeToClientMessage message)
             => message.RegistrationResponse;
+
+        /// <inheritdoc/>
+        public Failure GetFailureFromConnectResponse(EventHandlerRegistrationResponse response)
+            => response.Failure;
 
         /// <inheritdoc/>
         public Ping GetPingFrom(EventHandlerRuntimeToClientMessage message)

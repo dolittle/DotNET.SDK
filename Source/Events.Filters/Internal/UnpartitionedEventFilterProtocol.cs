@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.Protobuf.Contracts;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.Services.Contracts;
 using Grpc.Core;
@@ -9,9 +10,9 @@ using static Dolittle.Runtime.Events.Processing.Contracts.Filters;
 namespace Dolittle.SDK.Events.Filters.Internal
 {
     /// <summary>
-    /// Represents the reverse call protocol for registering event filters with the runtime.
+    /// Represents the reverse call protocol for registering unpartitioned event filters with the runtime.
     /// </summary>
-    public class EventFilterProtocol : IAmAFilterProtocol<FilterClientToRuntimeMessage, FilterRegistrationRequest, FilterResponse>
+    public class UnpartitionedEventFilterProtocol : IAmAFilterProtocol<FilterClientToRuntimeMessage, FilterRegistrationRequest, FilterResponse>
     {
         /// <inheritdoc/>
         public AsyncDuplexStreamingCall<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
@@ -32,6 +33,10 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <inheritdoc/>
         public FilterRegistrationResponse GetConnectResponseFrom(FilterRuntimeToClientMessage message)
             => message.RegistrationResponse;
+
+        /// <inheritdoc/>
+        public Failure GetFailureFromConnectResponse(FilterRegistrationResponse response)
+            => response.Failure;
 
         /// <inheritdoc/>
         public Ping GetPingFrom(FilterRuntimeToClientMessage message)
