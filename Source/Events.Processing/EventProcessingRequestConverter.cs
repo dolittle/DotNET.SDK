@@ -1,12 +1,12 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text.Json;
 using Dolittle.Artifacts.Contracts;
 using Dolittle.Execution.Contracts;
 using Dolittle.Protobuf.Contracts;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Newtonsoft.Json;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 using PbStreamEvent = Dolittle.Runtime.Events.Processing.Contracts.StreamEvent;
 
@@ -35,7 +35,7 @@ namespace Dolittle.SDK.Events.Processing
             var eventType = GetEventTypeOrThrow(pbEvent.Type);
             var clrEventType = _eventTypes.GetTypeFor(eventType);
 
-            return JsonSerializer.Deserialize(pbEvent.Content, clrEventType);
+            return JsonConvert.DeserializeObject(pbEvent.Content, clrEventType);
         }
 
         /// <inheritdoc/>
@@ -50,7 +50,7 @@ namespace Dolittle.SDK.Events.Processing
             var eventType = GetEventTypeOrThrow(pbEvent.Type);
             var associatedEventType = _eventTypes.GetFor<T>();
             if (eventType != associatedEventType) throw new EventTypeDoesNotMatchAssociatedEventType(eventType, associatedEventType, typeof(T));
-            return JsonSerializer.Deserialize<T>(pbEvent.Content);
+            return JsonConvert.DeserializeObject<T>(pbEvent.Content);
         }
 
         /// <inheritdoc/>

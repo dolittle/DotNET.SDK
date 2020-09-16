@@ -75,7 +75,7 @@ namespace Dolittle.SDK.Events.Processing.Internal
                     RetryTimeout = retryTimeout
                 };
 
-                _logger.LogWarning("Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", Kind, Identifier, retrySeconds);
+                _logger.LogWarning(ex, "Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", Kind, Identifier, retrySeconds);
 
                 return CreateResponseFromFailure(failure);
             }

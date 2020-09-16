@@ -112,7 +112,7 @@ namespace Dolittle.SDK
         /// <param name="port">The port to connect to.</param>
         /// <returns>The client builder for continuation.</returns>
         /// <remarks>If not used, the default host of 'localhost' and port 50053 will be used.</remarks>
-        public ClientBuilder ConnectToRuntime(string host, uint port)
+        public ClientBuilder ConnectToRuntime(string host, ushort port)
         {
             _host = host;
             _port = port;

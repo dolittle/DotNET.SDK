@@ -67,7 +67,8 @@ namespace Dolittle.SDK.Events.Handling
         public void Handle<T>(EventHandlerSignature<T> method)
             where T : class
         {
+            // FIXME!
+            method = null;
         }
     }
-
 }
