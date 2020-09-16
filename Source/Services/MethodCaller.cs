@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Services
     public class MethodCaller : IPerformMethodCalls
     {
         readonly string _host;
-        readonly int _port;
+        readonly uint _port;
         readonly ChannelOption[] _channelOptions;
         readonly ChannelCredentials _channelCredentials;
 
@@ -25,7 +25,7 @@ namespace Dolittle.SDK.Services
         /// </summary>
         /// <param name="host">The host to connect to for performing method calls.</param>
         /// <param name="port">The port to connect to for performing method calls.</param>
-        public MethodCaller(string host, int port)
+        public MethodCaller(string host, uint port)
         {
             _host = host;
             _port = port;
@@ -50,7 +50,16 @@ namespace Dolittle.SDK.Services
                     return ReceiveAllMessagesFromServer(observer, call.ResponseStream, tcs.Token);
                 });
 
-        Channel CreateChannel() => new Channel(_host, _port, _channelCredentials, _channelOptions);
+        /// <inheritdoc/>
+        public Task<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallAnUnaryMethod<TClient, TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+            where TClient : ClientBase<TClient>
+            where TClientMessage : IMessage
+            where TServerMessage : IMessage
+        {
+            return method.Call(request, CreateChannel(), CreateCallOptions(token)).ResponseAsync;
+        }
+
+        Channel CreateChannel() => new Channel(_host, Convert.ToInt32(_port), _channelCredentials, _channelOptions);
 
         CallOptions CreateCallOptions(CancellationToken token) => new CallOptions(cancellationToken: token);
 

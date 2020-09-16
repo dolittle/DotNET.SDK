@@ -4,10 +4,15 @@
         <AssemblyName>Dolittle.SDK.Events</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJson)" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="../Artifacts/Artifacts.csproj" />
         <ProjectReference Include="../Concepts/Concepts.csproj" />
+        <ProjectReference Include="../Execution/Execution.csproj" />
+        <ProjectReference Include="../Protobuf/Protobuf.csproj" />
+        <ProjectReference Include="../Services/Services.csproj" />
     </ItemGroup>
 </Project>
