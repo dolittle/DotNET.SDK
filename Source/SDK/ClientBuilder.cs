@@ -4,6 +4,8 @@
 using System;
 using System.Threading;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Filters;
+using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Services;
@@ -17,6 +19,7 @@ namespace Dolittle.SDK
     public class ClientBuilder
     {
         readonly EventTypesBuilder _eventTypesBuilder;
+        readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         uint _port = 50053;
@@ -44,6 +47,7 @@ namespace Dolittle.SDK
             _cancellation = default;
 
             _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
+            _eventFiltersBuilder = new EventFiltersBuilder();
         }
 
         /// <summary>
@@ -76,6 +80,17 @@ namespace Dolittle.SDK
         public ClientBuilder WithEventTypes(Action<EventTypesBuilder> callback)
         {
             callback(_eventTypesBuilder);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the filters through the <see cref="EventFiltersBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithFilters(Action<EventFiltersBuilder> callback)
+        {
+            callback(_eventFiltersBuilder);
             return this;
         }
 
@@ -124,12 +139,26 @@ namespace Dolittle.SDK
         {
             var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
             var eventTypes = _eventTypesBuilder.Build();
+            var reverseCallClientsCreator = new ReverseCallClientCreator(
+                TimeSpan.FromSeconds(5),
+                new MethodCaller(
+                    _host,
+                    (int)_port),
+                executionContextManager,
+                _loggerFactory);
+            var eventProcessingRequestConverter = new EventProcessingRequestConverter(eventTypes);
+            var filters = _eventFiltersBuilder.Build(reverseCallClientsCreator, eventProcessingRequestConverter, _loggerFactory, _cancellation);
             var reverseCallClientCreator = new ReverseCallClientCreator(
                 TimeSpan.FromSeconds(5),
                 new MethodCaller(_host, (int)_port),
                 executionContextManager,
                 _loggerFactory);
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, reverseCallClientCreator, eventTypes);
+            return new Client(
+                _loggerFactory.CreateLogger<Client>(),
+                executionContextManager,
+                reverseCallClientCreator,
+                eventTypes,
+                filters);
         }
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading.Tasks;
 using Dolittle.SDK;
 
 namespace Basic
@@ -16,6 +17,10 @@ namespace Basic
                     eventTypes
                         .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3")
                         .Associate<MyOtherEvent>("4463a85f-2e82-400b-ac49-9e795f6b4f06"))
+                .WithFilters(filtersBuilder =>
+                    filtersBuilder
+                        .CreatePrivateFilter("577b00c4-8b79-4727-835c-4710919c2df5", filterBuilder =>
+                            filterBuilder.Handle((@event, eventContext) => Task.FromResult(true))))
                 .Build();
             client.ExecutionContextManager.ForTenant("546fcbec-8167-41a0-b865-1d881e6efe9e");
         }
