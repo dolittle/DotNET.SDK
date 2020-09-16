@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.Protobuf.Contracts;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Dolittle.Services.Contracts;
 using Grpc.Core;
@@ -19,6 +20,8 @@ namespace Dolittle.SDK.Services.given
         public ClientMessage CreateMessageFrom(Response response) => new ClientMessage { Response = response };
 
         public ConnectResponse GetConnectResponseFrom(ServerMessage message) => message.Response;
+
+        public Failure GetFailureFromConnectResponse(ConnectResponse response) => response.Failure;
 
         public Ping GetPingFrom(ServerMessage message) => message.Ping;
 
