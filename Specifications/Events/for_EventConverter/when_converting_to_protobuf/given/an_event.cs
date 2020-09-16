@@ -3,7 +3,7 @@
 
 using Dolittle.Concepts;
 
-namespace Dolittle.SDK.Events.for_EventConverter.given
+namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_protobuf.given
 {
     public class an_event : Value<an_event>
     {
