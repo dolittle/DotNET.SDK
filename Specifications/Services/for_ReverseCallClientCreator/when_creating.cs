@@ -15,8 +15,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
     {
         static ConnectArguments arguments;
         static IReverseCallHandler<Request, Response> handler;
-        static ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method;
-        static IConvertReverseCallMessages<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response> converter;
+        static IAmAReverseCallProtocol<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response> protocol;
         static Mock<ILoggerFactory> loggerFactoryMock;
         static ReverseCallClientCreator reverseCallClientCreator;
 
@@ -28,9 +27,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
 
             handler = Mock.Of<IReverseCallHandler<Request, Response>>();
 
-            method = Mock.Of<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>();
-
-            converter = Mock.Of<IConvertReverseCallMessages<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>>();
+            protocol = Mock.Of<IAmAReverseCallProtocol<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>>();
 
             loggerFactoryMock = new Mock<ILoggerFactory>();
 
@@ -41,7 +38,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
                 loggerFactoryMock.Object);
         };
 
-        Because of = () => reverseCallClient = reverseCallClientCreator.Create(arguments, handler, method, converter);
+        Because of = () => reverseCallClient = reverseCallClientCreator.Create(arguments, handler, protocol);
 
         It should_create_a_client_with_the_correct_arguments = () => reverseCallClient.Arguments.ShouldEqual(arguments);
         It should_create_a_client_with_the_correct_handler = () => reverseCallClient.Handler.ShouldEqual(handler);
