@@ -1,26 +1,25 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.Protobuf.Contracts;
 using Dolittle.SDK.Concepts;
+using Dolittle.SDK.Protobuf;
 
 namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represents a response to committed events.
     /// </summary>
-    public class CommitEventsResponse : Value<CommitEventsResponse>
+    public class CommitEventsResult : Value<CommitEventsResult>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommitEventsResponse"/> class.
+        /// Initializes a new instance of the <see cref="CommitEventsResult"/> class.
         /// </summary>
         /// <param name="failure"><see cref="Failure"/>.</param>
         /// <param name="committedEvents"><see cref="CommittedEvents"/>.</param>
-        public CommitEventsResponse(Failure failure, CommittedEvents committedEvents)
+        public CommitEventsResult(Failure failure, CommittedEvents committedEvents)
         {
             Failure = failure;
             Events = committedEvents;
-            Failed = Failure != null;
         }
 
         /// <summary>
@@ -36,6 +35,6 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Gets a value indicating whether the commit failed.
         /// </summary>
-        public bool Failed { get; }
+        public bool Failed => Failure != null;
     }
 }

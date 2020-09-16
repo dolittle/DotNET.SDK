@@ -40,10 +40,10 @@ namespace Dolittle.SDK.Events
         IEnumerable<Contracts.UncommittedEvent> ToProtobuf(UncommittedEvents events);
 
         /// <summary>
-        /// Convert from <see cref="Contracts.CommitEventsResponse"/> to <see cref="CommitEventsResponse"/>.
+        /// Convert from <see cref="Contracts.CommitEventsResponse"/> to <see cref="CommitEventsResult"/>.
         /// </summary>
         /// <param name="source"><see cref="Contracts.CommitEventsResponse"/>.</param>
-        /// <returns>Converted <see cref="CommitEventsResponse"/>.</returns>
-        CommitEventsResponse ToSDK(Contracts.CommitEventsResponse source);
+        /// <returns>Converted <see cref="CommitEventsResult"/>.</returns>
+        CommitEventsResult ToSDK(Contracts.CommitEventsResponse source);
     }
 }
