@@ -97,8 +97,7 @@ namespace Dolittle.SDK.Events
                 CallContext = GetCurrentCallContext(),
             };
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
-            return response;
+            return await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
         }
 
         UncommittedEvents ToUncommittedEvents(object content, EventSourceId eventSourceId, EventType eventType, bool isPublic = false)
