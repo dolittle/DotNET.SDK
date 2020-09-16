@@ -31,7 +31,7 @@ _site
 
 *.fsx_*
 
-artifacts
+Artifacts
 !Source/Artifacts
 !Specifications/Artifacts
 !Source/Tooling/Plugin/Boilerplates/Artifacts
