@@ -1,11 +1,11 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
+// using System.Collections.Generic;
+// using System.Threading.Tasks;
 namespace Dolittle.SDK.Events.Handling
 {
+    /*
     /// <summary>
     /// An implementation of <see cref="IEventHandler" />.
     /// </summary>
@@ -41,4 +41,5 @@ namespace Dolittle.SDK.Events.Handling
             throw new System.NotImplementedException();
         }
     }
+    */
 }
