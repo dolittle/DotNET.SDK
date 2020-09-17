@@ -1,0 +1,74 @@
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using Dolittle.Protobuf.Contracts;
+using Dolittle.SDK.Events.for_EventConverter.given;
+using Dolittle.SDK.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using Machine.Specifications;
+using Newtonsoft.Json;
+using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
+using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
+
+namespace Dolittle.SDK.Events.for_EventConverter.when_converting_a_committed_event_to_sdk
+{
+    public class from_a_known_event_type : given.a_converter_and_a_protobuf_execution_context
+    {
+        static an_event content;
+        static bool is_public;
+        static PbArtifact event_type;
+        static Uuid event_source;
+        static Timestamp occured;
+        static ulong event_log_sequence_number;
+
+        static PbCommittedEvent committed_event;
+
+        static EventType converted_event_type;
+
+        static CommittedEvent converted_committed_event;
+
+        Establish context = () =>
+        {
+            content = new an_event("deadbeef", 13, true);
+            is_public = false;
+            event_type = new PbArtifact
+            {
+                Id = Guid.Parse("926a967f-3833-47ef-82af-95612b826015").ToProtobuf(),
+                Generation = 14,
+            };
+            event_source = Guid.Parse("d5886138-f29b-4684-bf9b-0e5e13894926").ToProtobuf();
+            occured = Timestamp.FromDateTime(new DateTime(2018, 5, 12, 22, 17, 19, DateTimeKind.Utc));
+            event_log_sequence_number = 3448072883;
+
+            committed_event = new PbCommittedEvent
+            {
+                External = false,
+                Content = JsonConvert.SerializeObject(content),
+                Public = is_public,
+                Type = event_type,
+                ExecutionContext = execution_context,
+                EventSourceId = event_source,
+                Occurred = occured,
+                EventLogSequenceNumber = event_log_sequence_number,
+            };
+
+            converted_event_type = new EventType(event_type.Id.To<EventTypeId>(), event_type.Generation);
+
+            event_types.Setup(_ => _.GetTypeFor(converted_event_type)).Returns(typeof(an_event));
+        };
+
+        Because of = () => converted_committed_event = converter.ToSDK(committed_event);
+
+        It should_create_an_internal_committed_event = () => converted_committed_event.ShouldBeOfExactType<CommittedEvent>();
+        It should_have_asked_the_event_types_for_the_clr_type = () => event_types.Verify(_ => _.GetTypeFor(converted_event_type));
+        It should_have_the_correct_event_log_sequence_number = () => converted_committed_event.EventLogSequenceNumber.ShouldEqual((EventLogSequenceNumber)event_log_sequence_number);
+        It should_have_the_correct_occurred = () => converted_committed_event.Occurred.ShouldEqual(occured.ToDateTimeOffset());
+        It should_have_the_correct_event_source = () => converted_committed_event.EventSource.ShouldEqual(event_source.To<EventSourceId>());
+        It should_have_the_correct_execution_context = () => converted_committed_event.ExecutionContext.ShouldEqual(execution_context.ToExecutionContext());
+        It should_have_the_correct_event_type = () => converted_committed_event.EventType.ShouldEqual(converted_event_type);
+        It should_have_the_correct_clr_type_of_the_event = () => converted_committed_event.Content.ShouldBeOfExactType<an_event>();
+        It should_have_created_a_new_event_instance_with_the_correct_properties = () => (converted_committed_event.Content as an_event).ShouldMatch(_ => _.a_string == content.a_string && _.an_integer == content.an_integer && _.a_bool == content.a_bool);
+        It should_have_the_correct_is_public = () => converted_committed_event.IsPublic.ShouldEqual(is_public);
+    }
+}
