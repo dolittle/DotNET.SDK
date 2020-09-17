@@ -52,7 +52,6 @@ namespace Dolittle.SDK.Protobuf
                 var artifactIdValueProperty = idType.GetProperty(nameof(ArtifactId.Value));
                 artifactIdValueProperty.SetValue(artifactId, id);
 
-                Generation generation = artifact.Generation;
                 var constructor = typeof(TArtifact).GetConstructor(new[] { idType, generationType });
                 if (constructor == default)
                 {
@@ -60,7 +59,7 @@ namespace Dolittle.SDK.Protobuf
                     return false;
                 }
 
-                artifact = constructor.Invoke(new object[] { artifactId, generation }) as TArtifact;
+                artifact = constructor.Invoke(new object[] { artifactId, (Generation)source.Generation }) as TArtifact;
                 if (artifact == default)
                 {
                     error = new CouldNotConvertProtobufArtifact(typeof(TArtifact), source, "Could not create instance of artifact");
