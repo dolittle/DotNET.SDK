@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Protobuf
         /// <summary>
         /// Gets the <see cref="FailureId" /> that represents an undocumented error type.
         /// </summary>
-        public static FailureId Other => Guid.Parse("05cc1d10-4efc-457b-84a6-a1be0a5f36ba");
+        public static FailureId Undocumented => Guid.Parse("05cc1d10-4efc-457b-84a6-a1be0a5f36ba");
 
         /// <summary>
         /// Implicitly converts the <see cref="Guid" /> to <see cref="FailureId" />.

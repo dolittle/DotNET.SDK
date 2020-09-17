@@ -3,7 +3,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Dolittle.SDK.Collections;
 
 namespace Dolittle.SDK.Events
 {
@@ -12,7 +11,7 @@ namespace Dolittle.SDK.Events
     /// </summary>
     public class CommittedEvents : IReadOnlyList<CommittedEvent>
     {
-        readonly NullFreeList<CommittedEvent> _events;
+        readonly IReadOnlyList<CommittedEvent> _events;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommittedEvents"/> class.
@@ -27,7 +26,7 @@ namespace Dolittle.SDK.Events
                 if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
             }
 
-            _events = new NullFreeList<CommittedEvent>(events);
+            _events = events;
         }
 
         /// <summary>

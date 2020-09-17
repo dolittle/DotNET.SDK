@@ -48,17 +48,30 @@ namespace Dolittle.SDK.Events
             try
             {
                 var content = JsonConvert.DeserializeObject(source.Content, clrEventType);
-                return new CommittedEvent(
-                    source.EventLogSequenceNumber,
-                    source.Occurred.ToDateTimeOffset(),
-                    source.EventSourceId.To<EventSourceId>(),
-                    source.ExecutionContext.ToExecutionContext(),
-                    eventType,
-                    content,
-                    source.Public,
-                    source.External,
-                    source.ExternalEventLogSequenceNumber,
-                    source.ExternalEventReceived != null ? source.ExternalEventReceived.ToDateTimeOffset() : DateTimeOffset.UtcNow);
+                if (source.External)
+                {
+                    return new CommittedExternalEvent(
+                        source.EventLogSequenceNumber,
+                        source.Occurred.ToDateTimeOffset(),
+                        source.EventSourceId.To<EventSourceId>(),
+                        source.ExecutionContext.ToExecutionContext(),
+                        eventType,
+                        content,
+                        source.Public,
+                        source.ExternalEventLogSequenceNumber,
+                        source.ExternalEventReceived.ToDateTimeOffset());
+                }
+                else
+                {
+                    return new CommittedEvent(
+                        source.EventLogSequenceNumber,
+                        source.Occurred.ToDateTimeOffset(),
+                        source.EventSourceId.To<EventSourceId>(),
+                        source.ExecutionContext.ToExecutionContext(),
+                        eventType,
+                        content,
+                        source.Public);
+                }
             }
             catch (Exception ex)
             {
@@ -76,7 +89,7 @@ namespace Dolittle.SDK.Events
             => new CommittedEvents(source.Select(ToSDK).ToList());
 
         /// <inheritdoc/>
-        public CommitEventsResponse ToSDK(Contracts.CommitEventsResponse source)
-            => new CommitEventsResponse(source.Failure, ToSDK(source.Events));
+        public CommitEventsResult ToSDK(Contracts.CommitEventsResponse source)
+            => new CommitEventsResult(source.Failure, ToSDK(source.Events));
     }
 }

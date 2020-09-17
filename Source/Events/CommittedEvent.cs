@@ -21,9 +21,6 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="content">The content of the Event.</param>
         /// <param name="isPublic">Whether the event is public or not.</param>
-        /// <param name="isExternal">Whether the event is from an external Microservice or not.</param>
-        /// <param name="externalEventLogSequenceNumber">The event log sequence number of the Event in the event log of the external Microservice that committed the event.</param>
-        /// <param name="externalEventReceived">The <see cref="DateTimeOffset"/> when the Event was received over the Event Horizon.</param>
         public CommittedEvent(
             EventLogSequenceNumber eventLogSequenceNumber,
             DateTimeOffset occurred,
@@ -31,21 +28,15 @@ namespace Dolittle.SDK.Events
             ExecutionContext executionContext,
             EventType eventType,
             object content,
-            bool isPublic,
-            bool isExternal,
-            EventLogSequenceNumber externalEventLogSequenceNumber,
-            DateTimeOffset externalEventReceived)
+            bool isPublic)
         {
             EventLogSequenceNumber = eventLogSequenceNumber;
             Occurred = occurred;
+            EventSource = eventSourceId;
             ExecutionContext = executionContext;
             EventType = eventType;
             Content = content;
             IsPublic = isPublic;
-            IsExternal = isExternal;
-            ExternalEventLogSequenceNumber = externalEventLogSequenceNumber;
-            ExternalEventReceived = externalEventReceived;
-            EventSource = eventSourceId;
         }
 
         /// <summary>
@@ -82,20 +73,5 @@ namespace Dolittle.SDK.Events
         /// Gets a value indicating whether the Event is public or not.
         /// </summary>
         public bool IsPublic { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the Event is from an external Microservice or not.
-        /// </summary>
-        public bool IsExternal { get; }
-
-        /// <summary>
-        /// Gets the event log sequence number of the Event from the external Microservice.
-        /// </summary>
-        public EventLogSequenceNumber ExternalEventLogSequenceNumber { get; }
-
-        /// <summary>
-        /// Gets the <see cref="DateTimeOffset" /> when the Event was received in the external Microservice.
-        /// </summary>
-        public DateTimeOffset ExternalEventReceived { get; }
     }
 }

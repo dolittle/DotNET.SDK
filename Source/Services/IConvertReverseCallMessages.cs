@@ -1,7 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.Protobuf.Contracts;
 using Dolittle.Services.Contracts;
+using Google.Protobuf;
 
 namespace Dolittle.SDK.Services
 {
@@ -15,6 +17,12 @@ namespace Dolittle.SDK.Services
     /// <typeparam name="TRequest">Type of the requests sent from the server to the client.</typeparam>
     /// <typeparam name="TResponse">Type of the responses received from the client.</typeparam>
     public interface IConvertReverseCallMessages<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>
+        where TClientMessage : IMessage
+        where TServerMessage : IMessage
+        where TConnectArguments : class
+        where TConnectResponse : class
+        where TRequest : class
+        where TResponse : class
     {
         /// <summary>
         /// Sets the <see cref="ReverseCallArgumentsContext"/> in a .
@@ -36,6 +44,13 @@ namespace Dolittle.SDK.Services
         /// <param name="message">The <typeparamref name="TServerMessage"/> to get the connect response from.</param>
         /// <returns>The <typeparamref name="TConnectResponse"/> in the message.</returns>
         TConnectResponse GetConnectResponseFrom(TServerMessage message);
+
+        /// <summary>
+        /// Gets the optional <see cref="Failure" /> from a <typeparamref name="TConnectResponse"/>.
+        /// </summary>
+        /// <param name="response">The <typeparamref name="TConnectResponse"/> to get the failure from.</param>
+        /// <returns>The <see cref="Failure" /> from the <typeparamref name="TConnectResponse"/> or null if there was no failure.</returns>
+        Failure GetFailureFromConnectResponse(TConnectResponse response);
 
         /// <summary>
         /// Gets the <see cref="Ping"/> from a <typeparamref name="TServerMessage"/>.

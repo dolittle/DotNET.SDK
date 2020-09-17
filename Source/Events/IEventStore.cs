@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Events
         /// <remarks>
         /// Cancelling this operation does not roll back the commit transaction if the events have already been written to the Event Store.
         /// </remarks>
-        Task<CommitEventsResponse> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default);
+        Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits an <see cref="UncommittedEvent" />.
@@ -28,7 +28,7 @@ namespace Dolittle.SDK.Events
         /// <param name="uncommittedEvent">The <see cref="UncommittedEvent" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResponse> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default);
+        Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single Event with the given content.
@@ -37,7 +37,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResponse> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single Event with the given content.
@@ -47,7 +47,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResponse> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
+        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single public Event with the given content.
@@ -56,7 +56,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResponse> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single public Event with the given content.
@@ -66,6 +66,6 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResponse> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
+        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
     }
 }
