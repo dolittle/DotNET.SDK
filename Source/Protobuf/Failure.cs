@@ -36,18 +36,37 @@ namespace Dolittle.SDK.Protobuf
         /// Implicitly convert <see cref="Failure" /> to <see cref="Contracts.Failure" />.
         /// </summary>
         /// <param name="failure"><see cref="Failure" /> to convert.</param>
-        public static implicit operator Contracts.Failure(Failure failure) =>
-            failure != null ?
-                new Contracts.Failure { Id = failure.Id.ToProtobuf(), Reason = failure.Reason }
-                : null;
+        public static implicit operator Contracts.Failure(Failure failure)
+        {
+            if (failure == null)
+            {
+                return null;
+            }
+
+            return new Contracts.Failure
+            {
+                Id = failure.Id == null ? FailureId.Undocumented.ToProtobuf() : failure.Id.ToProtobuf(),
+                Reason = failure.Reason,
+            };
+        }
 
         /// <summary>
         /// Implicitly convert <see cref="Contracts.Failure" /> to <see cref="Failure" />.
         /// </summary>
         /// <param name="failure"><see cref="Contracts.Failure" /> to convert.</param>
-        public static implicit operator Failure(Contracts.Failure failure) =>
-            failure != null ?
-                new Failure(failure.Id.To<FailureId>(), failure.Reason)
-                : null;
+        public static implicit operator Failure(Contracts.Failure failure)
+        {
+            if (failure == null)
+            {
+                return null;
+            }
+
+            if (!failure.Id.TryTo<FailureId>(out var id, out var _))
+            {
+                return new Failure(FailureId.Undocumented, failure.Reason);
+            }
+
+            return new Failure(id, failure.Reason);
+        }
     }
 }
