@@ -61,19 +61,21 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_a_committed_eve
 
             converted_event_type = new EventType(event_type.Id.To<EventTypeId>(), event_type.Generation);
 
+            event_types.Setup(_ => _.HasTypeFor(converted_event_type)).Returns(true);
             event_types.Setup(_ => _.GetTypeFor(converted_event_type)).Returns(typeof(an_event));
         };
 
         Because of = () => converted_committed_event = converter.ToSDK(committed_event);
 
         It should_create_an_internal_committed_event = () => converted_committed_event.ShouldBeOfExactType<CommittedExternalEvent>();
-        It should_have_asked_the_event_types_for_the_clr_type = () => event_types.Verify(_ => _.GetTypeFor(converted_event_type));
+        It should_have_asked_the_event_types_if_it_has_type_for = () => event_types.Verify(_ => _.HasTypeFor(converted_event_type));
+        It should_have_asked_the_event_types_for_the_type = () => event_types.Verify(_ => _.GetTypeFor(converted_event_type));
         It should_have_the_correct_event_log_sequence_number = () => converted_committed_event.EventLogSequenceNumber.ShouldEqual((EventLogSequenceNumber)event_log_sequence_number);
         It should_have_the_correct_occurred = () => converted_committed_event.Occurred.ShouldEqual(occured.ToDateTimeOffset());
         It should_have_the_correct_event_source = () => converted_committed_event.EventSource.ShouldEqual(event_source.To<EventSourceId>());
         It should_have_the_correct_execution_context = () => converted_committed_event.ExecutionContext.ShouldEqual(execution_context.ToExecutionContext());
         It should_have_the_correct_event_type = () => converted_committed_event.EventType.ShouldEqual(converted_event_type);
-        It should_have_the_correct_clr_type_of_the_event = () => converted_committed_event.Content.ShouldBeOfExactType<an_event>();
+        It should_have_the_correct_type_of_the_event = () => converted_committed_event.Content.ShouldBeOfExactType<an_event>();
         It should_have_created_a_new_event_instance_with_the_correct_properties = () => (converted_committed_event.Content as an_event).ShouldMatch(_ => _.a_string == content.a_string && _.an_integer == content.an_integer && _.a_bool == content.a_bool);
         It should_have_the_correct_is_public = () => converted_committed_event.IsPublic.ShouldEqual(is_public);
         It should_have_the_correct_external_event_received = () => (converted_committed_event as CommittedExternalEvent).ExternalEventReceived.ShouldEqual(external_event_received.ToDateTimeOffset());

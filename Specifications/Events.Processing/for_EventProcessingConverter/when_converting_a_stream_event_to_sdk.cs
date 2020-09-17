@@ -25,6 +25,8 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
         static PbStreamEvent stream_event;
         static StreamEvent converted_stream_event;
 
+        delegate void TryToSdkCallback(PbCommittedEvent source, out CommittedEvent @event, out Exception error);
+
         Establish context = () =>
         {
             committed_event = new PbCommittedEvent();
@@ -47,7 +49,14 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
                 new object(),
                 true);
 
-            event_converter.Setup(_ => _.ToSDK(committed_event)).Returns(committed_event_to_return);
+            event_converter
+                .Setup(_ => _.TryToSDK(committed_event, out Moq.It.Ref<CommittedEvent>.IsAny, out Moq.It.Ref<Exception>.IsAny))
+                .Callback(new TryToSdkCallback((PbCommittedEvent _, out CommittedEvent @event, out Exception error) =>
+                    {
+                        @event = committed_event_to_return;
+                        error = null;
+                    }))
+                .Returns(true);
 
             partitioned = true;
             partition_id = Guid.Parse("8c0e8392-bec0-4fe1-bd7d-df2f555afe55").ToProtobuf();
@@ -64,7 +73,7 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
 
         Because of = () => converted_stream_event = event_processing_converter.ToSDK(stream_event);
 
-        It should_call_the_event_converter_with_the_committed_event = () => event_converter.Verify(_ => _.ToSDK(committed_event));
+        It should_call_the_event_converter_with_the_committed_event = () => event_converter.Verify(_ => _.TryToSDK(committed_event, out Moq.It.Ref<CommittedEvent>.IsAny, out Moq.It.Ref<Exception>.IsAny));
         It should_return_the_result_from_the_event_converter = () => converted_stream_event.Event.ShouldBeTheSameAs(committed_event_to_return);
         It should_not_call_the_event_converter_for_anything_else = () => event_converter.VerifyNoOtherCalls();
         It should_have_the_correct_partitioned = () => converted_stream_event.Partitioned.ShouldEqual(partitioned);
