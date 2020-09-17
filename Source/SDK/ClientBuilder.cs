@@ -137,19 +137,27 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="Client"/>.</returns>
         public Client Build()
         {
-            var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
+            var executionContextManager = new ExecutionContextManager(
+                _microserviceId,
+                _version,
+                _environment,
+                _loggerFactory.CreateLogger<ExecutionContextManager>());
+
             var eventTypes = _eventTypesBuilder.Build();
+
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 TimeSpan.FromSeconds(5),
                 methodCaller,
                 executionContextManager,
                 _loggerFactory);
-            var eventProcessingRequestConverter = new EventProcessingRequestConverter(eventTypes);
-            var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
-            _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, _loggerFactory, _cancellation);
 
             var eventConverter = new EventConverter(eventTypes);
+            var eventProcessingConverter = new EventProcessingConverter(eventConverter);
+
+            var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
+            _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
+
             var eventStore = new EventStore(methodCaller, eventConverter, executionContextManager, eventTypes, _loggerFactory.CreateLogger<EventStore>());
             return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes, eventStore);
         }
