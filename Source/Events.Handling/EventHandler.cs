@@ -3,24 +3,36 @@
 
 // using System.Collections.Generic;
 // using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dolittle.SDK.Events.Handling.Builder;
+
 namespace Dolittle.SDK.Events.Handling
 {
-    /*
     /// <summary>
     /// An implementation of <see cref="IEventHandler" />.
     /// </summary>
     public class EventHandler : IEventHandler
     {
+        readonly IDictionary<EventType, IEventHandlerMethod> _eventHandlerMethods;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHandler"/> class.
+        /// </summary>
+        /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
+        /// <param name="scopeId">The <see cref="ScopeId" />.</param>
+        /// <param name="partitioned">The value indcating whether the <see cref="EventHandler" /> is partitioned.</param>
+        /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
         public EventHandler(
             EventHandlerId identifier,
             ScopeId scopeId,
             bool partitioned,
-            IDictionary<EventType, Method> signature
-        )
+            IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
         {
             Identifier = identifier;
             ScopeId = scopeId;
             Partitioned = partitioned;
+            _eventHandlerMethods = eventHandlerMethods;
         }
 
         /// <inheritdoc/>
@@ -33,13 +45,17 @@ namespace Dolittle.SDK.Events.Handling
         public bool Partitioned { get; }
 
         /// <inheritdoc/>
-        public IEnumerable<EventType> HandledEvents => throw new System.NotImplementedException();
+        public IEnumerable<EventType> HandledEvents => _eventHandlerMethods.Keys;
 
         /// <inheritdoc/>
         public Task Handle(object @event, EventType eventType, EventContext context)
         {
-            throw new System.NotImplementedException();
+            if (_eventHandlerMethods.TryGetValue(eventType, out var method))
+            {
+                return method.Invoke(@event, context);
+            }
+
+            throw new MissingEventHandlerForEventType(eventType);
         }
     }
-    */
 }
