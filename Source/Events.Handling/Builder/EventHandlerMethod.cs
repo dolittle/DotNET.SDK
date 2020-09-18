@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
+using Dolittle.SDK.Async;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -19,6 +20,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethod(EventHandlerSignature method) => _method = method;
 
         /// <inheritdoc/>
-        public Task Invoke(object @event, EventContext context) => _method(@event, context);
+        public Task<Try> TryHandle(object @event, EventContext context)
+            => _method(@event, context).TryTask();
     }
 }

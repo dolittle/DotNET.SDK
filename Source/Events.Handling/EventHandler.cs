@@ -3,9 +3,11 @@
 
 // using System.Collections.Generic;
 // using System.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Handling.Builder;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Handling
 {
@@ -15,6 +17,7 @@ namespace Dolittle.SDK.Events.Handling
     public class EventHandler : IEventHandler
     {
         readonly IDictionary<EventType, IEventHandlerMethod> _eventHandlerMethods;
+        readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHandler"/> class.
@@ -23,16 +26,19 @@ namespace Dolittle.SDK.Events.Handling
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="partitioned">The value indcating whether the <see cref="EventHandler" /> is partitioned.</param>
         /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
+        /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventHandler(
             EventHandlerId identifier,
             ScopeId scopeId,
             bool partitioned,
-            IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
+            IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods,
+            ILogger logger)
         {
             Identifier = identifier;
             ScopeId = scopeId;
             Partitioned = partitioned;
             _eventHandlerMethods = eventHandlerMethods;
+            _logger = logger;
         }
 
         /// <inheritdoc/>
@@ -48,11 +54,17 @@ namespace Dolittle.SDK.Events.Handling
         public IEnumerable<EventType> HandledEvents => _eventHandlerMethods.Keys;
 
         /// <inheritdoc/>
-        public Task Handle(object @event, EventType eventType, EventContext context)
+        public async Task Handle(object @event, EventType eventType, EventContext context)
         {
             if (_eventHandlerMethods.TryGetValue(eventType, out var method))
             {
-                return method.Invoke(@event, context);
+                Exception exception = await method.TryHandle(@event, context).ConfigureAwait(false);
+                if (exception != default)
+                {
+                    var exceptionToThrow = new EventHandlerMethodFailed(Identifier, eventType, @event, exception);
+                    _logger.LogWarning(exceptionToThrow, "An error occurred while event handler {EventHandler} tried to handled event with event type {EventType}", Identifier, eventType);
+                    throw exceptionToThrow;
+                }
             }
 
             throw new MissingEventHandlerForEventType(eventType);

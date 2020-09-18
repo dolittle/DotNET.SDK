@@ -13,11 +13,10 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <summary>
         /// Initializes a new instance of the <see cref="TypedEventHandlerMethodInvokedOnEventOfWrongType"/> class.
         /// </summary>
-        /// <param name="eventHandler">The <see cref="EventHandlerId" />.</param>
         /// <param name="expectedType">The expected <see cref="Type" />.</param>
         /// <param name="wrongType">The wrong <see cref="Type" />.</param>
-        public TypedEventHandlerMethodInvokedOnEventOfWrongType(EventHandlerId eventHandler, Type expectedType, Type wrongType)
-            : base($"Event handler {eventHandler} cannot handle event of type {wrongType} it expected it to be {expectedType}")
+        public TypedEventHandlerMethodInvokedOnEventOfWrongType(Type expectedType, Type wrongType)
+            : base($"Could not handle event of type {wrongType} because it was expected to be of type {expectedType}")
         {
         }
     }

@@ -43,7 +43,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Handle<T>(TypedEventHandlerSignature<T> method)
             where T : class
         {
-            if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(_eventHandlerId, method)))
+            if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
             {
                 _logger.LogWarning("Event handler {EventHandler} already handles event of type {EventType}", _eventHandlerId, typeof(T));
                 HasInvalidMethods = true;

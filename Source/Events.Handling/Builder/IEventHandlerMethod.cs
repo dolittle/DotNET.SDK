@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
+using Dolittle.SDK.Async;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -15,7 +16,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// </summary>
         /// <param name="event">The event.</param>
         /// <param name="context">The <see cref="EventContext" />.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous action.</returns>
-        Task Invoke(object @event, EventContext context);
+        /// <returns>A <see cref="Task" /> that, when resolved, returns <see cref="Try" />.</returns>
+        Task<Try> TryHandle(object @event, EventContext context);
     }
 }
