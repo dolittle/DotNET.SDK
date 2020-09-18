@@ -19,32 +19,30 @@ namespace Dolittle.SDK.Events.Filters.Internal
         where TRegisterArguments : class
         where TResponse : class
     {
-        readonly IEventProcessingRequestConverter _processingRequestConverter;
+        readonly IEventProcessingConverter _converter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}"/> class.
         /// </summary>
         /// <param name="kind">The kind of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" />.</param>
         /// <param name="filterId">The <see cref="FilterId" />.</param>
-        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerfactory">The <see cref="ILoggerFactory" />.</param>
         protected FilterEventProcessor(
             EventProcessorKind kind,
             FilterId filterId,
-            IEventProcessingRequestConverter processingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerfactory)
             : base(kind, filterId, loggerfactory.CreateLogger<EventProcessor<FilterId, TRegisterArguments, FilterEventRequest, TResponse>>())
         {
-            _processingRequestConverter = processingRequestConverter;
+            _converter = converter;
         }
 
         /// <inheritdoc/>
         protected override Task<TResponse> Process(FilterEventRequest request, CancellationToken cancellation)
         {
-            var eventContext = _processingRequestConverter.GetEventContext(request.Event);
-            var @event = _processingRequestConverter.GetCLREvent(request.Event);
-
-            return Filter(@event, eventContext);
+            var comittedEvent = _converter.ToSDK(request.Event);
+            return Filter(comittedEvent.Content, comittedEvent.GetEventContext());
         }
 
         /// <summary>

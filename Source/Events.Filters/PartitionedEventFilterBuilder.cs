@@ -29,12 +29,12 @@ namespace Dolittle.SDK.Events.Filters
             FilterId filterId,
             ScopeId scopeId,
             IEventProcessors eventProcessors,
-            IEventProcessingRequestConverter eventProcessingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
             ThrowIfCallbackIsMissing(filterId, scopeId);
-            var filter = new PartitionedEventFilterProcessor(filterId, scopeId, _callback, eventProcessingRequestConverter, loggerFactory);
+            var filter = new PartitionedEventFilterProcessor(filterId, scopeId, _callback, converter, loggerFactory);
             eventProcessors.Register(filter, _protocol, cancellation);
         }
 

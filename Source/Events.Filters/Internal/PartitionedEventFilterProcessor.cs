@@ -24,15 +24,15 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="filterId">The <see cref="FilterId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
-        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public PartitionedEventFilterProcessor(
             FilterId filterId,
             ScopeId scopeId,
             PartitionedFilterEventCallback filterEventCallback,
-            IEventProcessingRequestConverter processingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerFactory)
-            : base("Partitioned Filter", filterId, processingRequestConverter, loggerFactory)
+            : base("Partitioned Filter", filterId, converter, loggerFactory)
         {
             _filterEventCallback = filterEventCallback;
             _filterId = filterId;
