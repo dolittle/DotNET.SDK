@@ -81,9 +81,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// </summary>
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        public void BuildAndRegister(IEventProcessors eventProcessors, IEventTypes eventTypes, IEventProcessingRequestConverter processingRequestConverter, CancellationToken cancellation)
+        public void BuildAndRegister(IEventProcessors eventProcessors, IEventTypes eventTypes, IEventProcessingConverter processingConverter, CancellationToken cancellation)
         {
             if (_methodsBuilder == default)
             {
@@ -99,7 +99,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             }
 
             var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
-            var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingRequestConverter, _loggerFactory.CreateLogger<EventHandlerProcessor>());
+            var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingConverter, _loggerFactory.CreateLogger<EventHandlerProcessor>());
             eventProcessors.Register(
                 eventHandlerProcessor,
                 new EventHandlerProtocol(),
