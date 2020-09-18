@@ -98,7 +98,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 return;
             }
 
-            var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods, _loggerFactory.CreateLogger<EventHandler>());
+            var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
             var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingRequestConverter, _loggerFactory.CreateLogger<EventHandlerProcessor>());
             eventProcessors.Register(
                 eventHandlerProcessor,
