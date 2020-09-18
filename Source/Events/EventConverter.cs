@@ -249,7 +249,7 @@ namespace Dolittle.SDK.Events
             }
 
             error = null;
-            return false;
+            return true;
         }
 
         bool TrySerializeContent(object source, out string content, out Exception error)
