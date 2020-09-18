@@ -64,6 +64,7 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_a_committed_eve
         It should_create_an_internal_committed_event = () => converted_committed_event.ShouldBeOfExactType<CommittedEvent>();
         It should_have_asked_the_event_types_if_it_has_type_for = () => event_types.Verify(_ => _.HasTypeFor(converted_event_type));
         It should_have_asked_the_event_types_for_the_type = () => event_types.Verify(_ => _.GetTypeFor(converted_event_type));
+        It should_not_ask_the_event_types_for_anything_else = () => event_types.VerifyNoOtherCalls();
         It should_have_the_correct_event_log_sequence_number = () => converted_committed_event.EventLogSequenceNumber.ShouldEqual((EventLogSequenceNumber)event_log_sequence_number);
         It should_have_the_correct_occurred = () => converted_committed_event.Occurred.ShouldEqual(occured.ToDateTimeOffset());
         It should_have_the_correct_event_source = () => converted_committed_event.EventSource.ShouldEqual(event_source.To<EventSourceId>());
