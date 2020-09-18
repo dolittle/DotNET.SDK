@@ -6,9 +6,10 @@ using Machine.Specifications;
 
 namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_protobuf.given
 {
-    public class an_uncomitted_event
+    public class events : for_EventConverter.given.a_converter
     {
         protected static UncommittedEvent uncomitted_event;
+        protected static UncommittedEvents uncommitted_events;
         protected static EventSourceId event_source_id;
         protected static EventType event_type;
         protected static an_event @event;
@@ -19,6 +20,10 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_protobuf.giv
             event_type = new EventType(Guid.NewGuid());
             @event = new an_event { a_string = "Hello World", a_bool = true, an_integer = 42 };
             uncomitted_event = new UncommittedEvent(event_source_id, event_type, @event, false);
-        }
+
+            uncommitted_events = new UncommittedEvents { uncomitted_event, uncomitted_event, uncomitted_event };
+            event_types.Setup(_ => _.GetTypeFor(event_type)).Returns(typeof(an_event));
+            event_types.Setup(_ => _.GetFor<an_event>()).Returns(event_type);
+        };
     }
 }

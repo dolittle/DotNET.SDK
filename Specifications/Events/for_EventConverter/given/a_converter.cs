@@ -17,4 +17,4 @@ namespace Dolittle.SDK.Events.for_EventConverter.given
             converter = new EventConverter(event_types.Object);
         };
     }
-} 
+}

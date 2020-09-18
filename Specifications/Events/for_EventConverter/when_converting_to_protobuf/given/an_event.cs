@@ -13,4 +13,4 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_protobuf.giv
 
         public bool a_bool { get; set; }
     }
-} 
+}
