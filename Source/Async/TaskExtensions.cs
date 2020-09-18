@@ -17,11 +17,20 @@ namespace Dolittle.SDK.Async
         /// <typeparam name="T">The <see cref="Type" /> of the result of the <see cref="Task{TResult}" />.</typeparam>
         /// <param name="performTask">The callback that performs the task.</param>
         /// <returns>A <see cref="Task{TResult}" /> that, when resolved returns <see cref="Try{TResult}" />.</returns>
-        public static async Task<Try<T>> TryTask<T>(this Func<Task<T>> performTask)
+        public static Task<Try<T>> TryTask<T>(this Func<Task<T>> performTask)
+            => TryTask(performTask());
+
+        /// <summary>
+        /// Tries to perform a task that returns a <typeparamref name="T">result</typeparamref>.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type" /> of the result of the <see cref="Task{TResult}" />.</typeparam>
+        /// <param name="task">The task.</param>
+        /// <returns>A <see cref="Task{TResult}" /> that, when resolved returns <see cref="Try{TResult}" />.</returns>
+        public static async Task<Try<T>> TryTask<T>(this Task<T> task)
         {
             try
             {
-                return await performTask().ConfigureAwait(false);
+                return await task.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -30,15 +39,23 @@ namespace Dolittle.SDK.Async
         }
 
         /// <summary>
-        /// Tries to perform a task .
+        /// Tries to perform a task.
         /// </summary>
         /// <param name="performTask">The callback that performs the task.</param>
         /// <returns>A <see cref="Task{TResult}" /> that, when resolved returns <see cref="Try{TResult}" />.</returns>
-        public static async Task<Try> TryTask(this Func<Task> performTask)
+        public static Task<Try> TryTask(this Func<Task> performTask)
+            => TryTask(performTask());
+
+        /// <summary>
+        /// Tries to perform a task.
+        /// </summary>
+        /// <param name="task">The task.</param>
+        /// <returns>A <see cref="Task{TResult}" /> that, when resolved returns <see cref="Try{TResult}" />.</returns>
+        public static async Task<Try> TryTask(this Task task)
         {
             try
             {
-                await performTask().ConfigureAwait(false);
+                await task.ConfigureAwait(false);
                 return new Try();
             }
             catch (Exception ex)
