@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
+using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
@@ -20,6 +21,7 @@ namespace Dolittle.SDK
     {
         readonly EventTypesBuilder _eventTypesBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
+        readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         ushort _port = 50053;
@@ -48,6 +50,7 @@ namespace Dolittle.SDK
 
             _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
             _eventFiltersBuilder = new EventFiltersBuilder();
+            _eventHandlersBuilder = new EventHandlersBuilder(_loggerFactory);
         }
 
         /// <summary>
@@ -91,6 +94,17 @@ namespace Dolittle.SDK
         public ClientBuilder WithFilters(Action<EventFiltersBuilder> callback)
         {
             callback(_eventFiltersBuilder);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the event handlers through the <see cref="EventHandlersBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventHandlers(Action<EventHandlersBuilder> callback)
+        {
+            callback(_eventHandlersBuilder);
             return this;
         }
 
@@ -157,6 +171,7 @@ namespace Dolittle.SDK
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
+            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _cancellation);
 
             var eventStore = new EventStore(methodCaller, eventConverter, executionContextManager, eventTypes, _loggerFactory.CreateLogger<EventStore>());
             return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes, eventStore);
