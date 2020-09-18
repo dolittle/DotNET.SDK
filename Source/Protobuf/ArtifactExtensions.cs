@@ -107,9 +107,7 @@ namespace Dolittle.SDK.Protobuf
         {
             artifact = default;
             if (!source.Id.TryTo<ArtifactId>(out var id, out error))
-            {
                 return false;
-            }
 
             artifact = (id, source.Generation);
             return true;

@@ -30,6 +30,12 @@ namespace Dolittle.SDK.Events
         {
             @event = null;
 
+            if (source == null)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
+
             if (source.Occurred == null)
             {
                 error = new MissingCommittedEventInformation(nameof(source.Occurred));
@@ -60,29 +66,7 @@ namespace Dolittle.SDK.Events
                 return false;
             }
 
-            object content = null;
-            var deserializationFailed = false;
-            Exception deserializationError = null;
-
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Error = (_, args) =>
-                {
-                    deserializationFailed = true;
-                    deserializationError = args.ErrorContext.Error;
-                }
-            };
-
-            if (_eventTypes.HasTypeFor(eventType))
-            {
-                content = JsonConvert.DeserializeObject(source.Content, _eventTypes.GetTypeFor(eventType), serializerSettings);
-            }
-            else
-            {
-                content = JsonConvert.DeserializeObject(source.Content, serializerSettings);
-            }
-
-            if (deserializationFailed)
+            if (!TryDeserializeContent(source.Content, eventType, out var content, out var deserializationError))
             {
                 error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);
                 return false;
@@ -143,13 +127,9 @@ namespace Dolittle.SDK.Events
             foreach (var sourceEvent in source)
             {
                 if (!TryToSDK(sourceEvent, out var @event, out error))
-                {
                     return false;
-                }
-                else
-                {
-                    list.Add(@event);
-                }
+
+                list.Add(@event);
             }
 
             events = new CommittedEvents(list);
@@ -167,11 +147,8 @@ namespace Dolittle.SDK.Events
             result = default;
 
             if (!TryToSDK(source.Events, out var events, out error))
-            {
                 return false;
-            }
 
-            error = null;
             result = new CommitEventsResult(source.Failure, events);
             return true;
         }
@@ -185,21 +162,13 @@ namespace Dolittle.SDK.Events
         {
             @event = default;
 
-            var content = string.Empty;
-            var serializationFailed = false;
-            Exception serializationError = null;
-            var serializerSettings = new JsonSerializerSettings
+            if (source == null)
             {
-                Error = (_, args) =>
-                {
-                    serializationFailed = true;
-                    serializationError = args.ErrorContext.Error;
-                },
-                Formatting = Formatting.None,
-            };
-            content = JsonConvert.SerializeObject(source.Content, serializerSettings);
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
 
-            if (serializationFailed)
+            if (!TrySerializeContent(source.Content, out var content, out var serializationError))
             {
                 error = new CouldNotSerializeEventContent(source.Content, serializationError);
                 return false;
@@ -235,13 +204,9 @@ namespace Dolittle.SDK.Events
             foreach (var sourceEvent in source)
             {
                 if (!TryToProtobuf(sourceEvent, out var @event, out error))
-                {
                     return false;
-                }
-                else
-                {
-                    list.Add(@event);
-                }
+
+                list.Add(@event);
             }
 
             error = null;
@@ -252,5 +217,67 @@ namespace Dolittle.SDK.Events
         /// <inheritdoc/>
         public IEnumerable<Contracts.UncommittedEvent> ToProtobuf(UncommittedEvents source)
             => TryToProtobuf(source, out var events, out var error) ? events : throw error;
+
+        bool TryDeserializeContent(string source, EventType eventType, out object content, out Exception error)
+        {
+            content = null;
+            var deserializationFailed = false;
+            Exception deserializationError = null;
+
+            var serializerSettings = new JsonSerializerSettings
+            {
+                Error = (_, args) =>
+                {
+                    deserializationFailed = true;
+                    deserializationError = args.ErrorContext.Error;
+                }
+            };
+
+            if (_eventTypes.HasTypeFor(eventType))
+            {
+                content = JsonConvert.DeserializeObject(source, _eventTypes.GetTypeFor(eventType), serializerSettings);
+            }
+            else
+            {
+                content = JsonConvert.DeserializeObject(source, serializerSettings);
+            }
+
+            if (deserializationFailed)
+            {
+                error = deserializationError;
+                return false;
+            }
+
+            error = null;
+            return false;
+        }
+
+        bool TrySerializeContent(object source, out string content, out Exception error)
+        {
+            content = string.Empty;
+
+            var serializationFailed = false;
+            Exception serializationError = null;
+            var serializerSettings = new JsonSerializerSettings
+            {
+                Error = (_, args) =>
+                {
+                    serializationFailed = true;
+                    serializationError = args.ErrorContext.Error;
+                },
+                Formatting = Formatting.None,
+            };
+
+            content = JsonConvert.SerializeObject(source, serializerSettings);
+
+            if (serializationFailed)
+            {
+                error = new CouldNotSerializeEventContent(source, serializationError);
+                return false;
+            }
+
+            error = null;
+            return true;
+        }
     }
 }

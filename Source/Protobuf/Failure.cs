@@ -39,9 +39,7 @@ namespace Dolittle.SDK.Protobuf
         public static implicit operator Contracts.Failure(Failure failure)
         {
             if (failure == null)
-            {
                 return null;
-            }
 
             return new Contracts.Failure
             {
@@ -57,14 +55,10 @@ namespace Dolittle.SDK.Protobuf
         public static implicit operator Failure(Contracts.Failure failure)
         {
             if (failure == null)
-            {
                 return null;
-            }
 
             if (!failure.Id.TryTo<FailureId>(out var id, out var _))
-            {
                 return new Failure(FailureId.Undocumented, failure.Reason);
-            }
 
             return new Failure(id, failure.Reason);
         }
