@@ -2,12 +2,18 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using Dolittle.SDK.Execution;
+using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Security;
 using Dolittle.SDK.Services.given.ReverseCall;
+using Dolittle.SDK.Tenancy;
 using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Environment = Dolittle.SDK.Microservices.Environment;
 using It = Machine.Specifications.It;
+using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
 {
@@ -16,6 +22,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
         static ConnectArguments arguments;
         static IReverseCallHandler<Request, Response> handler;
         static IAmAReverseCallProtocol<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response> protocol;
+        static ExecutionContext executionContext;
         static Mock<ILoggerFactory> loggerFactoryMock;
         static ReverseCallClientCreator reverseCallClientCreator;
 
@@ -29,12 +36,21 @@ namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
 
             protocol = Mock.Of<IAmAReverseCallProtocol<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>>();
 
+            executionContext = new ExecutionContext(
+                MicroserviceId.New(),
+                TenantId.Development,
+                Version.NotSet,
+                Environment.Undetermined,
+                CorrelationId.New(),
+                Claims.Empty,
+                CultureInfo.InvariantCulture);
+
             loggerFactoryMock = new Mock<ILoggerFactory>();
 
             reverseCallClientCreator = new ReverseCallClientCreator(
                 TimeSpan.FromSeconds(23),
                 Mock.Of<IPerformMethodCalls>(),
-                Mock.Of<IExecutionContextManager>(),
+                executionContext,
                 loggerFactoryMock.Object);
         };
 
