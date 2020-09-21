@@ -180,8 +180,9 @@ namespace Dolittle.SDK
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
             _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _cancellation);
 
-            var eventStore = new EventStore(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStore);
+            var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder);
         }
     }
 }
