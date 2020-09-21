@@ -62,8 +62,7 @@ namespace Dolittle.SDK.Events.Handling.Internal
                 .Handle(
                     comittedEvent.Content,
                     comittedEvent.EventType,
-                    comittedEvent.GetEventContext(),
-                    executionContext,
+                    comittedEvent.GetEventContext(executionContext),
                     cancellation)
                 .ConfigureAwait(false);
             return new EventHandlerResponse();

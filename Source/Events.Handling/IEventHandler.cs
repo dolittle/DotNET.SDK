@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Handling
 {
@@ -39,9 +38,8 @@ namespace Dolittle.SDK.Events.Handling
         /// <param name="event">The event to handle.</param>
         /// <param name="eventType">The artifact representign the event type.</param>
         /// <param name="context">The context in which the event is in.</param>
-        /// <param name="executionContext">The execution context to handle the request in.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous action.</returns>
-        Task Handle(object @event, EventType eventType, EventContext context, ExecutionContext executionContext, CancellationToken cancellation);
+        Task Handle(object @event, EventType eventType, EventContext context, CancellationToken cancellation);
     }
 }

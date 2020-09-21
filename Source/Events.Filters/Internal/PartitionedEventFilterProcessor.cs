@@ -7,7 +7,6 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
-using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Filters.Internal
 {
@@ -54,7 +53,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             => new PartitionedFilterResponse { Failure = failure };
 
         /// <inheritdoc/>
-        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, ExecutionContext executionContext, CancellationToken cancellation)
+        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
         {
             var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
             return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.ToProtobuf() };

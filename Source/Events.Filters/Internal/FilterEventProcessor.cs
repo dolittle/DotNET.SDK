@@ -43,7 +43,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
         protected override Task<TResponse> Process(FilterEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
             var comittedEvent = _converter.ToSDK(request.Event);
-            return Filter(comittedEvent.Content, comittedEvent.GetEventContext(), executionContext, cancellation);
+            return Filter(comittedEvent.Content, comittedEvent.GetEventContext(executionContext), cancellation);
         }
 
         /// <summary>
@@ -51,10 +51,9 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// </summary>
         /// <param name="event">The event to filter.</param>
         /// <param name="context">The <see cref="EventContext" />.</param>
-        /// <param name="executionContext">The execution context to handle the request in.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns a <typeparamref name="TResponse"/>.</returns>
-        protected abstract Task<TResponse> Filter(object @event, EventContext context, ExecutionContext executionContext, CancellationToken cancellation);
+        protected abstract Task<TResponse> Filter(object @event, EventContext context, CancellationToken cancellation);
 
         /// <inheritdoc/>
         protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request)
