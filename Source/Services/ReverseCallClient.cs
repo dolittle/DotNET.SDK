@@ -188,8 +188,7 @@ namespace Dolittle.SDK.Services
 
             var executionContext = _executionContext
                 .ForTenant(requestContext.ExecutionContext.TenantId.To<TenantId>())
-                .ForCorrelation(requestContext.ExecutionContext.CorrelationId.To<CorrelationId>())
-                .ForClaims(requestContext.ExecutionContext.Claims.ToClaims());
+                .ForCorrelation(requestContext.ExecutionContext.CorrelationId.To<CorrelationId>());
 
             var response = await Handler.Handle(request, executionContext, token).ConfigureAwait(false);
 
