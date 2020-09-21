@@ -3,6 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Services
 {
@@ -19,8 +20,9 @@ namespace Dolittle.SDK.Services
         /// Method that will be called to handle requests coming from the server.
         /// </summary>
         /// <param name="request">The request to handle.</param>
+        /// <param name="executionContext">The execution context to handle the request in.</param>
         /// <param name="token">The <see cref="CancellationToken" />.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <typeparamref name="TResponse"/> to send to the server.</returns>
-        Task<TResponse> Handle(TRequest request, CancellationToken token);
+        Task<TResponse> Handle(TRequest request, ExecutionContext executionContext, CancellationToken token);
     }
 }
