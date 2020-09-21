@@ -5,8 +5,10 @@
 // using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Handling.Builder;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Handling
 {
@@ -49,7 +51,7 @@ namespace Dolittle.SDK.Events.Handling
         public IEnumerable<EventType> HandledEvents => _eventHandlerMethods.Keys;
 
         /// <inheritdoc/>
-        public async Task Handle(object @event, EventType eventType, EventContext context)
+        public async Task Handle(object @event, EventType eventType, EventContext context, ExecutionContext executionContext, CancellationToken cancellation)
         {
             if (!_eventHandlerMethods.TryGetValue(eventType, out var method)) throw new MissingEventHandlerForEventType(eventType);
 

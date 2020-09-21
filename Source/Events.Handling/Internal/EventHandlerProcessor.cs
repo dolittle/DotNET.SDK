@@ -9,6 +9,7 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Handling.Internal
 {
@@ -53,11 +54,18 @@ namespace Dolittle.SDK.Events.Handling.Internal
             }
 
         /// <inheritdoc/>
-        protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, CancellationToken cancellation)
+        protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
             var streamEvent = _converter.ToSDK(request.Event);
             var comittedEvent = streamEvent.Event;
-            await _eventHandler.Handle(comittedEvent.Content, comittedEvent.EventType, comittedEvent.GetEventContext()).ConfigureAwait(false);
+            await _eventHandler
+                .Handle(
+                    comittedEvent.Content,
+                    comittedEvent.EventType,
+                    comittedEvent.GetEventContext(),
+                    executionContext,
+                    cancellation)
+                .ConfigureAwait(false);
             return new EventHandlerResponse();
         }
 

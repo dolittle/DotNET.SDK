@@ -1,11 +1,13 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Filters.Internal
 {
@@ -52,7 +54,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             => new FilterResponse { Failure = failure };
 
         /// <inheritdoc/>
-        protected override async Task<FilterResponse> Filter(object @event, EventContext context)
+        protected override async Task<FilterResponse> Filter(object @event, EventContext context, ExecutionContext executionContext, CancellationToken cancellation)
             => new FilterResponse { IsIncluded = await _filterEventCallback(@event, context).ConfigureAwait(false) };
     }
 }
