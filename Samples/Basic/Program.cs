@@ -35,17 +35,12 @@ namespace Basic
                         )
                     )
                 ).Build();
-            client.ExecutionContextManager.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97");
 
             var myEvent = new MyEvent("test string", 12345);
+            var commit = client.EventStore.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97").Commit(myEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
+            Console.WriteLine(commit.Result.Events);
 
-            var myEventTask = client.EventStore.Commit(myEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
-            Console.WriteLine(myEventTask.Result.Events);
-
-            while (true)
-            {
-                Thread.Sleep(1000);
-            }
+            while (true) Thread.Sleep(1000);
         }
     }
 }

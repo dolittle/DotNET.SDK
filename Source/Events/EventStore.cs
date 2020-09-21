@@ -9,6 +9,7 @@ using Dolittle.SDK.Services;
 using Dolittle.Services.Contracts;
 using Microsoft.Extensions.Logging;
 using Contracts = Dolittle.Runtime.Events.Contracts;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events
 {
@@ -17,10 +18,11 @@ namespace Dolittle.SDK.Events
     /// </summary>
     public class EventStore : IEventStore
     {
+        static readonly EventStoreCommitMethod _method = new EventStoreCommitMethod();
+
         readonly IPerformMethodCalls _caller;
-        readonly EventStoreCommitMethod _method = new EventStoreCommitMethod();
         readonly IEventConverter _eventConverter;
-        readonly IExecutionContextManager _executionContextManager;
+        readonly ExecutionContext _executionContext;
         readonly IEventTypes _eventTypes;
         readonly ILogger _logger;
 
@@ -29,19 +31,19 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
         /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
-        /// <param name="executionContextManager">An <see cref="IExecutionContextManager"/> for getting execution context from.</param>
+        /// <param name="executionContext">The <see cref="ExecutionContext"/> to use.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStore(
             IPerformMethodCalls caller,
             IEventConverter eventConverter,
-            IExecutionContextManager executionContextManager,
+            ExecutionContext executionContext,
             IEventTypes eventTypes,
             ILogger logger)
         {
             _caller = caller;
             _eventConverter = eventConverter;
-            _executionContextManager = executionContextManager;
+            _executionContext = executionContext;
             _eventTypes = eventTypes;
             _logger = logger;
         }
@@ -110,7 +112,7 @@ namespace Dolittle.SDK.Events
             {
                 // in the future this should be set to something more meaningfull
                 HeadId = HeadId.NotSet.Value.ToProtobuf(),
-                ExecutionContext = _executionContextManager.Current.ToProtobuf(),
+                ExecutionContext = _executionContext.ToProtobuf(),
             };
     }
 }
