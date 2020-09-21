@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Services
     {
         readonly TimeSpan _pingInterval;
         readonly IPerformMethodCalls _caller;
-        readonly IExecutionContextManager _executionContextManager;
+        readonly ExecutionContext _executionContext;
         readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
@@ -23,17 +23,17 @@ namespace Dolittle.SDK.Services
         /// </summary>
         /// <param name="pingInterval">The interval at which to request pings from the server to keep the reverse calls alive.</param>
         /// <param name="caller">The caller that will be used to perform the method calls.</param>
-        /// <param name="executionContextManager">The execution context manager that will be used to set the execution context while handling requests from the server.</param>
+        /// <param name="executionContext">The execution context to use while initiating reverse calls.</param>
         /// <param name="loggerFactory">The logger that will be used create loggers to log messages while performing the reverse call.</param>
         public ReverseCallClientCreator(
             TimeSpan pingInterval,
             IPerformMethodCalls caller,
-            IExecutionContextManager executionContextManager,
+            ExecutionContext executionContext,
             ILoggerFactory loggerFactory)
         {
             _pingInterval = pingInterval;
             _caller = caller;
-            _executionContextManager = executionContextManager;
+            _executionContext = executionContext;
             _loggerFactory = loggerFactory;
         }
 
@@ -54,7 +54,7 @@ namespace Dolittle.SDK.Services
                 protocol,
                 _pingInterval,
                 _caller,
-                _executionContextManager,
+                _executionContext,
                 _loggerFactory.CreateLogger<ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>>());
     }
 }

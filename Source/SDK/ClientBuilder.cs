@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
@@ -9,8 +10,11 @@ using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK
 {
@@ -151,11 +155,14 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="Client"/>.</returns>
         public Client Build()
         {
-            var executionContextManager = new ExecutionContextManager(
+            var executionContext = new ExecutionContext(
                 _microserviceId,
+                TenantId.System,
                 _version,
                 _environment,
-                _loggerFactory.CreateLogger<ExecutionContextManager>());
+                CorrelationId.System,
+                Claims.Empty,
+                CultureInfo.InvariantCulture);
 
             var eventTypes = _eventTypesBuilder.Build();
 
@@ -163,7 +170,7 @@ namespace Dolittle.SDK
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 TimeSpan.FromSeconds(5),
                 methodCaller,
-                executionContextManager,
+                executionContext,
                 _loggerFactory);
 
             var eventConverter = new EventConverter(eventTypes);
@@ -173,8 +180,9 @@ namespace Dolittle.SDK
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
             _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _cancellation);
 
-            var eventStore = new EventStore(methodCaller, eventConverter, executionContextManager, eventTypes, _loggerFactory.CreateLogger<EventStore>());
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes, eventStore);
+            var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder);
         }
     }
 }

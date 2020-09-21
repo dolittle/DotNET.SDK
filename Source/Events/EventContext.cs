@@ -17,18 +17,21 @@ namespace Dolittle.SDK.Events
         /// <param name="sequenceNumber">The <see cref="EventLogSequenceNumber">sequence number</see> that uniquely identifies the event in the event log which it was committed.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId"/> that the event was committed to.</param>
         /// <param name="occurred">The <see cref="DateTimeOffset"/> when the event was committed to the <see cref="IEventStore"/>.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.</param>
+        /// <param name="committedExecutionContext">The <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.</param>
+        /// <param name="currentExecutionContext">The <see cref="ExecutionContext"/> in which the event is currently being processed.</param>
         public EventContext(
             EventLogSequenceNumber sequenceNumber,
             EventSourceId eventSourceId,
             DateTimeOffset occurred,
-            ExecutionContext executionContext)
+            ExecutionContext committedExecutionContext,
+            ExecutionContext currentExecutionContext)
             : this(
                 sequenceNumber,
                 eventSourceId,
                 occurred,
-                executionContext,
-                new EventIdentifier(executionContext.Microservice, executionContext.Tenant, sequenceNumber))
+                committedExecutionContext,
+                currentExecutionContext,
+                new EventIdentifier(committedExecutionContext.Microservice, committedExecutionContext.Tenant, sequenceNumber))
         {
         }
 
@@ -38,19 +41,22 @@ namespace Dolittle.SDK.Events
         /// <param name="sequenceNumber">The <see cref="EventLogSequenceNumber">sequence number</see> that uniquely identifies the event in the event log which it was committed.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId"/> that the event was committed to.</param>
         /// <param name="occurred">The <see cref="DateTimeOffset"/> when the event was committed to the <see cref="IEventStore"/>.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.</param>
+        /// <param name="committedExecutionContext">The <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.</param>
+        /// <param name="currentExecutionContext">The <see cref="ExecutionContext"/> in which the event is currently being processed.</param>
         /// <param name="uniqueIdentifier">The <see cref="EventIdentifier"/> that uniquely identifies the event.</param>
         protected EventContext(
             EventLogSequenceNumber sequenceNumber,
             EventSourceId eventSourceId,
             DateTimeOffset occurred,
-            ExecutionContext executionContext,
+            ExecutionContext committedExecutionContext,
+            ExecutionContext currentExecutionContext,
             EventIdentifier uniqueIdentifier)
         {
             SequenceNumber = sequenceNumber;
             EventSourceId = eventSourceId;
             Occurred = occurred;
-            ExecutionContext = executionContext;
+            CommittedExecutionContext = committedExecutionContext;
+            CurrentExecutionContext = currentExecutionContext;
             UniqueIdentifier = uniqueIdentifier;
         }
 
@@ -72,7 +78,12 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Gets the <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.
         /// </summary>
-        public ExecutionContext ExecutionContext { get; }
+        public ExecutionContext CommittedExecutionContext { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.
+        /// </summary>
+        public ExecutionContext CurrentExecutionContext { get; }
 
         /// <summary>
         /// Gets the <see cref="EventIdentifier"/> that uniquely identifies the event.

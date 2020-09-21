@@ -14,30 +14,26 @@ namespace Dolittle.SDK
     public class Client
     {
         readonly ILogger _logger;
+        readonly ExecutionContext _executionContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Client" /> class.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        /// <param name="executionContextManager">The <see cref="IExecutionContextManager" />.</param>
-        /// <param name="eventTypes">The <see cref="Events.EventTypes" />.</param>
-        /// <param name="eventStore">The <see cref="Events.EventStore" />.</param>
+        /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
+        /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
+        /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
         public Client(
             ILogger logger,
-            IExecutionContextManager executionContextManager,
+            ExecutionContext executionContext,
             IEventTypes eventTypes,
-            IEventStore eventStore)
+            EventStoreBuilder eventStoreBuilder)
         {
             _logger = logger;
-            ExecutionContextManager = executionContextManager;
+            _executionContext = executionContext;
             EventTypes = eventTypes;
-            EventStore = eventStore;
+            EventStore = eventStoreBuilder;
         }
-
-        /// <summary>
-        /// Gets the <see cref="IExecutionContextManager" />.
-        /// </summary>
-        public IExecutionContextManager ExecutionContextManager { get; }
 
         /// <summary>
         /// Gets the <see cref="IEventTypes" />.
@@ -45,9 +41,9 @@ namespace Dolittle.SDK
         public IEventTypes EventTypes { get; }
 
         /// <summary>
-        /// Gets the <see cref="IEventStore" />.
+        /// Gets the <see cref="EventStoreBuilder" />.
         /// </summary>
-        public IEventStore EventStore { get; }
+        public EventStoreBuilder EventStore { get; }
 
         /// <summary>
         /// Create a client builder for a Miroservice.

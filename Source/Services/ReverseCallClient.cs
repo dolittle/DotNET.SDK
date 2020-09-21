@@ -9,10 +9,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
+using Dolittle.SDK.Tenancy;
 using Dolittle.Services.Contracts;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Services
 {
@@ -37,7 +39,7 @@ namespace Dolittle.SDK.Services
         readonly IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> _protocol;
         readonly TimeSpan _pingInterval;
         readonly IPerformMethodCalls _caller;
-        readonly IExecutionContextManager _executionContextManager;
+        readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
         readonly IObservable<TConnectResponse> _observable;
 
@@ -49,7 +51,7 @@ namespace Dolittle.SDK.Services
         /// <param name="protocol">The the reverse call protocol that will be used to connect to the server.</param>
         /// <param name="pingInterval">The interval at which to request pings from the server to keep the reverse call alive.</param>
         /// <param name="caller">The caller that will be used to perform the method call.</param>
-        /// <param name="executionContextManager">The execution context manager that will be used to set the execution context while handling requests from the server.</param>
+        /// <param name="executionContext">The execution context to use while initiating the reverse call.</param>
         /// <param name="logger">The logger that will be used to log messages while performing the reverse call.</param>
         public ReverseCallClient(
             TConnectArguments arguments,
@@ -57,7 +59,7 @@ namespace Dolittle.SDK.Services
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol,
             TimeSpan pingInterval,
             IPerformMethodCalls caller,
-            IExecutionContextManager executionContextManager,
+            ExecutionContext executionContext,
             ILogger logger)
         {
             Arguments = arguments;
@@ -65,7 +67,7 @@ namespace Dolittle.SDK.Services
             _protocol = protocol;
             _pingInterval = pingInterval;
             _caller = caller;
-            _executionContextManager = executionContextManager;
+            _executionContext = executionContext;
             _logger = logger;
             _observable = CreateObservable();
         }
@@ -142,7 +144,7 @@ namespace Dolittle.SDK.Services
             => new ReverseCallArgumentsContext
                 {
                     HeadId = Guid.NewGuid().ToProtobuf(),
-                    ExecutionContext = _executionContextManager.Current.ToProtobuf(),
+                    ExecutionContext = _executionContext.ToProtobuf(),
                     PingInterval = Duration.FromTimeSpan(_pingInterval),
                 };
 
@@ -183,14 +185,12 @@ namespace Dolittle.SDK.Services
         async Task<TResponse> HandleRequest(TRequest request, CancellationToken token)
         {
             var requestContext = _protocol.GetRequestContextFrom(request);
-            var executionContext = requestContext.ExecutionContext.ToExecutionContext();
 
-            _executionContextManager
-                .ForTenant(executionContext.Tenant)
-                .ForCorrelation(executionContext.CorrelationId)
-                .ForClaims(executionContext.Claims);
+            var executionContext = _executionContext
+                .ForTenant(requestContext.ExecutionContext.TenantId.To<TenantId>())
+                .ForCorrelation(requestContext.ExecutionContext.CorrelationId.To<CorrelationId>());
 
-            var response = await Handler.Handle(request, token).ConfigureAwait(false);
+            var response = await Handler.Handle(request, executionContext, token).ConfigureAwait(false);
 
             var responseContext = new ReverseCallResponseContext { CallId = requestContext.CallId };
             _protocol.SetResponseContextIn(responseContext, response);
