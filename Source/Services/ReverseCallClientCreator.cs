@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reactive.Concurrency;
 using Dolittle.SDK.Execution;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ namespace Dolittle.SDK.Services
     /// </summary>
     public class ReverseCallClientCreator : ICreateReverseCallClients
     {
+        static readonly IScheduler _scheduler = TaskPoolScheduler.Default;
         readonly TimeSpan _pingInterval;
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
@@ -42,8 +44,8 @@ namespace Dolittle.SDK.Services
             TConnectArguments arguments,
             IReverseCallHandler<TRequest, TResponse> handler,
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol)
-            where TClientMessage : IMessage
-            where TServerMessage : IMessage
+            where TClientMessage : class, IMessage
+            where TServerMessage : class, IMessage
             where TConnectArguments : class
             where TConnectResponse : class
             where TRequest : class
@@ -55,6 +57,7 @@ namespace Dolittle.SDK.Services
                 _pingInterval,
                 _caller,
                 _executionContext,
+                _scheduler,
                 _loggerFactory.CreateLogger<ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>>());
     }
 }

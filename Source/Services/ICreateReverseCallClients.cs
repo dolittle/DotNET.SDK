@@ -27,8 +27,8 @@ namespace Dolittle.SDK.Services
             TConnectArguments arguments,
             IReverseCallHandler<TRequest, TResponse> handler,
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol)
-            where TClientMessage : IMessage
-            where TServerMessage : IMessage
+            where TClientMessage : class, IMessage
+            where TServerMessage : class, IMessage
             where TConnectArguments : class
             where TConnectResponse : class
             where TRequest : class

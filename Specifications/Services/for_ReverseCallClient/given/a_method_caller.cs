@@ -2,12 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
+using Microsoft.Reactive.Testing;
 using Moq;
 using It = Moq.It;
 
@@ -15,10 +14,9 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 {
     public class a_method_caller : an_execution_context
     {
-        protected static IEnumerable<ClientMessage> messagesSentToServer;
-        static List<ClientMessage> _messages;
+        protected static ITestableObserver<ClientMessage> messagesSentToServer;
 
-        Establish context = () => messagesSentToServer = _messages = new List<ClientMessage>();
+        Establish context = () => messagesSentToServer = scheduler.CreateObserver<ClientMessage>();
 
         protected static IPerformMethodCalls method_caller_that_replies_with(IObservable<ServerMessage> serverToClientMessages)
         {
@@ -27,17 +25,18 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
                 .Returns((ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method, IObservable<ClientMessage> clientToServerMessages)
                     => Observable.Create<ServerMessage>(observer =>
                     {
-                        var cts = new CancellationTokenSource();
-                        serverToClientMessages.Subscribe(observer, cts.Token);
-                        clientToServerMessages.Subscribe(
-                            message => _messages.Add(message),
-                            error =>
+                        var recordingSubscription = clientToServerMessages.Subscribe(messagesSentToServer);
+                        var respondingSubscription = serverToClientMessages.Subscribe(observer);
+                        var errorSubscription = clientToServerMessages.Subscribe(
+                            _ => { },
+                            error => observer.OnError(error),
+                            () => { });
+                        return Disposable.Create(() =>
                             {
-                                observer.OnError(error);
-                                cts.Cancel();
-                            },
-                            cts.Token);
-                        return Disposable.Create(cts.Cancel);
+                                recordingSubscription.Dispose();
+                                respondingSubscription.Dispose();
+                                errorSubscription.Dispose();
+                            });
                     }));
 
             return mock.Object;
