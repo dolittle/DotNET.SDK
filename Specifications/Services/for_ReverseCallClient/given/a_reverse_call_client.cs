@@ -20,11 +20,24 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 
         protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> reverse_call_client_with(
             ConnectArguments arguments,
+            IReverseCallHandler<Request, Response> handler,
+            IObservable<ServerMessage> serverToClientMessages)
+            => reverse_call_client_with(arguments, TimeSpan.FromTicks(1000), handler, serverToClientMessages);
+
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> reverse_call_client_with(
+            ConnectArguments arguments,
             TimeSpan pingInterval,
+            IObservable<ServerMessage> serverToClientMessages)
+            => reverse_call_client_with(arguments, pingInterval, Mock.Of<IReverseCallHandler<Request, Response>>(), serverToClientMessages);
+
+        protected static IReverseCallClient<ConnectArguments, ConnectResponse, Request, Response> reverse_call_client_with(
+            ConnectArguments arguments,
+            TimeSpan pingInterval,
+            IReverseCallHandler<Request, Response> handler,
             IObservable<ServerMessage> serverToClientMessages)
             => new ReverseCallClient<ClientMessage, ServerMessage, ConnectArguments, ConnectResponse, Request, Response>(
                 arguments,
-                Mock.Of<IReverseCallHandler<Request, Response>>(),
+                handler,
                 new Protocol(),
                 pingInterval,
                 method_caller_that_replies_with(serverToClientMessages),

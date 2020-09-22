@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 using Microsoft.Reactive.Testing;
@@ -36,7 +37,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.when_subscribing
         It should_send_the_arguments = () => ReactiveAssert.AreElementsEqual(
             new[]
             {
-                OnNext<ClientMessage>(2, _ => _.Arguments == arguments),
+                OnNext<ClientMessage>(2, _ => _.Arguments == arguments && _.Arguments.Context.ExecutionContext.ToExecutionContext() == executionContext),
                 OnCompleted<ClientMessage>(200),
             },
             messagesSentToServer.Messages);
