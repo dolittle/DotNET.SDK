@@ -13,7 +13,7 @@ using It = Moq.It;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 {
-    public class a_method_caller : an_execution_context_manager
+    public class a_method_caller : an_execution_context
     {
         protected static IEnumerable<ClientMessage> messagesSentToServer;
         static List<ClientMessage> _messages;

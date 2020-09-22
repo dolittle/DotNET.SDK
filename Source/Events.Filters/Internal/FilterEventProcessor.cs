@@ -7,6 +7,7 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Filters.Internal
 {
@@ -19,32 +20,30 @@ namespace Dolittle.SDK.Events.Filters.Internal
         where TRegisterArguments : class
         where TResponse : class
     {
-        readonly IEventProcessingRequestConverter _processingRequestConverter;
+        readonly IEventProcessingConverter _converter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}"/> class.
         /// </summary>
         /// <param name="kind">The kind of the <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" />.</param>
         /// <param name="filterId">The <see cref="FilterId" />.</param>
-        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerfactory">The <see cref="ILoggerFactory" />.</param>
         protected FilterEventProcessor(
             EventProcessorKind kind,
             FilterId filterId,
-            IEventProcessingRequestConverter processingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerfactory)
             : base(kind, filterId, loggerfactory.CreateLogger<EventProcessor<FilterId, TRegisterArguments, FilterEventRequest, TResponse>>())
         {
-            _processingRequestConverter = processingRequestConverter;
+            _converter = converter;
         }
 
         /// <inheritdoc/>
-        protected override Task<TResponse> Process(FilterEventRequest request, CancellationToken cancellation)
+        protected override Task<TResponse> Process(FilterEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
-            var eventContext = _processingRequestConverter.GetEventContext(request.Event);
-            var @event = _processingRequestConverter.GetCLREvent(request.Event);
-
-            return Filter(@event, eventContext);
+            var comittedEvent = _converter.ToSDK(request.Event);
+            return Filter(comittedEvent.Content, comittedEvent.GetEventContext(executionContext), cancellation);
         }
 
         /// <summary>
@@ -52,8 +51,9 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// </summary>
         /// <param name="event">The event to filter.</param>
         /// <param name="context">The <see cref="EventContext" />.</param>
+        /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns a <typeparamref name="TResponse"/>.</returns>
-        protected abstract Task<TResponse> Filter(object @event, EventContext context);
+        protected abstract Task<TResponse> Filter(object @event, EventContext context, CancellationToken cancellation);
 
         /// <inheritdoc/>
         protected override RetryProcessingState GetRetryProcessingStateFromRequest(FilterEventRequest request)

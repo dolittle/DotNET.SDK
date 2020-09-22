@@ -65,17 +65,17 @@ namespace Dolittle.SDK.Events.Filters
         /// Builds and register an instance of a private filter.
         /// </summary>
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
-            IEventProcessingRequestConverter eventProcessingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
             if (_innerBuilder == default) throw new FilterDefinitionIncomplete(FilterId, ScopeId, "Call Partitioned() or Handle(...) before building private filter");
-            _innerBuilder.BuildAndRegister(FilterId, ScopeId, eventProcessors, eventProcessingRequestConverter, loggerFactory, cancellation);
+            _innerBuilder.BuildAndRegister(FilterId, ScopeId, eventProcessors, converter, loggerFactory, cancellation);
         }
     }
 }

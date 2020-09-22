@@ -5,12 +5,19 @@ using Dolittle.Concepts;
 
 namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_sdk.given
 {
-    public class an_event : Value<an_event>
+    public class an_event
     {
-        public string a_string { get; set; }
+        public an_event(string a_string, int an_integer, bool a_bool)
+        {
+            this.a_string = a_string;
+            this.an_integer = an_integer;
+            this.a_bool = a_bool;
+        }
 
-        public int an_integer { get; set; }
+        public string a_string { get; }
 
-        public bool a_bool { get; set; }
+        public int an_integer { get; }
+
+        public bool a_bool { get; }
     }
 }

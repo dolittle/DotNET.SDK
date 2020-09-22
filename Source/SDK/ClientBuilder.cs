@@ -2,14 +2,19 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
+using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK
 {
@@ -20,6 +25,7 @@ namespace Dolittle.SDK
     {
         readonly EventTypesBuilder _eventTypesBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
+        readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         ushort _port = 50053;
@@ -48,6 +54,7 @@ namespace Dolittle.SDK
 
             _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
             _eventFiltersBuilder = new EventFiltersBuilder();
+            _eventHandlersBuilder = new EventHandlersBuilder(_loggerFactory);
         }
 
         /// <summary>
@@ -95,6 +102,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the event handlers through the <see cref="EventHandlersBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventHandlers(Action<EventHandlersBuilder> callback)
+        {
+            callback(_eventHandlersBuilder);
+            return this;
+        }
+
+        /// <summary>
         /// Sets the cancellation token for cancelling pending operations on the Runtime.
         /// </summary>
         /// <param name="cancellation">The cancellation token for cancelling pending operations on the Runtime.</param>
@@ -137,21 +155,34 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="Client"/>.</returns>
         public Client Build()
         {
-            var executionContextManager = new ExecutionContextManager(_microserviceId, _version, _environment, _loggerFactory.CreateLogger<ExecutionContextManager>());
+            var executionContext = new ExecutionContext(
+                _microserviceId,
+                TenantId.System,
+                _version,
+                _environment,
+                CorrelationId.System,
+                Claims.Empty,
+                CultureInfo.InvariantCulture);
+
             var eventTypes = _eventTypesBuilder.Build();
+
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 TimeSpan.FromSeconds(5),
                 methodCaller,
-                executionContextManager,
+                executionContext,
                 _loggerFactory);
-            var eventProcessingRequestConverter = new EventProcessingRequestConverter(eventTypes);
-            var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
-            _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, _loggerFactory, _cancellation);
 
             var eventConverter = new EventConverter(eventTypes);
-            var eventStore = new EventStore(methodCaller, eventConverter, executionContextManager, eventTypes, _loggerFactory.CreateLogger<EventStore>());
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContextManager, eventTypes, eventStore);
+            var eventProcessingConverter = new EventProcessingConverter(eventConverter);
+
+            var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
+            _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
+            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _cancellation);
+
+            var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder);
         }
     }
 }

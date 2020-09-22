@@ -18,14 +18,14 @@ namespace Dolittle.SDK.Events.Filters
         /// <param name="filterId">The <see cref="FilterId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         void BuildAndRegister(
             FilterId filterId,
             ScopeId scopeId,
             IEventProcessors eventProcessors,
-            IEventProcessingRequestConverter eventProcessingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation);
     }

@@ -8,6 +8,7 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Concepts;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Processing.Internal
 {
@@ -52,13 +53,13 @@ namespace Dolittle.SDK.Events.Processing.Internal
         public abstract TRegisterArguments RegistrationRequest { get; }
 
         /// <inheritdoc/>
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellation)
+        public async Task<TResponse> Handle(TRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
             RetryProcessingState retryProcessingState = null;
             try
             {
                 retryProcessingState = GetRetryProcessingStateFromRequest(request);
-                return await Process(request, cancellation).ConfigureAwait(false);
+                return await Process(request, executionContext, cancellation).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -85,9 +86,10 @@ namespace Dolittle.SDK.Events.Processing.Internal
         /// Method that will be called to process an event processing request from the server.
         /// </summary>
         /// <param name="request">The <typeparamref name="TRequest"/> to process.</param>
+        /// <param name="executionContext">The execution context to handle the request in.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task" /> that, when resolved, returns a <typeparamref name="TResponse"/>.</returns>
-        protected abstract Task<TResponse> Process(TRequest request, CancellationToken cancellation);
+        protected abstract Task<TResponse> Process(TRequest request, ExecutionContext executionContext, CancellationToken cancellation);
 
         /// <summary>
         /// Gets the <see cref="RetryProcessingState" /> from a <typeparamref name="TRequest"/>.

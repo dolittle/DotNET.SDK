@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
@@ -24,15 +25,15 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <param name="filterId">The <see cref="FilterId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
         /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
-        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public PartitionedEventFilterProcessor(
             FilterId filterId,
             ScopeId scopeId,
             PartitionedFilterEventCallback filterEventCallback,
-            IEventProcessingRequestConverter processingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerFactory)
-            : base("Partitioned Filter", filterId, processingRequestConverter, loggerFactory)
+            : base("Partitioned Filter", filterId, converter, loggerFactory)
         {
             _filterEventCallback = filterEventCallback;
             _filterId = filterId;
@@ -52,7 +53,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
             => new PartitionedFilterResponse { Failure = failure };
 
         /// <inheritdoc/>
-        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context)
+        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
         {
             var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
             return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.ToProtobuf() };

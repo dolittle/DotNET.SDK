@@ -49,23 +49,23 @@ namespace Dolittle.SDK.Events.Filters
         /// Builds and registers all the event filters.
         /// </summary>
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventProcessingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
-            IEventProcessingRequestConverter eventProcessingRequestConverter,
+            IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
             foreach (var filterBuilder in _privateFilterBuilders)
             {
-                filterBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, loggerFactory, cancellation);
+                filterBuilder.BuildAndRegister(eventProcessors, converter, loggerFactory, cancellation);
             }
 
             foreach (var filterBuilder in _publicFilterBuilders)
             {
-                filterBuilder.BuildAndRegister(eventProcessors, eventProcessingRequestConverter, loggerFactory, cancellation);
+                filterBuilder.BuildAndRegister(eventProcessors, converter, loggerFactory, cancellation);
             }
         }
     }

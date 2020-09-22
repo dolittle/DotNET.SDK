@@ -9,6 +9,7 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Events.Handling.Internal
 {
@@ -18,22 +19,22 @@ namespace Dolittle.SDK.Events.Handling.Internal
     public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>
     {
         readonly IEventHandler _eventHandler;
-        readonly IEventProcessingRequestConverter _processingRequestConverter;
+        readonly IEventProcessingConverter _converter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHandlerProcessor"/> class.
         /// </summary>
         /// <param name="eventHandler">The <see cref="IEventHandler" />.</param>
-        /// <param name="processingRequestConverter">The <see cref="IEventProcessingRequestConverter" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventHandlerProcessor(
             IEventHandler eventHandler,
-            IEventProcessingRequestConverter processingRequestConverter,
+            IEventProcessingConverter converter,
             ILogger logger)
             : base("EventHandler", eventHandler.Identifier, logger)
         {
             _eventHandler = eventHandler;
-            _processingRequestConverter = processingRequestConverter;
+            _converter = converter;
         }
 
         /// <inheritdoc/>
@@ -53,13 +54,17 @@ namespace Dolittle.SDK.Events.Handling.Internal
             }
 
         /// <inheritdoc/>
-        protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, CancellationToken cancellation)
+        protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
-            var eventContext = _processingRequestConverter.GetEventContext(request.Event);
-            var @event = _processingRequestConverter.GetCLREvent(request.Event);
-            var eventType = request.Event.Event.Type.To<EventType>();
-
-            await _eventHandler.Handle(@event, eventType, eventContext).ConfigureAwait(false);
+            var streamEvent = _converter.ToSDK(request.Event);
+            var comittedEvent = streamEvent.Event;
+            await _eventHandler
+                .Handle(
+                    comittedEvent.Content,
+                    comittedEvent.EventType,
+                    comittedEvent.GetEventContext(executionContext),
+                    cancellation)
+                .ConfigureAwait(false);
             return new EventHandlerResponse();
         }
 

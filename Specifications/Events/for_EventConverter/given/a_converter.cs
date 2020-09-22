@@ -9,7 +9,7 @@ namespace Dolittle.SDK.Events.for_EventConverter.given
     public class a_converter
     {
         protected static Mock<IEventTypes> event_types;
-        protected static IEventConverter converter;
+        protected static EventConverter converter;
 
         Establish context = () =>
         {
