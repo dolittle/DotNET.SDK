@@ -1,9 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.Concepts;
-
-namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_sdk.given
+namespace Dolittle.SDK.Events.for_EventConverter.given
 {
     public class an_event
     {
