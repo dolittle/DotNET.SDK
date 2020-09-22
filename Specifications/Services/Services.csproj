@@ -9,5 +9,7 @@
         <ProjectReference Include="../../Source/Services/Services.csproj" />
     </ItemGroup>
 
-
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Reactive.Testing" Version="$(RxVersion)" />
+    </ItemGroup>
 </Project>

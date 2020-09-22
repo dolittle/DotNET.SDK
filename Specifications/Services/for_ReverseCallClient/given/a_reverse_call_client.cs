@@ -36,6 +36,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
                 pingInterval,
                 method_caller_that_replies_with(serverToClientMessages),
                 executionContext,
+                scheduler,
                 Mock.Of<ILogger>());
     }
 }
