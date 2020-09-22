@@ -51,10 +51,7 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left <see cref="ConceptAs{T}"/>.</param>
         /// <param name="right">Right <see cref="ConceptAs{T}"/>.</param>
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is equal to the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
-        public static bool operator !=(ConceptAs<T> left, ConceptAs<T> right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(ConceptAs<T> left, ConceptAs<T> right) => !(left == right);
 
         /// <summary>
         /// Larger than comparison operator for comparing two <see cref="ConceptAs{T}"/>.
@@ -62,10 +59,7 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left <see cref="ConceptAs{T}"/>.</param>
         /// <param name="right">Right <see cref="ConceptAs{T}"/>.</param>
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is larger than the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
-        public static bool operator >(ConceptAs<T> left, ConceptAs<T> right)
-        {
-            return left.CompareTo(right) == 1;
-        }
+        public static bool operator >(ConceptAs<T> left, ConceptAs<T> right) => left.CompareTo(right) == 1;
 
         /// <summary>
         /// Smaller than comparison operator for comparing two <see cref="ConceptAs{T}"/>.
@@ -73,10 +67,7 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left <see cref="ConceptAs{T}"/>.</param>
         /// <param name="right">Right <see cref="ConceptAs{T}"/>.</param>
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is smaller than the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
-        public static bool operator <(ConceptAs<T> left, ConceptAs<T> right)
-        {
-            return left.CompareTo(right) == -1;
-        }
+        public static bool operator <(ConceptAs<T> left, ConceptAs<T> right) => left.CompareTo(right) == -1;
 
         /// <summary>
         /// Larger than or equal comparison operator for comparing two <see cref="ConceptAs{T}"/>.
@@ -84,10 +75,7 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left <see cref="ConceptAs{T}"/>.</param>
         /// <param name="right">Right <see cref="ConceptAs{T}"/>.</param>
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is larger or equal than the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
-        public static bool operator >=(ConceptAs<T> left, ConceptAs<T> right)
-        {
-            return left.CompareTo(right) > -1;
-        }
+        public static bool operator >=(ConceptAs<T> left, ConceptAs<T> right) => left.CompareTo(right) > -1;
 
         /// <summary>
         /// Smaller or equal than comparison operator for comparing two <see cref="ConceptAs{T}"/>.
@@ -95,10 +83,7 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left <see cref="ConceptAs{T}"/>.</param>
         /// <param name="right">Right <see cref="ConceptAs{T}"/>.</param>
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is smaller or equal than the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
-        public static bool operator <=(ConceptAs<T> left, ConceptAs<T> right)
-        {
-            return left.CompareTo(right) < 1;
-        }
+        public static bool operator <=(ConceptAs<T> left, ConceptAs<T> right) => left.CompareTo(right) < 1;
 
         /// <summary>
         /// Determines whether two object instances are equal.
@@ -129,60 +114,39 @@ namespace Dolittle.SDK.Concepts
         /// If the value is equal to the default value of the type of concept, it is concidered to be empty.
         /// </remarks>
         public bool IsEmpty()
-        {
-            if (Value == null)
-                return true;
-
-            if (Value is string value)
-                return value?.Length == 0;
-
-            return Value.Equals(default(T));
-        }
+            => Value switch
+                {
+                    null => true,
+                    string value => value?.Length == 0,
+                    _ => Value.Equals(default(T))
+                };
 
         /// <summary>
         /// Determines how two <see cref="ConceptAs{T}"/> instances compares to each other.
         /// </summary>
         /// <param name="other">The <see cref="ConceptAs{T}"/> to compare with the current <see cref="ConceptAs{T}"/>.</param>
         /// <returns>Comparison result.</returns>
-        public virtual int CompareTo(ConceptAs<T> other)
-        {
-            return other == null ? 1 : Comparer<T>.Default.Compare(Value, other.Value);
-        }
+        public virtual int CompareTo(ConceptAs<T> other) => other == null ? 1 : Comparer<T>.Default.Compare(Value, other.Value);
 
         /// <summary>
         /// Determines how the <see cref="ConceptAs{T}"/> instance compares to an <see cref="object"/>.
         /// </summary>
         /// <param name="obj">The <see cref="ConceptAs{T}"/> to compare with the current <see cref="ConceptAs{T}"/>.</param>
         /// <returns>Comparison result.</returns>
-        public virtual int CompareTo(object obj)
-        {
-            var other = obj as ConceptAs<T>;
-            return CompareTo(other);
-        }
+        public virtual int CompareTo(object obj) => CompareTo(obj as ConceptAs<T>);
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            return Value == null ? default(T).ToString() : Value.ToString();
-        }
+        public override string ToString() => Value == null ? default(T).ToString() : Value.ToString();
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
-        {
-            if (obj is ConceptAs<T> typed)
-            {
-                return Equals(typed);
-            }
-            else
-            {
-                return false;
-            }
-        }
+            => obj switch
+                {
+                    ConceptAs<T> other => Equals(other),
+                    _ => false
+                };
 
         /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            return HashCodeHelper.Generate(typeof(T), Value);
-        }
+        public override int GetHashCode() => HashCodeHelper.Generate(typeof(T), Value);
     }
 }
