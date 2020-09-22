@@ -40,7 +40,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.when_connected
             },
             messagesSentToServer.Messages);
 
-        It should_return_the_response_and_an_error = () => ReactiveAssert.AreElementsEqual(
+        It should_receive_the_response_and_error = () => ReactiveAssert.AreElementsEqual(
             new[]
             {
                 OnNext(100, response),
