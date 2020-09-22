@@ -22,8 +22,6 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_to_protobuf.giv
             uncomitted_event = new UncommittedEvent(event_source_id, event_type, @event, false);
 
             uncommitted_events = new UncommittedEvents { uncomitted_event, uncomitted_event, uncomitted_event };
-            event_types.Setup(_ => _.GetTypeFor(event_type)).Returns(typeof(an_event));
-            event_types.Setup(_ => _.GetFor<an_event>()).Returns(event_type);
         };
     }
 }
