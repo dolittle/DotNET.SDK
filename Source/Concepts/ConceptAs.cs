@@ -59,7 +59,7 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left <see cref="ConceptAs{T}"/>.</param>
         /// <param name="right">Right <see cref="ConceptAs{T}"/>.</param>
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is larger than the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
-        public static bool operator >(ConceptAs<T> left, ConceptAs<T> right) => left.CompareTo(right) == 1;
+        public static bool operator >(ConceptAs<T> left, ConceptAs<T> right) => left.CompareTo(right) > 0;
 
         /// <summary>
         /// Smaller than comparison operator for comparing two <see cref="ConceptAs{T}"/>.
