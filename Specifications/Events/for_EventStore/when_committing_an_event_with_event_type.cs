@@ -8,7 +8,7 @@ using It = Machine.Specifications.It;
 
 namespace Dolittle.SDK.Events.for_EventStore
 {
-    public class when_committing_an_object : given.an_event_store_and_an_execution_context
+    public class when_committing_an_event_with_event_type : given.an_event_store_and_an_execution_context
     {
         static an_event content;
         static EventSourceId event_source;
@@ -16,14 +16,12 @@ namespace Dolittle.SDK.Events.for_EventStore
 
         Establish context = () =>
         {
-            content = new an_event("goodbye world", 12345, true);
+            content = new an_event("goodbye world", 12345, false);
             event_source = new EventSourceId(Guid.NewGuid());
             event_type = new EventType(Guid.NewGuid());
-
-            event_types.Setup(_ => _.GetFor(content.GetType())).Returns(event_type);
         };
 
-        Because of = async () => await event_store.Commit(content, event_source);
+        Because of = async () => await event_store.Commit(content, event_source, event_type);
         It should_convert_the_object_to_uncommitted_events = () => events_to_convert.ShouldBeOfExactType<UncommittedEvents>();
         It should_have_the_correct_event_source_id = () => events_to_convert[0].EventSource.ShouldEqual(event_source);
         It should_have_the_correct_event_type = () => events_to_convert[0].EventType.ShouldEqual(event_type);
