@@ -3,7 +3,6 @@
 
 using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
-using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
 
 namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_handling.a_request_to_handle_event.and_stream_event.has_committed_event
@@ -14,9 +13,8 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
 
         Establish context = () =>
         {
-            var event_type = request.Event.Event.Type.To<EventType>();
-            event_types.Setup(_ => _.HasTypeFor(event_type)).Returns(true);
-            event_types.Setup(_ => _.GetTypeFor(event_type)).Returns(typeof(given.some_event));
+            event_types.Setup(_ => _.HasTypeFor(event_type_to_handle)).Returns(true);
+            event_types.Setup(_ => _.GetTypeFor(event_type_to_handle)).Returns(typeof(given.some_event));
             request.Event.Event.Content = "{\"something\": \"hello\"";
         };
 

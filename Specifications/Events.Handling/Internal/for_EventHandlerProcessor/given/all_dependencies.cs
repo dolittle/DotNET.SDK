@@ -22,6 +22,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
         protected static PbCommittedEvent committed_event;
         protected static PbStreamEvent stream_event;
         protected static some_event event_to_handle;
+        protected static EventType event_type_to_handle;
 
         Establish context = () =>
         {
@@ -34,6 +35,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
                 Security.Claims.Empty,
                 CultureInfo.InvariantCulture);
             event_to_handle = new some_event { some_string = "hello world" };
+            event_type_to_handle = handled_event_types.First();
             committed_event = new PbCommittedEvent
             {
                 Content = JsonConvert.SerializeObject(event_to_handle),
@@ -44,7 +46,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
                 ExternalEventReceived = null,
                 Occurred = Timestamp.FromDateTimeOffset(DateTimeOffset.Now),
                 Public = false,
-                Type = handled_event_types.First().ToProtobuf(),
+                Type = event_type_to_handle.ToProtobuf(),
                 ExecutionContext = execution_context.ToProtobuf()
             };
             stream_event = new PbStreamEvent
