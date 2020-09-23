@@ -17,6 +17,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
         protected static IEnumerable<EventType> handled_event_types;
         protected static Mock<IEventHandler> event_handler;
         protected static Mock<IEventTypes> event_types;
+        protected static Mock<IEventProcessingConverter> event_processing_converter;
         protected static EventHandlerProcessor event_handler_processor;
 
         Establish context = () =>
@@ -36,7 +37,8 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
             event_handler.SetupGet(_ => _.ScopeId).Returns(event_handler_scope);
             event_handler.SetupGet(_ => _.Partitioned).Returns(partitioned);
             event_handler.SetupGet(_ => _.HandledEvents).Returns(handled_event_types);
-            event_handler_processor = new EventHandlerProcessor(event_handler.Object, new EventProcessingConverter(new EventConverter(event_types.Object)), Mock.Of<ILogger>());
+            event_processing_converter = new Mock<IEventProcessingConverter>();
+            event_handler_processor = new EventHandlerProcessor(event_handler.Object, event_processing_converter.Object, Mock.Of<ILogger>());
         };
     }
 }

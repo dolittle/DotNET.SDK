@@ -5,13 +5,15 @@ using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_handling.a_request_to_handle_event.and_stream_event.has_committed_event
+namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_handling.a_request_to_handle_event
 {
-    public class with_missing_execution_context : given.all_dependencies
+    public class that_cannot_be_converted_to_sdk : given.all_dependencies
     {
         static EventHandlerResponse response;
 
-        Establish context = () => request.Event.Event.ExecutionContext = null;
+        Establish context = () => event_processing_converter
+            .Setup(_ => _.ToSDK(Moq.It.IsAny<Runtime.Events.Contracts.CommittedEvent>()))
+            .Throws(new System.Exception());
 
         Because of = () => response = event_handler_processor.Handle(request, execution_context, CancellationToken.None).GetAwaiter().GetResult();
 
