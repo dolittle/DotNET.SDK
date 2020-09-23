@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
         static EventHandlerResponse response;
 
         Establish context = () => event_processing_converter
-            .Setup(_ => _.ToSDK(Moq.It.IsAny<Runtime.Events.Contracts.CommittedEvent>()))
+            .Setup(_ => _.ToSDK(request.Event))
             .Throws(new System.Exception());
 
         Because of = () => response = event_handler_processor.Handle(request, execution_context, CancellationToken.None).GetAwaiter().GetResult();

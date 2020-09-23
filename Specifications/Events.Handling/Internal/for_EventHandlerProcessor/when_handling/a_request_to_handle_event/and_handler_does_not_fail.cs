@@ -29,7 +29,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
                 request.Event.PartitionId.To<PartitionId>(),
                 request.Event.ScopeId.To<ScopeId>());
             event_processing_converter
-                .Setup(_ => _.ToSDK(Moq.It.IsAny<StreamEvent>()))
+                .Setup(_ => _.ToSDK(request.Event))
                 .Returns(stream_event);
             event_context = new EventContext(
                 committed_event.EventLogSequenceNumber,
