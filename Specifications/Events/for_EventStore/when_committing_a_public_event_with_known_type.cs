@@ -8,7 +8,7 @@ using It = Machine.Specifications.It;
 
 namespace Dolittle.SDK.Events.for_EventStore
 {
-    public class when_committing_a_public_object : given.an_event_store_and_an_execution_context
+    public class when_committing_a_public_event_with_known_type : given.an_event_store_and_an_execution_context
     {
         static an_event content;
         static EventSourceId event_source;
