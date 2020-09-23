@@ -12,9 +12,9 @@ using Newtonsoft.Json;
 using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 
-namespace Dolittle.SDK.Events.for_EventConverter.when_converting_a_committed_event_to_sdk
+namespace Dolittle.SDK.Events.for_EventConverter
 {
-    public class from_a_commit_events_response : given.a_converter_and_a_protobuf_execution_context
+    public class when_converting_a_commit_events_response_to_sdk : a_converter_and_a_protobuf_execution_context
     {
         static an_event content;
         static bool is_public;
