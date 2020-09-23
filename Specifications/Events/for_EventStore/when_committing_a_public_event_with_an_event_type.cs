@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using Dolittle.SDK.Events.for_EventConverter.given;
 using Machine.Specifications;
 using It = Machine.Specifications.It;
@@ -17,8 +16,8 @@ namespace Dolittle.SDK.Events.for_EventStore
         Establish context = () =>
         {
             content = new an_event("goodbye public world", 12345, true);
-            event_source = new EventSourceId(Guid.NewGuid());
-            event_type = new EventType(Guid.NewGuid());
+            event_source = new EventSourceId("be274a66-e442-455a-b5d9-81d058fc179e");
+            event_type = new EventType("31819551-844f-4a6f-935c-917a126531f6");
         };
 
         Because of = async () => await event_store.CommitPublic(content, event_source, event_type);

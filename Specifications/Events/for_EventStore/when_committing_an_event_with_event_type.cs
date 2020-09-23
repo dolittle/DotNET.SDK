@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using Dolittle.SDK.Events.for_EventConverter.given;
 using Machine.Specifications;
 using It = Machine.Specifications.It;
@@ -17,8 +16,8 @@ namespace Dolittle.SDK.Events.for_EventStore
         Establish context = () =>
         {
             content = new an_event("goodbye world", 12345, false);
-            event_source = new EventSourceId(Guid.NewGuid());
-            event_type = new EventType(Guid.NewGuid());
+            event_source = new EventSourceId("6bb48542-29b7-4339-a711-b8c8ca733f9d");
+            event_type = new EventType("b40a6161-44dd-481f-a1ff-40694c05f91d");
         };
 
         Because of = async () => await event_store.Commit(content, event_source, event_type);

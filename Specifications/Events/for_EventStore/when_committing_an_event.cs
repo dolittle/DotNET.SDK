@@ -17,8 +17,8 @@ namespace Dolittle.SDK.Events.for_EventStore
         Establish context = () =>
         {
             content = new an_event("goodbye world", 12345, true);
-            event_source = new EventSourceId(Guid.NewGuid());
-            event_type = new EventType(Guid.NewGuid());
+            event_source = new EventSourceId("e4799653-eb7d-481b-9548-3156ddb45832");
+            event_type = new EventType("843c431e-7cd6-43d0-a3e2-e82d6da0218b");
 
             event_types.Setup(_ => _.GetFor(content.GetType())).Returns(event_type);
         };
