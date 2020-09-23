@@ -2,14 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Execution;
 
 namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represents the context in which an event occured in.
+    /// Represents the context in which an event occurred in.
     /// </summary>
-    public class EventContext
+    public class EventContext : Value<EventContext>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventContext"/> class.
