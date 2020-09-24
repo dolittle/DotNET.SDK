@@ -26,7 +26,6 @@ namespace Dolittle.SDK.Events.for_EventStore.given
         protected static Contracts.CommitEventsRequest commit_events_request;
         protected static Contracts.CommitEventsResponse commit_events_response;
         protected static IEnumerable<Contracts.UncommittedEvent> pb_uncommitted_events;
-        protected static IEnumerable<Contracts.CommittedEvent> pb_committed_events;
 
         Establish context = () =>
         {
@@ -43,19 +42,11 @@ namespace Dolittle.SDK.Events.for_EventStore.given
             converter.Setup(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()))
                 .Returns(pb_uncommitted_events);
 
-            pb_committed_events = new List<Contracts.CommittedEvent>();
+            var pb_committed_events = new List<Contracts.CommittedEvent>();
             pb_committed_events.Append(new Contracts.CommittedEvent { });
             pb_committed_events.Append(new Contracts.CommittedEvent { });
 
-            commit_events_response = new Contracts.CommitEventsResponse
-            {
-                Failure = new Pb.Failure
-                {
-                    Id = Guid.Parse("754cb9df-eb08-4345-9796-a4921310531f").ToProtobuf(),
-                    Reason = "opps i all the tacos"
-                },
-                Events = { pb_committed_events }
-            };
+            commit_events_response = new Contracts.CommitEventsResponse { };
 
             caller.Setup(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), Moq.It.IsAny<Contracts.CommitEventsRequest>(), Moq.It.IsAny<CancellationToken>()))
                 .Callback<ICanCallAnUnaryMethod<EventStoreClient, Contracts.CommitEventsRequest, Contracts.CommitEventsResponse>, Contracts.CommitEventsRequest, CancellationToken>((method, request, token) =>
