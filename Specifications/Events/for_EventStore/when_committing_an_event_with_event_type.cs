@@ -1,8 +1,11 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using Dolittle.SDK.Events.for_EventConverter.given;
+using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
+using Moq;
 using It = Machine.Specifications.It;
 
 namespace Dolittle.SDK.Events.for_EventStore
@@ -21,10 +24,11 @@ namespace Dolittle.SDK.Events.for_EventStore
         };
 
         Because of = async () => await event_store.Commit(content, event_source, event_type);
-        It should_convert_the_object_to_uncommitted_events = () => events_to_convert.ShouldBeOfExactType<UncommittedEvents>();
-        It should_have_the_correct_event_source_id = () => events_to_convert[0].EventSource.ShouldEqual(event_source);
-        It should_have_the_correct_event_type = () => events_to_convert[0].EventType.ShouldEqual(event_type);
-        It should_have_the_correct_content = () => events_to_convert[0].Content.ShouldEqual(content);
-        It shouldnt_be_public = () => events_to_convert[0].IsPublic.ShouldBeFalse();
+        It should_not_call_the_event_types_with_the_content = () => event_types.Verify(_ => _.GetFor(content.GetType()), Times.Never());
+        It should_call_the_converter_with_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()));
+        It should_call_the_caller_with_the_correct_request = () => caller.Verify(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), commit_events_request, Moq.It.IsAny<CancellationToken>()), Times.Once());
+        It should_set_the_execution_context_to_the_call_context = () => commit_events_request.CallContext.ExecutionContext.ShouldEqual(execution_context.ToProtobuf());
+        It should_set_the_events_in_the_request = () => commit_events_request.Events.ShouldEqual(pb_uncommitted_events);
+        It should_call_the_converter_with_results_from_the_caller = () => converter.Verify(_ => _.ToSDK(commit_events_response));
     }
 }

@@ -6,6 +6,7 @@ using Dolittle.SDK.Events.for_EventConverter.given;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
+using Moq;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 using It = Machine.Specifications.It;
 
@@ -39,24 +40,11 @@ namespace Dolittle.SDK.Events.for_EventStore
         };
 
         Because of = async () => await event_store.Commit(uncommitted_events);
-        It should_have_called_the_caller = () => caller.Verify(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), Moq.It.IsAny<Contracts.CommitEventsRequest>(), Moq.It.IsAny<CancellationToken>()));
-        It should_have_added_the_execution_context_to_the_call_context = () => commit_events_request.CallContext.ExecutionContext.ShouldEqual(execution_context.ToProtobuf());
-        It should_have_added_a_not_set_head_id_to_the_call_context = () => commit_events_request.CallContext.HeadId.ShouldEqual(HeadId.NotSet.Value.ToProtobuf());
-        It should_have_added_events_to_the_request = () => commit_events_request.Events.Count.ShouldEqual(uncommitted_events.Count);
-        It should_have_the_same_event_source_for_the_first_event = () => events_to_convert[0].EventSource.ShouldEqual(uncommitted_events[0].EventSource);
-        It should_have_the_same_event_type_for_the_first_event = () => events_to_convert[0].EventType.ShouldEqual(uncommitted_events[0].EventType);
-        It should_have_the_same_event_type_generation_for_the_first_event = () => events_to_convert[0].EventType.Generation.ShouldEqual(uncommitted_events[0].EventType.Generation);
-        It should_have_the_same_content_for_the_first_event = () => events_to_convert[0].Content.ShouldEqual(uncommitted_events[0].Content);
-        It should_have_the_same_is_public_for_the_first_event = () => events_to_convert[0].IsPublic.ShouldEqual(uncommitted_events[0].IsPublic);
-        It should_have_the_same_event_source_for_the_second_event = () => events_to_convert[1].EventSource.ShouldEqual(uncommitted_events[1].EventSource);
-        It should_have_the_same_event_type_for_the_second_event = () => events_to_convert[1].EventType.ShouldEqual(uncommitted_events[1].EventType);
-        It should_have_the_same_event_type_generation_for_the_second_event = () => events_to_convert[1].EventType.Generation.ShouldEqual(uncommitted_events[1].EventType.Generation);
-        It should_have_the_same_content_for_the_second_event = () => events_to_convert[1].Content.ShouldEqual(uncommitted_events[1].Content);
-        It should_have_the_same_is_public_for_the_second_event = () => events_to_convert[1].IsPublic.ShouldEqual(uncommitted_events[1].IsPublic);
-        It should_have_the_same_event_source_for_the_third_event = () => events_to_convert[2].EventSource.ShouldEqual(uncommitted_events[2].EventSource);
-        It should_have_the_same_event_type_for_the_third_event = () => events_to_convert[2].EventType.ShouldEqual(uncommitted_events[2].EventType);
-        It should_have_the_same_event_type_generation_for_the_third_event = () => events_to_convert[2].EventType.Generation.ShouldEqual(uncommitted_events[2].EventType.Generation);
-        It should_have_the_same_content_for_the_third_event = () => events_to_convert[2].Content.ShouldEqual(uncommitted_events[2].Content);
-        It should_have_the_same_is_public_for_the_third_event = () => events_to_convert[2].IsPublic.ShouldEqual(uncommitted_events[2].IsPublic);
+
+        It should_call_the_converter_with_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()));
+        It should_call_the_caller_with_the_correct_request = () => caller.Verify(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), commit_events_request, Moq.It.IsAny<CancellationToken>()), Times.Once());
+        It should_set_the_events_in_the_request = () => commit_events_request.Events.ShouldEqual(pb_uncommitted_events);
+        It should_call_the_converter_with_results_from_the_caller = () => converter.Verify(_ => _.ToSDK(commit_events_response));
+        It should_set_the_execution_context_to_the_call_context = () => commit_events_request.CallContext.ExecutionContext.ShouldEqual(execution_context.ToProtobuf());
     }
 }
