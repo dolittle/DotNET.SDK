@@ -1,8 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
 
@@ -14,23 +15,27 @@ namespace Dolittle.SDK
     public class Client
     {
         readonly ILogger _logger;
-        readonly ExecutionContext _executionContext;
+        readonly Execution.ExecutionContext _executionContext;
+        readonly CancellationToken _cancellation;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Client" /> class.
         /// </summary>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
+        /// <param name="executionContext">The <see cref="Execution.ExecutionContext" />.</param>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
+        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         public Client(
             ILogger logger,
-            ExecutionContext executionContext,
+            Execution.ExecutionContext executionContext,
             IEventTypes eventTypes,
-            EventStoreBuilder eventStoreBuilder)
+            EventStoreBuilder eventStoreBuilder,
+            CancellationToken cancellation)
         {
             _logger = logger;
             _executionContext = executionContext;
+            _cancellation = cancellation;
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
         }
@@ -71,5 +76,28 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
         public static ClientBuilder ForMicroservice(MicroserviceId microserviceId, Version version, Environment environment)
             => new ClientBuilder(microserviceId, version, environment);
+
+        /// <summary>
+        /// Runs the client until the <see cref="CancellationToken"/> given in
+        /// <see cref="ClientBuilder.WithCancellationToken(CancellationToken)"/> is cancelled.
+        /// </summary>
+        public async void Wait()
+        {
+            if (_cancellation != default)
+            {
+                try
+                {
+                    await Task.Delay(Timeout.Infinite, _cancellation).ConfigureAwait(false);
+                }
+                catch (System.OperationCanceledException ex)
+                {
+                    _logger.LogInformation(ex, "CancellationToken was cancelled. System will stop now.");
+                }
+            }
+            else
+            {
+                _logger.LogError("No cancellation token specified, system will stop now. Please provide one with Client.WithCancellationToken(cancellationToken)");
+            }
+        }
     }
 }

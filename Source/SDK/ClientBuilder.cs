@@ -182,7 +182,7 @@ namespace Dolittle.SDK
 
             var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
 
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder);
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder, _cancellation);
         }
     }
 }
