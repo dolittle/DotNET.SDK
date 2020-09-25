@@ -18,19 +18,13 @@ namespace Basic
                 .WithEventTypes(eventTypes =>
                     eventTypes
                         .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3"))
-                .WithFilters(filtersBuilder =>
-                    filtersBuilder
-                        .CreatePrivateFilter("577b00c4-8b79-4727-835c-4710919c2df5", filterBuilder =>
-                            filterBuilder.Handle((@event, eventContext) =>
-                            {
-                                Console.WriteLine($"Filtering event {@event} {eventContext}");
-                                return Task.FromResult(true);
-                            })))
                 .WithEventHandlers(eventHandlersBuilder =>
-                    eventHandlersBuilder.CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
-                        eventHandlerBuilder
-                            .Partitioned()
-                            .Handle(async (MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in first method"))))
+                    eventHandlersBuilder
+                        .CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
+                            eventHandlerBuilder
+                                .Partitioned()
+                                .Handle((MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in lambda")))
+                        .RegisterEventHandler<MyEventHandler>())
                 .Build();
 
             var myEvent = new MyEvent("test string", 12345);

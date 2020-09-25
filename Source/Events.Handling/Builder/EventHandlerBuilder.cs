@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Internal;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// <summary>
     /// Represents a building event handlers.
     /// </summary>
-    public class EventHandlerBuilder
+    public class EventHandlerBuilder : ICanBuildAndRegisterAnEventHandler
     {
         readonly EventHandlerId _eventHandlerId;
         readonly ILoggerFactory _loggerFactory;
@@ -67,14 +68,13 @@ namespace Dolittle.SDK.Events.Handling.Builder
             return this;
         }
 
-        /// <summary>
-        /// Builds and registers the event handlers.
-        /// </summary>
-        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        public void BuildAndRegister(IEventProcessors eventProcessors, IEventTypes eventTypes, IEventProcessingConverter processingConverter, CancellationToken cancellation)
+        /// <inheritdoc/>
+        public void BuildAndRegister(
+            IEventProcessors eventProcessors,
+            IEventTypes eventTypes,
+            IEventProcessingConverter processingConverter,
+            IContainer container,
+            CancellationToken cancellation)
         {
             if (_methodsBuilder == default)
             {

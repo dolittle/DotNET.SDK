@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using System.Threading;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
@@ -32,6 +33,7 @@ namespace Dolittle.SDK
         Microservices.Version _version;
         Microservices.Environment _environment;
         CancellationToken _cancellation;
+        IContainer _container;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -55,6 +57,7 @@ namespace Dolittle.SDK
             _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder(_loggerFactory);
+            _container = new Container();
         }
 
         /// <summary>
@@ -178,7 +181,7 @@ namespace Dolittle.SDK
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
-            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _cancellation);
+            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _cancellation);
 
             var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
 

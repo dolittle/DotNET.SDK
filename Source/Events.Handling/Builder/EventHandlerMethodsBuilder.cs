@@ -55,10 +55,45 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <summary>
         /// Add a handler method for handling the event.
         /// </summary>
+        /// <typeparam name="T">The <see cref="Type" /> of the event.</typeparam>
+        /// <param name="method">The <see cref="VoidTypedEventHandlerSignature{T}" />.</param>
+        /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
+        public EventHandlerMethodsBuilder Handle<T>(VoidTypedEventHandlerSignature<T> method)
+            where T : class
+        {
+            if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
+            {
+                _logger.LogWarning("Event handler {EventHandler} already handles event of type {EventType}", _eventHandlerId, typeof(T));
+                HasInvalidMethods = true;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add a handler method for handling the event.
+        /// </summary>
         /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
         /// <param name="method">The <see cref="EventHandlerSignature" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
         public EventHandlerMethodsBuilder Handle(EventType eventType, EventHandlerSignature method)
+        {
+            if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
+            {
+                _logger.LogWarning("Event handler {EventHandler} already handles event with event type {EventType}", _eventHandlerId, eventType);
+                HasInvalidMethods = true;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add a handler method for handling the event.
+        /// </summary>
+        /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
+        /// <param name="method">The <see cref="VoidEventHandlerSignature" />.</param>
+        /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
+        public EventHandlerMethodsBuilder Handle(EventType eventType, VoidEventHandlerSignature method)
         {
             if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
             {
@@ -82,10 +117,29 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Add a handler method for handling the event.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
+        /// <param name="method">The <see cref="VoidEventHandlerSignature" />.</param>
+        /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
+        public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, VoidEventHandlerSignature method)
+            => Handle(new EventType(eventTypeId), method);
+
+        /// <summary>
+        /// Add a handler method for handling the event.
+        /// </summary>
+        /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
         /// <param name="method">The <see cref="EventHandlerSignature" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
         public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, Generation eventTypeGeneration, EventHandlerSignature method)
+            => Handle(new EventType(eventTypeId, eventTypeGeneration), method);
+
+        /// <summary>
+        /// Add a handler method for handling the event.
+        /// </summary>
+        /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
+        /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
+        /// <param name="method">The <see cref="VoidEventHandlerSignature" />.</param>
+        /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
+        public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, Generation eventTypeGeneration, VoidEventHandlerSignature method)
             => Handle(new EventType(eventTypeId, eventTypeGeneration), method);
 
         /// <summary>

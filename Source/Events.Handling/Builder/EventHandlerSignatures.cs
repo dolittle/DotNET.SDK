@@ -21,4 +21,20 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
     public delegate Task TypedEventHandlerSignature<T>(T @event, EventContext eventContext)
         where T : class;
+
+     /// <summary>
+    /// Represents the signature for an event handler.
+    /// </summary>
+    /// <param name="event">The event to handle.</param>
+    /// <param name="eventContext">The <see cref="EventContext" />.</param>
+    public delegate void VoidEventHandlerSignature(object @event, EventContext eventContext);
+
+    /// <summary>
+    /// Represents the signature for an event handler.
+    /// </summary>
+    /// <typeparam name="T">The <see cref="Type" /> of the event to handle.</typeparam>
+    /// <param name="event">The event to handle.</param>
+    /// <param name="eventContext">The <see cref="EventContext" />.</param>
+    public delegate void VoidTypedEventHandlerSignature<T>(T @event, EventContext eventContext)
+        where T : class;
 }
