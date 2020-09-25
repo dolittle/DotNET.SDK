@@ -13,19 +13,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// <summary>
     /// Represents the builder for configuring event handlers.
     /// </summary>
-    public class EventHandlersBuilder : ICanBuildAndRegisterAnEventHandler
+    public class EventHandlersBuilder
     {
         readonly IList<ICanBuildAndRegisterAnEventHandler> _builders = new List<ICanBuildAndRegisterAnEventHandler>();
-        readonly ILoggerFactory _loggerFactory;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventHandlersBuilder"/> class.
-        /// </summary>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        public EventHandlersBuilder(ILoggerFactory loggerFactory)
-        {
-            _loggerFactory = loggerFactory;
-        }
 
         /// <summary>
         /// Start building an event handler.
@@ -35,7 +25,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
         public EventHandlersBuilder CreateEventHandler(EventHandlerId eventHandlerId, Action<EventHandlerBuilder> callback)
         {
-            var builder = new EventHandlerBuilder(eventHandlerId, _loggerFactory);
+            var builder = new EventHandlerBuilder(eventHandlerId);
             callback(builder);
             _builders.Add(builder);
             return this;
@@ -49,7 +39,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlersBuilder RegisterEventHandler<TEventHandler>()
             where TEventHandler : class
         {
-            _builders.Add(new ConventionEventHandlerBuilder(typeof(TEventHandler), _loggerFactory));
+            _builders.Add(new ConventionEventHandlerBuilder(typeof(TEventHandler)));
             return this;
         }
 
@@ -62,7 +52,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
             where TEventHandler : class
         {
-            _builders.Add(new ConventionEventHandlerBuilder(eventHandlerInstance, _loggerFactory));
+            _builders.Add(new ConventionEventHandlerBuilder(eventHandlerInstance));
             return this;
         }
 
@@ -73,21 +63,32 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
         public EventHandlersBuilder RegisterEventHandler(object eventHandlerInstance)
         {
-            _builders.Add(new ConventionEventHandlerBuilder(eventHandlerInstance, _loggerFactory));
+            _builders.Add(new ConventionEventHandlerBuilder(eventHandlerInstance));
             return this;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Build and registers event handlers.
+        /// </summary>
+        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+        /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="container">The <see cref="IContainer" />.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
+        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
             IContainer container,
+            ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
+            var logger = loggerFactory.CreateLogger<EventHandlersBuilder>();
             foreach (var builder in _builders)
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, cancellation);
+                var buildResult = builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, loggerFactory, cancellation);
+                if (!buildResult.Succeeded) logger.LogWarning(buildResult.Warnings.ToString());
             }
         }
     }

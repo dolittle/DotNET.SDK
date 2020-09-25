@@ -4,6 +4,7 @@
 using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Processing;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -19,12 +20,15 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="container">The <see cref="IContainer" />.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        void BuildAndRegister(
+        /// <returns>The <see cref="BuildEventHandlerResult" /> build results.</returns>
+        BuildEventHandlerResult BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
             IContainer container,
+            ILoggerFactory loggerFactory,
             CancellationToken cancellation);
     }
 }

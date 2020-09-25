@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -16,23 +15,13 @@ namespace Dolittle.SDK.Events.Handling.Builder
         readonly IDictionary<Type, IEventHandlerMethod> _handleMethodByType = new Dictionary<Type, IEventHandlerMethod>();
         readonly IDictionary<EventType, IEventHandlerMethod> _handleMethodByArtifact = new Dictionary<EventType, IEventHandlerMethod>();
         readonly EventHandlerId _eventHandlerId;
-        readonly ILogger _logger;
+        readonly IList<string> _warnings = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHandlerMethodsBuilder"/> class.
         /// </summary>
         /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
-        /// <param name="logger">The <see cref="ILogger" />.</param>
-        public EventHandlerMethodsBuilder(EventHandlerId eventHandlerId, ILogger logger)
-        {
-            _eventHandlerId = eventHandlerId;
-            _logger = logger;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether or not there are invalid event handler methods and the event handler shouldn't be registered.
-        /// </summary>
-        public bool HasInvalidMethods { get; private set; }
+        public EventHandlerMethodsBuilder(EventHandlerId eventHandlerId) => _eventHandlerId = eventHandlerId;
 
         /// <summary>
         /// Add a handler method for handling the event.
@@ -45,8 +34,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
             {
-                _logger.LogWarning("Event handler {EventHandler} already handles event of type {EventType}", _eventHandlerId, typeof(T));
-                HasInvalidMethods = true;
+                _warnings.Add($"Event handler {_eventHandlerId} already handles event of type {typeof(T)}");
             }
 
             return this;
@@ -63,8 +51,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
             {
-                _logger.LogWarning("Event handler {EventHandler} already handles event of type {EventType}", _eventHandlerId, typeof(T));
-                HasInvalidMethods = true;
+                _warnings.Add($"Event handler {_eventHandlerId} already handles event of type {typeof(T)}");
             }
 
             return this;
@@ -80,8 +67,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
             {
-                _logger.LogWarning("Event handler {EventHandler} already handles event with event type {EventType}", _eventHandlerId, eventType);
-                HasInvalidMethods = true;
+                _warnings.Add($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
             }
 
             return this;
@@ -97,8 +83,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
             {
-                _logger.LogWarning("Event handler {EventHandler} already handles event with event type {EventType}", _eventHandlerId, eventType);
-                HasInvalidMethods = true;
+                _warnings.Add($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
             }
 
             return this;
@@ -146,10 +131,11 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Builds the event handler methods.
         /// </summary>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+        /// <param name="eventTypesToMethods">The output <see cref="IDictionary{TKey, TValue}" /> of <see cref="EventType" /> to <see cref="IEventHandlerMethod" /> map.</param>
         /// <returns>The event handler methods.</returns>
-        public IDictionary<EventType, IEventHandlerMethod> Build(IEventTypes eventTypes)
+        public BuildEventHandlerResult TryBuild(IEventTypes eventTypes, out IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods)
         {
-            var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
+            eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
             foreach ((var eventType, var method) in _handleMethodByArtifact)
             {
                 eventTypesToMethods.Add(eventType, method);
@@ -160,12 +146,13 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 var eventType = eventTypes.GetFor(type);
                 if (!eventTypesToMethods.TryAdd(eventType, method))
                 {
-                    _logger.LogWarning("Event handler {EventHandler} already handles event with event type {EventType}", _eventHandlerId, eventType);
-                    HasInvalidMethods = true;
+                    _warnings.Add($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
                 }
             }
 
-            return eventTypesToMethods;
+            var result = new BuildEventHandlerResult(_eventHandlerId, _warnings);
+            if (!result.Succeeded) eventTypesToMethods = null;
+            return result;
         }
     }
 }

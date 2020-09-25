@@ -56,7 +56,7 @@ namespace Dolittle.SDK
 
             _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
             _eventFiltersBuilder = new EventFiltersBuilder();
-            _eventHandlersBuilder = new EventHandlersBuilder(_loggerFactory);
+            _eventHandlersBuilder = new EventHandlersBuilder();
             _container = new Container();
         }
 
@@ -181,7 +181,7 @@ namespace Dolittle.SDK
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
-            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _cancellation);
+            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
             var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
 
