@@ -30,11 +30,8 @@ namespace Basic
                 .WithEventHandlers(eventHandlersBuilder =>
                     eventHandlersBuilder.CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
                         eventHandlerBuilder
-                            .WithMethods(methodBuilder =>
-                                methodBuilder
-                                    .Handle(async (MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in first method"))
-                        )
-                    ))
+                            .Partitioned()
+                            .Handle(async (MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in first method"))))
                 .Build();
 
             var myEvent = new MyEvent("test string", 12345);

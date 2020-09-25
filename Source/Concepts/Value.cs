@@ -34,23 +34,15 @@ namespace Dolittle.SDK.Concepts
         /// <param name="left">Left value.</param>
         /// <param name="right">Right value.</param>
         /// <returns>True if the objects are not equal, false is they are.</returns>
-        public static bool operator !=(Value<T> left, Value<T> right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Value<T> left, Value<T> right) => !(left == right);
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
-        {
-            if (obj is T typed)
-            {
-                return Equals(typed);
-            }
-            else
-            {
-                return false;
-            }
-        }
+            => obj switch
+                {
+                    T typed => Equals(typed),
+                    _ => false
+                };
 
         /// <inheritdoc/>
         public override int GetHashCode()
