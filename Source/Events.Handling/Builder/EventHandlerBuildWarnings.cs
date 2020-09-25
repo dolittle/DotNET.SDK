@@ -41,6 +41,6 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
         /// <inheritdoc/>
         public override string ToString()
-            => $"Failed to build event handler {_eventHandlerId}{Warnings.Select(warning => $"{System.Environment.NewLine}\t{warning}")}";
+            => $"Failed to build event handler {_eventHandlerId}{System.Environment.NewLine}{string.Join($"{System.Environment.NewLine}\t", Warnings)}";
     }
 }

@@ -65,6 +65,33 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 scopeId,
                 _eventHandlerType);
 
+            if (!TryBuildHandlerMethods(
+                eventHandlerId,
+                eventTypes,
+                out var eventTypesToMethods,
+                out var buildResult))
+            {
+                return buildResult;
+            }
+
+            var eventHandler = new EventHandler(eventHandlerId, scopeId, partitioned, eventTypesToMethods);
+            var eventHandlerProcessor = new EventHandlerProcessor(
+                eventHandler,
+                processingConverter,
+                loggerFactory.CreateLogger<EventHandlerProcessor>());
+            eventProcessors.Register(
+                eventHandlerProcessor,
+                new EventHandlerProtocol(),
+                cancellation);
+            return new BuildEventHandlerResult();
+        }
+
+        bool TryBuildHandlerMethods(
+            EventHandlerId eventHandlerId,
+            IEventTypes eventTypes,
+            out IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
+            out BuildEventHandlerResult buildResult)
+        {
             var eventHandlerMethodsBuilder = new EventHandlerMethodsBuilder(eventHandlerId);
             var publicMethods = _eventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public);
 
@@ -88,29 +115,26 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 aggregatedWarnings.AddRange(conventionHandlerMethodsWarnings.Warnings);
             }
 
-            var eventHandlerMethodsBuildResult = eventHandlerMethodsBuilder.TryBuild(eventTypes, out var eventTypesToMethods);
+            var eventHandlerMethodsBuildResult = eventHandlerMethodsBuilder.TryBuild(eventTypes, out eventTypesToMethods);
 
             if (!eventHandlerMethodsBuildResult.Succeeded) aggregatedWarnings.AddRange(eventHandlerMethodsBuildResult.Warnings.Warnings);
 
-            if (aggregatedWarnings.Count > 0) return new BuildEventHandlerResult(eventHandlerId, aggregatedWarnings);
+            if (aggregatedWarnings.Count > 0)
+            {
+                buildResult = new BuildEventHandlerResult(eventHandlerId, aggregatedWarnings);
+                return false;
+            }
 
             if (eventTypesToMethods.Count == 0)
             {
-                return new BuildEventHandlerResult(
+                buildResult = new BuildEventHandlerResult(
                     eventHandlerId,
-                    $"There are no event handlers methods to register in event handler {_eventHandlerType}");
+                    $"There are no event handler methods to register in event handler {_eventHandlerType}. An event handler method either needs to be decorated with [{typeof(HandlesAttribute).Name}] or have the name {MethodName}");
+                return false;
             }
 
-            var eventHandler = new EventHandler(eventHandlerId, scopeId, partitioned, eventTypesToMethods);
-            var eventHandlerProcessor = new EventHandlerProcessor(
-                eventHandler,
-                processingConverter,
-                loggerFactory.CreateLogger<EventHandlerProcessor>());
-            eventProcessors.Register(
-                eventHandlerProcessor,
-                new EventHandlerProtocol(),
-                cancellation);
-            return new BuildEventHandlerResult();
+            buildResult = new BuildEventHandlerResult();
+            return true;
         }
 
         bool TryAddDecoratedHandlerMethods(
@@ -227,7 +251,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             var eventHandlerSignature = Delegate.CreateDelegate(eventHandlerSignatureType, _eventHandlerInstance, method);
             var builderHandleMethod = typeof(EventHandlerMethodsBuilder)
                                         .GetMethod(nameof(EventHandlerMethodsBuilder.Handle), new[] { typeof(EventType), eventHandlerSignatureType });
-            builder.Handle(eventType, eventHandlerSignature as EventHandlerSignature);
+            if (eventHandlerSignature is EventHandlerSignature signature) builder.Handle(eventType, signature);
+            else if (eventHandlerSignature is VoidEventHandlerSignature voidSignature) builder.Handle(eventType, voidSignature);
         }
 
         void AddTypedHandleSignatureToBuilder(Type eventParameterType, MethodInfo method, EventHandlerMethodsBuilder builder)
