@@ -26,39 +26,12 @@ namespace Dolittle.SDK.Events
             DateTimeOffset occurred,
             ExecutionContext committedExecutionContext,
             ExecutionContext currentExecutionContext)
-            : this(
-                sequenceNumber,
-                eventSourceId,
-                occurred,
-                committedExecutionContext,
-                currentExecutionContext,
-                new EventIdentifier(committedExecutionContext.Microservice, committedExecutionContext.Tenant, sequenceNumber))
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventContext"/> class.
-        /// </summary>
-        /// <param name="sequenceNumber">The <see cref="EventLogSequenceNumber">sequence number</see> that uniquely identifies the event in the event log which it was committed.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId"/> that the event was committed to.</param>
-        /// <param name="occurred">The <see cref="DateTimeOffset"/> when the event was committed to the <see cref="IEventStore"/>.</param>
-        /// <param name="committedExecutionContext">The <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.</param>
-        /// <param name="currentExecutionContext">The <see cref="ExecutionContext"/> in which the event is currently being processed.</param>
-        /// <param name="uniqueIdentifier">The <see cref="EventIdentifier"/> that uniquely identifies the event.</param>
-        protected EventContext(
-            EventLogSequenceNumber sequenceNumber,
-            EventSourceId eventSourceId,
-            DateTimeOffset occurred,
-            ExecutionContext committedExecutionContext,
-            ExecutionContext currentExecutionContext,
-            EventIdentifier uniqueIdentifier)
         {
             SequenceNumber = sequenceNumber;
             EventSourceId = eventSourceId;
             Occurred = occurred;
             CommittedExecutionContext = committedExecutionContext;
             CurrentExecutionContext = currentExecutionContext;
-            UniqueIdentifier = uniqueIdentifier;
         }
 
         /// <summary>
@@ -85,10 +58,5 @@ namespace Dolittle.SDK.Events
         /// Gets the <see cref="ExecutionContext"/> in which the event was committed to the <see cref="IEventStore"/>.
         /// </summary>
         public ExecutionContext CurrentExecutionContext { get; }
-
-        /// <summary>
-        /// Gets the <see cref="EventIdentifier"/> that uniquely identifies the event.
-        /// </summary>
-        public EventIdentifier UniqueIdentifier { get; }
     }
 }
