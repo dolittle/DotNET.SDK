@@ -41,13 +41,16 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
             event_handler
                 .Setup(_ => _.Handle(Moq.It.IsAny<object>(), Moq.It.IsAny<EventType>(), Moq.It.IsAny<EventContext>(), Moq.It.IsAny<CancellationToken>()))
                 .Throws(new System.Exception());
+
+            event_handler.Invocations.Clear();
         };
 
-        Because of = () => response = event_handler_processor.Handle(request, execution_context, CancellationToken.None).GetAwaiter().GetResult();
+        Because of = () => response = event_handler_processor.Handle(request, execution_context, cancellation_token).GetAwaiter().GetResult();
 
         It should_get_a_response = () => response.ShouldNotBeNull();
         It should_have_a_failure = () => response.Failure.ShouldNotBeNull();
         It should_try_to_retry_processing = () => response.Failure.Retry.ShouldBeTrue();
-        It should_have_called_the_handler = () => event_handler.Verify(_ => _.Handle(event_to_handle, event_type_to_handle, event_context, CancellationToken.None), Moq.Times.Once);
+        It should_have_called_the_handler_once_to_handle_the_event = () => event_handler.Verify(_ => _.Handle(event_to_handle, event_type_to_handle, event_context, cancellation_token), Moq.Times.Once);
+        It should_only_have_called_the_handler_to_handle_the_event = () => event_handler.VerifyNoOtherCalls();
     }
 }

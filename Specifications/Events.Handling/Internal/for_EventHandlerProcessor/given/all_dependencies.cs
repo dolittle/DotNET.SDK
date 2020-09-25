@@ -4,12 +4,14 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Machine.Specifications;
 using Newtonsoft.Json;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 using PbStreamEvent = Dolittle.Runtime.Events.Processing.Contracts.StreamEvent;
 
@@ -23,6 +25,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
         protected static PbStreamEvent stream_event;
         protected static some_event event_to_handle;
         protected static EventType event_type_to_handle;
+        protected static CancellationToken cancellation_token;
 
         Establish context = () =>
         {
@@ -61,6 +64,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
                 Event = stream_event,
                 RetryProcessingState = null
             };
+            cancellation_token = new CancellationToken(false);
         };
     }
 }
