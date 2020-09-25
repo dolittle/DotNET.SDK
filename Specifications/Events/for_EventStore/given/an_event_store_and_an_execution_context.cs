@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 using Contracts = Dolittle.Runtime.Events.Contracts;
-using Pb = Dolittle.Protobuf.Contracts;
 
 namespace Dolittle.SDK.Events.for_EventStore.given
 {
@@ -26,6 +25,7 @@ namespace Dolittle.SDK.Events.for_EventStore.given
         protected static Contracts.CommitEventsRequest commit_events_request;
         protected static Contracts.CommitEventsResponse commit_events_response;
         protected static IEnumerable<Contracts.UncommittedEvent> pb_uncommitted_events;
+        protected static CommitEventsResult commit_events_result;
 
         Establish context = () =>
         {
@@ -54,7 +54,13 @@ namespace Dolittle.SDK.Events.for_EventStore.given
                     commit_events_request = request;
                 })
                 .Returns(Task.FromResult(commit_events_response));
-            converter.Setup(_ => _.ToSDK(commit_events_response));
+
+            var failure = new Failure(Guid.Parse("72ae75dc-cdd7-4413-bf19-66aba13486ad"), "ran out of tacos");
+            var committedEvents = new CommittedEvents(new List<CommittedEvent>());
+            commit_events_result = new CommitEventsResult(failure, committedEvents);
+
+            converter.Setup(_ => _.ToSDK(commit_events_response))
+                .Returns(commit_events_result);
         };
     }
 }

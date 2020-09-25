@@ -27,11 +27,11 @@ namespace Dolittle.SDK.Events.for_EventStore
             event_types.Setup(_ => _.GetFor(content.GetType())).Throws(new UnknownArtifact(content.GetType()));
         };
 
-        Because of = async () =>
+        Because of = () =>
         {
             try
             {
-                await event_store.Commit(content, event_source);
+                event_store.Commit(content, event_source).Wait();
             }
             catch (Exception e)
             {

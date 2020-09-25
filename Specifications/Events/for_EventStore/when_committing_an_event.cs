@@ -15,6 +15,7 @@ namespace Dolittle.SDK.Events.for_EventStore
         static an_event content;
         static EventSourceId event_source;
         static EventType event_type;
+        static CommitEventsResult result;
 
         Establish context = () =>
         {
@@ -25,7 +26,7 @@ namespace Dolittle.SDK.Events.for_EventStore
             event_types.Setup(_ => _.GetFor(content.GetType())).Returns(event_type);
         };
 
-        Because of = async () => await event_store.Commit(content, event_source);
+        Because of = () => result = event_store.Commit(content, event_source).Result;
 
         It should_call_the_event_types_with_the_content = () => event_types.Verify(_ => _.GetFor(content.GetType()));
         It should_call_the_converter_with_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()));
@@ -33,5 +34,6 @@ namespace Dolittle.SDK.Events.for_EventStore
         It should_set_the_execution_context_to_the_call_context = () => commit_events_request.CallContext.ExecutionContext.ShouldEqual(execution_context.ToProtobuf());
         It should_set_the_events_in_the_request = () => commit_events_request.Events.ShouldEqual(pb_uncommitted_events);
         It should_call_the_converter_with_results_from_the_caller = () => converter.Verify(_ => _.ToSDK(commit_events_response));
+        It should_get_commit_events_result_from_the_converter = () => result.ShouldEqual(commit_events_result);
     }
 }
