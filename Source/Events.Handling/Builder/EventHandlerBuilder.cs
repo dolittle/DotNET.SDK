@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 using Dolittle.SDK.Events.Handling.Internal;
 using Dolittle.SDK.Events.Processing;
@@ -39,20 +38,22 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Defines the event handler to be partitioned - this is default for an event handler.
         /// </summary>
         /// <returns>The builder for continuation.</returns>
-        public EventHandlerBuilder Partitioned()
+        public EventHandlerMethodsBuilder Partitioned()
         {
             _partitioned = true;
-            return this;
+            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId, _loggerFactory.CreateLogger<EventHandlerMethodsBuilder>());
+            return _methodsBuilder;
         }
 
         /// <summary>
         /// Defines the event handler to be unpartitioned. By default it will be partitioned.
         /// </summary>
         /// <returns>The builder for continuation.</returns>
-        public EventHandlerBuilder Unpartitioned()
+        public EventHandlerMethodsBuilder Unpartitioned()
         {
             _partitioned = false;
-            return this;
+            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId, _loggerFactory.CreateLogger<EventHandlerMethodsBuilder>());
+            return _methodsBuilder;
         }
 
         /// <summary>
@@ -64,16 +65,6 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             _scopeId = scopeId;
             return this;
-        }
-
-        /// <summary>
-        /// Build event handler methods.
-        /// </summary>
-        /// <param name="callback">The callback for building event handler methods.</param>
-        public void WithMethods(Action<EventHandlerMethodsBuilder> callback)
-        {
-            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId, _loggerFactory.CreateLogger<EventHandlerMethodsBuilder>());
-            callback(_methodsBuilder);
         }
 
         /// <summary>

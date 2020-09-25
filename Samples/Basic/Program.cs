@@ -29,12 +29,9 @@ namespace Basic
                 .WithEventHandlers(eventHandlersBuilder =>
                     eventHandlersBuilder.CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
                         eventHandlerBuilder
-                            .WithMethods(methodBuilder =>
-                                methodBuilder
-                                    .Handle(async (MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in first method"))
-                        )
-                    )
-                ).Build();
+                            .Partitioned()
+                            .Handle(async (MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in first method"))))
+                .Build();
 
             var myEvent = new MyEvent("test string", 12345);
             var commit = client.EventStore.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97").Commit(myEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
