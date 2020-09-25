@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Services
     /// <typeparam name="TClient">The type of generated gRPC client to use.</typeparam>
     /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
     /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
-    public interface ICanCallAnUnaryMethod<TClient, TClientMessage, TServerMessage>
+    public interface ICanCallAUnaryMethod<TClient, TClientMessage, TServerMessage>
         where TClient : ClientBase<TClient>
         where TClientMessage : IMessage
         where TServerMessage : IMessage

@@ -51,7 +51,7 @@ namespace Dolittle.SDK.Services
                 });
 
         /// <inheritdoc/>
-        public Task<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallAnUnaryMethod<TClient, TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+        public Task<TServerMessage> Call<TClient, TClientMessage, TServerMessage>(ICanCallAUnaryMethod<TClient, TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
             where TClient : ClientBase<TClient>
             where TClientMessage : IMessage
             where TServerMessage : IMessage
