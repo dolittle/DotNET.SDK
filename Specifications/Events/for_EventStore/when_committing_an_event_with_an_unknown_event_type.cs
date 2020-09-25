@@ -29,14 +29,7 @@ namespace Dolittle.SDK.Events.for_EventStore
 
         Because of = () =>
         {
-            try
-            {
-                event_store.Commit(content, event_source).Wait();
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
+            exception = Catch.Exception(() => event_store.Commit(content, event_source).Result);
         };
 
         It should_thrown_an_unknkown_artifact_exception = () => exception.ShouldBeOfExactType<UnknownArtifact>();

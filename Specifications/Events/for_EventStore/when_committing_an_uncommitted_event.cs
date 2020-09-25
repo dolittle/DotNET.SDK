@@ -30,7 +30,7 @@ namespace Dolittle.SDK.Events.for_EventStore
 
         Because of = () => result = event_store.Commit(uncommitted_event).Result;
         It should_not_call_the_event_types_with_the_content = () => event_types.Verify(_ => _.GetFor(content.GetType()), Times.Never());
-        It should_call_the_converter_with_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()));
+        It should_call_the_converter_with_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.Is<UncommittedEvents>(_ => _[0] == uncommitted_event)));
         It should_call_the_caller_with_the_correct_request = () => caller.Verify(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), commit_events_request, Moq.It.IsAny<CancellationToken>()), Times.Once());
         It should_set_the_events_in_the_request = () => commit_events_request.Events.ShouldEqual(pb_uncommitted_events);
         It should_set_the_execution_context_to_the_call_context = () => commit_events_request.CallContext.ExecutionContext.ShouldEqual(execution_context.ToProtobuf());

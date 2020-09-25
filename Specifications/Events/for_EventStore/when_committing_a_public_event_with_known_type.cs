@@ -29,6 +29,9 @@ namespace Dolittle.SDK.Events.for_EventStore
         Because of = () => result = event_store.CommitPublic(content, event_source).Result;
         It should_call_the_event_types_with_the_content = () => event_types.Verify(_ => _.GetFor(content.GetType()));
         It should_call_the_converter_with_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()));
+        It should_have_the_same_content_on_the_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.Is<UncommittedEvents>(_ => _[0].Content == content)));
+        It should_have_the_same_event_source_on_the_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.Is<UncommittedEvents>(_ => _[0].EventSource == event_source)));
+        It should_have_the_same_event_type_on_the_uncommitted_events = () => converter.Verify(_ => _.ToProtobuf(Moq.It.Is<UncommittedEvents>(_ => _[0].EventType == event_type)));
         It should_call_the_caller_with_the_correct_request = () => caller.Verify(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), commit_events_request, Moq.It.IsAny<CancellationToken>()), Times.Once());
         It should_set_the_events_in_the_request = () => commit_events_request.Events.ShouldEqual(pb_uncommitted_events);
         It should_set_the_execution_context_to_the_call_context = () => commit_events_request.CallContext.ExecutionContext.ShouldEqual(execution_context.ToProtobuf());
