@@ -95,7 +95,7 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         SubscribeResponse CreateResponseFromRuntimeResponse(Subscription subscription, SubscriptionResponse response)
-            => new SubscribeResponse(subscription, response.ConsentId.To<ConsentId>(), response.Failure);
+            => new SubscribeResponse(subscription, response.ConsentId?.To<ConsentId>() ?? ConsentId.NotSet, response.Failure);
 
         async Task<SubscribeResponse> ProcessSubscriptionRequest(Subscription subscription, SubscriptionRequest request, CancellationToken cancellationToken)
         {
