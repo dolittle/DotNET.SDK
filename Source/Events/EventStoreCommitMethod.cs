@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Events
     /// <summary>
     /// Represents a wrapper for gRPC EventStore.Commit.
     /// </summary>
-    public class EventStoreCommitMethod : ICanCallAUnaryMethod<EventStoreClient, CommitEventsRequest, CommitEventsResponse>
+    public class EventStoreCommitMethod : ICanCallAUnaryMethod<CommitEventsRequest, CommitEventsResponse>
     {
         /// <inheritdoc/>
         public AsyncUnaryCall<CommitEventsResponse> Call(CommitEventsRequest message, Channel channel, CallOptions callOptions)

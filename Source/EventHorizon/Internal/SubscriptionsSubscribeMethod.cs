@@ -12,7 +12,7 @@ namespace Dolittle.SDK.EventHorizon.Internal
     /// <summary>
     /// Represents a wrapper for gRPC Subscriptions.Subscribe.
     /// </summary>
-    public class SubscriptionsSubscribeMethod : ICanCallAUnaryMethod<SubscriptionsClient, SubscriptionRequest, SubscriptionResponse>
+    public class SubscriptionsSubscribeMethod : ICanCallAUnaryMethod<SubscriptionRequest, SubscriptionResponse>
     {
         /// <inheritdoc/>
         public AsyncUnaryCall<SubscriptionResponse> Call(SubscriptionRequest message, Channel channel, CallOptions callOptions)

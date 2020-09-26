@@ -9,11 +9,9 @@ namespace Dolittle.SDK.Services
     /// <summary>
     /// Represents a wrapper of a gRPC unary method call.
     /// </summary>
-    /// <typeparam name="TClient">The type of generated gRPC client to use.</typeparam>
     /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
     /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
-    public interface ICanCallAUnaryMethod<TClient, TClientMessage, TServerMessage>
-        where TClient : ClientBase<TClient>
+    public interface ICanCallAUnaryMethod<TClientMessage, TServerMessage>
         where TClientMessage : IMessage
         where TServerMessage : IMessage
     {
