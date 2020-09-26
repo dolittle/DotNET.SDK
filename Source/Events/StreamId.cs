@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Events
     public class StreamId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Gets the unspecified partition id.
+        /// Gets the Event Log stream id.
         /// </summary>
         public static StreamId EventLog => new StreamId { Value = Guid.Empty };
 

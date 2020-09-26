@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Dolittle.SDK.Tenancy;
 
 namespace Dolittle.SDK.EventHorizon
@@ -30,10 +29,15 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         /// <summary>
-        /// Builds the event horizon subscriptions.
+        /// Builds and registers the event horizon subscriptions.
         /// </summary>
-        /// <returns>An <see cref="IEnumerable{T}"/> of type <see cref="Subscription"/>.</returns>
-        public IEnumerable<Subscription> Build()
-            => _builders.SelectMany(_ => _.Build());
+        /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
+        public void BuildAndSubscribe(IEventHorizons eventHorizons)
+        {
+            foreach (var builder in _builders)
+            {
+                builder.BuildAndSubscribe(eventHorizons);
+            }
+        }
     }
 }

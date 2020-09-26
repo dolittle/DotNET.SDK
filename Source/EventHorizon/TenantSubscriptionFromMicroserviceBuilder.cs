@@ -45,13 +45,13 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         /// <summary>
-        /// Builds the <see cref="Subscription"/>.
+        /// Builds and registers the event horizon subscriptions.
         /// </summary>
-        /// <returns>The event handler subscription definition.</returns>
-        public Subscription Build()
+        /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
+        public void BuildAndSubscribe(IEventHorizons eventHorizons)
         {
             ThrowIfProducerTenantIsNotDefined();
-            return _builder.Build();
+            _builder.BuildAndSubscribe(eventHorizons);
         }
 
         void ThrowIfProducerTenantIsAlreadyDefined()
