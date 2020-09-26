@@ -17,13 +17,9 @@ namespace Basic
             var client = Client.ForMicroservice("7a6155dd-9109-4488-8f6f-c57fe4b65bfb")
                 .WithEventTypes(eventTypes =>
                     eventTypes
-                        .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3"))
+                        .Associate<MyEvent>())
                 .WithEventHandlers(eventHandlersBuilder =>
                     eventHandlersBuilder
-                        .CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
-                            eventHandlerBuilder
-                                .Partitioned()
-                                .Handle((MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in lambda")))
                         .RegisterEventHandler<MyEventHandler>())
                 .Build();
 

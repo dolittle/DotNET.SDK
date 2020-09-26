@@ -11,8 +11,6 @@ namespace Basic
     class MyEventHandler
     {
         public void Handle(MyEvent @event, EventContext context)
-        {
-            Console.WriteLine("Handling event in event handler class");
-        }
+            => Console.WriteLine($"Handling event {@event} in event handler class");
     }
 }
