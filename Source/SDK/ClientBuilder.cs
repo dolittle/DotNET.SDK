@@ -54,7 +54,7 @@ namespace Dolittle.SDK
             _environment = environment;
             _cancellation = default;
 
-            _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
+            _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
             _container = new Container();
@@ -78,8 +78,19 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public ClientBuilder WithEnvironment(Microservices.Environment environment)
         {
-             _environment = environment;
-             return this;
+            _environment = environment;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IContainer" /> to use for inversion of control.
+        /// </summary>
+        /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithContainer(IContainer container)
+        {
+            _container = container;
+            return this;
         }
 
         /// <summary>
@@ -167,7 +178,7 @@ namespace Dolittle.SDK
                 Claims.Empty,
                 CultureInfo.InvariantCulture);
 
-            var eventTypes = _eventTypesBuilder.Build();
+            var eventTypes = _eventTypesBuilder.Build(new EventTypes(_loggerFactory.CreateLogger<EventTypes>()));
 
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
