@@ -11,20 +11,20 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents a builder for building event horizons.
     /// </summary>
-    public class EventHorizonsBuilder
+    public class SubscriptionsBuilder
     {
         readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
-        readonly IList<TenantSubscriptionsBuilder> _builders = new List<TenantSubscriptionsBuilder>();
+        readonly IList<SubscriptionsBuilderForConsumerTenant> _builders = new List<SubscriptionsBuilderForConsumerTenant>();
 
         /// <summary>
-        /// Sets the event horizon subscriptions for the consumer tenant through the <see cref="TenantSubscriptionsBuilder"/>.
+        /// Sets the event horizon subscriptions for the consumer tenant through the <see cref="SubscriptionsBuilderForConsumerTenant"/>.
         /// </summary>
         /// <param name="consumerTenantId">The <see cref="TenantId"/> to subscribe to events for.</param>
         /// <param name="callback">The builder callback.</param>
         /// <returns>Continuation of the builder.</returns>
-        public EventHorizonsBuilder ForTenant(TenantId consumerTenantId, Action<TenantSubscriptionsBuilder> callback)
+        public SubscriptionsBuilder ForTenant(TenantId consumerTenantId, Action<SubscriptionsBuilderForConsumerTenant> callback)
         {
-            var builder = new TenantSubscriptionsBuilder(consumerTenantId);
+            var builder = new SubscriptionsBuilderForConsumerTenant(consumerTenantId);
             callback(builder);
             _builders.Add(builder);
             return this;
@@ -35,7 +35,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionSucceeded"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public EventHorizonsBuilder OnSuccess(SubscriptionSucceeded callback)
+        public SubscriptionsBuilder OnSuccess(SubscriptionSucceeded callback)
         {
             _callbacks.OnSuccess += callback;
             return this;
@@ -46,7 +46,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionFailed"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public EventHorizonsBuilder OnFailure(SubscriptionFailed callback)
+        public SubscriptionsBuilder OnFailure(SubscriptionFailed callback)
         {
             _callbacks.OnFailure += callback;
             return this;
@@ -57,7 +57,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionCompleted"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public EventHorizonsBuilder OnCompleted(SubscriptionCompleted callback)
+        public SubscriptionsBuilder OnCompleted(SubscriptionCompleted callback)
         {
             _callbacks.OnCompleted += callback;
             return this;

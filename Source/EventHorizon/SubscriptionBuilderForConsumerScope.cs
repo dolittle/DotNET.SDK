@@ -13,7 +13,7 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents a builder for building an event horizon subscription with consumer tenant, producer microservice, producer tenant, producer stream, producer partition and consumer scope already defined.
     /// </summary>
-    public class TenantSubscriptionToScopeBuilder
+    public class SubscriptionBuilderForConsumerScope
     {
         readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
         readonly TenantId _consumerTenantId;
@@ -24,7 +24,7 @@ namespace Dolittle.SDK.EventHorizon
         readonly ScopeId _consumerScopeId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TenantSubscriptionToScopeBuilder"/> class.
+        /// Initializes a new instance of the <see cref="SubscriptionBuilderForConsumerScope"/> class.
         /// </summary>
         /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
         /// <param name="producerMicroserviceId">The producer <see cref="MicroserviceId"/> of the subscription.</param>
@@ -32,7 +32,7 @@ namespace Dolittle.SDK.EventHorizon
         /// <param name="producerStreamId">The producer <see cref="StreamId"/> of the subscription.</param>
         /// <param name="producerPartitionId">The producer <see cref="PartitionId"/> of the subscription.</param>
         /// <param name="consumerScopeId">The consumer <see cref="ScopeId"/> of the subscription.</param>
-        public TenantSubscriptionToScopeBuilder(
+        public SubscriptionBuilderForConsumerScope(
             TenantId consumerTenantId,
             MicroserviceId producerMicroserviceId,
             TenantId producerTenantId,
@@ -53,7 +53,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionSucceeded"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionToScopeBuilder OnSuccess(SubscriptionSucceeded callback)
+        public SubscriptionBuilderForConsumerScope OnSuccess(SubscriptionSucceeded callback)
         {
             _callbacks.OnSuccess += callback;
             return this;
@@ -64,7 +64,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionFailed"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionToScopeBuilder OnFailure(SubscriptionFailed callback)
+        public SubscriptionBuilderForConsumerScope OnFailure(SubscriptionFailed callback)
         {
             _callbacks.OnFailure += callback;
             return this;
@@ -75,7 +75,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionCompleted"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionToScopeBuilder OnCompleted(SubscriptionCompleted callback)
+        public SubscriptionBuilderForConsumerScope OnCompleted(SubscriptionCompleted callback)
         {
             _callbacks.OnCompleted += callback;
             return this;

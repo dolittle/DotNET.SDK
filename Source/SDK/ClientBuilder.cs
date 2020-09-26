@@ -27,7 +27,7 @@ namespace Dolittle.SDK
         readonly EventTypesBuilder _eventTypesBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly EventHandlersBuilder _eventHandlersBuilder;
-        readonly EventHorizonsBuilder _eventHorizonsBuilder;
+        readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         ushort _port = 50053;
@@ -57,7 +57,7 @@ namespace Dolittle.SDK
             _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder(_loggerFactory);
-            _eventHorizonsBuilder = new EventHorizonsBuilder();
+            _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 
         /// <summary>
@@ -116,11 +116,11 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the event handlers through the <see cref="EventHorizonsBuilder" />.
+        /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventHorizonSubscriptions(Action<EventHorizonsBuilder> callback)
+        public ClientBuilder WithEventHorizonSubscriptions(Action<SubscriptionsBuilder> callback)
         {
             callback(_eventHorizonsBuilder);
             return this;

@@ -13,31 +13,31 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents a builder for building event horizon subscriptions for a consumer tenant.
     /// </summary>
-    public class TenantSubscriptionsBuilder
+    public class SubscriptionsBuilderForConsumerTenant
     {
         readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
-        readonly IList<TenantSubscriptionFromMicroserviceBuilder> _builders = new List<TenantSubscriptionFromMicroserviceBuilder>();
+        readonly IList<SubscriptionsBuilderForProducerMicroservice> _builders = new List<SubscriptionsBuilderForProducerMicroservice>();
         readonly TenantId _consumerTenantId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TenantSubscriptionsBuilder"/> class.
+        /// Initializes a new instance of the <see cref="SubscriptionsBuilderForConsumerTenant"/> class.
         /// </summary>
         /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
-        public TenantSubscriptionsBuilder(
+        public SubscriptionsBuilderForConsumerTenant(
             TenantId consumerTenantId)
         {
             _consumerTenantId = consumerTenantId;
         }
 
         /// <summary>
-        /// Sets the event horizon subscriptions for the consumer tenant from a producer microservice through the <see cref="TenantSubscriptionFromMicroserviceBuilder"/>.
+        /// Sets the event horizon subscriptions for the consumer tenant from a producer microservice through the <see cref="SubscriptionsBuilderForProducerMicroservice"/>.
         /// </summary>
         /// <param name="producerMicroserviceId">The <see cref="MicroserviceId"/> to subscribe to events from.</param>
         /// <param name="callback">The builder callback.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionsBuilder FromMicroservice(MicroserviceId producerMicroserviceId, Action<TenantSubscriptionFromMicroserviceBuilder> callback)
+        public SubscriptionsBuilderForConsumerTenant FromMicroservice(MicroserviceId producerMicroserviceId, Action<SubscriptionsBuilderForProducerMicroservice> callback)
         {
-            var builder = new TenantSubscriptionFromMicroserviceBuilder(_consumerTenantId, producerMicroserviceId);
+            var builder = new SubscriptionsBuilderForProducerMicroservice(_consumerTenantId, producerMicroserviceId);
             callback(builder);
             _builders.Add(builder);
             return this;
@@ -48,7 +48,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionSucceeded"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionsBuilder OnSuccess(SubscriptionSucceeded callback)
+        public SubscriptionsBuilderForConsumerTenant OnSuccess(SubscriptionSucceeded callback)
         {
             _callbacks.OnSuccess += callback;
             return this;
@@ -59,7 +59,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionFailed"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionsBuilder OnFailure(SubscriptionFailed callback)
+        public SubscriptionsBuilderForConsumerTenant OnFailure(SubscriptionFailed callback)
         {
             _callbacks.OnFailure += callback;
             return this;
@@ -70,7 +70,7 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="callback">The <see cref="SubscriptionCompleted"/> to call.</param>
         /// <returns>Continuation of the builder.</returns>
-        public TenantSubscriptionsBuilder OnCompleted(SubscriptionCompleted callback)
+        public SubscriptionsBuilderForConsumerTenant OnCompleted(SubscriptionCompleted callback)
         {
             _callbacks.OnCompleted += callback;
             return this;

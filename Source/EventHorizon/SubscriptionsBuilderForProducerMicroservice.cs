@@ -10,18 +10,18 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents a builder for building an event horizon subscription with consumer tenant and producer microservice already defined.
     /// </summary>
-    public class TenantSubscriptionFromMicroserviceBuilder
+    public class SubscriptionsBuilderForProducerMicroservice
     {
         readonly TenantId _consumerTenantId;
         readonly MicroserviceId _producerMicroserviceId;
-        TenantSubscriptionFromTenantBuilder _builder;
+        SubscriptionBuilderForProducerTenant _builder;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TenantSubscriptionFromMicroserviceBuilder"/> class.
+        /// Initializes a new instance of the <see cref="SubscriptionsBuilderForProducerMicroservice"/> class.
         /// </summary>
         /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
         /// <param name="producerMicroserviceId">The producer <see cref="MicroserviceId"/> of the subscription.</param>
-        public TenantSubscriptionFromMicroserviceBuilder(
+        public SubscriptionsBuilderForProducerMicroservice(
             TenantId consumerTenantId,
             MicroserviceId producerMicroserviceId)
         {
@@ -34,11 +34,11 @@ namespace Dolittle.SDK.EventHorizon
         /// Sets the producer tenant to subscribe to events from.
         /// </summary>
         /// <param name="producerTenantId">The <see cref="TenantId"/> to subscribe to events from.</param>
-        /// <returns>A <see cref="TenantSubscriptionFromTenantBuilder"/> to continue building.</returns>
-        public TenantSubscriptionFromTenantBuilder FromTenant(TenantId producerTenantId)
+        /// <returns>A <see cref="SubscriptionBuilderForProducerTenant"/> to continue building.</returns>
+        public SubscriptionBuilderForProducerTenant FromTenant(TenantId producerTenantId)
         {
             ThrowIfProducerTenantIsAlreadyDefined();
-            _builder = new TenantSubscriptionFromTenantBuilder(
+            _builder = new SubscriptionBuilderForProducerTenant(
                 _consumerTenantId,
                 _producerMicroserviceId,
                 producerTenantId);

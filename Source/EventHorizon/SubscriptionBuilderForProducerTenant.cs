@@ -9,55 +9,45 @@ using Dolittle.SDK.Tenancy;
 namespace Dolittle.SDK.EventHorizon
 {
     /// <summary>
-    /// Represents a builder for building an event horizon subscription with consumer tenant, producer microservice, producer tenant, producer stream and producer partition already defined.
+    /// Represents a builder for building an event horizon subscription with consumer tenant, producer microservice and producer tenant already defined.
     /// </summary>
-    public class TenantSubscriptionFromPartitionBuilder
+    public class SubscriptionBuilderForProducerTenant
     {
         readonly TenantId _consumerTenantId;
         readonly MicroserviceId _producerMicroserviceId;
         readonly TenantId _producerTenantId;
-        readonly StreamId _producerStreamId;
-        readonly PartitionId _producerPartitionId;
-        TenantSubscriptionToScopeBuilder _builder;
+        SubscriptionBuilderForProducerStream _builder;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TenantSubscriptionFromPartitionBuilder"/> class.
+        /// Initializes a new instance of the <see cref="SubscriptionBuilderForProducerTenant"/> class.
         /// </summary>
         /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
         /// <param name="producerMicroserviceId">The producer <see cref="MicroserviceId"/> of the subscription.</param>
         /// <param name="producerTenantId">The producer <see cref="TenantId"/> of the subscription.</param>
-        /// <param name="producerStreamId">The producer <see cref="StreamId"/> of the subscription.</param>
-        /// <param name="producerPartitionId">The producer <see cref="PartitionId"/> of the subscription.</param>
-        public TenantSubscriptionFromPartitionBuilder(
+        public SubscriptionBuilderForProducerTenant(
             TenantId consumerTenantId,
             MicroserviceId producerMicroserviceId,
-            TenantId producerTenantId,
-            StreamId producerStreamId,
-            PartitionId producerPartitionId)
+            TenantId producerTenantId)
         {
             _consumerTenantId = consumerTenantId;
             _producerMicroserviceId = producerMicroserviceId;
             _producerTenantId = producerTenantId;
-            _producerStreamId = producerStreamId;
-            _producerPartitionId = producerPartitionId;
             _builder = null;
         }
 
         /// <summary>
-        /// Sets the scope into which the events received over this subscription will be stored.
+        /// Sets the producer stream to subscribe to events from.
         /// </summary>
-        /// <param name="consumerScopeId">The <see cref="ScopeId"/> to store the events in.</param>
-        /// <returns>A <see cref="TenantSubscriptionToScopeBuilder"/> to continue building.</returns>
-        public TenantSubscriptionToScopeBuilder ToScope(ScopeId consumerScopeId)
+        /// <param name="producerStreamId">The <see cref="StreamId"/> to subscribe to events from.</param>
+        /// <returns>A <see cref="SubscriptionBuilderForProducerStream"/> to continue building.</returns>
+        public SubscriptionBuilderForProducerStream FromStream(StreamId producerStreamId)
         {
-            ThrowIfConsumerScopeIsAlreadyDefined();
-            _builder = new TenantSubscriptionToScopeBuilder(
+            ThrowIfProducerStreamIsAlreadyDefined();
+            _builder = new SubscriptionBuilderForProducerStream(
                 _consumerTenantId,
                 _producerMicroserviceId,
                 _producerTenantId,
-                _producerStreamId,
-                _producerPartitionId,
-                consumerScopeId);
+                producerStreamId);
             return _builder;
         }
 
@@ -68,23 +58,23 @@ namespace Dolittle.SDK.EventHorizon
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
         {
-            ThrowIfConsumerScopeIsNotDefined();
+            ThrowIfProducerStreamIsNotDefined();
             _builder.BuildAndSubscribe(eventHorizons, cancellationToken);
         }
 
-        void ThrowIfConsumerScopeIsAlreadyDefined()
+        void ThrowIfProducerStreamIsAlreadyDefined()
         {
             if (_builder != null)
             {
-                throw new SubscriptionBuilderMethodAlreadyCalled("ToScope()");
+                throw new SubscriptionBuilderMethodAlreadyCalled("FromStream()");
             }
         }
 
-        void ThrowIfConsumerScopeIsNotDefined()
+        void ThrowIfProducerStreamIsNotDefined()
         {
             if (_builder == null)
             {
-                throw new SubscriptionDefinitionIncomplete("Scope", "Call ToScope() with a non-default scope");
+                throw new SubscriptionDefinitionIncomplete("Stream", "Call FromStream()");
             }
         }
     }
