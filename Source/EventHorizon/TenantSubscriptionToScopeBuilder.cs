@@ -1,6 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Reactive.Linq;
+using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Tenancy;
@@ -12,6 +15,7 @@ namespace Dolittle.SDK.EventHorizon
     /// </summary>
     public class TenantSubscriptionToScopeBuilder
     {
+        readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
         readonly TenantId _consumerTenantId;
         readonly MicroserviceId _producerMicroserviceId;
         readonly TenantId _producerTenantId;
@@ -45,10 +49,44 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         /// <summary>
+        /// Registers a success callback to be called if this subscription succeeds.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionSucceeded"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public TenantSubscriptionToScopeBuilder OnSuccess(SubscriptionSucceeded callback)
+        {
+            _callbacks.OnSuccess += callback;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a success callback to be called if this subscription fails.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionFailed"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public TenantSubscriptionToScopeBuilder OnFailure(SubscriptionFailed callback)
+        {
+            _callbacks.OnFailure += callback;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a success callback to be called when this subscription completes.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionCompleted"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public TenantSubscriptionToScopeBuilder OnCompleted(SubscriptionCompleted callback)
+        {
+            _callbacks.OnCompleted += callback;
+            return this;
+        }
+
+        /// <summary>
         /// Builds and registers the event horizon subscriptions.
         /// </summary>
         /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
-        public void BuildAndSubscribe(IEventHorizons eventHorizons)
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
         {
             var subscription = new Subscription(
                 _consumerTenantId,
@@ -57,6 +95,8 @@ namespace Dolittle.SDK.EventHorizon
                 _producerStreamId,
                 _producerPartitionId,
                 _consumerScopeId);
+
+            eventHorizons.Responses.Where(_ => _.Subscribtion == subscription).Subscribe(_callbacks, cancellationToken);
 
             eventHorizons.Subscribe(subscription);
         }

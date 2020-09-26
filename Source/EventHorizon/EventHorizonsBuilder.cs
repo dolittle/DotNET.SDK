@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Dolittle.SDK.Tenancy;
 
 namespace Dolittle.SDK.EventHorizon
@@ -12,6 +13,7 @@ namespace Dolittle.SDK.EventHorizon
     /// </summary>
     public class EventHorizonsBuilder
     {
+        readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
         readonly IList<TenantSubscriptionsBuilder> _builders = new List<TenantSubscriptionsBuilder>();
 
         /// <summary>
@@ -29,14 +31,49 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         /// <summary>
+        /// Registers a success callback to be called when subscriptions succeed.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionSucceeded"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public EventHorizonsBuilder OnSuccess(SubscriptionSucceeded callback)
+        {
+            _callbacks.OnSuccess += callback;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a success callback to be called when subscriptions fail.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionFailed"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public EventHorizonsBuilder OnFailure(SubscriptionFailed callback)
+        {
+            _callbacks.OnFailure += callback;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a success callback to be called when subscriptions complete.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionCompleted"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public EventHorizonsBuilder OnCompleted(SubscriptionCompleted callback)
+        {
+            _callbacks.OnCompleted += callback;
+            return this;
+        }
+
+        /// <summary>
         /// Builds and registers the event horizon subscriptions.
         /// </summary>
         /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
-        public void BuildAndSubscribe(IEventHorizons eventHorizons)
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
         {
+            eventHorizons.Responses.Subscribe(_callbacks, cancellationToken);
             foreach (var builder in _builders)
             {
-                builder.BuildAndSubscribe(eventHorizons);
+                builder.BuildAndSubscribe(eventHorizons, cancellationToken);
             }
         }
     }

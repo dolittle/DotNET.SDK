@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Threading;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Tenancy;
 
@@ -13,6 +15,7 @@ namespace Dolittle.SDK.EventHorizon
     /// </summary>
     public class TenantSubscriptionsBuilder
     {
+        readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
         readonly IList<TenantSubscriptionFromMicroserviceBuilder> _builders = new List<TenantSubscriptionFromMicroserviceBuilder>();
         readonly TenantId _consumerTenantId;
 
@@ -41,14 +44,49 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         /// <summary>
+        /// Registers a success callback to be called when subscriptions for this tenant succeed.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionSucceeded"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public TenantSubscriptionsBuilder OnSuccess(SubscriptionSucceeded callback)
+        {
+            _callbacks.OnSuccess += callback;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a success callback to be called when subscriptions for this tenant fail.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionFailed"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public TenantSubscriptionsBuilder OnFailure(SubscriptionFailed callback)
+        {
+            _callbacks.OnFailure += callback;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a success callback to be called when subscriptions for this tenant complete.
+        /// </summary>
+        /// <param name="callback">The <see cref="SubscriptionCompleted"/> to call.</param>
+        /// <returns>Continuation of the builder.</returns>
+        public TenantSubscriptionsBuilder OnCompleted(SubscriptionCompleted callback)
+        {
+            _callbacks.OnCompleted += callback;
+            return this;
+        }
+
+        /// <summary>
         /// Builds and registers the event horizon subscriptions.
         /// </summary>
         /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
-        public void BuildAndSubscribe(IEventHorizons eventHorizons)
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
         {
+            eventHorizons.Responses.Where(_ => _.Subscribtion.ConsumerTenant == _consumerTenantId).Subscribe(_callbacks, cancellationToken);
             foreach (var builder in _builders)
             {
-                builder.BuildAndSubscribe(eventHorizons);
+                builder.BuildAndSubscribe(eventHorizons, cancellationToken);
             }
         }
     }

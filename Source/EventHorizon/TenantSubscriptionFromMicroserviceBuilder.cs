@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Tenancy;
 
@@ -48,10 +49,11 @@ namespace Dolittle.SDK.EventHorizon
         /// Builds and registers the event horizon subscriptions.
         /// </summary>
         /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
-        public void BuildAndSubscribe(IEventHorizons eventHorizons)
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
         {
             ThrowIfProducerTenantIsNotDefined();
-            _builder.BuildAndSubscribe(eventHorizons);
+            _builder.BuildAndSubscribe(eventHorizons, cancellationToken);
         }
 
         void ThrowIfProducerTenantIsAlreadyDefined()
