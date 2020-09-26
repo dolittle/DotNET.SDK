@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 
 namespace Dolittle.SDK.Artifacts
 {
@@ -21,75 +22,43 @@ namespace Dolittle.SDK.Artifacts
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactsBuilderFor{TArtifacts, TArtifact, TArtifactId, TBuilder}"/> class.
         /// </summary>
-        /// <param name="artifacts">The <see cref="IArtifacts{TArtifact}" />.</param>
-        protected ArtifactsBuilderFor(TArtifacts artifacts) => Artifacts = artifacts;
+        protected ArtifactsBuilderFor() => Associations = new List<(Type, TArtifact)>();
 
         /// <summary>
-        /// Gets the <see cref="IArtifacts{TArtifact}" />.
+        /// Gets all the associations to build.
         /// </summary>
-        protected TArtifacts Artifacts { get; }
+        protected IList<(Type, TArtifact)> Associations { get; }
 
-        /// <summary>
-        /// Build an instance of <typeparamref name="TArtifacts" /> for <typeparamref name="TArtifact"/> artifact.
-        /// </summary>
-        /// <returns>An instance of <typeparamref name="TArtifacts" />.</returns>
-        public TArtifacts Build() => Artifacts;
+        /// <inheritdoc/>
+        public TArtifacts Build(TArtifacts artifacts)
+        {
+            foreach (var (type, artifact) in Associations) artifacts.Associate(type, artifact);
+            return artifacts;
+        }
 
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact"/> />.
-        /// </summary>
-        /// <param name="artifact">The <typeparamref name="TArtifact"/> that the <see cref="Type" /> is associated to.</param>
-        /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <typeparamref name="TArtifact"/>.</typeparam>
-        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        /// <inheritdoc/>
         public TBuilder Associate<T>(TArtifact artifact)
             where T : class
             => Associate(typeof(T), artifact);
 
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> to associate with an <typeparamref name="TArtifact"/>.</param>
-        /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
-        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        /// <inheritdoc/>
         public virtual TBuilder Associate(Type type, TArtifactId artifactId)
             => Associate(type, artifactId, Generation.First);
 
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact"/>.
-        /// </summary>
-        /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
-        /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <typeparamref name="TArtifact"/>.</typeparam>
-        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        /// <inheritdoc/>
         public TBuilder Associate<T>(TArtifactId artifactId)
             where T : class
             => Associate(typeof(T), artifactId);
 
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact"/>.
-        /// </summary>
-        /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
-        /// <param name="generation">The <see cref="Generation" /> of the <typeparamref name="TArtifact"/>.</param>
-        /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <typeparamref name="TArtifact"/>.</typeparam>
-        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        /// <inheritdoc/>
         public TBuilder Associate<T>(TArtifactId artifactId, Generation generation)
             where T : class
             => Associate(typeof(T), artifactId, generation);
 
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact" />.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> to associate with an <typeparamref name="TArtifact" />.</param>
-        /// <param name="artifact">The <typeparamref name="TArtifact" /> that the <see cref="Type" /> is associated to.</param>
-        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        /// <inheritdoc/>
         public abstract TBuilder Associate(Type type, TArtifact artifact);
 
-        /// <summary>
-        /// Associate the <see cref="Type" /> with an <typeparamref name="TArtifact"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> to associate with an <typeparamref name="TArtifact"/>.</param>
-        /// <param name="artifactId">The <see cref="ArtifactId" /> that the <see cref="Type" /> is associated to.</param>
-        /// <param name="generation">The <see cref="Generation" /> of the <typeparamref name="TArtifact"/>.</param>
-        /// <returns>The <typeparamref name="TBuilder" /> for building <typeparamref name="TArtifacts" />.</returns>
+        /// <inheritdoc/>
         public abstract TBuilder Associate(Type type, TArtifactId artifactId, Generation generation);
     }
 }

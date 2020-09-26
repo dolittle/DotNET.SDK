@@ -4,7 +4,7 @@
 using System;
 using Dolittle.SDK.Artifacts;
 
-namespace Dolittle.SDK.Events.Handling
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Decorates a class to indicate the <see cref="EventType" /> of an event class.

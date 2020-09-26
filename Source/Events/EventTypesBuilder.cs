@@ -2,8 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using Dolittle.SDK.Artifacts;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events
 {
@@ -13,23 +13,40 @@ namespace Dolittle.SDK.Events
     public class EventTypesBuilder : ArtifactsBuilderFor<IEventTypes, EventType, EventTypeId, EventTypesBuilder>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventTypesBuilder"/> class.
+        /// Associate <typeparamref name="TEventType"/> with the <see cref="EventType" /> that it is decorated with.
         /// </summary>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        public EventTypesBuilder(ILoggerFactory loggerFactory)
-            : base(new EventTypes(loggerFactory.CreateLogger<EventTypes>()))
+        /// <typeparam name="TEventType">The <see cref="Type" /> of the event type class.</typeparam>
+        /// <returns>The <see cref="EventTypesBuilder" /> for continuation.</returns>
+        public EventTypesBuilder Associate<TEventType>()
+            where TEventType : class
         {
+            var type = typeof(TEventType);
+            if (!TryGetDecoratedEventType(type, out var eventType)) throw new EventTypeNotDecorated(type);
+
+            return Associate(type, eventType);
         }
 
         /// <inheritdoc/>
-        public override EventTypesBuilder Associate(Type type, EventType artifact)
+        public override EventTypesBuilder Associate(Type type, EventType eventType)
         {
-            Artifacts.Associate(type, artifact);
+            if (TryGetDecoratedEventType(type, out var decoratedEventType)
+                && decoratedEventType != eventType)
+            {
+                throw new EventTypeDoesNotMatchDecoratedEventType(eventType, decoratedEventType, type);
+            }
+
+            Associations.Add((type, eventType));
             return this;
         }
 
         /// <inheritdoc/>
         public override EventTypesBuilder Associate(Type type, EventTypeId artifactId, Generation generation)
             => Associate(type, new EventType(artifactId, generation));
+
+        bool TryGetDecoratedEventType(Type type, out EventType eventType)
+        {
+            eventType = (type.GetCustomAttributes(typeof(EventTypeAttribute), true).FirstOrDefault() as EventTypeAttribute)?.EventType;
+            return eventType != default;
+        }
     }
 }
