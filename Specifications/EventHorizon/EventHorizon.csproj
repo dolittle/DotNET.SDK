@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <Import Project="../../specs.props"/>
 
     <PropertyGroup>
@@ -8,4 +9,5 @@
     <ItemGroup>
         <ProjectReference Include="../../Source/EventHorizon/EventHorizon.csproj" />
     </ItemGroup>
+
 </Project>

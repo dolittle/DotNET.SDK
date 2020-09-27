@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <Import Project="../../default.props" />
+
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events.Processing</AssemblyName>
     </PropertyGroup>
@@ -7,8 +9,8 @@
     <ItemGroup>
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
         <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
+        <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
     </ItemGroup>
 
     <ItemGroup>
