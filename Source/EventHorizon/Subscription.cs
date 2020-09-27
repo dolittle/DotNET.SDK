@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Tenancy;
@@ -10,7 +11,7 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents a subscription definition that can be used to set up an event horizon subscription through the runtime.
     /// </summary>
-    public class Subscription
+    public class Subscription : Value<Subscription>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Subscription"/> class.
