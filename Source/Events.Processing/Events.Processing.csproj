@@ -7,8 +7,8 @@
     <ItemGroup>
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageReference Include="System.Reactive" Version="4.4.1" />
-        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJson)" />
+        <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
+        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
     </ItemGroup>
 
     <ItemGroup>

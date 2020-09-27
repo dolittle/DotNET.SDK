@@ -6,7 +6,7 @@
     <ItemGroup>
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJson)" />
+        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="../Artifacts/Artifacts.csproj" />
