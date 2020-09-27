@@ -24,13 +24,13 @@ namespace Dolittle.SDK
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
-        /// <param name="eventHorizons">The <see cref="EventHorizons" />.</param>
+        /// <param name="eventHorizons">The <see cref="IEventHorizons" />.</param>
         public Client(
             ILogger logger,
             ExecutionContext executionContext,
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
-            EventHorizons eventHorizons)
+            IEventHorizons eventHorizons)
         {
             _logger = logger;
             _executionContext = executionContext;

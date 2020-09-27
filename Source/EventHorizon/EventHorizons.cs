@@ -22,7 +22,9 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents an implementation of <see cref="IEventHorizons"/>.
     /// </summary>
-    public class EventHorizons : IEventHorizons, IDisposable
+    #pragma warning disable CA1001
+    public class EventHorizons : IEventHorizons
+    #pragma warning restore CA1001
     {
         static readonly SubscriptionsSubscribeMethod _method = new SubscriptionsSubscribeMethod();
         readonly Subject<Subscription> _subscriptions = new Subject<Subscription>();
@@ -37,16 +39,19 @@ namespace Dolittle.SDK.EventHorizon
         /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
         /// <param name="executionContext">Tha base <see cref="ExecutionContext"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/> to use.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         public EventHorizons(
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
-            ILogger logger)
+            ILogger logger,
+            CancellationToken cancellationToken)
         {
             _caller = caller;
             _executionContext = executionContext;
             _logger = logger;
 
             SetupSubscriptionProcessing();
+            SetupSubjectDisposal(cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -59,13 +64,6 @@ namespace Dolittle.SDK.EventHorizon
             return _responses.Where(_ => _.Subscribtion == subscription).FirstAsync().ToTask();
         }
 
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            _subscriptions.Dispose();
-            _responses.Dispose();
-        }
-
         void SetupSubscriptionProcessing()
         {
             _subscriptions
@@ -74,6 +72,13 @@ namespace Dolittle.SDK.EventHorizon
                 .Merge()
                 .Subscribe(_responses);
         }
+
+        void SetupSubjectDisposal(CancellationToken cancellationToken)
+            => cancellationToken.Register(() =>
+            {
+                _subscriptions.Dispose();
+                _responses.Dispose();
+            });
 
         SubscriptionRequest CreateRuntimeRequestFromSubscription(Subscription subscription)
         {
