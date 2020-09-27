@@ -42,8 +42,8 @@ namespace Dolittle.SDK.Events.Filters.Internal
         /// <inheritdoc/>
         protected override Task<TResponse> Process(FilterEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
-            var comittedEvent = _converter.ToSDK(request.Event);
-            return Filter(comittedEvent.Content, comittedEvent.GetEventContext(executionContext), cancellation);
+            var committedEvent = _converter.ToSDK(request.Event);
+            return Filter(committedEvent.Content, committedEvent.GetEventContext(executionContext), cancellation);
         }
 
         /// <summary>

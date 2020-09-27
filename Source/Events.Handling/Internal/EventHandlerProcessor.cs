@@ -57,12 +57,12 @@ namespace Dolittle.SDK.Events.Handling.Internal
         protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
             var streamEvent = _converter.ToSDK(request.Event);
-            var comittedEvent = streamEvent.Event;
+            var committedEvent = streamEvent.Event;
             await _eventHandler
                 .Handle(
-                    comittedEvent.Content,
-                    comittedEvent.EventType,
-                    comittedEvent.GetEventContext(executionContext),
+                    committedEvent.Content,
+                    committedEvent.EventType,
+                    committedEvent.GetEventContext(executionContext),
                     cancellation)
                 .ConfigureAwait(false);
             return new EventHandlerResponse();
