@@ -10,10 +10,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Async\Async.csproj" />
-        <ProjectReference Include="..\Events\Events.csproj" />
-        <ProjectReference Include="..\Events.Processing\Events.Processing.csproj" />
-        <ProjectReference Include="..\Protobuf\Protobuf.csproj" />
+        <ProjectReference Include="../Async/Async.csproj" />
+        <ProjectReference Include="../Events/Events.csproj" />
+        <ProjectReference Include="../Events.Processing/Events.Processing.csproj" />
+        <ProjectReference Include="../Protobuf/Protobuf.csproj" />
     </ItemGroup>
     
 </Project>

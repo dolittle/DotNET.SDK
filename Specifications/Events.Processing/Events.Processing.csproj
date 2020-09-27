@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Source\Events.Processing\Events.Processing.csproj" />
+        <ProjectReference Include="../../Source/Events.Processing/Events.Processing.csproj" />
     </ItemGroup>
 
 

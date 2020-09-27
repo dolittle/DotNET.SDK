@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Source\Protobuf\Protobuf.csproj" />
+        <ProjectReference Include="../../Source/Protobuf/Protobuf.csproj" />
     </ItemGroup>
 
 
