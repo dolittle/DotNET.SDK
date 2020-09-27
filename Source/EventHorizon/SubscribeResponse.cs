@@ -13,20 +13,20 @@ namespace Dolittle.SDK.EventHorizon
         /// <summary>
         /// Initializes a new instance of the <see cref="SubscribeResponse"/> class.
         /// </summary>
-        /// <param name="subscribtion">The <see cref="Subscription"/> that the response refers to.</param>
+        /// <param name="subscription">The <see cref="Subscription"/> that the response refers to.</param>
         /// <param name="consent">The <see cref="ConsentId"/> that authorized the subscription.</param>
         /// <param name="failure">The <see cref="Failure"/> describing why the subscription failed.</param>
-        public SubscribeResponse(Subscription subscribtion, ConsentId consent, Failure failure)
+        public SubscribeResponse(Subscription subscription, ConsentId consent, Failure failure)
         {
-            Subscribtion = subscribtion;
+            Subscription = subscription;
             Consent = consent;
             Failure = failure;
         }
 
         /// <summary>
-        /// Gets the <see cref="Subscribtion"/> that the response refers to.
+        /// Gets the <see cref="Subscription"/> that the response refers to.
         /// </summary>
-        public Subscription Subscribtion { get; }
+        public Subscription Subscription { get; }
 
         /// <summary>
         /// Gets a value indicating whether or not the subscribe request failed.

@@ -51,11 +51,11 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (!value.Failed)
             {
-                OnSuccess?.Invoke(value.Subscribtion, value.Consent);
+                OnSuccess?.Invoke(value.Subscription, value.Consent);
             }
             else
             {
-                OnFailure?.Invoke(value.Subscribtion, value.Failure);
+                OnFailure?.Invoke(value.Subscription, value.Failure);
             }
 
             OnCompleted?.Invoke(value);

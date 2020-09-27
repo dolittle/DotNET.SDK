@@ -61,7 +61,7 @@ namespace Dolittle.SDK.EventHorizon
         public Task<SubscribeResponse> Subscribe(Subscription subscription)
         {
             _subscriptions.OnNext(subscription);
-            return _responses.Where(_ => _.Subscribtion == subscription).FirstAsync().ToTask();
+            return _responses.Where(_ => _.Subscription == subscription).FirstAsync().ToTask();
         }
 
         void SetupSubscriptionProcessing()

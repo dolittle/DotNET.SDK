@@ -83,7 +83,7 @@ namespace Dolittle.SDK.EventHorizon
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
         {
-            eventHorizons.Responses.Where(_ => _.Subscribtion.ConsumerTenant == _consumerTenantId).Subscribe(_callbacks, cancellationToken);
+            eventHorizons.Responses.Where(_ => _.Subscription.ConsumerTenant == _consumerTenantId).Subscribe(_callbacks, cancellationToken);
             foreach (var builder in _builders)
             {
                 builder.BuildAndSubscribe(eventHorizons, cancellationToken);

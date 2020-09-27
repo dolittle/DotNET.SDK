@@ -96,7 +96,7 @@ namespace Dolittle.SDK.EventHorizon
                 _producerPartitionId,
                 _consumerScopeId);
 
-            eventHorizons.Responses.Where(_ => _.Subscribtion == subscription).Subscribe(_callbacks, cancellationToken);
+            eventHorizons.Responses.Where(_ => _.Subscription == subscription).Subscribe(_callbacks, cancellationToken);
 
             eventHorizons.Subscribe(subscription);
         }
