@@ -6,7 +6,6 @@
     <ItemGroup>
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-        <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
     <ItemGroup>
