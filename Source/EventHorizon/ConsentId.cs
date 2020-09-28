@@ -7,7 +7,7 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.EventHorizon
 {
     /// <summary>
-    /// Represents the concept of a unique identifier for a stream.
+    /// Represents the concept of a unique identifier for a consent from an event horizon subscription.
     /// </summary>
     public class ConsentId : ConceptAs<Guid>
     {
