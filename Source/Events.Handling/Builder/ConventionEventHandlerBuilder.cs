@@ -145,7 +145,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             warnings = default;
             var warningMessages = new List<string>();
-            foreach (var method in methods.Where(IsDecoratedHandlerMethod))
+            foreach (var method in methods.Where(IsDecoratedHandlerMethod).ToArray())
             {
                 var shouldAddHandler = true;
                 var eventType = (method.GetCustomAttributes(typeof(HandlesAttribute), true)[0] as HandlesAttribute)?.EventType;
@@ -185,7 +185,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             warnings = default;
             var warningMessages = new List<string>();
-            foreach (var method in methods.Where(_ => !IsDecoratedHandlerMethod(_) && _.Name == MethodName))
+            foreach (var method in methods.Where(_ => !IsDecoratedHandlerMethod(_) && _.Name == MethodName).ToArray())
             {
                 var shouldAddHandler = true;
                 if (!TryGetFirstMethodParameterType(method, out var eventParameterType))
