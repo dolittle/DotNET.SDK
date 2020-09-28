@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
@@ -23,16 +24,19 @@ namespace Dolittle.SDK
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
+        /// <param name="eventHorizons">The <see cref="IEventHorizons" />.</param>
         public Client(
             ILogger logger,
             ExecutionContext executionContext,
             IEventTypes eventTypes,
-            EventStoreBuilder eventStoreBuilder)
+            EventStoreBuilder eventStoreBuilder,
+            IEventHorizons eventHorizons)
         {
             _logger = logger;
             _executionContext = executionContext;
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
+            EventHorizons = eventHorizons;
         }
 
         /// <summary>
@@ -44,6 +48,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="EventStoreBuilder" />.
         /// </summary>
         public EventStoreBuilder EventStore { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEventHorizons" />.
+        /// </summary>
+        public IEventHorizons EventHorizons { get; }
 
         /// <summary>
         /// Create a client builder for a Miroservice.

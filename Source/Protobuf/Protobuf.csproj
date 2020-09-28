@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <Import Project="../../default.props" />
 
   <PropertyGroup>
@@ -15,4 +16,5 @@
     <ProjectReference Include="../Concepts/Concepts.csproj" />
     <ProjectReference Include="../Execution/Execution.csproj" />
   </ItemGroup>
+
 </Project>
