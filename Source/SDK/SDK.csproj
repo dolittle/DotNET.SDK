@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <Import Project="../../default.props" />
 
   <PropertyGroup>
@@ -13,4 +14,5 @@
   <ItemGroup>
     <ProjectReference Include="../**/*.csproj" Exclude="../SDK/SDK.csproj" />
   </ItemGroup>
+
 </Project>

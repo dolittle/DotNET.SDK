@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
@@ -27,6 +28,7 @@ namespace Dolittle.SDK
         readonly EventTypesBuilder _eventTypesBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly EventHandlersBuilder _eventHandlersBuilder;
+        readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         ushort _port = 50053;
@@ -58,6 +60,7 @@ namespace Dolittle.SDK
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
             _container = new Container();
+            _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 
         /// <summary>
@@ -123,6 +126,17 @@ namespace Dolittle.SDK
         public ClientBuilder WithEventHandlers(Action<EventHandlersBuilder> callback)
         {
             callback(_eventHandlersBuilder);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventHorizonSubscriptions(Action<SubscriptionsBuilder> callback)
+        {
+            callback(_eventHorizonsBuilder);
             return this;
         }
 
@@ -196,7 +210,10 @@ namespace Dolittle.SDK
 
             var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
 
-            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder);
+            var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>(), _cancellation);
+            _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
+
+            return new Client(_loggerFactory.CreateLogger<Client>(), executionContext, eventTypes, eventStoreBuilder, eventHorizons);
         }
     }
 }
