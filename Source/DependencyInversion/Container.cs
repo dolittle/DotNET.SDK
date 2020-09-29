@@ -8,7 +8,7 @@ namespace Dolittle.SDK.DependencyInversion
     /// <summary>
     /// Represents an implementation of <see cref="IContainer" />.
     /// </summary>
-    public class Container : IContainer
+    public class DefaultContainer : IContainer
     {
         /// <inheritdoc/>
         public object Get(Type service)
