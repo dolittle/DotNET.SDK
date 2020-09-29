@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -12,10 +13,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// </summary>
     public class EventHandlerMethodsBuilder
     {
-        readonly IDictionary<Type, IEventHandlerMethod> _handleMethodByType = new Dictionary<Type, IEventHandlerMethod>();
-        readonly IDictionary<EventType, IEventHandlerMethod> _handleMethodByArtifact = new Dictionary<EventType, IEventHandlerMethod>();
+        readonly IList<(Type, IEventHandlerMethod)> _handleMethodAndTypes = new List<(Type, IEventHandlerMethod)>();
+        readonly IList<(EventType, IEventHandlerMethod)> _handleMethodAndArtifacts = new List<(EventType, IEventHandlerMethod)>();
         readonly EventHandlerId _eventHandlerId;
-        readonly IList<string> _warnings = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHandlerMethodsBuilder"/> class.
@@ -32,11 +32,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Handle<T>(TaskEventHandlerSignature<T> method)
             where T : class
         {
-            if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
-            {
-                _warnings.Add($"Event handler {_eventHandlerId} already handles event of type {typeof(T)}");
-            }
-
+            _handleMethodAndTypes.Add((typeof(T), new TypedEventHandlerMethod<T>(method)));
             return this;
         }
 
@@ -49,11 +45,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Handle<T>(VoidEventHandlerSignature<T> method)
             where T : class
         {
-            if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
-            {
-                _warnings.Add($"Event handler {_eventHandlerId} already handles event of type {typeof(T)}");
-            }
-
+            _handleMethodAndTypes.Add((typeof(T), new TypedEventHandlerMethod<T>(method)));
             return this;
         }
 
@@ -65,11 +57,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
         public EventHandlerMethodsBuilder Handle(EventType eventType, TaskEventHandlerSignature method)
         {
-            if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
-            {
-                _warnings.Add($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
-            }
-
+            _handleMethodAndArtifacts.Add((eventType, new EventHandlerMethod(method)));
             return this;
         }
 
@@ -81,11 +69,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
         public EventHandlerMethodsBuilder Handle(EventType eventType, VoidEventHandlerSignature method)
         {
-            if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
-            {
-                _warnings.Add($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
-            }
-
+            _handleMethodAndArtifacts.Add((eventType, new EventHandlerMethod(method)));
             return this;
         }
 
@@ -132,27 +116,37 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// </summary>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="eventTypesToMethods">The output <see cref="IDictionary{TKey, TValue}" /> of <see cref="EventType" /> to <see cref="IEventHandlerMethod" /> map.</param>
-        /// <returns>The event handler methods.</returns>
-        public BuildEventHandlerResult TryBuild(IEventTypes eventTypes, out IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods)
+        /// <param name="logger">The <see cref="ILogger" />.</param>
+        /// <returns>Whether all the event handler methods could be built.</returns>
+        public bool TryAddEventHandlerMethods(IEventTypes eventTypes, IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods, ILogger logger)
         {
-            eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
-            foreach ((var eventType, var method) in _handleMethodByArtifact)
+            var okay = true;
+            foreach ((var eventType, var method) in _handleMethodAndArtifacts)
             {
-                eventTypesToMethods.Add(eventType, method);
+                if (!eventTypesToMethods.TryAdd(eventType, method))
+                {
+                    okay = false;
+                    logger.LogWarning(
+                        "Event handler {EventHandlerId} already handles event with event type {EventType}",
+                        _eventHandlerId,
+                        eventType);
+                }
             }
 
-            foreach ((var type, var method) in _handleMethodByType)
+            foreach ((var type, var method) in _handleMethodAndTypes)
             {
                 var eventType = eventTypes.GetFor(type);
                 if (!eventTypesToMethods.TryAdd(eventType, method))
                 {
-                    _warnings.Add($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
+                    okay = false;
+                    logger.LogWarning(
+                        "Event handler {EventHandlerId} already handles event with event type {EventType}",
+                        _eventHandlerId,
+                        eventType);
                 }
             }
 
-            var result = new BuildEventHandlerResult(_eventHandlerId, _warnings);
-            if (!result.Succeeded) eventTypesToMethods = null;
-            return result;
+            return okay;
         }
     }
 }

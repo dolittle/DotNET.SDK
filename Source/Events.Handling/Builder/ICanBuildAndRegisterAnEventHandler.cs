@@ -22,8 +22,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="container">The <see cref="IContainer" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        /// <returns>The <see cref="BuildEventHandlerResult" /> build results.</returns>
-        BuildEventHandlerResult BuildAndRegister(
+        void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,

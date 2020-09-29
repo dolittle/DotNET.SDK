@@ -26,7 +26,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         }
 
         /// <inheritdoc/>
-        public override BuildEventHandlerResult BuildAndRegister(
+        public override void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,

@@ -81,11 +81,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
-            var logger = loggerFactory.CreateLogger<EventHandlersBuilder>();
             foreach (var builder in _builders)
             {
-                var buildResult = builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, loggerFactory, cancellation);
-                if (!buildResult.Succeeded) logger.LogWarning(buildResult.Warnings.ToString());
+                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, loggerFactory, cancellation);
             }
         }
     }

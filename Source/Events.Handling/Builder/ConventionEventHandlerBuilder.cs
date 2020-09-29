@@ -34,7 +34,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         protected Type EventHandlerType { get; }
 
         /// <inheritdoc/>
-        public abstract BuildEventHandlerResult BuildAndRegister(
+        public abstract void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
@@ -53,8 +53,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        /// <returns>The <see cref="BuildEventHandlerResult"/>.</returns>
-        protected BuildEventHandlerResult BuildAndRegister(
+        protected void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
@@ -67,9 +66,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             logger.LogDebug("Building event handler from type {EventHandler}", EventHandlerType);
             if (!TryGetEventHandlerInformation(out var eventHandlerId, out var partitioned, out var scopeId))
             {
-                return new BuildEventHandlerResult(
-                    null,
-                    $"The event handler class {EventHandlerType} needs to be decorated with an [{typeof(EventHandlerAttribute).Name}]");
+                logger.LogWarning("The event handler class {EventHandlerType} needs to be decorated with an [{EventHandlerAttribute}]", EventHandlerType, typeof(EventHandlerAttribute).Name);
             }
 
             logger.LogTrace(
@@ -87,9 +84,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 createUntypedHandlerMethod,
                 createTypedHandlerMethod,
                 eventTypesToMethods,
-                out var buildResult))
+                logger))
             {
-                return buildResult;
+                return;
             }
 
             var eventHandler = new EventHandler(eventHandlerId, scopeId, partitioned, eventTypesToMethods);
@@ -102,7 +99,6 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 eventHandlerProcessor,
                 new EventHandlerProtocol(),
                 cancellation);
-            return new BuildEventHandlerResult();
         }
 
         bool TryBuildHandlerMethods(
@@ -111,18 +107,18 @@ namespace Dolittle.SDK.Events.Handling.Builder
             CreateUntypedHandleMethod createUntypedHandlerMethod,
             CreateTypedHandleMethod createTypedHandlerMethod,
             IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
-            out BuildEventHandlerResult buildResult)
+            ILogger logger)
         {
             var publicMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public);
-            var aggregatedWarnings = new List<string>();
+            var hasWrongMethods = false;
             if (!TryAddDecoratedHandlerMethods(
                 publicMethods,
                 eventHandlerId,
                 createUntypedHandlerMethod,
                 eventTypesToMethods,
-                out var decoratedHandlerMethodsWarnings))
+                logger))
             {
-                aggregatedWarnings.AddRange(decoratedHandlerMethodsWarnings.Warnings);
+                hasWrongMethods = true;
             }
 
             if (!TryAddConventionHandlerMethods(
@@ -131,26 +127,26 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 eventTypes,
                 createTypedHandlerMethod,
                 eventTypesToMethods,
-                out var conventionHandlerMethodsWarnings))
+                logger))
             {
-                aggregatedWarnings.AddRange(conventionHandlerMethodsWarnings.Warnings);
+                hasWrongMethods = true;
             }
 
-            if (aggregatedWarnings.Count > 0)
+            if (hasWrongMethods)
             {
-                buildResult = new BuildEventHandlerResult(eventHandlerId, aggregatedWarnings);
                 return false;
             }
 
             if (eventTypesToMethods.Count == 0)
             {
-                buildResult = new BuildEventHandlerResult(
-                    eventHandlerId,
-                    $"There are no event handler methods to register in event handler {EventHandlerType}. An event handler method either needs to be decorated with [{typeof(HandlesAttribute).Name}] or have the name {MethodName}");
+                logger.LogWarning(
+                    "There are no event handler methods to register in event handler {EventHandlerType}. An event handler method either needs to be decorated with [{HandlesAttribute}] or have the name {MethodName}",
+                    EventHandlerType,
+                    typeof(HandlesAttribute).Name,
+                    MethodName);
                 return false;
             }
 
-            buildResult = new BuildEventHandlerResult();
             return true;
         }
 
@@ -159,44 +155,48 @@ namespace Dolittle.SDK.Events.Handling.Builder
             EventHandlerId eventHandlerId,
             CreateUntypedHandleMethod createUntypedHandlerMethod,
             IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
-            out EventHandlerBuildWarnings warnings)
+            ILogger logger)
         {
-            warnings = default;
-
-            var warningMessages = new List<string>();
-
+            var allMethodsAdded = true;
             foreach (var method in methods.Where(IsDecoratedHandlerMethod).ToArray())
             {
                 var shouldAddHandler = true;
                 var eventType = (method.GetCustomAttributes(typeof(HandlesAttribute), true)[0] as HandlesAttribute)?.EventType;
                 if (!TryGetFirstMethodParameterType(method, out var eventParameterType))
                 {
-                    warningMessages.Add($"Event handler method {method} on event handler {EventHandlerType} has no parameters, but is decorated with [{typeof(HandlesAttribute).Name}]. An event handler method should take in as paramters an event and an {typeof(EventContext).Name}");
+                    logger.LogWarning(
+                        "Event handler method {Method} on event handler {EventHandlerType} has no parameters, but is decorated with [{HandlesAttribute}]. An event handler method should take in as paramters an event and an {EventContext}",
+                        method,
+                        EventHandlerType,
+                        typeof(HandlesAttribute).Name,
+                        typeof(EventContext).Name);
                     shouldAddHandler = false;
                 }
 
-                if (!ParametersAreOkay(method, eventHandlerId, out var parameterWarnings))
-                {
-                    warningMessages.AddRange(parameterWarnings.Warnings);
-                    shouldAddHandler = false;
-                }
+                if (!ParametersAreOkay(method, logger)) shouldAddHandler = false;
 
                 if (eventParameterType != typeof(object))
                 {
-                    warningMessages.Add($"Event handler method {method} on event handler {EventHandlerType} should only handle an event of type object");
+                    logger.LogWarning(
+                        "Event handler method {Method} on event handler {EventHandlerType} should only handle an event of type object",
+                        method,
+                        EventHandlerType);
                     shouldAddHandler = false;
                 }
 
                 if (shouldAddHandler && !eventTypesToMethods.TryAdd(eventType, createUntypedHandlerMethod(method)))
                 {
-                    warningMessages.Add($"Event type {eventType} is already handled in event handler {eventHandlerId}");
+                    allMethodsAdded = false;
+                    logger.LogWarning(
+                        "Event type {EventType} is already handled in event handler {EventHandlerId}",
+                        eventType,
+                        eventHandlerId);
                 }
+
+                if (!shouldAddHandler) allMethodsAdded = false;
             }
 
-            if (warningMessages.Count == 0) return true;
-
-            warnings = new EventHandlerBuildWarnings(eventHandlerId, warningMessages);
-            return false;
+            return allMethodsAdded;
         }
 
         bool TryAddConventionHandlerMethods(
@@ -205,72 +205,95 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventTypes eventTypes,
             CreateTypedHandleMethod createTypedHandlerMethod,
             IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
-            out EventHandlerBuildWarnings warnings)
+            ILogger logger)
         {
-            warnings = default;
-            var warningMessages = new List<string>();
+            var allMethodsAdded = true;
             foreach (var method in methods.Where(_ => !IsDecoratedHandlerMethod(_) && _.Name == MethodName).ToArray())
             {
                 var shouldAddHandler = true;
                 if (!TryGetFirstMethodParameterType(method, out var eventParameterType))
                 {
-                    warningMessages.Add($"Event handler method {method} on event handler {EventHandlerType} has no parameters. An event handler method should take in as paramters an event and an {typeof(EventContext).Name}");
+                    logger.LogWarning(
+                        "Event handler method {Method} on event handler {EventHandlerType} has no parameters. An event handler method should take in as paramters an event and an {EventContext}",
+                        method,
+                        EventHandlerType,
+                        typeof(EventContext).Name);
                     shouldAddHandler = false;
                 }
 
                 if (eventParameterType == typeof(object))
                 {
-                    warningMessages.Add($"Event handler method {method} on event handler {EventHandlerType} cannot handle an untyped event when not decorated with [{typeof(HandlesAttribute).Name}]");
+                    logger.LogWarning(
+                        "Event handler method {Method} on event handler {EventHandlerType} cannot handle an untyped event when not decorated with [{HandlesAttribute}]",
+                        method,
+                        EventHandlerType,
+                        typeof(HandlesAttribute).Name);
                     shouldAddHandler = false;
                 }
 
                 if (!eventTypes.HasFor(eventParameterType))
                 {
-                    warningMessages.Add($"Event handler method {method} on event handler {EventHandlerType} handles event of type {eventParameterType}, but it is not associated to any event type");
+                    logger.LogWarning(
+                        "Event handler method {Method} on event handler {EventHandlerType} handles event of type {EventParameterType}, but it is not associated to any event type",
+                        method,
+                        EventHandlerType,
+                        eventParameterType);
                     shouldAddHandler = false;
                 }
 
-                if (!ParametersAreOkay(method, eventHandlerId, out var parameterWarnings))
-                {
-                    warningMessages.AddRange(parameterWarnings.Warnings);
-                    shouldAddHandler = false;
-                }
+                if (!ParametersAreOkay(method, logger)) shouldAddHandler = false;
 
                 var eventType = eventTypes.GetFor(eventParameterType);
                 if (shouldAddHandler && !eventTypesToMethods.TryAdd(eventType, createTypedHandlerMethod(eventParameterType, method)))
                 {
-                    warningMessages.Add($"Event type {eventParameterType} is already handled in event handler {eventHandlerId}");
+                    allMethodsAdded = false;
+                    logger.LogWarning(
+                        "Event type {EventParameterType} is already handled in event handler {EventHandlerId}",
+                        eventParameterType,
+                        eventHandlerId);
                 }
+
+                if (!shouldAddHandler) allMethodsAdded = false;
             }
 
-            if (warningMessages.Count == 0) return true;
-
-            warnings = new EventHandlerBuildWarnings(eventHandlerId, warningMessages);
-            return false;
+            return allMethodsAdded;
         }
 
-        bool ParametersAreOkay(MethodInfo method, EventHandlerId eventHandlerId, out EventHandlerBuildWarnings buildWarnings)
+        bool ParametersAreOkay(MethodInfo method, ILogger logger)
         {
-            buildWarnings = default;
-            var warnings = new List<string>();
+            var okay = true;
             if (!SecondMethodParameterIsEventContext(method))
             {
-                warnings.Add($"Event handler method {method} on event handler {EventHandlerType} needs to have two parameters where the second parameter is {typeof(EventContext)}");
+                okay = false;
+                logger.LogWarning(
+                    "Event handler method {Method} on event handler {EventHandlerType} needs to have two parameters where the second parameter is {EventContext}",
+                    method,
+                    EventHandlerType,
+                    typeof(EventContext));
             }
 
             if (!MethodHasNoExtraParameters(method))
             {
-                warnings.Add($"Event handler method {method} on event handler {EventHandlerType} needs to only have two parameters where the first is the event to handle and the second is {typeof(EventContext)}");
+                okay = false;
+                logger.LogWarning(
+                    "Event handler method {Method} on event handler {EventHandlerType} needs to only have two parameters where the first is the event to handle and the second is {EventContext}",
+                    method,
+                    EventHandlerType,
+                    typeof(EventContext));
             }
 
             if (MethodReturnsAsyncVoid(method) || (!MethodReturnsVoid(method) && !MethodReturnsTask(method)))
             {
-                warnings.Add($"Event handler method {method} on event handler {EventHandlerType} needs to return either {typeof(void)} or {typeof(Task)}");
+                okay = false;
+                logger.LogWarning(
+                    "Event handler method {Method} on event handler {EventHandlerType} needs to return either {Void} or {Task}",
+                    method,
+                    EventHandlerType,
+                    typeof(void),
+                    typeof(Task));
             }
 
-            if (warnings.Count == 0) return true;
-            buildWarnings = new EventHandlerBuildWarnings(eventHandlerId, warnings);
-            return false;
+            return okay;
         }
 
         bool TryGetEventHandlerInformation(out EventHandlerId eventHandlerId, out bool partitioned, out ScopeId scopeId)

@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Internal;
@@ -61,7 +62,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         }
 
         /// <inheritdoc/>
-        public BuildEventHandlerResult BuildAndRegister(
+        public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
@@ -71,13 +72,24 @@ namespace Dolittle.SDK.Events.Handling.Builder
         {
             if (_methodsBuilder == default)
             {
-                return new BuildEventHandlerResult(
-                    _eventHandlerId,
-                    $"No event handler methods are configured for event handler {_eventHandlerId}");
+                loggerFactory
+                    .CreateLogger<EventHandlerBuilder>()
+                    .LogWarning(
+                        "Failed to build event handler {EventHandlerId. No event handler methods are configured for event handler",
+                        _eventHandlerId);
+                return;
             }
 
-            var buildResult = _methodsBuilder.TryBuild(eventTypes, out var eventTypesToMethods);
-            if (!buildResult.Succeeded) return buildResult;
+            var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
+            if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
+            {
+                loggerFactory
+                    .CreateLogger<EventHandlerBuilder>()
+                    .LogWarning(
+                        "Failed to build event handler {EventHandlerId. One or more event handler methods could not be built",
+                        _eventHandlerId);
+                return;
+            }
 
             var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
             var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingConverter, loggerFactory.CreateLogger<EventHandlerProcessor>());
@@ -85,8 +97,6 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 eventHandlerProcessor,
                 new EventHandlerProtocol(),
                 cancellation);
-
-            return new BuildEventHandlerResult();
         }
     }
 }
