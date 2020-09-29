@@ -44,33 +44,40 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// <param name="instance">The instance of the event handler to invoke the method on.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
-    public delegate Task TaskEventHandlerMethodSignature(object instance, object @event, EventContext eventContext);
+    public delegate Task TaskEventHandlerMethodSignature<TEventHandler>(TEventHandler instance, object @event, EventContext eventContext)
+        where TEventHandler : class;
 
     /// <summary>
     /// Represents the signature for an event handler method.
     /// </summary>
+    /// <typeparam name="TEventHandler">The <see cref="Type" /> of the event handler.</typeparam>
     /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
     /// <param name="instance">The instance of the event handler to invoke the method on.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
-    public delegate Task TaskEventHandlerMethodSignature<TEvent>(object instance, TEvent @event, EventContext eventContext)
+    public delegate Task TaskEventHandlerMethodSignature<TEventHandler, TEvent>(TEventHandler instance, TEvent @event, EventContext eventContext)
+        where TEventHandler : class
         where TEvent : class;
 
     /// <summary>
     /// Represents the signature for an event handler method.
     /// </summary>
+    /// <typeparam name="TEventHandler">The <see cref="Type" /> of the event handler.</typeparam>
     /// <param name="instance">The instance of the event handler to invoke the method on.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
-    public delegate void VoidEventHandlerMethodSignature(object instance, object @event, EventContext eventContext);
+    public delegate void VoidEventHandlerMethodSignature<TEventHandler>(TEventHandler instance, object @event, EventContext eventContext)
+        where TEventHandler : class;
 
     /// <summary>
     /// Represents the signature for an event handler method.
     /// </summary>
+    /// <typeparam name="TEventHandler">The <see cref="Type" /> of the event handler.</typeparam>
     /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
     /// <param name="instance">The instance of the event handler to invoke the method on.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="eventContext">The <see cref="EventContext" />.</param>
-    public delegate void VoidEventHandlerMethodSignature<TEvent>(object instance, TEvent @event, EventContext eventContext)
+    public delegate void VoidEventHandlerMethodSignature<TEventHandler, TEvent>(TEventHandler instance, TEvent @event, EventContext eventContext)
+        where TEventHandler : class
         where TEvent : class;
 }

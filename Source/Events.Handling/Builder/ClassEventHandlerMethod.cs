@@ -11,36 +11,33 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// <summary>
     /// An implementation of <see cref="IEventHandlerMethod" /> that invokes a method on an event handler instance for an event of a specific type.
     /// </summary>
-    public class ClassEventHandlerMethod : IEventHandlerMethod
+    /// <typeparam name="TEventHandler">The <see cref="Type" /> of the event handler.</typeparam>
+    public class ClassEventHandlerMethod<TEventHandler> : IEventHandlerMethod
+        where TEventHandler : class
     {
-        readonly Type _eventHandlerType;
         readonly IContainer _container;
-        readonly TaskEventHandlerMethodSignature _method;
+        readonly TaskEventHandlerMethodSignature<TEventHandler> _method;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassEventHandlerMethod"/> class.
+        /// Initializes a new instance of the <see cref="ClassEventHandlerMethod{TEventHandler}"/> class.
         /// </summary>
-        /// <param name="eventHandlerType">The <see cref="Type" /> of the event handler.</param>
         /// <param name="container">The <see cref="IContainer"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="TaskEventHandlerMethodSignature{TEvent}"/> method to invoke.</param>
-        public ClassEventHandlerMethod(Type eventHandlerType, IContainer container, TaskEventHandlerMethodSignature method)
+        public ClassEventHandlerMethod(IContainer container, TaskEventHandlerMethodSignature<TEventHandler> method)
         {
-            _eventHandlerType = eventHandlerType;
             _container = container;
             _method = method;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassEventHandlerMethod"/> class.
+        /// Initializes a new instance of the <see cref="ClassEventHandlerMethod{TEventHandler}"/> class.
         /// </summary>
-        /// <param name="eventHandlerType">The <see cref="Type" /> of the event handler.</param>
         /// <param name="container">The <see cref="IContainer"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="VoidEventHandlerMethodSignature{TEvent}" /> method to invoke.</param>
-        public ClassEventHandlerMethod(Type eventHandlerType, IContainer container, VoidEventHandlerMethodSignature method)
+        public ClassEventHandlerMethod(IContainer container, VoidEventHandlerMethodSignature<TEventHandler> method)
             : this(
-                eventHandlerType,
                 container,
-                (object instance, object @event, EventContext context) =>
+                (TEventHandler instance, object @event, EventContext context) =>
                 {
                     method(instance, @event, context);
                     return Task.CompletedTask;
@@ -50,6 +47,6 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
         /// <inheritdoc/>
         public Task<Try> TryHandle(object @event, EventContext context)
-        => _method(_container.Get(_eventHandlerType), @event, context).TryTask();
+        => _method(_container.GetFor<TEventHandler>(), @event, context).TryTask();
     }
 }

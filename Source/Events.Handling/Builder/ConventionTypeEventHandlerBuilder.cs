@@ -46,29 +46,26 @@ namespace Dolittle.SDK.Events.Handling.Builder
         IEventHandlerMethod CreateUntypedHandleMethod(IContainer container, MethodInfo method)
         {
             var eventHandlerSignatureType = method.ReturnType == typeof(Task) ?
-                                    typeof(TaskEventHandlerMethodSignature)
-                                    : typeof(VoidEventHandlerMethodSignature);
-            var eventHandlerSignature = method.CreateDelegate(eventHandlerSignatureType, null);
+                                    typeof(TaskEventHandlerMethodSignature<>)
+                                    : typeof(VoidEventHandlerMethodSignature<>);
+            var eventHandlerSignature = method.CreateDelegate(eventHandlerSignatureType.MakeGenericType(EventHandlerType), null);
 
-            return eventHandlerSignature switch
-            {
-                TaskEventHandlerMethodSignature signature => new ClassEventHandlerMethod(EventHandlerType, container, signature),
-                VoidEventHandlerMethodSignature signature => new ClassEventHandlerMethod(EventHandlerType, container, signature),
-                _ => null
-            };
+            return Activator.CreateInstance(
+                typeof(ClassEventHandlerMethod<>).MakeGenericType(EventHandlerType),
+                container,
+                eventHandlerSignature) as IEventHandlerMethod;
         }
 
         IEventHandlerMethod CreateTypedHandleMethod(IContainer container, Type eventParameterType, MethodInfo method)
         {
             var eventHandlerSignatureGenericTypeDefinition = method.ReturnType == typeof(Task) ?
-                                                typeof(TaskEventHandlerMethodSignature<>)
-                                                : typeof(VoidEventHandlerMethodSignature<>);
-            var eventHandlerSignatureType = eventHandlerSignatureGenericTypeDefinition.MakeGenericType(eventParameterType);
+                                                typeof(TaskEventHandlerMethodSignature<,>)
+                                                : typeof(VoidEventHandlerMethodSignature<,>);
+            var eventHandlerSignatureType = eventHandlerSignatureGenericTypeDefinition.MakeGenericType(EventHandlerType, eventParameterType);
             var eventHandlerSignature = method.CreateDelegate(eventHandlerSignatureType, null);
 
             return Activator.CreateInstance(
-                typeof(TypedClassEventHandlerMethod<>).MakeGenericType(eventParameterType),
-                EventHandlerType,
+                typeof(TypedClassEventHandlerMethod<,>).MakeGenericType(EventHandlerType, eventParameterType),
                 container,
                 eventHandlerSignature) as IEventHandlerMethod;
         }
