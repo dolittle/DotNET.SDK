@@ -22,8 +22,7 @@ namespace Dolittle.SDK.Artifacts
         /// Build an instance of <see cref="IArtifacts{TArtifact}" /> for <typeparamref name="TArtifact"/> artifact.
         /// </summary>
         /// <param name="artifacts">The <typeparamref name="TArtifacts"/> to build upon.</param>
-        /// <returns>An instance of <see cref="IArtifacts{TArtifact}" />.</returns>
-        TArtifacts Build(TArtifacts artifacts);
+        void AddAssociationsInto(TArtifacts artifacts);
 
         /// <summary>
         /// Associate the <see cref="Type" /> with an <see cref="Artifact{TId}" />.

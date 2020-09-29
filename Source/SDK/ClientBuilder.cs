@@ -191,8 +191,8 @@ namespace Dolittle.SDK
                 CorrelationId.System,
                 Claims.Empty,
                 CultureInfo.InvariantCulture);
-
-            var eventTypes = _eventTypesBuilder.Build(new EventTypes(_loggerFactory.CreateLogger<EventTypes>()));
+            var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
+            _eventTypesBuilder.AddAssociationsInto(eventTypes);
 
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(

@@ -30,10 +30,9 @@ namespace Dolittle.SDK.Artifacts
         protected IList<(Type, TArtifact)> Associations { get; }
 
         /// <inheritdoc/>
-        public TArtifacts Build(TArtifacts artifacts)
+        public void AddAssociationsInto(TArtifacts artifacts)
         {
             foreach (var (type, artifact) in Associations) artifacts.Associate(type, artifact);
-            return artifacts;
         }
 
         /// <inheritdoc/>
