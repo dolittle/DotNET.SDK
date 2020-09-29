@@ -38,8 +38,16 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
         public EventHandlersBuilder RegisterEventHandler<TEventHandler>()
             where TEventHandler : class
+            => RegisterEventHandler(typeof(TEventHandler));
+
+        /// <summary>
+        /// Registers a <see cref="Type" /> as an event handler class.
+        /// </summary>
+        /// <param name="type">The <see cref="Type" /> of the event handler.</param>
+        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
+        public EventHandlersBuilder RegisterEventHandler(Type type)
         {
-            _builders.Add(new ConventionEventHandlerBuilder(typeof(TEventHandler)));
+            _builders.Add(new ConventionTypeEventHandlerBuilder(type));
             return this;
         }
 
@@ -52,18 +60,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
             where TEventHandler : class
         {
-            _builders.Add(new ConventionEventHandlerBuilder(eventHandlerInstance));
-            return this;
-        }
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as an event handler class.
-        /// </summary>
-        /// <param name="eventHandlerInstance">The event handler instance.</param>
-        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlersBuilder RegisterEventHandler(object eventHandlerInstance)
-        {
-            _builders.Add(new ConventionEventHandlerBuilder(eventHandlerInstance));
+            _builders.Add(new ConventionInstanceEventHandlerBuilder(eventHandlerInstance));
             return this;
         }
 

@@ -27,9 +27,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Add a handler method for handling the event.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type" /> of the event.</typeparam>
-        /// <param name="method">The <see cref="TypedEventHandlerSignature{T}" />.</param>
+        /// <param name="method">The <see cref="TaskEventHandlerSignature{T}" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
-        public EventHandlerMethodsBuilder Handle<T>(TypedEventHandlerSignature<T> method)
+        public EventHandlerMethodsBuilder Handle<T>(TaskEventHandlerSignature<T> method)
             where T : class
         {
             if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
@@ -44,9 +44,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Add a handler method for handling the event.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type" /> of the event.</typeparam>
-        /// <param name="method">The <see cref="VoidTypedEventHandlerSignature{T}" />.</param>
+        /// <param name="method">The <see cref="VoidEventHandlerSignature{T}" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
-        public EventHandlerMethodsBuilder Handle<T>(VoidTypedEventHandlerSignature<T> method)
+        public EventHandlerMethodsBuilder Handle<T>(VoidEventHandlerSignature<T> method)
             where T : class
         {
             if (!_handleMethodByType.TryAdd(typeof(T), new TypedEventHandlerMethod<T>(method)))
@@ -61,9 +61,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Add a handler method for handling the event.
         /// </summary>
         /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
-        /// <param name="method">The <see cref="EventHandlerSignature" />.</param>
+        /// <param name="method">The <see cref="TaskEventHandlerSignature" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
-        public EventHandlerMethodsBuilder Handle(EventType eventType, EventHandlerSignature method)
+        public EventHandlerMethodsBuilder Handle(EventType eventType, TaskEventHandlerSignature method)
         {
             if (!_handleMethodByArtifact.TryAdd(eventType, new EventHandlerMethod(method)))
             {
@@ -93,9 +93,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Add a handler method for handling the event.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
-        /// <param name="method">The <see cref="EventHandlerSignature" />.</param>
+        /// <param name="method">The <see cref="TaskEventHandlerSignature" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
-        public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, EventHandlerSignature method)
+        public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, TaskEventHandlerSignature method)
             => Handle(new EventType(eventTypeId), method);
 
         /// <summary>
@@ -112,9 +112,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
-        /// <param name="method">The <see cref="EventHandlerSignature" />.</param>
+        /// <param name="method">The <see cref="TaskEventHandlerSignature" />.</param>
         /// <returns>The <see cref="EventHandlerMethodsBuilder" /> for continuation.</returns>
-        public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, Generation eventTypeGeneration, EventHandlerSignature method)
+        public EventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, Generation eventTypeGeneration, TaskEventHandlerSignature method)
             => Handle(new EventType(eventTypeId, eventTypeGeneration), method);
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace Dolittle.SDK
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
-            _container = new Container();
+            _container = new DefaultContainer();
             _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 

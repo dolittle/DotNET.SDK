@@ -14,20 +14,20 @@ namespace Dolittle.SDK.Events.Handling.Builder
     public class TypedEventHandlerMethod<T> : IEventHandlerMethod
         where T : class
     {
-        readonly Func<T, EventContext, Task> _method;
+        readonly TaskEventHandlerSignature<T> _method;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypedEventHandlerMethod{T}"/> class.
         /// </summary>
-        /// <param name="method">The <see cref="TypedEventHandlerSignature{T}" />.</param>
-        public TypedEventHandlerMethod(TypedEventHandlerSignature<T> method)
-            => _method = (T @event, EventContext context) => method(@event, context);
+        /// <param name="method">The <see cref="TaskEventHandlerSignature{T}" />.</param>
+        public TypedEventHandlerMethod(TaskEventHandlerSignature<T> method)
+            => _method = method;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypedEventHandlerMethod{T}"/> class.
         /// </summary>
-        /// <param name="method">The <see cref="VoidTypedEventHandlerSignature{T}" />.</param>
-        public TypedEventHandlerMethod(VoidTypedEventHandlerSignature<T> method)
+        /// <param name="method">The <see cref="VoidEventHandlerSignature{T}" />.</param>
+        public TypedEventHandlerMethod(VoidEventHandlerSignature<T> method)
             => _method = (T @event, EventContext context) =>
             {
                 method(@event, context);
