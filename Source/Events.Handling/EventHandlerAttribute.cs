@@ -16,12 +16,12 @@ namespace Dolittle.SDK.Events.Handling
         /// </summary>
         /// <param name="eventHandlerId">The unique identifier of the event handler.</param>
         /// <param name="partitioned">Whether the event handler is partitioned.</param>
-        /// <param name="scopeId">The scope that the event handler handles events in.</param>
-        public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string scopeId = default)
+        /// <param name="inScope">The scope that the event handler handles events in.</param>
+        public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string inScope = default)
         {
             Identifier = Guid.Parse(eventHandlerId);
             Partitioned = partitioned;
-            ScopeId = scopeId == default ? ScopeId.Default : new ScopeId(Guid.Parse(scopeId));
+            ScopeId = inScope == default ? ScopeId.Default : new ScopeId(Guid.Parse(inScope));
         }
 
         /// <summary>
