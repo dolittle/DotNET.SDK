@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.DependencyInversion;
@@ -227,17 +228,17 @@ namespace Dolittle.SDK.Events.Handling.Builder
             var warnings = new List<string>();
             if (!SecondMethodParameterIsEventContext(method))
             {
-                warnings.Append($"Event handler method {method} on event handler {_eventHandlerType} needs to have two parameters where the second parameter is {typeof(EventContext)}");
+                warnings.Add($"Event handler method {method} on event handler {_eventHandlerType} needs to have two parameters where the second parameter is {typeof(EventContext)}");
             }
 
             if (!MethodHasNoExtraParameters(method))
             {
-                warnings.Append($"Event handler method {method} on event handler {_eventHandlerType} needs to only have two parameters where the first is the event to handle and the second is {typeof(EventContext)}");
+                warnings.Add($"Event handler method {method} on event handler {_eventHandlerType} needs to only have two parameters where the first is the event to handle and the second is {typeof(EventContext)}");
             }
 
-            if (!MethodReturnsVoid(method) && !MethodReturnsTask(method))
+            if (MethodReturnsAsyncVoid(method) || (!MethodReturnsVoid(method) && !MethodReturnsTask(method)))
             {
-                warnings.Append($"Event handler method {method} on event handler {_eventHandlerType} needs to return either {typeof(void)} or {typeof(Task)}");
+                warnings.Add($"Event handler method {method} on event handler {_eventHandlerType} needs to return either {typeof(void)} or {typeof(Task)}");
             }
 
             if (warnings.Count == 0) return true;
@@ -307,5 +308,12 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
         bool MethodReturnsVoid(MethodInfo method)
             => method.ReturnType == typeof(void);
+
+        bool MethodReturnsAsyncVoid(MethodInfo method)
+        {
+            var asyncAttribute = typeof(AsyncStateMachineAttribute);
+            var isAsyncMethod = (AsyncStateMachineAttribute)method.GetCustomAttribute(asyncAttribute) != null;
+            return isAsyncMethod && MethodReturnsVoid(method);
+        }
     }
 }
