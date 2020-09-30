@@ -49,7 +49,7 @@ namespace Dolittle.SDK.Events.for_EventStore.given
             commit_events_response = new Contracts.CommitEventsResponse { };
 
             caller.Setup(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), Moq.It.IsAny<Contracts.CommitEventsRequest>(), Moq.It.IsAny<CancellationToken>()))
-                .Callback<ICanCallAnUnaryMethod<EventStoreClient, Contracts.CommitEventsRequest, Contracts.CommitEventsResponse>, Contracts.CommitEventsRequest, CancellationToken>((method, request, token) =>
+                .Callback<ICanCallAUnaryMethod<Contracts.CommitEventsRequest, Contracts.CommitEventsResponse>, Contracts.CommitEventsRequest, CancellationToken>((method, request, token) =>
                 {
                     commit_events_request = request;
                 })

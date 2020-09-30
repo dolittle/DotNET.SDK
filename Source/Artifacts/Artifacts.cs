@@ -74,12 +74,18 @@ namespace Dolittle.SDK.Artifacts
 
         void ThrowIfMultipleTypesAssociatedWithArtifact(TArtifact artifact, Type type)
         {
-            if (_artifactToTypeMap.ContainsKey(artifact)) throw new CannotHaveMultipleTypesAssociatedWithArtifact(artifact, type, _artifactToTypeMap[artifact]);
+            if (_artifactToTypeMap.ContainsKey(artifact))
+            {
+                throw new CannotHaveMultipleTypesAssociatedWithArtifact(artifact, type, _artifactToTypeMap[artifact]);
+            }
         }
 
         void ThrowIfMultipleArtifactsAssociatedWithType(Type type, TArtifact artifact)
         {
-            if (_typeToArtifactMap.ContainsKey(type)) throw new CannotHaveMultipleArtifactsAssociatedWithType(type, artifact, _typeToArtifactMap[type]);
+            if (_typeToArtifactMap.ContainsKey(type))
+            {
+                throw new CannotHaveMultipleArtifactsAssociatedWithType(type, artifact, _typeToArtifactMap[type]);
+            }
         }
     }
 }

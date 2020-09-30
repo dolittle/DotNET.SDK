@@ -19,7 +19,7 @@ namespace Basic
             var client = Client.ForMicroservice("7a6155dd-9109-4488-8f6f-c57fe4b65bfb")
                 .WithEventTypes(eventTypes =>
                     eventTypes
-                        .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3"))
+                        .Associate<MyEvent>())
                 .WithFilters(filtersBuilder =>
                     filtersBuilder
                         .CreatePublicFilter("2c087657-b318-40b1-ae92-a400de44e507", filterBuilder =>
@@ -29,10 +29,8 @@ namespace Basic
                                 return Task.FromResult(new PartitionedFilterResult(true, PartitionId.Unspecified));
                             })))
                 .WithEventHandlers(eventHandlersBuilder =>
-                    eventHandlersBuilder.CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
-                        eventHandlerBuilder
-                            .Partitioned()
-                            .Handle(async (MyEvent @event, EventContext context) => Console.WriteLine($"Handling event {@event} in first method"))))
+                    eventHandlersBuilder
+                        .RegisterEventHandler<MyEventHandler>())
                 .Build();
 
             var myEvent = new MyEvent("test string", 12345);
