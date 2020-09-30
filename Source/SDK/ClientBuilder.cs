@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.Reactive.Linq;
 using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
@@ -12,11 +13,14 @@ using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
+using Environment = Dolittle.SDK.Microservices.Environment;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
+using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK
 {
@@ -32,9 +36,10 @@ namespace Dolittle.SDK
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
         ushort _port = 50053;
-        Microservices.Version _version;
-        Microservices.Environment _environment;
+        Version _version;
+        Environment _environment;
         CancellationToken _cancellation;
+        RetryPolicy _retryPolicy;
         IContainer _container;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
@@ -47,14 +52,14 @@ namespace Dolittle.SDK
         /// Initializes a new instance of the <see cref="ClientBuilder"/> class.
         /// </summary>
         /// <param name="microserviceId">The <see cref="MicroserviceId"/> of the microservice.</param>
-        /// <param name="version">The <see cref="Microservices.Version"/> of the microservice.</param>
-        /// <param name="environment">The <see cref="Microservices.Environment"/> of the microservice.</param>
-        public ClientBuilder(MicroserviceId microserviceId, Microservices.Version version, Microservices.Environment environment)
+        public ClientBuilder(MicroserviceId microserviceId)
         {
             _microserviceId = microserviceId;
-            _version = version;
-            _environment = environment;
-            _cancellation = default;
+
+            _version = Version.NotSet;
+            _environment = Environment.Undetermined;
+            _cancellation = CancellationToken.None;
+            _retryPolicy = (IObservable<Exception> exceptions) => exceptions.Delay(TimeSpan.FromSeconds(1));
 
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
@@ -206,7 +211,7 @@ namespace Dolittle.SDK
             var eventProcessingConverter = new EventProcessingConverter(eventConverter);
             var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
 
-            var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _loggerFactory.CreateLogger<EventProcessors>());
+            var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _retryPolicy, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
             _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
