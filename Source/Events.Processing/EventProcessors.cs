@@ -35,8 +35,8 @@ namespace Dolittle.SDK.Events.Processing
         /// <inheritdoc/>
         public void Register<TIdentifier, TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse>(IEventProcessor<TIdentifier, TRegisterArguments, TRequest, TResponse> eventProcessor, IAmAReverseCallProtocol<TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse> protocol, CancellationToken cancellationToken)
             where TIdentifier : ConceptAs<Guid>
-            where TClientMessage : IMessage
-            where TServerMessage : IMessage
+            where TClientMessage : class, IMessage
+            where TServerMessage : class, IMessage
             where TRegisterArguments : class
             where TRegisterResponse : class
             where TRequest : class

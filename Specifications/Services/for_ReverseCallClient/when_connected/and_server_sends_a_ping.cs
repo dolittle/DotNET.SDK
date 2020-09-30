@@ -1,12 +1,11 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
+using System;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Dolittle.Services.Contracts;
 using Machine.Specifications;
+using Microsoft.Reactive.Testing;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_connected
 {
@@ -15,28 +14,43 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.when_connected
         static ConnectArguments arguments;
         static ConnectResponse response;
 
-        static IEnumerable<ConnectResponse> receivedResponses;
+        static ITestableObservable<ServerMessage> serverToClientMessages;
+        static ITestableObserver<ConnectResponse> observer;
 
         Establish context = () =>
         {
             arguments = new ConnectArguments();
             response = new ConnectResponse(arguments);
 
-            var serverToClientMessages = new[]
-            {
-                new ServerMessage { Response = response },
-                new ServerMessage { Ping = new Ping() },
-            };
+            serverToClientMessages = scheduler.CreateHotObservable(
+                OnNext(100, new ServerMessage { Response = response }),
+                OnNext(110, new ServerMessage { Ping = new Ping() }),
+                OnCompleted<ServerMessage>(120));
 
             client = reverse_call_client_with(arguments, serverToClientMessages);
         };
 
-        Because of = () => receivedResponses = client.ToArray().Wait();
+        Because of = () => observer = scheduler.Start(
+            () => reverse_call_client_with(arguments, TimeSpan.FromTicks(10), serverToClientMessages),
+            created: 0,
+            subscribed: 0,
+            disposed: 1000);
 
-        It should_return_one_response = () => receivedResponses.Count().ShouldEqual(1);
-        It should_return_the_correct_response = () => receivedResponses.First().ShouldEqual(response);
-        It should_send_two_messages = () => messagesSentToServer.Count().ShouldEqual(2);
-        It should_send_the_arguments_as_the_first_message = () => messagesSentToServer.First().ShouldMatch(_ => _.Arguments == arguments);
-        It should_send_a_pong_as_the_second_message = () => messagesSentToServer.Skip(1).First().ShouldMatch(_ => _.Pong != null);
+        It should_send_the_arguments_and_a_pong_to_the_server = () => ReactiveAssert.AreElementsEqual(
+            new[]
+            {
+                OnNext<ClientMessage>(2, _ => _.Arguments == arguments),
+                OnNext<ClientMessage>(110, _ => _.Pong != null),
+                OnCompleted<ClientMessage>(120),
+            },
+            messagesSentToServer.Messages);
+
+        It should_receive_the_response = () => ReactiveAssert.AreElementsEqual(
+            new[]
+            {
+                OnNext(100, response),
+                OnCompleted<ConnectResponse>(120),
+            },
+            observer.Messages);
     }
 }

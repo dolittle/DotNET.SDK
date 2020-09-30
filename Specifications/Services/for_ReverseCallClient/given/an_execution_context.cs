@@ -10,7 +10,7 @@ using Machine.Specifications;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.given
 {
-    public class an_execution_context
+    public class an_execution_context : a_test_scheduler
     {
         protected static ExecutionContext executionContext;
 

@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <Import Project="../../specs.props"/>
 
     <PropertyGroup>
@@ -6,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../../Source/Services/Services.csproj" />
+        <PackageReference Include="Microsoft.Reactive.Testing" Version="$(RxVersion)" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="../../Source/Services/Services.csproj" />
+    </ItemGroup>
 
 </Project>

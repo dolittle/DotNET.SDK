@@ -3,6 +3,8 @@
 
 using System;
 using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -29,8 +31,8 @@ namespace Dolittle.SDK.Services
     /// <typeparam name="TResponse">Type of the responses received from the client.</typeparam>
     public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>
         : IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse>
-        where TClientMessage : IMessage
-        where TServerMessage : IMessage
+        where TClientMessage : class, IMessage
+        where TServerMessage : class, IMessage
         where TConnectArguments : class
         where TConnectResponse : class
         where TRequest : class
@@ -40,8 +42,8 @@ namespace Dolittle.SDK.Services
         readonly TimeSpan _pingInterval;
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
+        readonly IScheduler _scheduler;
         readonly ILogger _logger;
-        readonly IObservable<TConnectResponse> _observable;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReverseCallClient{TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/> class.
@@ -52,6 +54,7 @@ namespace Dolittle.SDK.Services
         /// <param name="pingInterval">The interval at which to request pings from the server to keep the reverse call alive.</param>
         /// <param name="caller">The caller that will be used to perform the method call.</param>
         /// <param name="executionContext">The execution context to use while initiating the reverse call.</param>
+        /// <param name="scheduler">The scheduler to use for executing reactive subscriptions.</param>
         /// <param name="logger">The logger that will be used to log messages while performing the reverse call.</param>
         public ReverseCallClient(
             TConnectArguments arguments,
@@ -60,6 +63,7 @@ namespace Dolittle.SDK.Services
             TimeSpan pingInterval,
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
+            IScheduler scheduler,
             ILogger logger)
         {
             Arguments = arguments;
@@ -68,8 +72,8 @@ namespace Dolittle.SDK.Services
             _pingInterval = pingInterval;
             _caller = caller;
             _executionContext = executionContext;
+            _scheduler = scheduler;
             _logger = logger;
-            _observable = CreateObservable();
         }
 
         /// <inheritdoc/>
@@ -80,90 +84,102 @@ namespace Dolittle.SDK.Services
 
         /// <inheritdoc/>
         public IDisposable Subscribe(IObserver<TConnectResponse> observer)
-            => _observable.Subscribe(observer);
+        {
+            #pragma warning disable CA2000
+            var toClientMessages = new Subject<TServerMessage>();
+            #pragma warning restore CA2000
 
-        IObservable<TConnectResponse> CreateObservable()
-            => Observable.Create<TConnectResponse>((observer) =>
-                {
-                    var toClientMessages = new Subject<TServerMessage>();
+            var connectResponse = GetConnectResponseFromFirstMessageOrError(toClientMessages);
+            var timeout = TimeoutAfterPingIntervalAfterFirstMessageIsReceived(toClientMessages);
 
-                    var validMessages = toClientMessages.Skip(1).Where(MessageIsPingOrRequest).Timeout(_pingInterval * 3);
-                    var pings = validMessages.Where(MessageIsPing);
-                    var requests = validMessages.Where(MessageIsRequest);
+            var pongs = RespondToPingWithPong(toClientMessages);
+            var responses = RespondToRequestWithResponse(toClientMessages);
 
-                    var pongs = pings
-                        .Select(_protocol.GetPingFrom)
-                        .Select(_ => new Pong())
-                        .Select(_protocol.CreateMessageFrom);
+            var toServerMessages = MergeArgumentsWithPongsResponsesAndTimeout(pongs, responses, timeout);
 
-                    var responses = requests
-                        .Select(_protocol.GetRequestFrom)
-                        .Where(RequestIsValid)
-                        .Select(request => Observable.FromAsync((token) => HandleRequest(request, token)))
-                        .Merge()
-                        .Select(_protocol.CreateMessageFrom);
+            var connectResponseAndErrors = MergeConnectResponseWithErrorsFromServer(connectResponse, toClientMessages);
+            connectResponseAndErrors.Subscribe(observer);
 
-                    var connectArguments = Arguments;
-                    var connectContext = CreateReverseCallArgumentsContext();
-                    _protocol.SetConnectArgumentsContextIn(connectContext, connectArguments);
-                    var connectMessage = _protocol.CreateMessageFrom(connectArguments);
+            var subscription = _caller.Call(_protocol, toServerMessages).Subscribe(toClientMessages);
 
-                    var toServerMessages = pongs.Merge(responses).StartWith(connectMessage);
+            return Disposable.Create(() =>
+            {
+                subscription.Dispose();
+                toClientMessages.Dispose();
+            });
+        }
 
-                    var connectResponse = toClientMessages
-                        .Take(1)
-                        .Select(_ =>
-                            {
-                                var response = _protocol.GetConnectResponseFrom(_);
-                                if (response == null)
-                                {
-                                    return Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse());
-                                }
+        IObservable<TConnectResponse> GetConnectResponseFromFirstMessageOrError(IObservable<TServerMessage> toClientMessages)
+            => toClientMessages
+                .Take(1)
+                .Select(_ =>
+                    {
+                        var response = _protocol.GetConnectResponseFrom(_);
+                        if (response == null)
+                        {
+                            return Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse());
+                        }
 
-                                var failure = _protocol.GetFailureFromConnectResponse(response);
-                                if (failure != null)
-                                {
-                                    return Notification.CreateOnError<TConnectResponse>(new ReverseCallConnectionFailed(failure));
-                                }
+                        var failure = _protocol.GetFailureFromConnectResponse(response);
+                        if (failure != null)
+                        {
+                            return Notification.CreateOnError<TConnectResponse>(new ReverseCallConnectionFailed(failure));
+                        }
 
-                                return Notification.CreateOnNext(response);
-                            })
-                        .DefaultIfEmpty(Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse()))
-                        .Dematerialize();
+                        return Notification.CreateOnNext(response);
+                    })
+                .DefaultIfEmpty(Notification.CreateOnError<TConnectResponse>(new DidNotReceiveConnectResponse()))
+                .Dematerialize();
 
-                    var errorsAndCompletion = toClientMessages
+        IObservable<TConnectResponse> MergeConnectResponseWithErrorsFromServer(IObservable<TConnectResponse> connectResponse, IObservable<TServerMessage> toClientMessages)
+            => connectResponse.Concat(
+                toClientMessages
+                    .Where(_ => false)
+                    .Cast<TConnectResponse>());
+
+        IObservable<TClientMessage> RespondToPingWithPong(IObservable<TServerMessage> toClientMessages)
+            => toClientMessages
+                .Where(MessageIsPing)
+                .Select(_protocol.GetPingFrom)
+                .Select(_ => new Pong())
+                .Select(_protocol.CreateMessageFrom);
+
+        IObservable<TClientMessage> RespondToRequestWithResponse(IObservable<TServerMessage> toClientMessages)
+            => toClientMessages
+                .Where(MessageIsRequest)
+                .Select(_protocol.GetRequestFrom)
+                .Where(RequestIsValid)
+                .Select(request => Observable.FromAsync((token) => HandleRequest(request, token), _scheduler))
+                .Merge()
+                .Select(_protocol.CreateMessageFrom);
+
+        IObservable<TClientMessage> TimeoutAfterPingIntervalAfterFirstMessageIsReceived(IObservable<TServerMessage> toClientMessages)
+            => toClientMessages
+                .Take(1)
+                .Concat(
+                    toClientMessages
+                        .Timeout(_pingInterval * 3, _scheduler))
                         .Where(_ => false)
-                        .Select(_protocol.GetConnectResponseFrom)
-                        .Catch((TimeoutException _) => Observable.Throw<TConnectResponse>(new PingTimedOut(_pingInterval)));
+                        .Cast<TClientMessage>()
+                        .Catch((TimeoutException _) => Observable.Throw<TClientMessage>(new PingTimedOut(_pingInterval), _scheduler));
 
-                    connectResponse.Merge(errorsAndCompletion).Subscribe(observer);
-                    return _caller.Call(_protocol, toServerMessages).Subscribe(toClientMessages);
-                });
+        IObservable<TClientMessage> MergeArgumentsWithPongsResponsesAndTimeout(IObservable<TClientMessage> pongs, IObservable<TClientMessage> responses, IObservable<TClientMessage> timeout)
+        {
+            var pongsResponsesAndTimeout = pongs.Merge(responses, _scheduler).Merge(timeout, _scheduler);
 
-        ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
-            => new ReverseCallArgumentsContext
-                {
-                    HeadId = Guid.NewGuid().ToProtobuf(),
-                    ExecutionContext = _executionContext.ToProtobuf(),
-                    PingInterval = Duration.FromTimeSpan(_pingInterval),
-                };
+            var connectArguments = Arguments;
+            var connectContext = CreateReverseCallArgumentsContext();
+            _protocol.SetConnectArgumentsContextIn(connectContext, connectArguments);
+            var connectMessage = _protocol.CreateMessageFrom(connectArguments);
+
+            return pongsResponsesAndTimeout.StartWith(_scheduler, connectMessage);
+        }
 
         bool MessageIsPing(TServerMessage message)
             => _protocol.GetPingFrom(message) != null;
 
         bool MessageIsRequest(TServerMessage message)
             => _protocol.GetRequestFrom(message) != null;
-
-        bool MessageIsPingOrRequest(TServerMessage message)
-        {
-            if (MessageIsPing(message) || MessageIsRequest(message))
-            {
-                return true;
-            }
-
-            _logger.LogWarning("Received message from Reverse Call Dispatcher, but it was not a request or a ping");
-            return false;
-        }
 
         bool RequestIsValid(TRequest request)
         {
@@ -197,5 +213,13 @@ namespace Dolittle.SDK.Services
 
             return response;
         }
+
+        ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
+            => new ReverseCallArgumentsContext
+                {
+                    HeadId = Guid.NewGuid().ToProtobuf(),
+                    ExecutionContext = _executionContext.ToProtobuf(),
+                    PingInterval = Duration.FromTimeSpan(_pingInterval),
+                };
     }
 }

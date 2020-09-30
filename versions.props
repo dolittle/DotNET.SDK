@@ -7,6 +7,6 @@
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.11.2</ProtobufVersion>
         <GrpcVersion>2.26.0</GrpcVersion>
-        <NewtonsoftJson>12.0.3</NewtonsoftJson>
+        <NewtonsoftVersion>12.0.3</NewtonsoftVersion>
     </PropertyGroup>
 </Project>
