@@ -109,7 +109,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
             ILogger logger)
         {
-            var publicMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public);
+            var publicMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly);
             var hasWrongMethods = false;
             if (!TryAddDecoratedHandlerMethods(
                 publicMethods,
@@ -184,6 +184,15 @@ namespace Dolittle.SDK.Events.Handling.Builder
                     shouldAddHandler = false;
                 }
 
+                if (!method.IsPublic)
+                {
+                    logger.LogWarning(
+                        "Method {Method} on event handler {EventHandlerType} has the signature of an event handler method, but is not public. Event handler methods needs to be public",
+                        method,
+                        EventHandlerType);
+                    shouldAddHandler = false;
+                }
+
                 if (shouldAddHandler && !eventTypesToMethods.TryAdd(eventType, createUntypedHandlerMethod(method)))
                 {
                     allMethodsAdded = false;
@@ -242,6 +251,15 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 }
 
                 if (!ParametersAreOkay(method, logger)) shouldAddHandler = false;
+
+                if (!method.IsPublic)
+                {
+                    logger.LogWarning(
+                        "Method {Method} on event handler {EventHandlerType} has the signature of an event handler method, but is not public. Event handler methods needs to be public",
+                        method,
+                        EventHandlerType);
+                    shouldAddHandler = false;
+                }
 
                 var eventType = eventTypes.GetFor(eventParameterType);
                 if (shouldAddHandler && !eventTypesToMethods.TryAdd(eventType, createTypedHandlerMethod(eventParameterType, method)))
