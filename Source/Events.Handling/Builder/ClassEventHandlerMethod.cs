@@ -47,6 +47,10 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
         /// <inheritdoc/>
         public Task<Try> TryHandle(object @event, EventContext context)
-        => _method(_container.GetFor<TEventHandler>(), @event, context).TryTask();
+        {
+            var eventHandlerInstance = _container.GetFor<TEventHandler>();
+            if (eventHandlerInstance == null) throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
+            return _method(_container.GetFor<TEventHandler>(), @event, context).TryTask();
+        }
     }
 }
