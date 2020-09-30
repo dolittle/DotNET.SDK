@@ -31,6 +31,15 @@ namespace Dolittle.SDK.Events
         public EventSourceId(Guid id) => Value = id;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="EventSourceId"/> class.
+        /// </summary>
+        /// <param name="id"><see cref="string"/> value.</param>
+        public EventSourceId(string id)
+            : this(Guid.Parse(id))
+            {
+            }
+
+        /// <summary>
         /// Implicitly convert from a <see cref="Guid"/> to an <see cref="EventSourceId"/>.
         /// </summary>
         /// <param name="eventId">EventSourceId as <see cref="Guid"/>.</param>
