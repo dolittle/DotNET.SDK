@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using System.Threading;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
@@ -34,6 +35,7 @@ namespace Dolittle.SDK
         Microservices.Version _version;
         Microservices.Environment _environment;
         CancellationToken _cancellation;
+        IContainer _container;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -54,9 +56,10 @@ namespace Dolittle.SDK
             _environment = environment;
             _cancellation = default;
 
-            _eventTypesBuilder = new EventTypesBuilder(_loggerFactory);
+            _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
-            _eventHandlersBuilder = new EventHandlersBuilder(_loggerFactory);
+            _eventHandlersBuilder = new EventHandlersBuilder();
+            _container = new DefaultContainer();
             _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 
@@ -78,8 +81,19 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public ClientBuilder WithEnvironment(Microservices.Environment environment)
         {
-             _environment = environment;
-             return this;
+            _environment = environment;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="IContainer" /> to use for inversion of control.
+        /// </summary>
+        /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithContainer(IContainer container)
+        {
+            _container = container;
+            return this;
         }
 
         /// <summary>
@@ -177,8 +191,8 @@ namespace Dolittle.SDK
                 CorrelationId.System,
                 Claims.Empty,
                 CultureInfo.InvariantCulture);
-
-            var eventTypes = _eventTypesBuilder.Build();
+            var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
+            _eventTypesBuilder.AddAssociationsInto(eventTypes);
 
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
@@ -192,7 +206,7 @@ namespace Dolittle.SDK
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
-            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _cancellation);
+            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
             var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
 
