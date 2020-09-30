@@ -109,7 +109,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
             ILogger logger)
         {
-            var publicMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            var publicMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
             var hasWrongMethods = false;
             if (!TryAddDecoratedHandlerMethods(
                 publicMethods,
@@ -260,6 +260,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
                         EventHandlerType);
                     shouldAddHandler = false;
                 }
+
+                if (!shouldAddHandler) continue;
 
                 var eventType = eventTypes.GetFor(eventParameterType);
                 if (shouldAddHandler && !eventTypesToMethods.TryAdd(eventType, createTypedHandlerMethod(eventParameterType, method)))
