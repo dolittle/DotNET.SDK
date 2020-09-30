@@ -158,7 +158,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             ILogger logger)
         {
             var allMethodsAdded = true;
-            foreach (var method in methods.Where(IsDecoratedHandlerMethod).ToArray())
+            foreach (var method in methods.Where(IsDecoratedHandlerMethod))
             {
                 var shouldAddHandler = true;
                 var eventType = (method.GetCustomAttributes(typeof(HandlesAttribute), true)[0] as HandlesAttribute)?.EventType;
@@ -208,7 +208,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             ILogger logger)
         {
             var allMethodsAdded = true;
-            foreach (var method in methods.Where(_ => !IsDecoratedHandlerMethod(_) && _.Name == MethodName).ToArray())
+            foreach (var method in methods.Where(_ => !IsDecoratedHandlerMethod(_) && _.Name == MethodName))
             {
                 var shouldAddHandler = true;
                 if (!TryGetFirstMethodParameterType(method, out var eventParameterType))
