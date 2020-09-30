@@ -37,7 +37,7 @@ namespace Dolittle.SDK.EventHorizon.for_EventHorizons
             event_horizons.Responses.Subscribe(_ => observed_responses.Add(_));
         };
 
-        Because of = () => cancellation_token_source.Cancel();
+        Because of = () => event_horizons.Dispose();
 
         It should_observe_three_responses = () => observed_responses.Count.ShouldEqual(3);
         It should_observe_the_first_returned_response = () => observed_responses.ShouldContain(returned_responses[0]);

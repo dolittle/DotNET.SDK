@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading;
 using Dolittle.SDK.Services.given;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Microsoft.Extensions.Logging;
@@ -43,6 +44,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
                 method_caller_that_replies_with(serverToClientMessages),
                 executionContext,
                 scheduler,
-                Mock.Of<ILogger>());
+                Mock.Of<ILogger>(),
+                CancellationToken.None);
     }
 }

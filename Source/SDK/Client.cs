@@ -1,42 +1,43 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Threading;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
-using Microsoft.Extensions.Logging;
+using Dolittle.SDK.Services;
+using Environment = Dolittle.SDK.Microservices.Environment;
+using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK
 {
     /// <summary>
     /// Represents the client for working with the Dolittle Runtime.
     /// </summary>
-    public class Client
+    public class Client : IDisposable
     {
-        readonly ILogger _logger;
-        readonly ExecutionContext _executionContext;
+        readonly ProcessingCoordinator _processingCoordinator;
+        readonly EventHorizons _eventHorizons;
+        bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Client" /> class.
         /// </summary>
-        /// <param name="logger">The <see cref="ILogger" />.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
-        /// <param name="eventHorizons">The <see cref="IEventHorizons" />.</param>
+        /// <param name="eventHorizons">The <see cref="EventHorizons" />.</param>
+        /// <param name="processingCoordinator">The <see cref="ProcessingCoordinator" />.</param>
         public Client(
-            ILogger logger,
-            ExecutionContext executionContext,
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
-            IEventHorizons eventHorizons)
+            EventHorizons eventHorizons,
+            ProcessingCoordinator processingCoordinator)
         {
-            _logger = logger;
-            _executionContext = executionContext;
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
-            EventHorizons = eventHorizons;
+            _eventHorizons = eventHorizons;
+            _processingCoordinator = processingCoordinator;
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace Dolittle.SDK
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.
         /// </summary>
-        public IEventHorizons EventHorizons { get; }
+        public IEventHorizons EventHorizons => _eventHorizons;
 
         /// <summary>
         /// Create a client builder for a Miroservice.
@@ -63,22 +64,34 @@ namespace Dolittle.SDK
             => new ClientBuilder(microserviceId, Version.NotSet, Environment.Undetermined);
 
         /// <summary>
-        /// Create a client builder for a Miroservice.
+        /// Runs the client until the <see cref="CancellationToken"/> given in
+        /// <see cref="ClientBuilder.WithCancellationToken(CancellationToken)"/> is cancelled.
         /// </summary>
-        /// /// <param name="microserviceId">The unique identifier for the microservice.</param>
-        /// <param name="version">Version of the microservice.</param>
-        /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
-        public static ClientBuilder ForMicroservice(MicroserviceId microserviceId, Version version)
-            => new ClientBuilder(microserviceId, version, Environment.Undetermined);
+        public void Wait()
+            => _processingCoordinator.Completion.Wait();
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         /// <summary>
-        /// Create a client builder for a Microservice.
+        /// Dispose resources.
         /// </summary>
-        /// <param name="microserviceId">The unique identifier for the microservice.</param>
-        /// <param name="version">Version of the microservice.</param>
-        /// <param name="environment">The environment the software is running in.</param>
-        /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
-        public static ClientBuilder ForMicroservice(MicroserviceId microserviceId, Version version, Environment environment)
-            => new ClientBuilder(microserviceId, version, environment);
+        /// <param name="disposeManagedResources">Whether to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposeManagedResources)
+        {
+            if (_disposed) return;
+
+            if (disposeManagedResources)
+            {
+                _eventHorizons.Dispose();
+                _processingCoordinator.Dispose();
+            }
+
+            _disposed = true;
+        }
     }
 }

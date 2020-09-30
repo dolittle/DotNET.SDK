@@ -39,7 +39,7 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming
             caller = new MethodCaller("hest", 1000);
         };
 
-        Because of = () => exception = caller.Call(method, clientToServerMessages.ToObservable()).SubscribeAndCatchError();
+        Because of = () => exception = caller.Call(method, clientToServerMessages.ToObservable(), CancellationToken.None).SubscribeAndCatchError();
 
         It should_make_the_call_with_the_correct_host_and_port = () => providedChannel.ResolvedTarget.ShouldEqual("hest:1000");
         It should_return_an_error = () => exception.ShouldEqual(thrownException);

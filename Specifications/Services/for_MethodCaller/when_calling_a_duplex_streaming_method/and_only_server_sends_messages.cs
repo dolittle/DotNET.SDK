@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Threading;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 
@@ -31,7 +32,7 @@ namespace Dolittle.SDK.Services.for_MethodCaller.when_calling_a_duplex_streaming
             caller = new MethodCaller("host", 42);
         };
 
-        Because of = () => receivedServerMessages = caller.Call(method, Observable.Empty<ClientMessage>()).ToArray().Wait();
+        Because of = () => receivedServerMessages = caller.Call(method, Observable.Empty<ClientMessage>(), CancellationToken.None).ToArray().Wait();
 
         It should_make_the_call_with_the_correct_host_and_port = () => providedChannel.ResolvedTarget.ShouldEqual("host:42");
         It should_not_send_any_messages_from_client = () => writtenClientMessages.ShouldBeEmpty();

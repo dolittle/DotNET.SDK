@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.Threading;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Security;
@@ -12,6 +13,7 @@ using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Environment = Dolittle.SDK.Microservices.Environment;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using It = Machine.Specifications.It;
 using Version = Dolittle.SDK.Microservices.Version;
 
@@ -51,7 +53,8 @@ namespace Dolittle.SDK.Services.for_ReverseCallClientClientCreator
                 TimeSpan.FromSeconds(23),
                 Mock.Of<IPerformMethodCalls>(),
                 executionContext,
-                loggerFactoryMock.Object);
+                loggerFactoryMock.Object,
+                CancellationToken.None);
         };
 
         Because of = () => reverseCallClient = reverseCallClientCreator.Create(arguments, handler, protocol);

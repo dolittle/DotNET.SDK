@@ -3,9 +3,10 @@
 
 using System;
 using System.Reactive.Concurrency;
-using Dolittle.SDK.Execution;
+using System.Threading;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Services
 {
@@ -19,6 +20,7 @@ namespace Dolittle.SDK.Services
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
         readonly ILoggerFactory _loggerFactory;
+        readonly CancellationToken _cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReverseCallClientCreator"/> class.
@@ -27,16 +29,19 @@ namespace Dolittle.SDK.Services
         /// <param name="caller">The caller that will be used to perform the method calls.</param>
         /// <param name="executionContext">The execution context to use while initiating reverse calls.</param>
         /// <param name="loggerFactory">The logger that will be used create loggers to log messages while performing the reverse call.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the call.</param>
         public ReverseCallClientCreator(
             TimeSpan pingInterval,
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellationToken)
         {
             _pingInterval = pingInterval;
             _caller = caller;
             _executionContext = executionContext;
             _loggerFactory = loggerFactory;
+            _cancellationToken = cancellationToken;
         }
 
         /// <inheritdoc/>
@@ -58,6 +63,7 @@ namespace Dolittle.SDK.Services
                 _caller,
                 _executionContext,
                 _scheduler,
-                _loggerFactory.CreateLogger<ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>>());
+                _loggerFactory.CreateLogger<ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>>(),
+                _cancellationToken);
     }
 }

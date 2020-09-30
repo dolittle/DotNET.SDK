@@ -39,10 +39,10 @@ namespace Dolittle.SDK.Services
         }
 
         /// <inheritdoc/>
-        public IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests)
+        public IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests, CancellationToken token)
             where TClientMessage : IMessage
             where TServerMessage : IMessage
-            => Observable.Create<TServerMessage>((observer, token) =>
+            => Observable.Create<TServerMessage>((observer) =>
                 {
                     var tcs = CancellationTokenSource.CreateLinkedTokenSource(token);
                     var call = method.Call(CreateChannel(), CreateCallOptions(tcs.Token));
@@ -83,6 +83,9 @@ namespace Dolittle.SDK.Services
                 {
                     observer.OnNext(reader.Current);
                 }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+            {
             }
             catch (Exception ex)
             {

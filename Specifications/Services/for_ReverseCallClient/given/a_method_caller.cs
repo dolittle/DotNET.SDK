@@ -4,6 +4,7 @@
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using Dolittle.SDK.Services.given.ReverseCall;
 using Machine.Specifications;
 using Microsoft.Reactive.Testing;
@@ -21,8 +22,8 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.given
         protected static IPerformMethodCalls method_caller_that_replies_with(IObservable<ServerMessage> serverToClientMessages)
         {
             var mock = new Mock<IPerformMethodCalls>();
-            mock.Setup(_ => _.Call(It.IsAny<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(), It.IsAny<IObservable<ClientMessage>>()))
-                .Returns((ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method, IObservable<ClientMessage> clientToServerMessages)
+            mock.Setup(_ => _.Call(It.IsAny<ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage>>(), It.IsAny<IObservable<ClientMessage>>(), It.IsAny<CancellationToken>()))
+                .Returns((ICanCallADuplexStreamingMethod<ClientMessage, ServerMessage> method, IObservable<ClientMessage> clientToServerMessages, CancellationToken token)
                     => Observable.Create<ServerMessage>(observer =>
                     {
                         var recordingSubscription = clientToServerMessages.Subscribe(messagesSentToServer);
