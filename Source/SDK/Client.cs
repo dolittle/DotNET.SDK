@@ -18,6 +18,7 @@ namespace Dolittle.SDK
     public class Client : IDisposable
     {
         readonly ProcessingCoordinator _processingCoordinator;
+        readonly EventHorizons _eventHorizons;
         bool _disposed;
 
         /// <summary>
@@ -25,17 +26,17 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
-        /// <param name="eventHorizons">The <see cref="IEventHorizons" />.</param>
+        /// <param name="eventHorizons">The <see cref="EventHorizons" />.</param>
         /// <param name="processingCoordinator">The <see cref="ProcessingCoordinator" />.</param>
         public Client(
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
-            IEventHorizons eventHorizons,
+            EventHorizons eventHorizons,
             ProcessingCoordinator processingCoordinator)
         {
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
-            EventHorizons = eventHorizons;
+            _eventHorizons = eventHorizons;
             _processingCoordinator = processingCoordinator;
         }
 
@@ -52,7 +53,7 @@ namespace Dolittle.SDK
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.
         /// </summary>
-        public IEventHorizons EventHorizons { get; }
+        public IEventHorizons EventHorizons => _eventHorizons;
 
         /// <summary>
         /// Create a client builder for a Miroservice.
@@ -86,6 +87,7 @@ namespace Dolittle.SDK
 
             if (disposeManagedResources)
             {
+                _eventHorizons.Dispose();
                 _processingCoordinator.Dispose();
             }
 
