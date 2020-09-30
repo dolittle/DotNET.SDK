@@ -2,11 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "Launch Basic Sample",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-dotnet",
             "program": "${workspaceFolder}/Samples/Basic/bin/Debug/netcoreapp3.1/Basic.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Launch EventHorizonSample",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-dotnet",
+            "program": "${workspaceFolder}/Samples/EventHorizon/bin/Debug/netcoreapp3.1/EventHorizon.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

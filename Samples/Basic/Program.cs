@@ -6,6 +6,7 @@ using Dolittle.SDK;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Filters;
 
 namespace Basic
 {
@@ -21,11 +22,11 @@ namespace Basic
                         .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3"))
                 .WithFilters(filtersBuilder =>
                     filtersBuilder
-                        .CreatePrivateFilter("577b00c4-8b79-4727-835c-4710919c2df5", filterBuilder =>
+                        .CreatePublicFilter("2c087657-b318-40b1-ae92-a400de44e507", filterBuilder =>
                             filterBuilder.Handle((@event, eventContext) =>
                             {
                                 Console.WriteLine($"Filtering event {@event} {eventContext}");
-                                return Task.FromResult(true);
+                                return Task.FromResult(new PartitionedFilterResult(true, PartitionId.Unspecified));
                             })))
                 .WithEventHandlers(eventHandlersBuilder =>
                     eventHandlersBuilder.CreateEventHandler("e8e53f11-d843-4a77-92dd-f8675ebf6aa0", eventHandlerBuilder =>
@@ -35,7 +36,7 @@ namespace Basic
                 .Build();
 
             var myEvent = new MyEvent("test string", 12345);
-            var commit = client.EventStore.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97").Commit(myEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
+            var commit = client.EventStore.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97").CommitPublic(myEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
             Console.WriteLine(commit.Result.Events);
             client.Wait();
             client.Wait();

@@ -3,6 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
@@ -26,18 +27,21 @@ namespace Dolittle.SDK
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="eventHorizons">The <see cref="IEventHorizons" />.</param>
         public Client(
             ILogger logger,
             Execution.ExecutionContext executionContext,
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
-            CancellationToken cancellation)
+            CancellationToken cancellation,
+            IEventHorizons eventHorizons)
         {
             _logger = logger;
             _executionContext = executionContext;
             _cancellation = cancellation;
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
+            EventHorizons = eventHorizons;
         }
 
         /// <summary>
@@ -49,6 +53,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="EventStoreBuilder" />.
         /// </summary>
         public EventStoreBuilder EventStore { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEventHorizons" />.
+        /// </summary>
+        public IEventHorizons EventHorizons { get; }
 
         /// <summary>
         /// Create a client builder for a Miroservice.

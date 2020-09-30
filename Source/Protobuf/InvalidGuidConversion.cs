@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Protobuf
         /// </summary>
         /// <param name="details">The details on why conversion failed.</param>
         public InvalidGuidConversion(string details)
-            : base($"Could not guid because {details}")
+            : base($"Could not convert to guid because {details}")
         {
         }
     }
