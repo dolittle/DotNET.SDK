@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Events.Processing.Internal;
+using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Services;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,7 @@ namespace Dolittle.SDK.Events.Processing
     {
         readonly ICreateReverseCallClients _reverseCallClientsCreator;
         readonly ICoordinateProcessing _processingCoordinator;
+        readonly RetryPolicy _retryPolicy;
         readonly ILogger _logger;
 
         /// <summary>
@@ -26,14 +28,17 @@ namespace Dolittle.SDK.Events.Processing
         /// </summary>
         /// <param name="reverseCallClientsCreator">The <see cref="ICreateReverseCallClients" />.</param>
         /// <param name="processingCoordinator">The <see cref="ICoordinateProcessing" />.</param>
+        /// <param name="retryPolicy">The <see cref="RetryPolicy"/> to use for processors.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventProcessors(
             ICreateReverseCallClients reverseCallClientsCreator,
             ICoordinateProcessing processingCoordinator,
+            RetryPolicy retryPolicy,
             ILogger logger)
         {
             _reverseCallClientsCreator = reverseCallClientsCreator;
             _processingCoordinator = processingCoordinator;
+            _retryPolicy = retryPolicy;
             _logger = logger;
         }
 
@@ -51,11 +56,15 @@ namespace Dolittle.SDK.Events.Processing
             where TResponse : class
         {
             var client = _reverseCallClientsCreator.Create(eventProcessor.RegistrationRequest, eventProcessor, protocol);
-            _processingCoordinator.StartProcessor(
-                client.Do(
-                    _ => EventProcessorRegistered(eventProcessor),
-                    error => EventProcessorRegistrationFailed(error, eventProcessor),
-                    () => EventProcessorRegistrationStopped(eventProcessor)));
+
+            var clientWithLogging = client.Do(
+                _ => EventProcessorRegistered(eventProcessor),
+                error => EventProcessorRegistrationFailed(error, eventProcessor),
+                () => EventProcessorRegistrationStopped(eventProcessor));
+
+            var retryingClient = clientWithLogging.RetryWithPolicy(_retryPolicy, cancellationToken);
+
+            _processingCoordinator.StartProcessor(retryingClient);
         }
 
         void EventProcessorRegistered<TIdentifier, TRegisterArguments, TRequest, TResponse>(IEventProcessor<TIdentifier, TRegisterArguments, TRequest, TResponse> eventProcessor)

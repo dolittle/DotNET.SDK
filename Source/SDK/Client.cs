@@ -7,8 +7,6 @@ using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Services;
-using Environment = Dolittle.SDK.Microservices.Environment;
-using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK
 {
@@ -61,7 +59,7 @@ namespace Dolittle.SDK
         /// <param name="microserviceId">The unique identifier for the microservice.</param>
         /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
         public static ClientBuilder ForMicroservice(MicroserviceId microserviceId)
-            => new ClientBuilder(microserviceId, Version.NotSet, Environment.Undetermined);
+            => new ClientBuilder(microserviceId);
 
         /// <summary>
         /// Runs the client until the <see cref="CancellationToken"/> given in
