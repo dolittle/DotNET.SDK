@@ -84,6 +84,9 @@ namespace Dolittle.SDK.Services
                     observer.OnNext(reader.Current);
                 }
             }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+            {
+            }
             catch (Exception ex)
             {
                 observer.OnError(ex);
