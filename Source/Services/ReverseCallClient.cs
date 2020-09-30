@@ -44,6 +44,7 @@ namespace Dolittle.SDK.Services
         readonly ExecutionContext _executionContext;
         readonly IScheduler _scheduler;
         readonly ILogger _logger;
+        readonly CancellationToken _cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReverseCallClient{TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/> class.
@@ -56,6 +57,7 @@ namespace Dolittle.SDK.Services
         /// <param name="executionContext">The execution context to use while initiating the reverse call.</param>
         /// <param name="scheduler">The scheduler to use for executing reactive subscriptions.</param>
         /// <param name="logger">The logger that will be used to log messages while performing the reverse call.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> used to cancel the call.</param>
         public ReverseCallClient(
             TConnectArguments arguments,
             IReverseCallHandler<TRequest, TResponse> handler,
@@ -64,7 +66,8 @@ namespace Dolittle.SDK.Services
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
             IScheduler scheduler,
-            ILogger logger)
+            ILogger logger,
+            CancellationToken cancellationToken)
         {
             Arguments = arguments;
             Handler = handler;
@@ -74,6 +77,7 @@ namespace Dolittle.SDK.Services
             _executionContext = executionContext;
             _scheduler = scheduler;
             _logger = logger;
+            _cancellationToken = cancellationToken;
         }
 
         /// <inheritdoc/>
@@ -100,7 +104,7 @@ namespace Dolittle.SDK.Services
             var connectResponseAndErrors = MergeConnectResponseWithErrorsFromServer(connectResponse, toClientMessages);
             connectResponseAndErrors.Subscribe(observer);
 
-            var subscription = _caller.Call(_protocol, toServerMessages).Subscribe(toClientMessages);
+            var subscription = _caller.Call(_protocol, toServerMessages, _cancellationToken).Subscribe(toClientMessages);
 
             return Disposable.Create(() =>
             {

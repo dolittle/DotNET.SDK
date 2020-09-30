@@ -18,10 +18,11 @@ namespace Dolittle.SDK.Services
         /// </summary>
         /// <param name="method">The <see cref="ICanCallADuplexStreamingMethod{TClientMessage, TServerMessage}">method</see> to call.</param>
         /// <param name="requests">An <see cref="IObservable{TClientMessage}"/> of requests to send.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> used to cancel the call.</param>
         /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
         /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
         /// <returns>An <see cref="IObservable{TServerMessage}"/> of response from the server, that when subscribed to initiates the call.</returns>
-        IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests)
+        IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests, CancellationToken token)
             where TClientMessage : IMessage
             where TServerMessage : IMessage;
 
@@ -32,7 +33,7 @@ namespace Dolittle.SDK.Services
         /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
         /// <param name="method">The <see cref="ICanCallAUnaryMethod{TClientMessage, TServerMessage}"/> method to call.</param>
         /// <param name="request">The <see cref="IMessage"/> to send to the server.</param>
-        /// <param name="token">The <see cref="CancellationToken"/>.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> used to cancel the call.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         Task<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAUnaryMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
             where TClientMessage : IMessage

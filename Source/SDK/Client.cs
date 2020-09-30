@@ -1,47 +1,42 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Microservices;
-using Microsoft.Extensions.Logging;
+using Dolittle.SDK.Services;
+using Environment = Dolittle.SDK.Microservices.Environment;
+using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK
 {
     /// <summary>
     /// Represents the client for working with the Dolittle Runtime.
     /// </summary>
-    public class Client
+    public class Client : IDisposable
     {
-        readonly ILogger _logger;
-        readonly Execution.ExecutionContext _executionContext;
-        readonly CancellationToken _cancellation;
+        readonly ProcessingCoordinator _processingCoordinator;
+        bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Client" /> class.
         /// </summary>
-        /// <param name="logger">The <see cref="ILogger" />.</param>
-        /// <param name="executionContext">The <see cref="Execution.ExecutionContext" />.</param>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         /// <param name="eventHorizons">The <see cref="IEventHorizons" />.</param>
+        /// <param name="processingCoordinator">The <see cref="ProcessingCoordinator" />.</param>
         public Client(
-            ILogger logger,
-            Execution.ExecutionContext executionContext,
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
-            CancellationToken cancellation,
-            IEventHorizons eventHorizons)
+            IEventHorizons eventHorizons,
+            ProcessingCoordinator processingCoordinator)
         {
-            _logger = logger;
-            _executionContext = executionContext;
-            _cancellation = cancellation;
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
             EventHorizons = eventHorizons;
+            _processingCoordinator = processingCoordinator;
         }
 
         /// <summary>
@@ -68,45 +63,33 @@ namespace Dolittle.SDK
             => new ClientBuilder(microserviceId, Version.NotSet, Environment.Undetermined);
 
         /// <summary>
-        /// Create a client builder for a Miroservice.
-        /// </summary>
-        /// /// <param name="microserviceId">The unique identifier for the microservice.</param>
-        /// <param name="version">Version of the microservice.</param>
-        /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
-        public static ClientBuilder ForMicroservice(MicroserviceId microserviceId, Version version)
-            => new ClientBuilder(microserviceId, version, Environment.Undetermined);
-
-        /// <summary>
-        /// Create a client builder for a Microservice.
-        /// </summary>
-        /// <param name="microserviceId">The unique identifier for the microservice.</param>
-        /// <param name="version">Version of the microservice.</param>
-        /// <param name="environment">The environment the software is running in.</param>
-        /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
-        public static ClientBuilder ForMicroservice(MicroserviceId microserviceId, Version version, Environment environment)
-            => new ClientBuilder(microserviceId, version, environment);
-
-        /// <summary>
         /// Runs the client until the <see cref="CancellationToken"/> given in
         /// <see cref="ClientBuilder.WithCancellationToken(CancellationToken)"/> is cancelled.
         /// </summary>
-        public async void Wait()
+        public void Wait()
+            => _processingCoordinator.Completion.Wait();
+
+        /// <inheritdoc/>
+        public void Dispose()
         {
-            if (_cancellation != default)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose resources.
+        /// </summary>
+        /// <param name="disposeManagedResources">Whether to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposeManagedResources)
+        {
+            if (_disposed) return;
+
+            if (disposeManagedResources)
             {
-                try
-                {
-                    await Task.Delay(Timeout.Infinite, _cancellation).ConfigureAwait(false);
-                }
-                catch (System.OperationCanceledException ex)
-                {
-                    _logger.LogInformation(ex, "CancellationToken was cancelled. System will stop now.");
-                }
+                _processingCoordinator.Dispose();
             }
-            else
-            {
-                _logger.LogError("No cancellation token specified, system will stop now. Please provide one with Client.WithCancellationToken(cancellationToken)");
-            }
+
+            _disposed = true;
         }
     }
 }

@@ -22,9 +22,7 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents an implementation of <see cref="IEventHorizons"/>.
     /// </summary>
-    #pragma warning disable CA1001
-    public class EventHorizons : IEventHorizons
-    #pragma warning restore CA1001
+    public class EventHorizons : IEventHorizons, IDisposable
     {
         static readonly SubscriptionsSubscribeMethod _method = new SubscriptionsSubscribeMethod();
         readonly Subject<Subscription> _subscriptions = new Subject<Subscription>();
@@ -32,6 +30,7 @@ namespace Dolittle.SDK.EventHorizon
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
+        bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHorizons"/> class.
@@ -39,19 +38,16 @@ namespace Dolittle.SDK.EventHorizon
         /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
         /// <param name="executionContext">Tha base <see cref="ExecutionContext"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/> to use.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         public EventHorizons(
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
-            ILogger logger,
-            CancellationToken cancellationToken)
+            ILogger logger)
         {
             _caller = caller;
             _executionContext = executionContext;
             _logger = logger;
 
             SetupSubscriptionProcessing();
-            SetupSubjectDisposal(cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -64,6 +60,30 @@ namespace Dolittle.SDK.EventHorizon
             return _responses.Where(_ => _.Subscription == subscription).FirstAsync().ToTask();
         }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose resources.
+        /// </summary>
+        /// <param name="disposeManagedResources">Whether to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposeManagedResources)
+        {
+            if (_disposed) return;
+
+            if (disposeManagedResources)
+            {
+                _subscriptions.Dispose();
+                _responses.Dispose();
+            }
+
+            _disposed = true;
+        }
+
         void SetupSubscriptionProcessing()
         {
             _subscriptions
@@ -72,13 +92,6 @@ namespace Dolittle.SDK.EventHorizon
                 .Merge()
                 .Subscribe(_responses);
         }
-
-        void SetupSubjectDisposal(CancellationToken cancellationToken)
-            => cancellationToken.Register(() =>
-            {
-                _subscriptions.Dispose();
-                _responses.Dispose();
-            });
 
         SubscriptionRequest CreateRuntimeRequestFromSubscription(Subscription subscription)
         {
