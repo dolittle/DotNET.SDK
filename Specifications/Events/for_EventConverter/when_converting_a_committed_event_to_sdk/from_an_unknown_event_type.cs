@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.Protobuf.Contracts;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events.for_EventConverter.given;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;

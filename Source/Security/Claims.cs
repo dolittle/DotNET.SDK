@@ -38,12 +38,12 @@ namespace Dolittle.SDK.Security
         /// <returns>True if equals, false otherwise.</returns>
         public static bool operator ==(Claims leftHandSide, Claims rightHandSide)
         {
-            if (object.Equals(leftHandSide, null) && object.Equals(rightHandSide, null))
+            if (Equals(leftHandSide, null) && Equals(rightHandSide, null))
             {
                 return true;
             }
 
-            return object.Equals(leftHandSide, null) ? false : leftHandSide.Equals(rightHandSide);
+            return !Equals(leftHandSide, null) && leftHandSide.Equals(rightHandSide);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Dolittle.SDK.Security
 
             for (int i = 0; i < thisClaims.Length; i++)
             {
-                if (!object.Equals(thisClaims[i], otherClaims[i]))
+                if (!Equals(thisClaims[i], otherClaims[i]))
                 {
                     return false;
                 }

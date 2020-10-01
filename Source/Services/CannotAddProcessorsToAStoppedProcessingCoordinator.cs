@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Services
         /// Initializes a new instance of the <see cref="CannotAddProcessorsToAStoppedProcessingCoordinator"/> class.
         /// </summary>
         public CannotAddProcessorsToAStoppedProcessingCoordinator()
-            : base($"Cannot add a processor to an already stopped processing coordinator.")
+            : base("Cannot add a processor to an already stopped processing coordinator.")
             {
             }
     }

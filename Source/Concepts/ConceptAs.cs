@@ -36,10 +36,10 @@ namespace Dolittle.SDK.Concepts
         /// <returns>true if the left <see cref="ConceptAs{T}"/> is equal to the right <see cref="ConceptAs{T}"/>; otherwise, false.</returns>
         public static bool operator ==(ConceptAs<T> left, ConceptAs<T> right)
         {
-            if (ReferenceEquals(left, null) && ReferenceEquals(right, null))
+            if (left is null && right is null)
                 return true;
 
-            if (ReferenceEquals(left, null) ^ ReferenceEquals(right, null))
+            if (left is null ^ right is null)
                 return false;
 
             return left.Equals(right);

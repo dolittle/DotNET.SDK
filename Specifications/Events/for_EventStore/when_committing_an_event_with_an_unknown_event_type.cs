@@ -3,9 +3,7 @@
 
 using System;
 using System.Threading;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events.for_EventConverter.given;
-using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;

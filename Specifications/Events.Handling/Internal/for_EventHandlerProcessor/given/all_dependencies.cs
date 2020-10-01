@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Machine.Specifications;

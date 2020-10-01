@@ -11,7 +11,6 @@ using Dolittle.SDK.Services;
 using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
-using static Dolittle.Runtime.Events.Contracts.EventStore;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
 namespace Dolittle.SDK.Events.for_EventStore.given
@@ -36,23 +35,20 @@ namespace Dolittle.SDK.Events.for_EventStore.given
             event_store = new EventStore(caller.Object, converter.Object, execution_context, event_types.Object, Mock.Of<ILogger>());
 
             pb_uncommitted_events = new List<Contracts.UncommittedEvent>();
-            pb_uncommitted_events.Append(new Contracts.UncommittedEvent { });
-            pb_uncommitted_events.Append(new Contracts.UncommittedEvent { });
+            pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
+            pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
 
             converter.Setup(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()))
                 .Returns(pb_uncommitted_events);
 
             var pb_committed_events = new List<Contracts.CommittedEvent>();
-            pb_committed_events.Append(new Contracts.CommittedEvent { });
-            pb_committed_events.Append(new Contracts.CommittedEvent { });
+            pb_committed_events.Append(new Contracts.CommittedEvent());
+            pb_committed_events.Append(new Contracts.CommittedEvent());
 
-            commit_events_response = new Contracts.CommitEventsResponse { };
+            commit_events_response = new Contracts.CommitEventsResponse();
 
             caller.Setup(_ => _.Call(Moq.It.IsAny<EventStoreCommitMethod>(), Moq.It.IsAny<Contracts.CommitEventsRequest>(), Moq.It.IsAny<CancellationToken>()))
-                .Callback<ICanCallAUnaryMethod<Contracts.CommitEventsRequest, Contracts.CommitEventsResponse>, Contracts.CommitEventsRequest, CancellationToken>((method, request, token) =>
-                {
-                    commit_events_request = request;
-                })
+                .Callback<ICanCallAUnaryMethod<Contracts.CommitEventsRequest, Contracts.CommitEventsResponse>, Contracts.CommitEventsRequest, CancellationToken>((method, request, token) => commit_events_request = request)
                 .Returns(Task.FromResult(commit_events_response));
 
             var failure = new Failure(Guid.Parse("72ae75dc-cdd7-4413-bf19-66aba13486ad"), "ran out of tacos");
