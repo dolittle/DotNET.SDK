@@ -12,6 +12,6 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts.when_getting_type
 
         Because of = () => exception = Catch.Exception(() => artifacts.GetTypeFor(new given.artifact_type("276244a5-ee98-4135-ba3b-a282b41094a1")));
 
-        It should_fail_because_of_unknown_type = () => exception.ShouldBeOfExactType<UnknownType>();
+        It should_fail_because_of_no_type_associated_with_artifact = () => exception.ShouldEqual(given.artifact_types.NoTypeAssociatedWithArtifactException);
     }
 }
