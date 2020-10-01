@@ -75,7 +75,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 loggerFactory
                     .CreateLogger<EventHandlerBuilder>()
                     .LogWarning(
-                        "Failed to build event handler {EventHandlerId. No event handler methods are configured for event handler",
+                        "Failed to build event handler {EventHandlerId}. No event handler methods are configured for event handler",
                         _eventHandlerId);
                 return;
             }
@@ -86,7 +86,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 loggerFactory
                     .CreateLogger<EventHandlerBuilder>()
                     .LogWarning(
-                        "Failed to build event handler {EventHandlerId. One or more event handler methods could not be built",
+                        "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
                         _eventHandlerId);
                 return;
             }
