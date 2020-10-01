@@ -44,7 +44,7 @@ namespace Dolittle.SDK
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
-                _.SetMinimumLevel(LogLevel.Trace);
+                _.SetMinimumLevel(LogLevel.Information);
                 _.AddConsole();
             });
 
