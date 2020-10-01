@@ -8,9 +8,11 @@ namespace Dolittle.SDK.Artifacts
     /// <summary>
     /// Defines a system that knows about <see cref="Artifact{TId}"/>.
     /// </summary>
-    /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="IArtifact" />.</typeparam>
-    public interface IArtifacts<TArtifact>
-        where TArtifact : IArtifact
+    /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
+    /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
+    public interface IArtifacts<TArtifact, TId>
+        where TArtifact : Artifact<TId>
+        where TId : ArtifactId
     {
         /// <summary>
         /// Check if there is a type associated with an <see cref="Artifact{TId}" />.

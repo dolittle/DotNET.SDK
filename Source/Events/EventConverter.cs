@@ -54,7 +54,7 @@ namespace Dolittle.SDK.Events
                 return false;
             }
 
-            if (!source.Type.TryTo<EventType>(out var eventType, out var eventTypeError))
+            if (!source.Type.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
             {
                 error = new InvalidCommittedEventInformation(nameof(source.Type), eventTypeError);
                 return false;
