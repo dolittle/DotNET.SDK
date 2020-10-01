@@ -42,9 +42,9 @@ namespace Dolittle.SDK.EventHorizon
         /// <summary>
         /// Sets the partition of the producer stream to subscribe to events from.
         /// </summary>
-        /// <param name="producerPartitionId">The <see cref="PartitionId"/> to subscribe to events from.</param>
+        /// <param name="partitionId">The <see cref="PartitionId"/> to subscribe to events from.</param>
         /// <returns>A <see cref="SubscriptionBuilderForProducerPartition"/> to continue building.</returns>
-        public SubscriptionBuilderForProducerPartition FromPartition(PartitionId producerPartitionId)
+        public SubscriptionBuilderForProducerPartition FromProducerPartition(PartitionId partitionId)
         {
             ThrowIfProducerPartitionIsAlreadyDefined();
             _builder = new SubscriptionBuilderForProducerPartition(
@@ -52,7 +52,7 @@ namespace Dolittle.SDK.EventHorizon
                 _producerMicroserviceId,
                 _producerTenantId,
                 _producerStreamId,
-                producerPartitionId);
+                partitionId);
             return _builder;
         }
 
@@ -71,7 +71,7 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (_builder != null)
             {
-                throw new SubscriptionBuilderMethodAlreadyCalled("FromPartition()");
+                throw new SubscriptionBuilderMethodAlreadyCalled("FromProducerPartition()");
             }
         }
 
@@ -79,7 +79,7 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (_builder == null)
             {
-                throw new SubscriptionDefinitionIncomplete("Partition", "Call FromPartition()");
+                throw new SubscriptionDefinitionIncomplete("Partition", "Call FromProducerPartition()");
             }
         }
     }

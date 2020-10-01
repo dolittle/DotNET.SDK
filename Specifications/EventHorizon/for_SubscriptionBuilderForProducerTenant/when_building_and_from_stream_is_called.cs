@@ -34,8 +34,8 @@ namespace Dolittle.SDK.EventHorizon.for_SubscriptionBuilderForProducerTenant
 
             producer_stream = "e617fc5a-cec8-41ee-b9ad-361f8cfe7641";
             builder
-                .FromStream(producer_stream)
-                .FromPartition("aa440723-bc9a-46c3-8777-fadbc9f472f6")
+                .FromProducerStream(producer_stream)
+                .FromProducerPartition("aa440723-bc9a-46c3-8777-fadbc9f472f6")
                 .ToScope("3d87171e-8b04-4cb5-92f2-966e5c7a5371");
         };
 

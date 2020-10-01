@@ -19,12 +19,12 @@ namespace Dolittle.SDK.EventHorizon
         /// <summary>
         /// Sets the event horizon subscriptions for the consumer tenant through the <see cref="SubscriptionsBuilderForConsumerTenant"/>.
         /// </summary>
-        /// <param name="consumerTenantId">The <see cref="TenantId"/> to subscribe to events for.</param>
+        /// <param name="tenantId">The <see cref="TenantId"/> to subscribe to events for.</param>
         /// <param name="callback">The builder callback.</param>
         /// <returns>Continuation of the builder.</returns>
-        public SubscriptionsBuilder ForTenant(TenantId consumerTenantId, Action<SubscriptionsBuilderForConsumerTenant> callback)
+        public SubscriptionsBuilder ForTenant(TenantId tenantId, Action<SubscriptionsBuilderForConsumerTenant> callback)
         {
-            var builder = new SubscriptionsBuilderForConsumerTenant(consumerTenantId);
+            var builder = new SubscriptionsBuilderForConsumerTenant(tenantId);
             callback(builder);
             _builders.Add(builder);
             return this;

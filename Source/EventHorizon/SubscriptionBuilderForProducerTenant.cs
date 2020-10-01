@@ -38,16 +38,16 @@ namespace Dolittle.SDK.EventHorizon
         /// <summary>
         /// Sets the producer stream to subscribe to events from.
         /// </summary>
-        /// <param name="producerStreamId">The <see cref="StreamId"/> to subscribe to events from.</param>
+        /// <param name="streamId">The <see cref="StreamId"/> to subscribe to events from.</param>
         /// <returns>A <see cref="SubscriptionBuilderForProducerStream"/> to continue building.</returns>
-        public SubscriptionBuilderForProducerStream FromStream(StreamId producerStreamId)
+        public SubscriptionBuilderForProducerStream FromProducerStream(StreamId streamId)
         {
             ThrowIfProducerStreamIsAlreadyDefined();
             _builder = new SubscriptionBuilderForProducerStream(
                 _consumerTenantId,
                 _producerMicroserviceId,
                 _producerTenantId,
-                producerStreamId);
+                streamId);
             return _builder;
         }
 
@@ -66,7 +66,7 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (_builder != null)
             {
-                throw new SubscriptionBuilderMethodAlreadyCalled("FromStream()");
+                throw new SubscriptionBuilderMethodAlreadyCalled("FromProducerStream()");
             }
         }
 
@@ -74,7 +74,7 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (_builder == null)
             {
-                throw new SubscriptionDefinitionIncomplete("Stream", "Call FromStream()");
+                throw new SubscriptionDefinitionIncomplete("Stream", "Call FromProducerStream()");
             }
         }
     }
