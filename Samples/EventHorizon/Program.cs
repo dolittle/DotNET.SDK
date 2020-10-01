@@ -12,11 +12,11 @@ namespace EventHorizon
         static void Main(string[] args)
         {
             var client = Client.ForMicroservice("a14bb24e-51f3-4d83-9eba-44c4cffe6bb9")
-                .ConnectToRuntime("localhost", 50055)
+                .WithRuntimeOn("localhost", 50055)
                 .WithEventTypes(eventTypes =>
                     eventTypes
                         .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3"))
-                .WithEventHorizonSubscriptions(eventHorizons => {
+                .WithEventHorizons(eventHorizons => {
                     eventHorizons.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97", tenantSubscriptions => {
                         tenantSubscriptions.FromMicroservice("7a6155dd-9109-4488-8f6f-c57fe4b65bfb", subscriptions => {
                             subscriptions

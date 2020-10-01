@@ -73,9 +73,24 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="version">The version of the microservice.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithVersion(Microservices.Version version)
+        public ClientBuilder WithVersion(Version version)
         {
             _version = version;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the version of the microservice.
+        /// </summary>
+        /// <param name="major">Major version of the microservice.</param>
+        /// <param name="minor">Minor version of the microservice.</param>
+        /// <param name="patch">Path level of the microservice.</param>
+        /// <param name="build">Build number of the microservice.</param>
+        /// <param name="preReleaseString">If prerelease - the prerelease string.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithVersion(int major, int minor, int patch, int build = 0, string preReleaseString = "")
+        {
+            _version = new Version(major, minor, patch, build, preReleaseString);
             return this;
         }
 
@@ -84,9 +99,34 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="environment">The environment in which the microservice is running.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEnvironment(Microservices.Environment environment)
+        public ClientBuilder WithEnvironment(Environment environment)
         {
             _environment = environment;
+            return this;
+        }
+
+        /// <summary>
+        /// Connect to a specific host and port for the Dolittle runtime.
+        /// </summary>
+        /// <param name="host">The host name to connect to.</param>
+        /// <param name="port">The port to connect to.</param>
+        /// <returns>The client builder for continuation.</returns>
+        /// <remarks>If not specified, host 'localhost' and port 50053 will be used.</remarks>
+        public ClientBuilder WithRuntimeOn(string host, ushort port)
+        {
+            _host = host;
+            _port = port;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the cancellation token for cancelling pending operations on the Runtime.
+        /// </summary>
+        /// <param name="cancellation">The cancellation token for cancelling pending operations on the Runtime.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithCancellation(CancellationToken cancellation)
+        {
+            _cancellation = cancellation;
             return this;
         }
 
@@ -139,44 +179,19 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventHorizonSubscriptions(Action<SubscriptionsBuilder> callback)
+        public ClientBuilder WithEventHorizons(Action<SubscriptionsBuilder> callback)
         {
             callback(_eventHorizonsBuilder);
             return this;
         }
 
         /// <summary>
-        /// Sets the cancellation token for cancelling pending operations on the Runtime.
-        /// </summary>
-        /// <param name="cancellation">The cancellation token for cancelling pending operations on the Runtime.</param>
-        /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithCancellationToken(CancellationToken cancellation)
-        {
-            _cancellation = cancellation;
-            return this;
-        }
-
-        /// <summary>
-        /// Connect to a specific host and port for the Dolittle runtime.
-        /// </summary>
-        /// <param name="host">The host name to connect to.</param>
-        /// <param name="port">The port to connect to.</param>
-        /// <returns>The client builder for continuation.</returns>
-        /// <remarks>If not used, the default host of 'localhost' and port 50053 will be used.</remarks>
-        public ClientBuilder ConnectToRuntime(string host, ushort port)
-        {
-            _host = host;
-            _port = port;
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the <see cref="ILoggerFactory"/> for the client.
+        /// Sets the <see cref="ILoggerFactory"/> to use for creating instances of <see cref="ILogger"/> for the client.
         /// </summary>
         /// <param name="factory">The given <see cref="ILoggerFactory"/>.</param>
         /// <returns>The client builder for continuation.</returns>
         /// <remarks>If not used, a factory with 'Trace' level logging will be used.</remarks>
-        public ClientBuilder ConfigureLogging(ILoggerFactory factory)
+        public ClientBuilder WithLogging(ILoggerFactory factory)
         {
             _loggerFactory = factory;
             return this;

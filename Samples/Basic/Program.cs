@@ -31,7 +31,7 @@ namespace Basic
                 .WithEventHandlers(eventHandlersBuilder =>
                     eventHandlersBuilder
                         .RegisterEventHandler<MyEventHandler>())
-                .WithCancellationToken(source.Token)
+                .WithCancellation(source.Token)
                 .Build();
 
             var myEvent = new MyEvent("test string", 12345);
