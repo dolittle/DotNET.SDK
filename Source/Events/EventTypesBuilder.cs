@@ -118,7 +118,7 @@ namespace Dolittle.SDK.Events
 
         void AddAssociation(Type type, EventType eventType)
         {
-            ThrowIfEventTypeFromAttributeDoesNotMatchProvidedEventType(type, eventType);
+            ThrowIfAttributeSpecifiesADifferentEventType(type, eventType);
             _associations.Add((type, eventType));
         }
 
@@ -130,7 +130,7 @@ namespace Dolittle.SDK.Events
             }
         }
 
-        void ThrowIfEventTypeFromAttributeDoesNotMatchProvidedEventType(Type type, EventType providedType)
+        void ThrowIfAttributeSpecifiesADifferentEventType(Type type, EventType providedType)
         {
             if (TryGetEventTypeFromAttribute(type, out var attributeType) && attributeType != providedType)
             {
