@@ -1,18 +1,82 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Domain;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Defines an interface for working directly with the Event Store.
     /// </summary>
     public interface IEventStore
     {
+        /// <summary>
+        /// Commits a single Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single public Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single public Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single public Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits an <see cref="UncommittedEvent" />.
+        /// </summary>
+        /// <param name="uncommittedEvent">The <see cref="UncommittedEvent" />.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
+        Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Commits <see cref="UncommittedEvents" />.
         /// </summary>
@@ -22,36 +86,6 @@ namespace Dolittle.Events
         /// <remarks>
         /// Cancelling this operation does not roll back the commit transaction if the events have already been written to the Event Store.
         /// </remarks>
-        Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits <see cref="UncommittedAggregateEvents" />.
-        /// </summary>
-        /// <param name="uncommittedAggregateEvents">The <see cref="UncommittedAggregateEvents" />.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedAggregateEvents" />.</returns>
-        /// <remarks>
-        /// Cancelling this operation does not roll back the commit transaction if the events have already been written to the Event Store.
-        /// </remarks>
-        Task<CommittedAggregateEvents> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Fetch <see cref="CommittedAggregateEvents" /> for a <see cref="AggregateRoot" />.
-        /// </summary>
-        /// <param name="aggregateRoot">The <see cref="Type"/> of the Aggregate Root that applied the events to the Event Source.</param>
-        /// <param name="eventSource">The <see cref="EventSourceId" /> of the Aggregate.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedAggregateEvents" /> on from this Aggregate.</returns>
-        Task<CommittedAggregateEvents> FetchForAggregate(Type aggregateRoot, EventSourceId eventSource, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Fetch <see cref="CommittedAggregateEvents" /> for a <see cref="AggregateRoot" />.
-        /// </summary>
-        /// <param name="eventSource">The <see cref="EventSourceId" /> of the Aggregate.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <typeparam name="TAggregateRoot">Thetype of the Aggregate Root that applied the events to the Event Source.</typeparam>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedAggregateEvents" /> on from this Aggregate.</returns>
-        Task<CommittedAggregateEvents> FetchForAggregate<TAggregateRoot>(EventSourceId eventSource, CancellationToken cancellationToken = default)
-            where TAggregateRoot : AggregateRoot;
+        Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default);
     }
 }

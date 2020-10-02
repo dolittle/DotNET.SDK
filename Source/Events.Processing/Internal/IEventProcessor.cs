@@ -1,41 +1,38 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Dolittle.Resilience;
+using System;
+using Dolittle.SDK.Concepts;
+using Dolittle.SDK.Services;
 
-namespace Dolittle.Events.Processing.Internal
+namespace Dolittle.SDK.Events.Processing.Internal
 {
     /// <summary>
-    /// Defines a system that handles the behaviour of event processors that registers with the Runtime and handles processing requests.
+    /// Defines a system that handles the behavior of event processors that registers with the Runtime and handles processing requests.
     /// </summary>
-    public interface IEventProcessor
+    /// <typeparam name="TIdentifier">The <see cref="Type" /> of the <see cref="ConceptAs{T}" /> <see cref="Guid" />.>.</typeparam>
+    /// <typeparam name="TRegisterRequest">The <see cref="Type" /> of the registration request.</typeparam>
+    /// <typeparam name="TRequest">The <see cref="Type" /> of the request.</typeparam>
+    /// <typeparam name="TResponse">The <see cref="Type" /> of the response.</typeparam>
+    public interface IEventProcessor<TIdentifier, TRegisterRequest, TRequest, TResponse> : IReverseCallHandler<TRequest, TResponse>
+        where TIdentifier : ConceptAs<Guid>
+        where TRegisterRequest : class
+        where TRequest : class
+        where TResponse : class
     {
         /// <summary>
-        /// Registers the event processor with the Runtime, and if successful starts handling requests.
+        /// Gets the <see cref="EventProcessorKind"/>.
         /// </summary>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task RegisterAndHandle(CancellationToken cancellationToken);
+        EventProcessorKind Kind { get; }
 
         /// <summary>
-        /// Registers the event processor with the Runtime, and if successful starts handling requests.
-        /// If the processor fails during registration or handling, the provided policy will be used to retry.
-        /// If the processor finishes handling of requests without failing, it will restart.
+        /// Gets the <typeparamref name="TIdentifier"/> identifier.
         /// </summary>
-        /// <param name="policy">The <see cref="IAsyncPolicy"/> that defines the retry behaviour upon failure.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task RegisterAndHandleForeverWithPolicy(IAsyncPolicy policy, CancellationToken cancellationToken);
+        TIdentifier Identifier { get; }
 
         /// <summary>
-        /// Registers the event processor with the Runtime, and if successful starts handling requests.
-        /// If the processor fails during registration or handling, the provided policy will be used to retry.
+        /// Gets the <typeparamref name="TRegisterRequest"/> registration request.
         /// </summary>
-        /// <param name="policy">The <see cref="IAsyncPolicy"/> that defines the retry behaviour upon failure.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        Task RegisterAndHandleWithPolicy(IAsyncPolicy policy, CancellationToken cancellationToken);
+        TRegisterRequest RegistrationRequest { get; }
     }
 }

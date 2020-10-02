@@ -1,169 +1,79 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Artifacts;
-using Dolittle.Events.Processing.Internal;
-using Dolittle.Logging;
-using Dolittle.Protobuf;
 using Dolittle.Runtime.Events.Processing.Contracts;
-using Dolittle.Services.Clients;
-using static Dolittle.Runtime.Events.Processing.Contracts.EventHandlers;
-using Artifact = Dolittle.Artifacts.Contracts.Artifact;
-using Failure = Dolittle.Protobuf.Contracts.Failure;
+using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Events.Processing.Internal;
+using Dolittle.SDK.Protobuf;
+using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.Events.Handling.Internal
+namespace Dolittle.SDK.Events.Handling.Internal
 {
     /// <summary>
-    /// Implementation of <see cref="EventProcessor{TIdentifier, TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/> for Event Handlers.
+    /// Represents a <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRequest, TResponse}" /> that can handle events.
     /// </summary>
-    /// <typeparam name="TEventType">The event type that the handler can handle.</typeparam>
-    public class EventHandlerProcessor<TEventType> : EventProcessor<EventHandlerId, EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage, EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse>
-        where TEventType : IEvent
+    public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>
     {
-        readonly ScopeId _scope;
-        readonly bool _partitioned;
-        readonly IEventHandler<TEventType> _handler;
-        readonly EventHandlersClient _client;
-        readonly IReverseCallClients _reverseCallClients;
-        readonly IEventProcessingCompletion _completion;
-        readonly IArtifactTypeMap _artifacts;
-        readonly IEventConverter _converter;
-        readonly ILogger _logger;
+        readonly IEventHandler _eventHandler;
+        readonly IEventProcessingConverter _converter;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventHandlerProcessor{TEventType}"/> class.
+        /// Initializes a new instance of the <see cref="EventHandlerProcessor"/> class.
         /// </summary>
-        /// <param name="handlerId">The unique <see cref="EventHandlerId"/> for the event handler.</param>
-        /// <param name="scope">The <see cref="ScopeId"/> of the scope in the Event Store where the event handler will run.</param>
-        /// <param name="partitioned">Whether the event handler should create a partitioned stream or not.</param>
-        /// <param name="handler">The <see cref="IEventHandler{TEventType}"/> that will be called to handle incoming events.</param>
-        /// <param name="client">The <see cref="EventHandlersClient"/> to use to connect to the Runtime.</param>
-        /// <param name="reverseCallClients">The <see cref="IReverseCallClients"/> to use for creating instances of <see cref="IReverseCallClient{TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/>.</param>
-        /// <param name="completion">The <see cref="IEventProcessingCompletion"/> to use for notifying of event handling completion.</param>
-        /// <param name="artifacts">The <see cref="IArtifactTypeMap"/> to use for converting event types to artifacts.</param>
-        /// <param name="converter">The <see cref="IEventConverter"/> to use to convert events.</param>
-        /// <param name="logger">The <see cref="ILogger"/> to use for logging.</param>
+        /// <param name="eventHandler">The <see cref="IEventHandler" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventHandlerProcessor(
-            EventHandlerId handlerId,
-            ScopeId scope,
-            bool partitioned,
-            IEventHandler<TEventType> handler,
-            EventHandlersClient client,
-            IReverseCallClients reverseCallClients,
-            IEventProcessingCompletion completion,
-            IArtifactTypeMap artifacts,
-            IEventConverter converter,
+            IEventHandler eventHandler,
+            IEventProcessingConverter converter,
             ILogger logger)
-            : base(logger)
+            : base("EventHandler", eventHandler.Identifier, logger)
         {
-            Identifier = handlerId;
-            _scope = scope;
-            _partitioned = partitioned;
-            _handler = handler;
-            _client = client;
-            _reverseCallClients = reverseCallClients;
-            _completion = completion;
-            _artifacts = artifacts;
+            _eventHandler = eventHandler;
             _converter = converter;
-            _logger = logger;
         }
 
         /// <inheritdoc/>
-        protected override string Kind => "event handler";
-
-        /// <inheritdoc/>
-        protected override EventHandlerId Identifier { get; }
-
-        /// <inheritdoc/>
-        protected override IReverseCallClient<EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage, EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse> CreateClient()
-            => _reverseCallClients.GetFor<EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage, EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse>(
-                () => _client.Connect(),
-                (message, arguments) => message.RegistrationRequest = arguments,
-                message => message.RegistrationResponse,
-                message => message.HandleRequest,
-                (message, response) => message.HandleResult = response,
-                (arguments, context) => arguments.CallContext = context,
-                request => request.CallContext,
-                (response, context) => response.CallContext = context,
-                messsage => messsage.Ping,
-                (message, pong) => message.Pong = pong,
-                TimeSpan.FromSeconds(5));
-
-        /// <inheritdoc/>
-        protected override EventHandlerResponse CreateResponseFromFailure(ProcessorFailure failure)
-            => new EventHandlerResponse
+        public override EventHandlerRegistrationRequest RegistrationRequest
             {
-                Failure = failure,
-            };
-
-        /// <inheritdoc/>
-        protected override Failure GetFailureFromRegisterResponse(EventHandlerRegistrationResponse response)
-            => response.Failure;
-
-        /// <inheritdoc/>
-        protected override EventHandlerRegistrationRequest GetRegisterArguments()
-        {
-            var request = new EventHandlerRegistrationRequest
-            {
-                EventHandlerId = Identifier.ToProtobuf(),
-                ScopeId = _scope.ToProtobuf(),
-                Partitioned = _partitioned,
-            };
-
-            foreach (var eventType in _handler.HandledEventTypes)
-            {
-                var artifact = _artifacts.GetArtifactFor(eventType);
-                request.Types_.Add(new Artifact
+                get
                 {
-                    Id = artifact.Id.ToProtobuf(),
-                    Generation = artifact.Generation,
-                });
+                    var registrationRequest = new EventHandlerRegistrationRequest
+                    {
+                        EventHandlerId = _eventHandler.Identifier.ToProtobuf(),
+                        ScopeId = _eventHandler.ScopeId.ToProtobuf(),
+                        Partitioned = _eventHandler.Partitioned
+                    };
+                    registrationRequest.Types_.AddRange(_eventHandler.HandledEvents.Select(_ => _.ToProtobuf()).ToArray());
+                    return registrationRequest;
+                }
             }
 
-            return request;
+        /// <inheritdoc/>
+        protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, CancellationToken cancellation)
+        {
+            var streamEvent = _converter.ToSDK(request.Event);
+            var committedEvent = streamEvent.Event;
+            await _eventHandler
+                .Handle(
+                    committedEvent.Content,
+                    committedEvent.EventType,
+                    committedEvent.GetEventContext(executionContext),
+                    cancellation)
+                .ConfigureAwait(false);
+            return new EventHandlerResponse();
         }
 
         /// <inheritdoc/>
-        protected override RetryProcessingState GetRetryProcessingState(HandleEventRequest request)
+        protected override RetryProcessingState GetRetryProcessingStateFromRequest(HandleEventRequest request)
             => request.RetryProcessingState;
 
         /// <inheritdoc/>
-        protected override async Task<EventHandlerResponse> Handle(HandleEventRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var committed = _converter.ToSDK(request.Event.Event);
-                try
-                {
-                    if (committed.Event is TEventType typedEvent)
-                    {
-                        await _handler.Handle(typedEvent, committed.DeriveContext()).ConfigureAwait(false);
-                        return new EventHandlerResponse();
-                    }
-
-                    throw new EventHandlerDoesNotHandleEvent(typeof(TEventType));
-                }
-                finally
-                {
-                    try
-                    {
-                        var correlationId = committed.ExecutionContext.CorrelationId;
-                        var eventType = committed.Event.GetType();
-                        _completion.EventHandlerCompletedForEvent(correlationId, Identifier, eventType);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Warning(ex, "Error notifying waiters of event handler completion");
-                    }
-                }
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(request.Event.ScopeId.To<ScopeId>(), ex);
-            }
-        }
+        protected override EventHandlerResponse CreateResponseFromFailure(ProcessorFailure failure)
+            => new EventHandlerResponse { Failure = failure };
     }
 }

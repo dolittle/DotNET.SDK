@@ -2,9 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.Execution;
+using Dolittle.SDK.Execution;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represent an Event that is committed to the Event Store.
@@ -16,21 +16,27 @@ namespace Dolittle.Events
         /// </summary>
         /// <param name="eventLogSequenceNumber">The event log sequence number of the Event.</param>
         /// <param name="occurred">The <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" /> of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the Event.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext"/> in which the Event was committed.</param>
-        /// <param name="event">An instance of the Event that was committed to the Event Store.</param>
+        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="isPublic">Whether the event is public or not.</param>
         public CommittedEvent(
             EventLogSequenceNumber eventLogSequenceNumber,
             DateTimeOffset occurred,
             EventSourceId eventSourceId,
             ExecutionContext executionContext,
-            IEvent @event)
+            EventType eventType,
+            object content,
+            bool isPublic)
         {
             EventLogSequenceNumber = eventLogSequenceNumber;
             Occurred = occurred;
-            ExecutionContext = executionContext;
-            Event = @event;
             EventSource = eventSourceId;
+            ExecutionContext = executionContext;
+            EventType = eventType;
+            Content = content;
+            IsPublic = isPublic;
         }
 
         /// <summary>
@@ -54,8 +60,18 @@ namespace Dolittle.Events
         public ExecutionContext ExecutionContext { get; }
 
         /// <summary>
-        /// Gets an instance of the Event that was committed to the Event Store.
+        /// Gets the <see cref="EventType"/> in which the Event is associated with.
         /// </summary>
-        public IEvent Event { get; }
+        public EventType EventType { get; }
+
+        /// <summary>
+        /// Gets the content of the Event.
+        /// </summary>
+        public object Content { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the Event is public or not.
+        /// </summary>
+        public bool IsPublic { get; }
     }
 }

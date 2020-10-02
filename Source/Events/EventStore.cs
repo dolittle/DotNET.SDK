@@ -1,142 +1,108 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Artifacts;
-using Dolittle.Domain;
-using Dolittle.Execution;
-using Dolittle.Heads;
-using Dolittle.Lifecycle;
-using Dolittle.Logging;
-using Dolittle.Protobuf;
+using Dolittle.SDK.Execution;
+using Dolittle.SDK.Protobuf;
+using Dolittle.SDK.Services;
 using Dolittle.Services.Contracts;
-using static Dolittle.Runtime.Events.Contracts.EventStore;
+using Microsoft.Extensions.Logging;
 using Contracts = Dolittle.Runtime.Events.Contracts;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represents an implementation of <see cref="IEventStore" />.
     /// </summary>
-    [SingletonPerTenant]
     public class EventStore : IEventStore
     {
-        readonly EventStoreClient _eventStoreClient;
-        readonly IArtifactTypeMap _artifactMap;
+        static readonly EventStoreCommitMethod _method = new EventStoreCommitMethod();
+
+        readonly IPerformMethodCalls _caller;
         readonly IEventConverter _eventConverter;
-        readonly IExecutionContextManager _executionContextManager;
-        readonly Head _head;
+        readonly ExecutionContext _executionContext;
+        readonly IEventTypes _eventTypes;
         readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStore"/> class.
         /// </summary>
-        /// <param name="eventStoreClient">The event store grpc client.</param>
-        /// <param name="artifactMap">The <see cref="IArtifactTypeMap" />.</param>
+        /// <param name="caller">The caller for unary calls.</param>
         /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
-        /// <param name="executionContextManager">An <see cref="IExecutionContextManager"/> for getting execution context from.</param>
-        /// <param name="head">The current <see cref="Head"/>.</param>
+        /// <param name="executionContext">The <see cref="ExecutionContext"/> to use.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStore(
-            EventStoreClient eventStoreClient,
-            IArtifactTypeMap artifactMap,
+            IPerformMethodCalls caller,
             IEventConverter eventConverter,
-            IExecutionContextManager executionContextManager,
-            Head head,
+            ExecutionContext executionContext,
+            IEventTypes eventTypes,
             ILogger logger)
         {
-            _artifactMap = artifactMap;
-            _eventStoreClient = eventStoreClient;
+            _caller = caller;
             _eventConverter = eventConverter;
-            _executionContextManager = executionContextManager;
-            _head = head;
+            _executionContext = executionContext;
+            _eventTypes = eventTypes;
             _logger = logger;
         }
 
         /// <inheritdoc/>
-        public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+            => Commit(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+            => Commit(ToUncommittedEvent(content, eventSourceId, eventType, false), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+            => Commit(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+            => CommitPublic(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+            => Commit(ToUncommittedEvent(content, eventSourceId, eventType, true), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+            => CommitPublic(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
+            => Commit(new UncommittedEvents { uncommittedEvent }, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
-            _logger.Debug("Committing events");
+            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
+            return _eventConverter.ToSDK(response);
+        }
+
+        Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        {
+            _logger.LogDebug("Committing events");
             var request = new Contracts.CommitEventsRequest
             {
                 CallContext = GetCurrentCallContext(),
             };
             request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            var response = await _eventStoreClient.CommitAsync(request, cancellationToken: cancellationToken);
-            ThrowIfFailure(response.Failure);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
+            return _caller.Call(_method, request, cancellationToken);
         }
 
-        /// <inheritdoc/>
-        public async Task<CommittedAggregateEvents> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken)
-        {
-            _logger.Debug("Committing events for aggregate");
-            var request = new Contracts.CommitAggregateEventsRequest
-            {
-                CallContext = GetCurrentCallContext(),
-                Events = _eventConverter.ToProtobuf(uncommittedAggregateEvents),
-            };
-            var response = await _eventStoreClient.CommitForAggregateAsync(request, cancellationToken: cancellationToken);
-            ThrowIfFailure(response.Failure);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
-        }
-
-        /// <inheritdoc/>
-        public async Task<CommittedAggregateEvents> FetchForAggregate(Type aggregateRoot, EventSourceId eventSource, CancellationToken cancellationToken)
-        {
-            _logger.Debug("Fetching events for aggregate");
-            var request = new Contracts.FetchForAggregateRequest
-            {
-                CallContext = GetCurrentCallContext(),
-                Aggregate = new Contracts.Aggregate
-                {
-                    AggregateRootId = _artifactMap.GetArtifactFor(aggregateRoot).Id.ToProtobuf(),
-                    EventSourceId = eventSource.ToProtobuf(),
-                },
-            };
-            var response = await _eventStoreClient.FetchForAggregateAsync(request, cancellationToken: cancellationToken);
-            ThrowIfFailure(response.Failure);
-            try
-            {
-                return _eventConverter.ToSDK(response.Events);
-            }
-            catch (CouldNotDeserializeEvent ex)
-            {
-                throw new CouldNotDeserializeEventFromScope(ScopeId.Default, ex);
-            }
-        }
-
-        /// <inheritdoc/>
-        public Task<CommittedAggregateEvents> FetchForAggregate<TAggregateRoot>(EventSourceId eventSource, CancellationToken cancellationToken)
-            where TAggregateRoot : AggregateRoot
-            => FetchForAggregate(typeof(TAggregateRoot), eventSource, cancellationToken);
+        UncommittedEvent ToUncommittedEvent(object content, EventSourceId eventSourceId, EventType eventType, bool isPublic)
+            => new UncommittedEvent(eventSourceId, eventType, content, isPublic);
 
         CallRequestContext GetCurrentCallContext()
             => new CallRequestContext
             {
-                HeadId = _head.Id.ToProtobuf(),
-                ExecutionContext = _executionContextManager.Current.ToProtobuf(),
+                // in the future this should be set to something more meaningfull
+                HeadId = HeadId.NotSet.Value.ToProtobuf(),
+                ExecutionContext = _executionContext.ToProtobuf(),
             };
-
-        void ThrowIfFailure(Failure failure)
-        {
-            if (failure != null) throw new EventStoreOperationFailed(failure.Reason);
-        }
     }
 }

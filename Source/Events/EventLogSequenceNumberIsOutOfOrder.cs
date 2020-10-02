@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Exception that gets thrown when a event log sequence numbers in a sequence of events are out of order, meaning that an event has a lower event log sequence number than the previous event.

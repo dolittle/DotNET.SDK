@@ -1,9 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.Concepts;
+using Dolittle.SDK.Concepts;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represents the sequence number of the Event Log as a natural number, corresponding to the number of events that has been committed to the Event Store.
@@ -19,6 +19,6 @@ namespace Dolittle.Events
         /// Implicitly convert a <see cref="uint"/> to an <see cref="EventLogSequenceNumber"/>.
         /// </summary>
         /// <param name="number">The number.</param>
-        public static implicit operator EventLogSequenceNumber(ulong number) => new EventLogSequenceNumber { Value = number };
+        public static implicit operator EventLogSequenceNumber(ulong number) => new EventLogSequenceNumber { Value = number };
     }
 }

@@ -2,9 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.Concepts;
+using Dolittle.SDK.Concepts;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represents the concept of a unique identifier for a stream.
@@ -12,25 +12,22 @@ namespace Dolittle.Events
     public class StreamId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Represents the all stream <see cref="StreamId"/>.
+        /// Gets the Event Log stream id.
         /// </summary>
-        public static StreamId EventLog = Guid.Empty;
+        public static StreamId EventLog => new StreamId { Value = Guid.Empty };
 
         /// <summary>
-        /// Gets a value indicating whether a <see cref="StreamId" /> is writeable for a user-defined filter.
+        /// Implicitly converts from a <see cref="Guid"/> to an <see cref="StreamId"/>.
         /// </summary>
-        public bool IsNonWriteable => this == EventLog;
+        /// <param name="id">The <see cref="Guid"/> representation.</param>
+        /// <returns>The converted <see cref="StreamId"/>.</returns>
+        public static implicit operator StreamId(Guid id) => new StreamId { Value = id };
 
         /// <summary>
-        /// Implicitly convert from <see cref="Guid"/> to <see cref="StreamId"/>.
+        /// Implicitly converts from a <see cref="string"/> to an <see cref="StreamId"/>.
         /// </summary>
-        /// <param name="id"><see cref="Guid"/> to convert from.</param>
-        public static implicit operator StreamId(Guid id) => new StreamId { Value = id };
-
-        /// <summary>
-        /// Creates a new instance of <see cref="StreamId"/> with a unique id.
-        /// </summary>
-        /// <returns>A new <see cref="StreamId"/>.</returns>
-        public static StreamId New() => new StreamId { Value = Guid.NewGuid() };
+        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <returns>The converted <see cref="StreamId"/>.</returns>
+        public static implicit operator StreamId(string id) => new StreamId { Value = Guid.Parse(id) };
     }
 }

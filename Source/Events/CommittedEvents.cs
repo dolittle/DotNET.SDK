@@ -1,18 +1,17 @@
-﻿// Copyright (c) Dolittle. All rights reserved.
+// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections;
 using System.Collections.Generic;
-using Dolittle.Collections;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
-    /// Represents a sequence of <see cref="IEvent"/>s that have been committed to the Event Store.
+    /// Represents a sequence of Events that have been committed to the Event Store.
     /// </summary>
     public class CommittedEvents : IReadOnlyList<CommittedEvent>
     {
-        readonly NullFreeList<CommittedEvent> _events;
+        readonly IReadOnlyList<CommittedEvent> _events;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommittedEvents"/> class.
@@ -27,7 +26,7 @@ namespace Dolittle.Events
                 if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
             }
 
-            _events = new NullFreeList<CommittedEvent>(events);
+            _events = events;
         }
 
         /// <summary>

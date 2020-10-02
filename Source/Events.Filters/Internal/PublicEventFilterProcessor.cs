@@ -1,90 +1,57 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Events.Filters.EventHorizon;
-using Dolittle.Logging;
-using Dolittle.Protobuf;
 using Dolittle.Runtime.Events.Processing.Contracts;
-using Dolittle.Services.Clients;
-using static Dolittle.Runtime.Events.Processing.Contracts.Filters;
+using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Protobuf;
+using Microsoft.Extensions.Logging;
 
-namespace Dolittle.Events.Filters.Internal
+namespace Dolittle.SDK.Events.Filters.Internal
 {
     /// <summary>
-    /// An implementation of <see cref="AbstractFilterProcessor{TEventType, TClientMessage, TRegistrationRequest, TFilterResponse}"/> used for <see cref="ICanFilterPublicEvents"/>.
+    /// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter public events.
     /// </summary>
-    public class PublicEventFilterProcessor : AbstractFilterProcessor<IPublicEvent, PublicFilterClientToRuntimeMessage, PublicFilterRegistrationRequest, PartitionedFilterResponse>
+    public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegistrationRequest, PartitionedFilterResponse>
     {
-        readonly FiltersClient _client;
-        readonly IReverseCallClients _reverseCallClients;
-        readonly ICanFilterPublicEvents _filter;
+        readonly PartitionedFilterEventCallback _filterEventCallback;
+        readonly FilterId _filterId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublicEventFilterProcessor"/> class.
         /// </summary>
-        /// <param name="filterId">The unique <see cref="FilterId"/> for the event filter.</param>
-        /// <param name="client">The <see cref="FiltersClient"/> to use to connect to the Runtime.</param>
-        /// <param name="reverseCallClients">The <see cref="IReverseCallClients"/> to use for creating instances of <see cref="IReverseCallClient{TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/>.</param>
-        /// <param name="filter">The <see cref="ICanFilterPublicEvents"/> to use for filtering the events.</param>
-        /// <param name="converter">The <see cref="IEventConverter"/> to use to convert events.</param>
-        /// <param name="logger">The <see cref="ILogger"/> to use for logging.</param>
+        /// <param name="filterId">The <see cref="FilterId" />.</param>
+        /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
+        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public PublicEventFilterProcessor(
             FilterId filterId,
-            FiltersClient client,
-            IReverseCallClients reverseCallClients,
-            ICanFilterPublicEvents filter,
-            IEventConverter converter,
-            ILogger logger)
-            : base(filterId, converter, logger)
+            PartitionedFilterEventCallback filterEventCallback,
+            IEventProcessingConverter converter,
+            ILoggerFactory loggerFactory)
+            : base("Public Filter", filterId, converter, loggerFactory)
         {
-            _client = client;
-            _reverseCallClients = reverseCallClients;
-            _filter = filter;
+            _filterEventCallback = filterEventCallback;
+            _filterId = filterId;
         }
 
         /// <inheritdoc/>
-        protected override string Kind => "public filter";
-
-        /// <inheritdoc/>
-        protected override IReverseCallClient<PublicFilterClientToRuntimeMessage, FilterRuntimeToClientMessage, PublicFilterRegistrationRequest, FilterRegistrationResponse, FilterEventRequest, PartitionedFilterResponse> CreateClient()
-            => _reverseCallClients.GetFor<PublicFilterClientToRuntimeMessage, FilterRuntimeToClientMessage, PublicFilterRegistrationRequest, FilterRegistrationResponse, FilterEventRequest, PartitionedFilterResponse>(
-                () => _client.ConnectPublic(),
-                (message, arguments) => message.RegistrationRequest = arguments,
-                message => message.RegistrationResponse,
-                message => message.FilterRequest,
-                (message, response) => message.FilterResult = response,
-                (arguments, context) => arguments.CallContext = context,
-                request => request.CallContext,
-                (response, context) => response.CallContext = context,
-                message => message.Ping,
-                (message, pong) => message.Pong = pong,
-                TimeSpan.FromSeconds(5));
-
-        /// <inheritdoc/>
-        protected override PublicFilterRegistrationRequest GetRegisterArguments()
+        public override PublicFilterRegistrationRequest RegistrationRequest
             => new PublicFilterRegistrationRequest
-            {
-                FilterId = Identifier.ToProtobuf(),
-            };
+                {
+                    FilterId = _filterId.ToProtobuf()
+                };
 
         /// <inheritdoc/>
         protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)
-            => new PartitionedFilterResponse
-            {
-                Failure = failure,
-            };
+            => new PartitionedFilterResponse { Failure = failure };
 
         /// <inheritdoc/>
-        protected override async Task<PartitionedFilterResponse> Filter(IPublicEvent @event, EventContext context)
+        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
         {
-            var result = await _filter.Filter(@event, context).ConfigureAwait(false);
-            return new PartitionedFilterResponse
-            {
-                IsIncluded = result.Included,
-                PartitionId = result.Partition.ToProtobuf(),
-            };
+            var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
+            return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.ToProtobuf() };
         }
     }
 }

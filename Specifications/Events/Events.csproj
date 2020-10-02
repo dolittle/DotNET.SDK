@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <Import Project="../../specs.props"/>
 
     <PropertyGroup>
-        <AssemblyName>Dolittle.Events.Specs</AssemblyName>
+        <AssemblyName>Dolittle.SDK.Events.Specs</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Source\Events\Events.csproj" />
+        <ProjectReference Include="../../Source/Events/Events.csproj" />
     </ItemGroup>
 
 </Project>

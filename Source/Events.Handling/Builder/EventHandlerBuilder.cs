@@ -1,60 +1,102 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.DependencyInversion;
+using System.Collections.Generic;
+using System.Threading;
+using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Events.Handling.Internal;
+using Dolittle.SDK.Events.Processing;
+using Microsoft.Extensions.Logging;
 
-namespace Dolittle.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder
 {
     /// <summary>
-    /// Defines a builder that can build instances of <see cref="IEventHandler{TEventType}"/> of type <typeparamref name="TEventType"/> from handler delegates.
+    /// Represents a building event handlers.
     /// </summary>
-    /// <typeparam name="TEventType">The type of events to handle.</typeparam>
-    public class EventHandlerBuilder<TEventType>
-        where TEventType : IEvent
+    public class EventHandlerBuilder : ICanBuildAndRegisterAnEventHandler
     {
-        readonly DelegateEventHandler<TEventType> _handler;
+        readonly EventHandlerId _eventHandlerId;
+        EventHandlerMethodsBuilder _methodsBuilder;
 
-        internal EventHandlerBuilder()
+        ScopeId _scopeId = ScopeId.Default;
+
+        bool _partitioned = true;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
+        /// </summary>
+        /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
+        public EventHandlerBuilder(EventHandlerId eventHandlerId) => _eventHandlerId = eventHandlerId;
+
+        /// <summary>
+        /// Defines the event handler to be partitioned - this is default for an event handler.
+        /// </summary>
+        /// <returns>The builder for continuation.</returns>
+        public EventHandlerMethodsBuilder Partitioned()
         {
-            _handler = new DelegateEventHandler<TEventType>();
+            _partitioned = true;
+            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
+            return _methodsBuilder;
         }
 
         /// <summary>
-        /// Builds the <see cref="IEventHandler{TEventType}"/> of type <typeparamref name="TEventType"/> from the provided delegates.
+        /// Defines the event handler to be unpartitioned. By default it will be partitioned.
         /// </summary>
-        /// <returns>The composed <see cref="IEventHandler{TEventType}"/> of type <typeparamref name="TEventType"/>.</returns>
-        public IEventHandler<TEventType> Build()
-            => _handler;
+        /// <returns>The builder for continuation.</returns>
+        public EventHandlerMethodsBuilder Unpartitioned()
+        {
+            _partitioned = false;
+            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
+            return _methodsBuilder;
+        }
 
         /// <summary>
-        /// Adds a <see cref="EventHandlerAction{TEventType}"/> of type <typeparamref name="TTEventType"/> to be performed when events of type <typeparamref name="TTEventType"/> are received.
+        /// Defines the event handler to operate on a specific <see cref="_scopeId" />.
         /// </summary>
-        /// <typeparam name="TTEventType">The type of event to handle.</typeparam>
-        /// <param name="action">The action to be performed when events of type <typeparamref name="TTEventType"/> are received.</param>
-        /// <returns>The <see cref="EventHandlerBuilder{TEventType}"/> for continued building.</returns>
-        public EventHandlerBuilder<TEventType> Handle<TTEventType>(EventHandlerAction<TTEventType> action)
-            where TTEventType : TEventType
+        /// <param name="scopeId">The <see cref="_scopeId" />.</param>
+        /// <returns>The builder for continuation.</returns>
+        public EventHandlerBuilder InScope(ScopeId scopeId)
         {
-            _handler.AddAction<TTEventType>((@event, context) => action.Invoke((TTEventType)@event, context));
+            _scopeId = scopeId;
             return this;
         }
 
-        /// <summary>
-        /// Creates a builder to add methods to call on an instance of <typeparamref name="THandlerType"/>.
-        /// </summary>
-        /// <param name="instance">The instance of <typeparamref name="THandlerType"/> that will be used to call methods on when events are received.</param>
-        /// <typeparam name="THandlerType">The type of the instance to call methods on.</typeparam>
-        /// <returns>A <see cref="EventHandlerInstanceBuilder{THandlerType, TEventType}"/> to add methods to call on an instance of <typeparamref name="THandlerType"/>.</returns>
-        public EventHandlerInstanceBuilder<THandlerType, TEventType> With<THandlerType>(THandlerType instance)
-            => new EventHandlerInstanceBuilder<THandlerType, TEventType>(this, instance);
+        /// <inheritdoc/>
+        public void BuildAndRegister(
+            IEventProcessors eventProcessors,
+            IEventTypes eventTypes,
+            IEventProcessingConverter processingConverter,
+            IContainer container,
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellation)
+        {
+            if (_methodsBuilder == default)
+            {
+                loggerFactory
+                    .CreateLogger<EventHandlerBuilder>()
+                    .LogWarning(
+                        "Failed to build event handler {EventHandlerId}. No event handler methods are configured for event handler",
+                        _eventHandlerId);
+                return;
+            }
 
-        /// <summary>
-        /// Creates a builder to add methods to call on an instance of <typeparamref name="THandlerType"/> instantiate by a <see cref="FactoryFor{T}"/> of type <typeparamref name="THandlerType"/>.
-        /// </summary>
-        /// <param name="factory">The <see cref="FactoryFor{T}"/> of type <typeparamref name="THandlerType"/> use to instantiate the <typeparamref name="THandlerType"/>.</param>
-        /// <typeparam name="THandlerType">The type of the instance to call methods on.</typeparam>
-        /// <returns>A <see cref="EventHandlerFactoryBuilder{THandlerType, TEventType}"/> to add methods to call on an instance of <typeparamref name="THandlerType"/> instantiate by a <see cref="FactoryFor{T}"/> of type <typeparamref name="THandlerType"/>.</returns>
-        public EventHandlerFactoryBuilder<THandlerType, TEventType> With<THandlerType>(FactoryFor<THandlerType> factory)
-            => new EventHandlerFactoryBuilder<THandlerType, TEventType>(this, factory);
+            var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
+            if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
+            {
+                loggerFactory
+                    .CreateLogger<EventHandlerBuilder>()
+                    .LogWarning(
+                        "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
+                        _eventHandlerId);
+                return;
+            }
+
+            var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
+            var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingConverter, loggerFactory.CreateLogger<EventHandlerProcessor>());
+            eventProcessors.Register(
+                eventHandlerProcessor,
+                new EventHandlerProtocol(),
+                cancellation);
+        }
     }
 }

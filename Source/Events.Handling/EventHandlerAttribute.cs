@@ -3,10 +3,10 @@
 
 using System;
 
-namespace Dolittle.Events.Handling
+namespace Dolittle.SDK.Events.Handling
 {
     /// <summary>
-    /// Decorates a method to indicate the Event Handler Id of the Event Handler class.
+    /// Decorates a class to indicate the Event Handler Id of the Event Handler class.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class EventHandlerAttribute : Attribute
@@ -14,20 +14,29 @@ namespace Dolittle.Events.Handling
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHandlerAttribute"/> class.
         /// </summary>
-        /// <param name="id">The <see cref="Guid" /> identifier.</param>
-        public EventHandlerAttribute(string id)
+        /// <param name="eventHandlerId">The unique identifier of the event handler.</param>
+        /// <param name="partitioned">Whether the event handler is partitioned.</param>
+        /// <param name="inScope">The scope that the event handler handles events in.</param>
+        public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string inScope = default)
         {
-            Id = Guid.Parse(id);
+            Identifier = Guid.Parse(eventHandlerId);
+            Partitioned = partitioned;
+            ScopeId = inScope == default ? ScopeId.Default : new ScopeId(Guid.Parse(inScope));
         }
 
         /// <summary>
-        /// Gets the unique id for this event processor.
+        /// Gets the unique identifier for this event handler.
         /// </summary>
-        public EventHandlerId Id { get; }
+        public EventHandlerId Identifier { get; }
 
-        void ThrowIfIllegalId(EventHandlerId id)
-        {
-            var stream = new StreamId { Value = id };
-        }
+        /// <summary>
+        /// Gets a value indicating whether this event handler is partitioned.
+        /// </summary>
+        public bool Partitioned { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Events.ScopeId" />.
+        /// </summary>
+        public ScopeId ScopeId { get; }
     }
 }

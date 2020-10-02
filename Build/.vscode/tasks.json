@@ -25,7 +25,15 @@
                 "fileLocation": ["absolute"]
             }            
         },
-        
+        {
+            "label": "build-dotnet",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build"
+            ],
+            "problemMatcher": "$tsc"
+        },
         {
             "label": "build",
             "command": "node",

@@ -1,35 +1,32 @@
-﻿// Copyright (c) Dolittle. All rights reserved.
+// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
-namespace Dolittle.Events.Filters
+namespace Dolittle.SDK.Events.Filters
 {
     /// <summary>
-    /// Represents the result of a <see cref="ICanFilterEventsWithPartition"/>.
+    /// Represents the result from a partitioned filter.
     /// </summary>
-    public class PartitionedFilterResult : FilterResult
+    public class PartitionedFilterResult
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PartitionedFilterResult"/> class.
         /// </summary>
-        /// <param name="included">true if the <see cref="IEvent"/> should be included in the stream, false if not.</param>
-        /// <param name="partition">The <see cref="PartitionId"/> of which the <see cref="IEvent"/> should be put in the stream.</param>
-        public PartitionedFilterResult(bool included, PartitionId partition)
-            : base(included)
+        /// <param name="shouldInclude">Whether or not the event should be included.</param>
+        /// <param name="partitionId">The <see cref="PartitionId" />.</param>
+        public PartitionedFilterResult(bool shouldInclude, PartitionId partitionId)
         {
-            Partition = partition;
+            PartitionId = partitionId;
+            ShouldInclude = shouldInclude;
         }
 
         /// <summary>
-        /// Gets the <see cref="PartitionId"/> of which the <see cref="CommittedEvent"/> should be put in the stream.
+        /// Gets the <see cref="PartitionId" />.
         /// </summary>
-        public PartitionId Partition { get; }
+        public PartitionId PartitionId { get; }
 
         /// <summary>
-        /// Implicitly convert from a <see cref="Tuple{T,U}"/> to <see cref="PartitionedFilterResult"/>.
+        /// Gets a value indicating whether the event should be included or not.
         /// </summary>
-        /// <param name="result">A <see cref="Tuple{T,U}"/> containing the result of the filtering operation.</param>
-        public static implicit operator PartitionedFilterResult((bool included, PartitionId partition) result) => new PartitionedFilterResult(result.included, result.partition);
+        public bool ShouldInclude { get; }
     }
 }

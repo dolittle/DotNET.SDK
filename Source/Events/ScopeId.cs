@@ -2,9 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.Concepts;
+using Dolittle.SDK.Concepts;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represents the identification of a scope.
@@ -32,5 +32,12 @@ namespace Dolittle.Events
         /// </summary>
         /// <param name="scopeId">ScopeId as <see cref="Guid"/>.</param>
         public static implicit operator ScopeId(Guid scopeId) => new ScopeId(scopeId);
+
+        /// <summary>
+        /// Implicitly converts from a <see cref="string"/> to an <see cref="ScopeId"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <returns>The converted <see cref="ScopeId"/>.</returns>
+        public static implicit operator ScopeId(string id) => new ScopeId { Value = Guid.Parse(id) };
     }
 }

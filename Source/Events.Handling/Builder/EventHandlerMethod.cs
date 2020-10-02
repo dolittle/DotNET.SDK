@@ -2,18 +2,37 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
+using Dolittle.SDK.Async;
 
-namespace Dolittle.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder
 {
     /// <summary>
-    /// Represents method to call on a <typeparamref name="THandlerType"/> when an event of type <typeparamref name="TEventType"/> is received.
+    /// An implementation of <see cref="IEventHandlerMethod" />.
     /// </summary>
-    /// <param name="handler">The handler.</param>
-    /// <param name="event">The event to handle.</param>
-    /// <param name="context">The <see cref="EventContext"/> of the event to handle.</param>
-    /// <typeparam name="THandlerType">The type of handler.</typeparam>
-    /// <typeparam name="TEventType">The type of the event to handle.</typeparam>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public delegate Task EventHandlerMethod<THandlerType, TEventType>(THandlerType handler, TEventType @event, EventContext context)
-        where TEventType : IEvent;
+    public class EventHandlerMethod : IEventHandlerMethod
+    {
+        readonly TaskEventHandlerSignature _method;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHandlerMethod"/> class.
+        /// </summary>
+        /// <param name="method">The <see cref="TaskEventHandlerSignature" />.</param>
+        public EventHandlerMethod(TaskEventHandlerSignature method)
+            => _method = method;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventHandlerMethod"/> class.
+        /// </summary>
+        /// <param name="method">The <see cref="VoidEventHandlerSignature" />.</param>
+        public EventHandlerMethod(VoidEventHandlerSignature method)
+            => _method = (@event, context) =>
+                {
+                    method(@event, context);
+                    return Task.CompletedTask;
+                };
+
+        /// <inheritdoc/>
+        public Task<Try> TryHandle(object @event, EventContext context)
+            => _method(@event, context).TryTask();
+    }
 }

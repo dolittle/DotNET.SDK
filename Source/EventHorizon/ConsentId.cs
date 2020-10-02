@@ -2,20 +2,32 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.Concepts;
-using Dolittle.Tenancy;
+using Dolittle.SDK.Concepts;
 
-namespace Dolittle.EventHorizon
+namespace Dolittle.SDK.EventHorizon
 {
     /// <summary>
-    /// Represents an identifier for a consent given to share events between two <see cref="TenantId">tenants</see> in two <see cref="ApplicationModel.Microservice">microservices</see>.
+    /// Represents the concept of a unique identifier for a consent from an event horizon subscription.
     /// </summary>
     public class ConsentId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Convert a <see cref="Guid"/> to a <see cref="ConsentId"/>.
+        /// Gets the consent id used if it is not set.
         /// </summary>
-        /// <param name="consentId">The identifier of the consent.</param>
-        public static implicit operator ConsentId(Guid consentId) => new ConsentId { Value = consentId };
+        public static ConsentId NotSet => new ConsentId { Value = Guid.Empty };
+
+        /// <summary>
+        /// Implicitly converts from a <see cref="Guid"/> to an <see cref="ConsentId"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="Guid"/> representation.</param>
+        /// <returns>The converted <see cref="ConsentId"/>.</returns>
+        public static implicit operator ConsentId(Guid id) => new ConsentId { Value = id };
+
+        /// <summary>
+        /// Implicitly converts from a <see cref="string"/> to an <see cref="ConsentId"/>.
+        /// </summary>
+        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <returns>The converted <see cref="ConsentId"/>.</returns>
+        public static implicit operator ConsentId(string id) => new ConsentId { Value = Guid.Parse(id) };
     }
 }

@@ -1,20 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <Import Project="../../default.props" />
+
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events.Handling</AssemblyName>
     </PropertyGroup>
+
     <ItemGroup>
-        <PackageReference Include="Dolittle.Artifacts" Version="$(FundamentalsVersion)" />
-        <PackageReference Include="Dolittle.Booting" Version="$(FundamentalsVersion)" />
-        <PackageReference Include="Dolittle.Lifecycle" Version="$(FundamentalsVersion)" />
-        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Microservice.Configuration\Microservice.Configuration.csproj" />
-        <ProjectReference Include="..\Artifacts.Configuration\Artifacts.Configuration.csproj" />
-        <ProjectReference Include="..\Events\Events.csproj" />
-        <ProjectReference Include="..\Events.Processing\Events.Processing.csproj" />
+        <ProjectReference Include="../Async/Async.csproj" />
+        <ProjectReference Include="../DependencyInversion/DependencyInversion.csproj" />
+        <ProjectReference Include="../Events/Events.csproj" />
+        <ProjectReference Include="../Events.Processing/Events.Processing.csproj" />
+        <ProjectReference Include="../Protobuf/Protobuf.csproj" />
     </ItemGroup>
     
 </Project>

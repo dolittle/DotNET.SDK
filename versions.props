@@ -3,5 +3,10 @@
         <ContractsVersion>5.*</ContractsVersion>
         <FundamentalsVersion>5.*</FundamentalsVersion>
         <ReadModelsMongo>5.*</ReadModelsMongo>
+        <MicrosoftExtensionsVersion>3.1.2</MicrosoftExtensionsVersion>
+        <RxVersion>4.4.1</RxVersion>
+        <ProtobufVersion>3.11.2</ProtobufVersion>
+        <GrpcVersion>2.26.0</GrpcVersion>
+        <NewtonsoftVersion>12.0.3</NewtonsoftVersion>
     </PropertyGroup>
 </Project>

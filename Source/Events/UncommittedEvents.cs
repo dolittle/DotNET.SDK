@@ -1,21 +1,20 @@
-﻿// Copyright (c) Dolittle. All rights reserved.
+// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections;
 using System.Collections.Generic;
-using Dolittle.Collections;
 
-namespace Dolittle.Events
+namespace Dolittle.SDK.Events
 {
     /// <summary>
     /// Represents a sequence of <see cref="UncommittedEvent"/>s that have not been committed to the Event Store.
     /// </summary>
-    public class UncommittedEvents : IReadOnlyList<UncommittedEvent>
+    public class UncommittedEvents : IList<UncommittedEvent>
     {
-        readonly NullFreeList<UncommittedEvent> _events = new NullFreeList<UncommittedEvent>();
+        readonly List<UncommittedEvent> _events = new List<UncommittedEvent>();
 
         /// <summary>
-        /// Gets a value indicating whether or not there are any events in the uncommitted sequence.
+        /// Gets a value indicating whether or not there are any events in the committed sequence.
         /// </summary>
         public bool HasEvents => Count > 0;
 
@@ -23,24 +22,13 @@ namespace Dolittle.Events
         public int Count => _events.Count;
 
         /// <inheritdoc/>
-        public UncommittedEvent this[int index] => _events[index];
+        public bool IsReadOnly => false;
 
-        /// <summary>
-        /// Appends an event to the uncommitted sequence.
-        /// </summary>
-        /// <param name="eventSource">The <see cref="EventSourceId"/> of the <see cref="UncommittedEvent"/> to append.</param>
-        /// <param name="event">The <see cref="IEvent"/> of the <see cref="UncommittedEvent"/> to append.</param>
-        public void Append(EventSourceId eventSource, IEvent @event)
-            => Append(new UncommittedEvent(eventSource, @event));
-
-        /// <summary>
-        /// Appends an event to the uncommitted sequence.
-        /// </summary>
-        /// <param name="event"><see cref="UncommittedEvent"/> to append.</param>
-        public void Append(UncommittedEvent @event)
+        /// <inheritdoc/>
+        public UncommittedEvent this[int index]
         {
-            ThrowIfEventIsNull(@event);
-            _events.Add(@event);
+            get => _events[index];
+            set => Insert(index, value);
         }
 
         /// <inheritdoc/>
@@ -48,6 +36,46 @@ namespace Dolittle.Events
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
+
+        /// <inheritdoc/>
+        public int IndexOf(UncommittedEvent item) => _events.IndexOf(item);
+
+        /// <inheritdoc/>
+        public void Insert(int index, UncommittedEvent item)
+        {
+            ThrowIfEventIsNull(item);
+            _events.Insert(index, item);
+        }
+
+        /// <inheritdoc/>
+        public void RemoveAt(int index) => _events.RemoveAt(index);
+
+        /// <inheritdoc/>
+        public void Add(UncommittedEvent item)
+        {
+            ThrowIfEventIsNull(item);
+            _events.Add(item);
+        }
+
+        /// <inheritdoc/>
+        public void Clear() => _events.Clear();
+
+        /// <inheritdoc/>
+        public bool Contains(UncommittedEvent item) => _events.Contains(item);
+
+        /// <inheritdoc/>
+        public void CopyTo(UncommittedEvent[] array, int arrayIndex)
+        {
+            foreach (var item in array)
+            {
+                ThrowIfEventIsNull(item);
+            }
+
+            _events.CopyTo(array, arrayIndex);
+        }
+
+        /// <inheritdoc/>
+        public bool Remove(UncommittedEvent item) => _events.Remove(item);
 
         void ThrowIfEventIsNull(UncommittedEvent @event)
         {

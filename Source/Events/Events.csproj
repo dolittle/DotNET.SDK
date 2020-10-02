@@ -1,16 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <Import Project="../../default.props" />
+
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events</AssemblyName>
     </PropertyGroup>
+
     <ItemGroup>
-        <PackageReference Include="Dolittle.Artifacts" Version="$(FundamentalsVersion)" />
-        <PackageReference Include="Dolittle.Rules" Version="$(FundamentalsVersion)" />
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
     </ItemGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\Artifacts\Artifacts.csproj" />
-        <ProjectReference Include="..\Heads\Heads.csproj" />
-        <ProjectReference Include="..\Transactions\Transactions.csproj" />
+        <ProjectReference Include="../Artifacts/Artifacts.csproj" />
+        <ProjectReference Include="../Concepts/Concepts.csproj" />
+        <ProjectReference Include="../Execution/Execution.csproj" />
+        <ProjectReference Include="../Protobuf/Protobuf.csproj" />
+        <ProjectReference Include="../Services/Services.csproj" />
     </ItemGroup>
+
 </Project>
