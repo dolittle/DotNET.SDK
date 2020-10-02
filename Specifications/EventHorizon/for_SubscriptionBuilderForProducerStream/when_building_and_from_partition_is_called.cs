@@ -36,7 +36,7 @@ namespace Dolittle.SDK.EventHorizon.for_SubscriptionBuilderForProducerStream
 
             producer_partition = "e9395405-0906-4baa-a7da-e9641c548572";
             builder
-                .FromPartition(producer_partition)
+                .FromProducerPartition(producer_partition)
                 .ToScope("3d87171e-8b04-4cb5-92f2-966e5c7a5371");
         };
 

@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Events.Filters
     /// <summary>
     /// Represents the builder for building partitioned event filters.
     /// </summary>
-    public class PartitionedEventFilterBuilder : IBuildNonPublicFilter
+    public class PartitionedEventFilterBuilder : IPrivateFilterBuilder
     {
         static readonly PartitionedEventFilterProtocol _protocol = new PartitionedEventFilterProtocol();
 

@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.Protobuf.Contracts;
-using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events.for_EventConverter.given;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -58,7 +57,7 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_a_committed_eve
             converted_event_type = new EventType(event_type.Id.To<EventTypeId>(), event_type.Generation);
 
             event_types.Setup(_ => _.HasTypeFor(converted_event_type)).Returns(false);
-            event_types.Setup(_ => _.GetTypeFor(converted_event_type)).Throws(new UnknownType(converted_event_type));
+            event_types.Setup(_ => _.GetTypeFor(converted_event_type)).Throws(new NoTypeAssociatedWithEventType(converted_event_type));
         };
 
         Because of = () => converted_committed_event = converter.ToSDK(committed_event);

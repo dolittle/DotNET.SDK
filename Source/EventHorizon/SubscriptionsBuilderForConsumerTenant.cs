@@ -16,7 +16,7 @@ namespace Dolittle.SDK.EventHorizon
     public class SubscriptionsBuilderForConsumerTenant
     {
         readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
-        readonly IList<SubscriptionsBuilderForProducerMicroservice> _builders = new List<SubscriptionsBuilderForProducerMicroservice>();
+        readonly IList<SubscriptionBuilderForProducerMicroservice> _builders = new List<SubscriptionBuilderForProducerMicroservice>();
         readonly TenantId _consumerTenantId;
 
         /// <summary>
@@ -30,17 +30,15 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         /// <summary>
-        /// Sets the event horizon subscriptions for the consumer tenant from a producer microservice through the <see cref="SubscriptionsBuilderForProducerMicroservice"/>.
+        /// Sets the producer microservice to subscribe to events from.
         /// </summary>
-        /// <param name="producerMicroserviceId">The <see cref="MicroserviceId"/> to subscribe to events from.</param>
-        /// <param name="callback">The builder callback.</param>
-        /// <returns>Continuation of the builder.</returns>
-        public SubscriptionsBuilderForConsumerTenant FromMicroservice(MicroserviceId producerMicroserviceId, Action<SubscriptionsBuilderForProducerMicroservice> callback)
+        /// <param name="microserviceId">The <see cref="MicroserviceId"/> to subscribe to events from.</param>
+        /// <returns>A <see cref="SubscriptionBuilderForProducerMicroservice"/> to continue building.</returns>
+        public SubscriptionBuilderForProducerMicroservice FromProducerMicroservice(MicroserviceId microserviceId)
         {
-            var builder = new SubscriptionsBuilderForProducerMicroservice(_consumerTenantId, producerMicroserviceId);
-            callback(builder);
+            var builder = new SubscriptionBuilderForProducerMicroservice(_consumerTenantId, microserviceId);
             _builders.Add(builder);
-            return this;
+            return builder;
         }
 
         /// <summary>

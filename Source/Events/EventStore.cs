@@ -49,45 +49,38 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+            => Commit(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+            => Commit(ToUncommittedEvent(content, eventSourceId, eventType, false), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+            => Commit(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+            => CommitPublic(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+            => Commit(ToUncommittedEvent(content, eventSourceId, eventType, true), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+            => CommitPublic(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
+            => Commit(new UncommittedEvents { uncommittedEvent }, cancellationToken);
+
+        /// <inheritdoc/>
         public async Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
             return _eventConverter.ToSDK(response);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
-        {
-            var uncommittedEvents = new UncommittedEvents { uncommittedEvent };
-            return Commit(uncommittedEvents, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
-        {
-            var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType);
-            return Commit(uncommittedEvents, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
-        {
-            var eventType = _eventTypes.GetFor(content.GetType());
-            return Commit(content, eventSourceId, eventType, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
-        {
-            var uncommittedEvents = ToUncommittedEvents(content, eventSourceId, eventType, true);
-            return Commit(uncommittedEvents, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
-        {
-            var eventType = _eventTypes.GetFor(content.GetType());
-            return CommitPublic(content, eventSourceId, eventType, cancellationToken);
         }
 
         Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
@@ -101,11 +94,8 @@ namespace Dolittle.SDK.Events
             return _caller.Call(_method, request, cancellationToken);
         }
 
-        UncommittedEvents ToUncommittedEvents(object content, EventSourceId eventSourceId, EventType eventType, bool isPublic = false)
-            => new UncommittedEvents
-            {
-                new UncommittedEvent(eventSourceId, eventType, content, isPublic)
-            };
+        UncommittedEvent ToUncommittedEvent(object content, EventSourceId eventSourceId, EventType eventType, bool isPublic)
+            => new UncommittedEvent(eventSourceId, eventType, content, isPublic);
 
         CallRequestContext GetCurrentCallContext()
             => new CallRequestContext

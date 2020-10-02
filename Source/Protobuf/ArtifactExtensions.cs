@@ -8,33 +8,37 @@ using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 namespace Dolittle.SDK.Protobuf
 {
     /// <summary>
-    /// Conversion extensions for converting between <see cref="IArtifact"/> and <see cref="PbArtifact"/>.
+    /// Conversion extensions for converting between <see cref="Artifact{TId}"/> and <see cref="PbArtifact"/>.
     /// </summary>
     public static class ArtifactExtensions
     {
         /// <summary>
-        /// Convert a <see cref="IArtifact"/> to a <see cref="PbArtifact"/>.
+        /// Convert a <see cref="Artifact{TId}"/> to a <see cref="PbArtifact"/>.
         /// </summary>
-        /// <param name="artifact"><see cref="IArtifact"/> to convert.</param>
+        /// <param name="artifact"><see cref="Artifact{TId}"/> to convert.</param>
+        /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
         /// <returns>The converted <see cref="PbArtifact"/>.</returns>
-        public static PbArtifact ToProtobuf(this IArtifact artifact)
+        public static PbArtifact ToProtobuf<TId>(this Artifact<TId> artifact)
+            where TId : ArtifactId
             => new PbArtifact { Id = artifact.Id.ToProtobuf(), Generation = artifact.Generation.Value };
 
         /// <summary>
         /// Convert a <see cref="PbArtifact"/> to a <typeparamref name="TArtifact"/>.
         /// </summary>
         /// <remarks>
-        /// The method assumes that the <see cref="IArtifact" /> class has a constructor that takes in
+        /// The method assumes that the <see cref="Artifact{TId}" /> class has a constructor that takes in
         /// <see cref="ArtifactId" /> as first parameter and <see cref="Generation" /> as second parameter.
-        /// It also assumes that the <see cref="ArtifactId" /> type in the <see cref="IArtifact" /> only has the default parameterless constructor.
+        /// It also assumes that the <see cref="ArtifactId" /> type in the <see cref="Artifact{TId}" /> only has the default parameterless constructor.
         /// </remarks>
         /// <param name="source"><see cref="PbArtifact"/> to convert.</param>
         /// <param name="artifact">When the method returns, the converted <see cref="Artifact{TId}"/> if conversion was successful, otherwise default.</param>
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
-        /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="IArtifact" />.</typeparam>
+        /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
+        /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
-        public static bool TryTo<TArtifact>(this PbArtifact source, out TArtifact artifact, out Exception error)
-            where TArtifact : class, IArtifact
+        public static bool TryTo<TArtifact, TId>(this PbArtifact source, out TArtifact artifact, out Exception error)
+            where TArtifact : Artifact<TId>
+            where TId : ArtifactId
         {
             artifact = default;
 
@@ -44,8 +48,8 @@ namespace Dolittle.SDK.Protobuf
                 return false;
             }
 
-            var idType = typeof(TArtifact).GetProperty(nameof(IArtifact.Id)).PropertyType;
-            var generationType = typeof(TArtifact).GetProperty(nameof(IArtifact.Generation)).PropertyType;
+            var idType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Id)).PropertyType;
+            var generationType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Generation)).PropertyType;
             try
             {
                 object artifactId = Activator.CreateInstance(idType);
@@ -85,16 +89,18 @@ namespace Dolittle.SDK.Protobuf
         /// Convert a <see cref="PbArtifact"/> to a <typeparamref name="TArtifact"/>.
         /// </summary>
         /// <remarks>
-        /// The method assumes that the <see cref="IArtifact" /> class has a constructor that takes in
+        /// The method assumes that the <see cref="Artifact{TId}" /> class has a constructor that takes in
         /// <see cref="ArtifactId" /> as first parameter and <see cref="Generation" /> as second parameter.
-        /// It also assumes that the <see cref="ArtifactId" /> type in the <see cref="IArtifact" /> only has the default parameterless constructor.
+        /// It also assumes that the <see cref="ArtifactId" /> type in the <see cref="Artifact{TId}" /> only has the default parameterless constructor.
         /// </remarks>
         /// <param name="source"><see cref="PbArtifact"/> to convert.</param>
-        /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="IArtifact" />.</typeparam>
+        /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
+        /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
         /// <returns>The converted <see cref="Artifact{TId}"/>.</returns>
-        public static TArtifact To<TArtifact>(this PbArtifact source)
-            where TArtifact : class, IArtifact
-            => source.TryTo<TArtifact>(out var artifact, out var error) ? artifact : throw error;
+        public static TArtifact To<TArtifact, TId>(this PbArtifact source)
+            where TArtifact : Artifact<TId>
+            where TId : ArtifactId
+            => source.TryTo<TArtifact, TId>(out var artifact, out var error) ? artifact : throw error;
 
         /// <summary>
         /// Convert a <see cref="PbArtifact"/> to a tuple with an <see cref="ArtifactId" /> and a <see cref="Generation" />.

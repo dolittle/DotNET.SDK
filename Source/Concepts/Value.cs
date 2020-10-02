@@ -89,10 +89,16 @@ namespace Dolittle.SDK.Concepts
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("{[Type: " + GetType() + "]");
+            sb.Append("{[Type: ")
+              .Append(GetType())
+              .AppendLine("]");
             foreach (var field in GetFields())
             {
-                sb.Append($"{{ {RemoveBackingAutoBackingFieldPropertyName(field.Name)} : {field.GetValue(this) ?? "[NULL]"} }}");
+                sb.Append("{ ")
+                  .Append(RemoveBackingAutoBackingFieldPropertyName(field.Name))
+                  .Append(" : ")
+                  .Append(field.GetValue(this) ?? "[NULL]")
+                  .Append(" }");
             }
 
             sb.AppendLine("}");

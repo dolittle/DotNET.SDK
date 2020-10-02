@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Events.Filters
 {
     /// <summary>
-    /// Defines a builder that can build a non-public filter.
+    /// Defines a builder that can build a private filter.
     /// </summary>
-    public interface IBuildNonPublicFilter
+    public interface IPrivateFilterBuilder
     {
         /// <summary>
         /// Builds and register an instance of a private filter.

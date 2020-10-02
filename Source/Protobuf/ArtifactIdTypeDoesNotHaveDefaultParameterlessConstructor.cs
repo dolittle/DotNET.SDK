@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Protobuf
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor"/> class.
         /// </summary>
-        /// <param name="expectedArtifactType">The <see cref="Type" /> of <see cref="IArtifact" /> the protobuf artifact should be converted to.</param>
+        /// <param name="expectedArtifactType">The <see cref="Type" /> of <see cref="Artifact{TId}" /> the protobuf artifact should be converted to.</param>
         /// <param name="artifact">The <see cref="PbArtifact" />.</param>
         /// <param name="artifactIdType">The <see cref="Type" /> of the <see cref="ArtifactId" />.</param>
         public ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor(Type expectedArtifactType, PbArtifact artifact, Type artifactIdType)

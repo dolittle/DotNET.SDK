@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
-using Dolittle.SDK.Tenancy;
 using Machine.Specifications;
 using Version = Dolittle.SDK.Microservices.Version;
 

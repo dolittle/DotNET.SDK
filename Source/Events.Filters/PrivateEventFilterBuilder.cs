@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Events.Filters
     /// </summary>
     public class PrivateEventFilterBuilder
     {
-        IBuildNonPublicFilter _innerBuilder;
+        IPrivateFilterBuilder _innerBuilder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PrivateEventFilterBuilder"/> class.
@@ -47,18 +47,20 @@ namespace Dolittle.SDK.Events.Filters
         /// <returns>The partitioned event filter builder continuation.</returns>
         public PartitionedEventFilterBuilder Partitioned()
         {
-            _innerBuilder = new PartitionedEventFilterBuilder();
-            return _innerBuilder as PartitionedEventFilterBuilder;
+            var builder = new PartitionedEventFilterBuilder();
+            _innerBuilder = builder;
+            return builder;
         }
 
         /// <summary>
-        /// Defines a callback for the filter.
+        /// Defines the filter to not be partitioned.
         /// </summary>
-        /// <param name="callback">The callback that will be called for each event.</param>
-        public void Handle(FilterEventCallback callback)
+        /// <returns>The unpartitioned event filter builder continuation.</returns>
+        public UnpartitionedEventFilterBuilder Unpartitioned()
         {
-            _innerBuilder = new UnpartitionedEventFilterBuilder();
-            (_innerBuilder as UnpartitionedEventFilterBuilder).Handle(callback);
+            var builder = new UnpartitionedEventFilterBuilder();
+            _innerBuilder = builder;
+            return builder;
         }
 
         /// <summary>

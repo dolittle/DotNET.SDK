@@ -62,9 +62,11 @@ namespace Dolittle.SDK
             => new ClientBuilder(microserviceId);
 
         /// <summary>
-        /// Runs the client until the <see cref="CancellationToken"/> given in
-        /// <see cref="ClientBuilder.WithCancellationToken(CancellationToken)"/> is cancelled.
+        /// Waits for the pending operations and processing to complete.
         /// </summary>
+        /// <remarks>
+        /// Use <see cref="ClientBuilder.WithCancellation(CancellationToken)"/> to cancel the processing.
+        /// </remarks>
         public void Wait()
             => _processingCoordinator.Completion.Wait();
 

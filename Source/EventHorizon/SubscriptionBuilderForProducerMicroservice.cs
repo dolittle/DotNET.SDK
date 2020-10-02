@@ -10,18 +10,18 @@ namespace Dolittle.SDK.EventHorizon
     /// <summary>
     /// Represents a builder for building an event horizon subscription with consumer tenant and producer microservice already defined.
     /// </summary>
-    public class SubscriptionsBuilderForProducerMicroservice
+    public class SubscriptionBuilderForProducerMicroservice
     {
         readonly TenantId _consumerTenantId;
         readonly MicroserviceId _producerMicroserviceId;
         SubscriptionBuilderForProducerTenant _builder;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SubscriptionsBuilderForProducerMicroservice"/> class.
+        /// Initializes a new instance of the <see cref="SubscriptionBuilderForProducerMicroservice"/> class.
         /// </summary>
         /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
         /// <param name="producerMicroserviceId">The producer <see cref="MicroserviceId"/> of the subscription.</param>
-        public SubscriptionsBuilderForProducerMicroservice(
+        public SubscriptionBuilderForProducerMicroservice(
             TenantId consumerTenantId,
             MicroserviceId producerMicroserviceId)
         {
@@ -33,15 +33,15 @@ namespace Dolittle.SDK.EventHorizon
         /// <summary>
         /// Sets the producer tenant to subscribe to events from.
         /// </summary>
-        /// <param name="producerTenantId">The <see cref="TenantId"/> to subscribe to events from.</param>
+        /// <param name="tenantId">The <see cref="TenantId"/> to subscribe to events from.</param>
         /// <returns>A <see cref="SubscriptionBuilderForProducerTenant"/> to continue building.</returns>
-        public SubscriptionBuilderForProducerTenant FromTenant(TenantId producerTenantId)
+        public SubscriptionBuilderForProducerTenant FromProducerTenant(TenantId tenantId)
         {
             ThrowIfProducerTenantIsAlreadyDefined();
             _builder = new SubscriptionBuilderForProducerTenant(
                 _consumerTenantId,
                 _producerMicroserviceId,
-                producerTenantId);
+                tenantId);
             return _builder;
         }
 
@@ -60,7 +60,7 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (_builder != null)
             {
-                throw new SubscriptionBuilderMethodAlreadyCalled("FromTenant()");
+                throw new SubscriptionBuilderMethodAlreadyCalled("FromProducerTenant()");
             }
         }
 
@@ -68,7 +68,7 @@ namespace Dolittle.SDK.EventHorizon
         {
             if (_builder == null)
             {
-                throw new SubscriptionDefinitionIncomplete("Producer Tenant", "Call FromTenant()");
+                throw new SubscriptionDefinitionIncomplete("Producer Tenant", "Call FromProducerTenant()");
             }
         }
     }

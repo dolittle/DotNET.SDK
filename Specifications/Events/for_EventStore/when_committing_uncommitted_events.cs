@@ -3,11 +3,9 @@
 
 using System.Threading;
 using Dolittle.SDK.Events.for_EventConverter.given;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
 using Moq;
-using Contracts = Dolittle.Runtime.Events.Contracts;
 using It = Machine.Specifications.It;
 
 namespace Dolittle.SDK.Events.for_EventStore
@@ -19,18 +17,17 @@ namespace Dolittle.SDK.Events.for_EventStore
 
         Establish context = () =>
         {
-            var event_source_one = "e7fe623b-5fb7-4699-9b08-7c14d7556e84";
-            var event_type_one = new EventType("4134d0b4-a13f-4c5d-ae98-8e44903ab147", 2);
-            var content_one = new an_event("hello wörld", 42, true);
-            var is_public_one = true;
+            var event_one = new UncommittedEvent(
+                "e7fe623b-5fb7-4699-9b08-7c14d7556e84",
+                new EventType("4134d0b4-a13f-4c5d-ae98-8e44903ab147", 2),
+                new an_event("hello wörld", 42, true),
+                true);
 
-            var event_source_two = "d3bc1b39-960b-44b4-a5f2-fa3d8c6c8056";
-            var event_type_two = new EventType("da6b65d6-1a8e-4c93-a778-5200a0b7fbbf", 1337);
-            var content_two = new an_event("bye wørld", -42, false);
-            var is_public_two = false;
-
-            var event_one = new UncommittedEvent(event_source_one, event_type_one, content_one, is_public_one);
-            var event_two = new UncommittedEvent(event_source_two, event_type_two, content_two, is_public_two);
+            var event_two = new UncommittedEvent(
+                "d3bc1b39-960b-44b4-a5f2-fa3d8c6c8056",
+                new EventType("da6b65d6-1a8e-4c93-a778-5200a0b7fbbf", 1337),
+                new an_event("bye wørld", -42, false),
+                false);
 
             uncommitted_events = new UncommittedEvents
             {
