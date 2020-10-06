@@ -6,7 +6,7 @@ using System;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Handling;
 
-namespace Basic
+namespace Kitchen
 {
     [EventHandler("f2d366cf-c00a-4479-acc4-851e04b6fbba")]
     public class DishHandler
