@@ -17,11 +17,7 @@ namespace Basic
                     builder.RegisterEventHandler<DishHandler>())
                 .Build();
 
-            var preparedTaco = new DishPrepared
-            {
-                Dish = "Bean Blaster Taco",
-                Chef = "Mr. Taco"
-            };
+            var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
 
             client.EventStore
                 .ForTenant("900893e7-c4cc-4873-8032-884e965e4b97")
