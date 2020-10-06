@@ -3,6 +3,7 @@
 // Sample code for the tutorial at https://dolittle.io/tutorial/getting-started/csharp/
 
 using Dolittle.SDK;
+using Dolittle.SDK.Tenancy;
 
 namespace Basic
 {
@@ -21,10 +22,10 @@ namespace Basic
             var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
 
             client.EventStore
-                .ForTenant("900893e7-c4cc-4873-8032-884e965e4b97")
+                .ForTenant(TenantId.Development)
                 .Commit(preparedTaco, "bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
 
-            // blocks the thread to let all the event handlers to keep handling events
+            // Blocks until the EventHandlers are finished, i.e. forever
             client.Wait();
         }
     }
