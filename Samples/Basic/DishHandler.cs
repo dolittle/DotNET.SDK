@@ -8,7 +8,6 @@ using Dolittle.SDK.Events.Handling;
 
 namespace Basic
 {
-    // an example GUID, you should create your own
     [EventHandler("f2d366cf-c00a-4479-acc4-851e04b6fbba")]
     public class DishHandler
     {
