@@ -4,7 +4,12 @@
 using System;
 using System.Collections.Generic;
 using PbCommitEventsResponse = Dolittle.Runtime.Events.Contracts.CommitEventsResponse;
+using PbCommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.CommittedAggregateEvents;
+using PbCommittedAggregateEventsResponse = Dolittle.Runtime.Events.Contracts.CommitAggregateEventsResponse;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
+using PbFetchForAggregateResponse = Dolittle.Runtime.Events.Contracts.FetchForAggregateResponse;
+using PbUncommittedAggregateEvent = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent;
+using PbUncommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents;
 using PbUncommittedEvent = Dolittle.Runtime.Events.Contracts.UncommittedEvent;
 
 namespace Dolittle.SDK.Events
@@ -63,6 +68,72 @@ namespace Dolittle.SDK.Events
         CommitEventsResult ToSDK(PbCommitEventsResponse source);
 
         /// <summary>
+        /// Convert from <see cref="PbCommittedAggregateEvents"/> to <see cref="CommittedAggregateEvents"/>.
+        /// </summary>
+        /// <param name="source"><see cref="PbCommittedAggregateEvents"/>.</param>
+        /// <param name="result">When the method returns, the converted <see cref="CommittedAggregateEvents"/> if conversion was successful, otherwise null.</param>
+        /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+        /// <returns>A value indicating whether or not the conversion was successful.</returns>
+        bool TryToSDK(PbCommittedAggregateEvents source, out CommittedAggregateEvents result, out Exception error);
+
+        /// <summary>
+        /// Convert from <see cref="PbCommittedAggregateEvents"/> to <see cref="CommittedAggregateEvents"/>.
+        /// </summary>
+        /// <param name="source"><see cref="PbCommittedAggregateEvents"/>.</param>
+        /// <returns>Converted <see cref="CommittedAggregateEvents"/>.</returns>
+        CommittedAggregateEvents ToSDK(PbCommittedAggregateEvents source);
+
+        /// <summary>
+        /// Convert from <see cref="PbCommittedAggregateEvents.Types.CommittedAggregateEvent"/> to <see cref="List{ComittedAggregateEvent}"/>.
+        /// </summary>
+        /// <param name="source"><see cref="IEnumerable{T}"/> of type <see cref="PbCommittedAggregateEvents.Types.CommittedAggregateEvent"/>.</param>
+        /// <param name="eventSourceId"><see cref="EventSourceId"/>.</param>
+        /// <param name="aggregateRootId"><see cref="AggregateRootId"/>.</param>
+        /// <param name="aggregateRootVersion"><see cref="AggregateRootVersion"/>.</param>
+        /// <param name="events">When the method return, the converted <see cref="List{CommittedAggregateEvent}"/> if conversion was succesful, otherwise null.</param>
+        /// <param name="error">when the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+        /// <returns>A value indicating whether or not the conversion was successful.</returns>
+        public bool TryToSDK(
+            IEnumerable<PbCommittedAggregateEvents.Types.CommittedAggregateEvent> source,
+            EventSourceId eventSourceId,
+            AggregateRootId aggregateRootId,
+            AggregateRootVersion aggregateRootVersion,
+            out List<CommittedAggregateEvent> events,
+            out Exception error);
+
+        /// <summary>
+        /// Convert from <see cref="PbCommittedAggregateEventsResponse"/> to <see cref="CommitEventsForAggregateResult"/>.
+        /// </summary>
+        /// <param name="source"><see cref="PbCommittedAggregateEventsResponse"/>.</param>
+        /// <param name="result">When the method returns, the converted <see cref="CommitEventsForAggregateResult"/> if conversion was successful, otherwise null.</param>
+        /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+        /// <returns>A value indicating whether or not the conversion was successful.</returns>
+        bool TryToSDK(PbCommittedAggregateEventsResponse source, out CommitEventsForAggregateResult result, out Exception error);
+
+        /// <summary>
+        /// Convert from <see cref="PbCommittedAggregateEventsResponse"/> to <see cref="CommitEventsForAggregateResult"/>.
+        /// </summary>
+        /// <param name="source"><see cref="PbCommittedAggregateEventsResponse"/>.</param>
+        /// <returns>Converted <see cref="CommitEventsForAggregateResult"/>.</returns>
+        CommitEventsForAggregateResult ToSDK(PbCommittedAggregateEventsResponse source);
+
+        /// <summary>
+        /// Convert from <see cref="PbFetchForAggregateResponse"/> to <see cref="CommitEventsForAggregateResult"/>.
+        /// </summary>
+        /// <param name="source"><see cref="PbFetchForAggregateResponse"/>.</param>
+        /// <param name="result">When the method returns, the converted <see cref="CommitEventsForAggregateResult"/> if conversion was successful, otherwise null.</param>
+        /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+        /// <returns>A value indicating whether or not the conversion was successful.</returns>
+        bool TryToSDK(PbFetchForAggregateResponse source, out FetchForAggregateResult result, out Exception error);
+
+        /// <summary>
+        /// Convert from <see cref="PbFetchForAggregateResponse"/> to <see cref="FetchForAggregateResult"/>.
+        /// </summary>
+        /// <param name="source"><see cref="PbFetchForAggregateResponse"/>.</param>
+        /// <returns>Converted <see cref="FetchForAggregateResult"/>.</returns>
+        FetchForAggregateResult ToSDK(PbFetchForAggregateResponse source);
+
+        /// <summary>
         /// Convert from <see cref="UncommittedEvent" /> to <see cref="PbUncommittedEvent" />.
         /// </summary>
         /// <param name="source"><see cref="UncommittedEvent"/>.</param>
@@ -91,7 +162,39 @@ namespace Dolittle.SDK.Events
         /// Convert from <see cref="UncommittedEvent" /> to <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.
         /// </summary>
         /// <param name="source"><see cref="UncommittedEvent" />.</param>
-        /// <returns>Converted see <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.</returns>
+        /// <returns>Converted <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.</returns>
         IEnumerable<PbUncommittedEvent> ToProtobuf(UncommittedEvents source);
+
+        /// <summary>
+        /// Convert from <see cref="UncommittedAggregateEvent"/> to <see cref="PbUncommittedAggregateEvent"/>.
+        /// </summary>
+        /// <param name="source"><see cref="UncommittedAggregateEvent"/>.</param>
+        /// <param name="events">When the method returns, the converted <see cref="PbUncommittedAggregateEvent"/>. if conversion was successful, otherwise null.</param>
+        /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+        /// <returns>A value indicating whether or not the conversion was successful.</returns>
+        bool TryToProtobuf(UncommittedAggregateEvent source, out PbUncommittedAggregateEvent events, out Exception error);
+
+        /// <summary>
+        /// Convert from <see cref="UncommittedAggregateEvent"/> to <see cref="PbUncommittedAggregateEvent"/>.
+        /// </summary>
+        /// <param name="source"><see cref="UncommittedAggregateEvent"/>.</param>
+        /// <returns>Converted <see cref="PbUncommittedAggregateEvents"/>.</returns>
+        PbUncommittedAggregateEvent ToProtobuf(UncommittedAggregateEvent source);
+
+        /// <summary>
+        /// Convert from <see cref="UncommittedAggregateEvents"/> to <see cref="PbUncommittedAggregateEvents"/>.
+        /// </summary>
+        /// <param name="source"><see cref="UncommittedAggregateEvents"/>.</param>
+        /// <param name="events">When the method returns, the converted <see cref="PbUncommittedAggregateEvents"/>. if conversion was successful, otherwise null.</param>
+        /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+        /// <returns>A value indicating whether or not the conversion was successful.</returns>
+        bool TryToProtobuf(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error);
+
+        /// <summary>
+        /// Convert from <see cref="UncommittedAggregateEvents"/> to <see cref="PbUncommittedAggregateEvents"/>.
+        /// </summary>
+        /// <param name="source"><see cref="UncommittedAggregateEvents"/>.</param>
+        /// <returns>Converted <see cref="PbUncommittedAggregateEvents"/>.</returns>
+        PbUncommittedAggregateEvents ToProtobuf(UncommittedAggregateEvents source);
     }
 }

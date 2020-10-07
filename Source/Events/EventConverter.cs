@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dolittle.SDK.Protobuf;
 using Newtonsoft.Json;
 using Contracts = Dolittle.Runtime.Events.Contracts;
@@ -146,15 +147,135 @@ namespace Dolittle.SDK.Events
         {
             result = default;
 
+            if (source.Failure != null)
+            {
+                result = new CommitEventsResult(source.Failure, null);
+                error = null;
+                return true;
+            }
+
             if (!TryToSDK(source.Events, out var events, out error))
                 return false;
 
-            result = new CommitEventsResult(source.Failure, events);
+            result = new CommitEventsResult(null, events);
             return true;
         }
 
         /// <inheritdoc/>
         public CommitEventsResult ToSDK(Contracts.CommitEventsResponse source)
+            => TryToSDK(source, out var result, out var error) ? result : throw error;
+
+        /// <inheritdoc/>
+        public bool TryToSDK(Contracts.CommittedAggregateEvents source, out CommittedAggregateEvents events, out Exception error)
+        {
+            events = default;
+
+            if (source == null)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
+
+            if (!source.EventSourceId.TryTo<EventSourceId>(out var eventSourceId, out var eventSourceError))
+            {
+                error = new InvalidCommittedEventInformation(nameof(source.EventSourceId), eventSourceError);
+                return false;
+            }
+
+            if (!source.AggregateRootId.TryTo<AggregateRootId>(out var aggregateRootId, out var aggregateRootIdError))
+            {
+                error = new InvalidCommittedEventInformation(nameof(source.AggregateRootId), aggregateRootIdError);
+                return false;
+            }
+
+            if (!TryToSDK(source.Events, eventSourceId, aggregateRootId, source.AggregateRootVersion, out var committedAggregateEventList, out error))
+                return false;
+
+            events = new CommittedAggregateEvents(eventSourceId, aggregateRootId, committedAggregateEventList);
+            error = null;
+            return true;
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// We have to manually calculate and set the AggregateRootVersion for the events as the
+        /// CommittedAggregateEvents.AggregateRootVersion is set to the latest version.
+        /// </remarks>
+        public bool TryToSDK(
+            IEnumerable<Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent> source,
+            EventSourceId eventSourceId,
+            AggregateRootId aggregateRootId,
+            AggregateRootVersion aggregateRootVersion,
+            out List<CommittedAggregateEvent> events,
+            out Exception error)
+        {
+            events = default;
+            var list = new List<CommittedAggregateEvent>();
+            var committedEvents = source.ToArray();
+            for (ulong i = 0; i < (ulong)committedEvents.Length; i++)
+            {
+                var version = aggregateRootVersion + 1u - (ulong)committedEvents.Length + i;
+                var sourceEvent = committedEvents[i];
+
+                if (!TryToSDK(sourceEvent, eventSourceId, aggregateRootId, version, out var @event, out error))
+                    return false;
+
+                list.Add(@event);
+            }
+
+            events = list;
+            error = null;
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public CommittedAggregateEvents ToSDK(Contracts.CommittedAggregateEvents source)
+            => TryToSDK(source, out var @events, out var error) ? @events : throw error;
+
+        /// <inheritdoc/>
+        public bool TryToSDK(Contracts.CommitAggregateEventsResponse source, out CommitEventsForAggregateResult result, out Exception error)
+        {
+            result = default;
+
+            if (source.Failure != null)
+            {
+                result = new CommitEventsForAggregateResult(source.Failure, null);
+                error = null;
+                return true;
+            }
+
+            if (!TryToSDK(source.Events, out var events, out error))
+                return false;
+
+            result = new CommitEventsForAggregateResult(null, events);
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public CommitEventsForAggregateResult ToSDK(Contracts.CommitAggregateEventsResponse source)
+            => TryToSDK(source, out var result, out var error) ? result : throw error;
+
+        /// <inheritdoc/>
+        public bool TryToSDK(Contracts.FetchForAggregateResponse source, out FetchForAggregateResult result, out Exception error)
+        {
+            result = default;
+
+            if (source.Failure != null)
+            {
+                result = new FetchForAggregateResult(source.Failure, null);
+                error = null;
+                return true;
+            }
+
+            if (!TryToSDK(source.Events, out var events, out error))
+                return false;
+
+            result = new FetchForAggregateResult(null, events);
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public FetchForAggregateResult ToSDK(Contracts.FetchForAggregateResponse source)
             => TryToSDK(source, out var result, out var error) ? result : throw error;
 
         /// <inheritdoc/>
@@ -217,6 +338,131 @@ namespace Dolittle.SDK.Events
         /// <inheritdoc/>
         public IEnumerable<Contracts.UncommittedEvent> ToProtobuf(UncommittedEvents source)
             => TryToProtobuf(source, out var events, out var error) ? events : throw error;
+
+        /// <inheritdoc/>
+        public bool TryToProtobuf(UncommittedAggregateEvent source, out Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent @event, out Exception error)
+        {
+            @event = default;
+
+            if (source == null)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
+
+            if (!TrySerializeContent(source.Content, out var content, out var serializationError))
+            {
+                error = new CouldNotSerializeEventContent(source.Content, serializationError);
+                return false;
+            }
+
+            error = null;
+            @event = new Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent
+            {
+                Artifact = source.EventType.ToProtobuf(),
+                Content = content,
+                Public = source.IsPublic,
+            };
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent ToProtobuf(UncommittedAggregateEvent source)
+            => TryToProtobuf(source, out var events, out var error) ? events : throw error;
+
+        /// <inheritdoc/>
+        public bool TryToProtobuf(UncommittedAggregateEvents source, out Contracts.UncommittedAggregateEvents events, out Exception error)
+        {
+            events = default;
+
+            if (source == null)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
+
+            events = new Contracts.UncommittedAggregateEvents
+            {
+                EventSourceId = source.EventSourceId.ToProtobuf(),
+                AggregateRootId = source.AggregateRootId.ToProtobuf(),
+                ExpectedAggregateRootVersion = source.ExpectedAggregateRootVersion,
+            };
+
+            foreach (var sourceEvent in source)
+            {
+                if (!TryToProtobuf(sourceEvent, out var @event, out error))
+                    return false;
+
+                events.Events.Add(@event);
+            }
+
+            error = null;
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public Contracts.UncommittedAggregateEvents ToProtobuf(UncommittedAggregateEvents source)
+            => TryToProtobuf(source, out var events, out var error) ? events : throw error;
+
+        bool TryToSDK(
+            Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent source,
+            EventSourceId eventSourceId,
+            AggregateRootId aggregateRootId,
+            AggregateRootVersion aggregateRootVersion,
+            out CommittedAggregateEvent result,
+            out Exception error)
+        {
+            result = default;
+
+            if (source == null)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
+
+            if (!source.Type.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
+            {
+                error = new InvalidCommittedEventInformation(nameof(source.Type), eventTypeError);
+                return false;
+            }
+
+            if (!source.ExecutionContext.TryToExecutionContext(out var executionContext, out var executionContextError))
+            {
+                error = new InvalidCommittedEventInformation(nameof(source.ExecutionContext), executionContextError);
+                return false;
+            }
+
+            if (source.Occurred == null)
+            {
+                error = new MissingCommittedEventInformation(nameof(source.Occurred));
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(source.Content))
+            {
+                error = new MissingCommittedEventInformation(nameof(source.Content));
+                return false;
+            }
+
+            if (!TryDeserializeContent(source.Content, eventType, out var content, out var deserializationError))
+            {
+                error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);
+                return false;
+            }
+
+            error = null;
+            result = new CommittedAggregateEvent(
+                source.EventLogSequenceNumber,
+                source.Occurred.ToDateTimeOffset(),
+                eventSourceId,
+                aggregateRootId,
+                aggregateRootVersion,
+                executionContext,
+                eventType,
+                content,
+                source.Public);
+            return true;
+        }
 
         bool TryDeserializeContent(string source, EventType eventType, out object content, out Exception error)
         {
