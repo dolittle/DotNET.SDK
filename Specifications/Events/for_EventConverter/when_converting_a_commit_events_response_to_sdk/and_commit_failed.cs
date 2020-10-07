@@ -76,18 +76,7 @@ namespace Dolittle.SDK.Events.for_EventConverter.when_converting_a_commit_events
         It should_have_failed = () => commit_events_result.Failed.ShouldBeTrue();
         It should_have_the_same_failure_id = () => commit_events_result.Failure.Id.ShouldEqual(commit_events_response.Failure.Id.To<FailureId>());
         It should_have_the_same_failure_reason = () => commit_events_result.Failure.Reason.Value.ShouldEqual(commit_events_response.Failure.Reason);
-        It should_have_one_event = () => commit_events_result.Events.Count.ShouldEqual(1);
-        It should_create_an_internal_committed_event = () => commit_events_result.Events[0].ShouldBeOfExactType<CommittedEvent>();
-        It should_have_asked_the_event_types_if_it_has_type_for = () => event_types.Verify(_ => _.HasTypeFor(converted_event_type));
-        It should_have_asked_the_event_types_for_the_type = () => event_types.Verify(_ => _.GetTypeFor(converted_event_type));
+        It should_have_events_set_as_null = () => commit_events_result.Events.ShouldBeNull();
         It should_not_ask_the_event_types_for_anything_else = () => event_types.VerifyNoOtherCalls();
-        It should_have_the_correct_event_log_sequence_number = () => commit_events_result.Events[0].EventLogSequenceNumber.ShouldEqual((EventLogSequenceNumber)event_log_sequence_number);
-        It should_have_the_correct_occurred = () => commit_events_result.Events[0].Occurred.ShouldEqual(occured.ToDateTimeOffset());
-        It should_have_the_correct_event_source = () => commit_events_result.Events[0].EventSource.ShouldEqual(event_source.To<EventSourceId>());
-        It should_have_the_correct_execution_context = () => commit_events_result.Events[0].ExecutionContext.ShouldEqual(execution_context.ToExecutionContext());
-        It should_have_the_correct_event_type = () => commit_events_result.Events[0].EventType.ShouldEqual(converted_event_type);
-        It should_have_the_correct_type_of_the_event = () => commit_events_result.Events[0].Content.ShouldBeOfExactType<an_event>();
-        It should_have_created_a_new_event_instance_with_the_correct_properties = () => (commit_events_result.Events[0].Content as an_event).ShouldMatch(_ => _.a_string == content.a_string && _.an_integer == content.an_integer && _.a_bool == content.a_bool);
-        It should_have_the_correct_is_public = () => commit_events_result.Events[0].IsPublic.ShouldEqual(is_public);
     }
 }
