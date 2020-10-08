@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Failures.EventHorizon;
 using Dolittle.SDK.Failures.Events;
+using Dolittle.SDK.Failures.Events.Filters;
+using Dolittle.SDK.Failures.Events.Handling;
 
 namespace Dolittle.SDK.Failures
 {
@@ -33,6 +35,16 @@ namespace Dolittle.SDK.Failures
             { "2ed211ce-7f9b-4a9f-ae9d-973bfe8aaf2b", _ => new SubscriptionCancelled(_) },
             { "be1ba4e6-81e3-49c4-bec2-6c7e262bfb77", _ => new MissingConsent(_) },
             { "3f88dfb6-93d6-40d3-9d28-8be149f9e02d", _ => new MissingSubscriptionArguments(_) },
+
+            // Filter failures
+            { "d6060ba0-39bd-4815-8b0e-6b43b5f87bc5", _ => new NoFilterRegistrationReceived(_) },
+            { "2cdb6143-4f3d-49cb-bd58-68fd1376dab1", _ => new CannotRegisterFilterOnNonWriteableStream(_) },
+            { "f0480899-8aed-4191-b339-5121f4d9f2e2", _ => new FailedToRegisterFilter(_) },
+
+            // Event Handler failures
+            { "209a79c7-824c-4988-928b-0dd517746ca0", _ => new NoEventHandlerRegistrationReceived(_) },
+            { "45b4c918-37a5-405c-9865-d032869b1d24", _ => new CannotRegisterEventHandlerOnNonWriteableStream(_) },
+            { "dbfdfa15-e727-49f6-bed8-7a787954a4c6", _ => new FailedToRegisterEventHandler(_) },
         };
 
         /// <summary>
