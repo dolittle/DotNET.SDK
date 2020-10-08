@@ -7,7 +7,7 @@ using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Builders
 {
     /// <summary>
     /// Represents a builder for building <see cref="EventStore"/>.
