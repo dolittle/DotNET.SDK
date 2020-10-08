@@ -222,15 +222,28 @@ namespace Dolittle.SDK
                 _loggerFactory,
                 _cancellation);
 
-            var eventConverter = new EventConverter(eventTypes);
-            var eventProcessingConverter = new EventProcessingConverter(eventConverter);
+            var serializer = new EventContentSerializer(eventTypes);
+            var eventToProtobufConverter = new EventToProtobufConverter(serializer);
+            var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
+            var eventToSDKConverter = new EventResponseToSDKConverter(serializer);
+            var aggregateToSDKConverter = new AggregateResponseToSDKConverter(serializer);
+
+            var eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
             var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _retryPolicy, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
             _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
-            var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+            var eventStoreBuilder = new EventStoreBuilder(
+                methodCaller,
+                executionContext,
+                eventTypes,
+                eventToProtobufConverter,
+                aggregateEventToProtobufConverter,
+                eventToSDKConverter,
+                aggregateToSDKConverter,
+                _loggerFactory.CreateLogger<EventStore>());
 
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);

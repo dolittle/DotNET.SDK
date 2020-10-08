@@ -111,13 +111,6 @@ namespace Dolittle.SDK.Events
         bool TryToSDK(PbCommittedAggregateEventsResponse source, out CommitEventsForAggregateResult result, out Exception error);
 
         /// <summary>
-        /// Convert from <see cref="PbCommittedAggregateEventsResponse"/> to <see cref="CommitEventsForAggregateResult"/>.
-        /// </summary>
-        /// <param name="source"><see cref="PbCommittedAggregateEventsResponse"/>.</param>
-        /// <returns>Converted <see cref="CommitEventsForAggregateResult"/>.</returns>
-        CommitEventsForAggregateResult ToSDK(PbCommittedAggregateEventsResponse source);
-
-        /// <summary>
         /// Convert from <see cref="PbFetchForAggregateResponse"/> to <see cref="CommitEventsForAggregateResult"/>.
         /// </summary>
         /// <param name="source"><see cref="PbFetchForAggregateResponse"/>.</param>
@@ -125,13 +118,6 @@ namespace Dolittle.SDK.Events
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
         bool TryToSDK(PbFetchForAggregateResponse source, out FetchForAggregateResult result, out Exception error);
-
-        /// <summary>
-        /// Convert from <see cref="PbFetchForAggregateResponse"/> to <see cref="FetchForAggregateResult"/>.
-        /// </summary>
-        /// <param name="source"><see cref="PbFetchForAggregateResponse"/>.</param>
-        /// <returns>Converted <see cref="FetchForAggregateResult"/>.</returns>
-        FetchForAggregateResult ToSDK(PbFetchForAggregateResponse source);
 
         /// <summary>
         /// Convert from <see cref="UncommittedEvent" /> to <see cref="PbUncommittedEvent" />.
@@ -159,13 +145,6 @@ namespace Dolittle.SDK.Events
         bool TryToProtobuf(UncommittedEvents source, out IEnumerable<PbUncommittedEvent> events, out Exception error);
 
         /// <summary>
-        /// Convert from <see cref="UncommittedEvent" /> to <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.
-        /// </summary>
-        /// <param name="source"><see cref="UncommittedEvent" />.</param>
-        /// <returns>Converted <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.</returns>
-        IEnumerable<PbUncommittedEvent> ToProtobuf(UncommittedEvents source);
-
-        /// <summary>
         /// Convert from <see cref="UncommittedAggregateEvent"/> to <see cref="PbUncommittedAggregateEvent"/>.
         /// </summary>
         /// <param name="source"><see cref="UncommittedAggregateEvent"/>.</param>
@@ -189,12 +168,5 @@ namespace Dolittle.SDK.Events
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
         bool TryToProtobuf(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error);
-
-        /// <summary>
-        /// Convert from <see cref="UncommittedAggregateEvents"/> to <see cref="PbUncommittedAggregateEvents"/>.
-        /// </summary>
-        /// <param name="source"><see cref="UncommittedAggregateEvents"/>.</param>
-        /// <returns>Converted <see cref="PbUncommittedAggregateEvents"/>.</returns>
-        PbUncommittedAggregateEvents ToProtobuf(UncommittedAggregateEvents source);
     }
 }

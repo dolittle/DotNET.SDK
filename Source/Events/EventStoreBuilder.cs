@@ -15,30 +15,42 @@ namespace Dolittle.SDK.Events
     public class EventStoreBuilder
     {
         readonly IPerformMethodCalls _caller;
-        readonly IEventConverter _eventConverter;
         readonly ExecutionContext _executionContext;
         readonly IEventTypes _eventTypes;
+        readonly IConvertEventsToProtobuf _eventsToProtobufConverter;
+        readonly IConvertAggregateEventsToProtobuf _aggregateEventsToProtobufConverter;
+        readonly IConvertEventResponsestoSDK _eventResponsestoSDKConverter;
+        readonly IConvertAggregateResponsesToSDK _aggregateResponsesToSDKConverter;
         readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStoreBuilder"/> class.
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
-        /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
         /// <param name="executionContext">The base <see cref="ExecutionContext"/> to use.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
+        /// <param name="convertEventsToProtobuf">The <see cref="IConvertEventsToProtobuf"/>.</param>
+        /// <param name="convertAggregateEventsToProtobuf">The <see cref="IConvertAggregateEventsToProtobuf"/>.</param>
+        /// <param name="convertEventResponsestoSDK">The <see cref="IConvertEventResponsestoSDK"/>.</param>
+        /// <param name="convertAggregateResponsesToSDK">The <see cref="IConvertAggregateResponsesToSDK"/>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStoreBuilder(
             IPerformMethodCalls caller,
-            IEventConverter eventConverter,
             ExecutionContext executionContext,
             IEventTypes eventTypes,
+            IConvertEventsToProtobuf convertEventsToProtobuf,
+            IConvertAggregateEventsToProtobuf convertAggregateEventsToProtobuf,
+            IConvertEventResponsestoSDK convertEventResponsestoSDK,
+            IConvertAggregateResponsesToSDK convertAggregateResponsesToSDK,
             ILogger logger)
         {
             _caller = caller;
-            _eventConverter = eventConverter;
             _executionContext = executionContext;
             _eventTypes = eventTypes;
+            _eventsToProtobufConverter = convertEventsToProtobuf;
+            _aggregateEventsToProtobufConverter = convertAggregateEventsToProtobuf;
+            _eventResponsestoSDKConverter = convertEventResponsestoSDK;
+            _aggregateResponsesToSDKConverter = convertAggregateResponsesToSDK;
             _logger = logger;
         }
 
@@ -50,9 +62,12 @@ namespace Dolittle.SDK.Events
         public IEventStore ForTenant(TenantId tenant)
             => new EventStore(
                 _caller,
-                _eventConverter,
                 _executionContext.ForTenant(tenant),
                 _eventTypes,
+                _eventsToProtobufConverter,
+                _aggregateEventsToProtobufConverter,
+                _eventResponsestoSDKConverter,
+                _aggregateResponsesToSDKConverter,
                 _logger);
     }
 }

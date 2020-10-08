@@ -18,7 +18,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single Event with the given content.
@@ -28,7 +28,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single Event with the given content.
@@ -38,7 +38,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single public Event with the given content.
@@ -47,7 +47,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single public Event with the given content.
@@ -57,7 +57,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single public Event with the given content.
@@ -67,7 +67,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits an <see cref="UncommittedEvent" />.
@@ -75,7 +75,7 @@ namespace Dolittle.SDK.Events
         /// <param name="uncommittedEvent">The <see cref="UncommittedEvent" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits <see cref="UncommittedEvents" />.
@@ -86,7 +86,7 @@ namespace Dolittle.SDK.Events
         /// <remarks>
         /// Cancelling this operation does not roll back the commit transaction if the events have already been written to the Event Store.
         /// </remarks>
-        Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default);
+        Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Commits a single Event for an aggregate with the given content.
@@ -97,7 +97,7 @@ namespace Dolittle.SDK.Events
         /// <param name="expectedAggregateRootVersion">The <see cref="AggregateRootVersion"/> of the Aggregate Root that was used to apply the rules that resulted in the Events.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
+        Task<CommittedAggregateEvents> CommitForAggregate(
             object content,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -114,7 +114,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
+        Task<CommittedAggregateEvents> CommitForAggregate(
             object content,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -131,7 +131,7 @@ namespace Dolittle.SDK.Events
         /// <param name="expectedAggregateRootVersion">The <see cref="AggregateRootVersion"/> of the Aggregate Root that was used to apply the rules that resulted in the Events.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitPublicForAggregate(
+        Task<CommittedAggregateEvents> CommitPublicForAggregate(
             object content,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -148,7 +148,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitPublicForAggregate(
+        Task<CommittedAggregateEvents> CommitPublicForAggregate(
             object content,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -166,7 +166,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitPublicForAggregate(
+        Task<CommittedAggregateEvents> CommitPublicForAggregate(
             object content,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -184,7 +184,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
+        Task<CommittedAggregateEvents> CommitForAggregate(
             object content,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -201,7 +201,7 @@ namespace Dolittle.SDK.Events
         /// <param name="expectedAggregateRootVersion">The <see cref="AggregateRootVersion"/> of the Aggregate Root that was used to apply the rules that resulted in the Events.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommitEventsForAggregateResult" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
+        Task<CommittedAggregateEvents> CommitForAggregate(
             UncommittedAggregateEvent uncommittedAggregateEvent,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -214,7 +214,7 @@ namespace Dolittle.SDK.Events
         /// <param name="uncommittedAggregateEvents">The <see cref="UncommittedAggregateEvents"/> to commit.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommitEventsForAggregateResult" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
+        Task<CommittedAggregateEvents> CommitForAggregate(
             UncommittedAggregateEvents uncommittedAggregateEvents,
             CancellationToken cancellationToken = default);
 
@@ -225,7 +225,7 @@ namespace Dolittle.SDK.Events
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="FetchForAggregateResult" />.</returns>
-        Task<FetchForAggregateResult> FetchForAggregate(
+        Task<CommittedAggregateEvents> FetchForAggregate(
             AggregateRootId aggregateRootId,
             EventSourceId eventSourceId,
             CancellationToken cancellationToken = default);
