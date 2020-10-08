@@ -1,8 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
@@ -51,37 +53,43 @@ namespace Dolittle.SDK.Events
         }
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
-            => Commit(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
-            => Commit(ToUncommittedEvent(content, eventSourceId, eventType, false), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
-            => Commit(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
-            => CommitPublic(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
-            => Commit(ToUncommittedEvent(content, eventSourceId, eventType, true), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
-            => CommitPublic(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
-            => Commit(new UncommittedEvents { uncommittedEvent }, cancellationToken);
-
-        /// <inheritdoc/>
-        public async Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        public async Task<CommitEventsResult> Commit(Action<UncommittedEventsBuilder> callback, CancellationToken cancellationToken = default)
         {
-            var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
+            var builder = new UncommittedEventsBuilder();
+            callback(builder);
+            var uncommittedEvents = builder.Build(_eventTypes);
+            _logger.LogDebug("Committing events");
+            var request = new Contracts.CommitEventsRequest
+            {
+                CallContext = GetCurrentCallContext(),
+            };
+            request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
+            var response = await _caller.Call(_commitMethod, request, cancellationToken).ConfigureAwait(false);
+            return _eventConverter.ToSDK(response);
+        }
+
+        /// <inheritdoc/>
+        public async Task<CommitEventsForAggregateResult> CommitForAggregate(
+            AggregateRootId aggregateRootId,
+            AggregateRootVersion expectedVersion,
+            EventSourceId eventSourceId,
+            Action<UncommittedAggregateEventsBuilder> callback,
+            CancellationToken cancellationToken = default)
+        {
+            var builder = new UncommittedAggregateEventsBuilder(aggregateRootId, eventSourceId, expectedVersion);
+            callback(builder);
+            var uncommittedAggregateEvents = builder.Build(_eventTypes);
+            _logger.LogDebug(
+                "Committing events for aggregate root {AggregateRoot} with expected version {ExpectedVersion}",
+                uncommittedAggregateEvents.AggregateRootId,
+                uncommittedAggregateEvents.ExpectedAggregateRootVersion);
+
+            var request = new Contracts.CommitAggregateEventsRequest
+            {
+                CallContext = GetCurrentCallContext(),
+                Events = _eventConverter.ToProtobuf(uncommittedAggregateEvents)
+            };
+            var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
             return _eventConverter.ToSDK(response);
         }
 
@@ -105,77 +113,10 @@ namespace Dolittle.SDK.Events
             return _eventConverter.ToSDK(response);
         }
 
-        /// <inheritdoc/>
-        public async Task<CommitEventsForAggregateResult> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken = default)
-        {
-            _logger.LogDebug(
-                "Committing events for aggregate root {AggregateRoot} with expected version {ExpectedVersion}",
-                uncommittedAggregateEvents.AggregateRootId,
-                uncommittedAggregateEvents.ExpectedAggregateRootVersion);
-
-            var request = new Contracts.CommitAggregateEventsRequest
-            {
-                CallContext = GetCurrentCallContext(),
-                Events = _eventConverter.ToProtobuf(uncommittedAggregateEvents)
-            };
-            var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response);
-        }
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
-            => CommitForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, _eventTypes.GetFor(content.GetType()), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventType eventType, CancellationToken cancellationToken = default)
-            => CommitForAggregate(ToUncommittedAggregateEvent(content, eventType, false), eventSourceId, aggregateRootId, expectedAggregateRootVersion, cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
-            => CommitForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, new EventType(eventTypeId), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
-            => CommitPublicForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, _eventTypes.GetFor(content.GetType()), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventType eventType, CancellationToken cancellationToken = default)
-            => CommitForAggregate(ToUncommittedAggregateEvent(content, eventType, true), eventSourceId, aggregateRootId, expectedAggregateRootVersion, cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
-            => CommitPublicForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, new EventType(eventTypeId), cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(UncommittedAggregateEvent uncommittedAggregateEvent, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
-            => CommitForAggregate(
-                new UncommittedAggregateEvents(eventSourceId, aggregateRootId, expectedAggregateRootVersion)
-                {
-                    uncommittedAggregateEvent
-                },
-                cancellationToken);
-
-        Task<Contracts.CommitEventsResponse> CommitInternal(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
-        {
-            _logger.LogDebug("Committing events");
-            var request = new Contracts.CommitEventsRequest
-            {
-                CallContext = GetCurrentCallContext(),
-            };
-            request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
-            return _caller.Call(_commitMethod, request, cancellationToken);
-        }
-
-        UncommittedEvent ToUncommittedEvent(object content, EventSourceId eventSourceId, EventType eventType, bool isPublic)
-            => new UncommittedEvent(eventSourceId, eventType, content, isPublic);
-
-        UncommittedAggregateEvent ToUncommittedAggregateEvent(object content, EventType eventType, bool isPublic)
-            => new UncommittedAggregateEvent(eventType, content, isPublic);
-
         CallRequestContext GetCurrentCallContext()
             => new CallRequestContext
             {
-                // in the future this should be set to something more meaningfull
+                // In the future this should be set to something more meaningfull
                 HeadId = HeadId.NotSet.Value.ToProtobuf(),
                 ExecutionContext = _executionContext.ToProtobuf(),
             };
