@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Dolittle.SDK.Failures.EventHorizon;
 using Dolittle.SDK.Failures.Events;
 
 namespace Dolittle.SDK.Failures
@@ -25,6 +26,13 @@ namespace Dolittle.SDK.Failures
             { "eb51284e-c7b4-4966-8da4-64a862f07560", _ => new AggregateRootVersionIsOutOfOrder(_) },
             { "f25cccfb-3ae1-4969-bee6-906370ffbc2d", _ => new AggregateRootConcurrencyConflict(_) },
             { "ef3f1a42-9bc3-4d98-aa2a-942db7c56ac1", _ => new NoEventsToCommit(_) },
+
+            // Event Horizon failures
+            { "9b74482a-8eaa-47ab-ac1c-53d704e4e77d", _ => new MissingMicroserviceConfiguration(_) },
+            { "a1b791cf-b704-4eb8-9877-de918c36b948", _ => new DidNotReceiveSubscriptionResponse(_) },
+            { "2ed211ce-7f9b-4a9f-ae9d-973bfe8aaf2b", _ => new SubscriptionCancelled(_) },
+            { "be1ba4e6-81e3-49c4-bec2-6c7e262bfb77", _ => new MissingConsent(_) },
+            { "3f88dfb6-93d6-40d3-9d28-8be149f9e02d", _ => new MissingSubscriptionArguments(_) },
         };
 
         /// <summary>
