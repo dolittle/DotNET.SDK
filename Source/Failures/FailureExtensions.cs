@@ -47,5 +47,14 @@ namespace Dolittle.SDK.Failures
         /// <returns>An <see cref="Exception"/>.</returns>
         public static Exception ToException(this Contracts.Failure failure)
             => failure.ToSDK().ToException();
+
+        /// <summary>
+        /// Throws an <see cref="Exception"/> if a <see cref="Contracts.Failure"/> is set.
+        /// </summary>
+        /// <param name="failure">The <see cref="Contracts.Failure"/> to check.</param>
+        public static void ThrowIfFailureIsSet(this Contracts.Failure failure)
+        {
+            if (failure != null) throw failure.ToException();
+        }
     }
 }
