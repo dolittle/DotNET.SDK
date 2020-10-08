@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.EventHorizon.Internal;
 using Dolittle.SDK.Execution;
+using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Dolittle.Services.Contracts;
@@ -113,7 +114,7 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         SubscribeResponse CreateResponseFromRuntimeResponse(Subscription subscription, SubscriptionResponse response)
-            => new SubscribeResponse(subscription, response.ConsentId?.To<ConsentId>() ?? ConsentId.NotSet, response.Failure);
+            => new SubscribeResponse(subscription, response.ConsentId?.To<ConsentId>() ?? ConsentId.NotSet, response.Failure.ToSDK());
 
         async Task<SubscribeResponse> ProcessSubscriptionRequest(Subscription subscription, SubscriptionRequest request, CancellationToken cancellationToken)
         {
