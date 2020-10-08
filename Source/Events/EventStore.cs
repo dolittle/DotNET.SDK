@@ -70,9 +70,9 @@ namespace Dolittle.SDK.Events
 
         /// <inheritdoc/>
         public async Task<CommitEventsForAggregateResult> CommitForAggregate(
+            EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
             AggregateRootVersion expectedVersion,
-            EventSourceId eventSourceId,
             Action<UncommittedAggregateEventsBuilder> callback,
             CancellationToken cancellationToken = default)
         {

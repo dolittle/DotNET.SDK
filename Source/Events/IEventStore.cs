@@ -24,16 +24,16 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Commits a single Event for an aggregate with the given content.
         /// </summary>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="aggregateRootId">The <see cref="AggregateRootId"/> of the aggregate that applied the events to the Event Source.</param>
         /// <param name="expectedVersion">The expected <see cref="AggregateRootVersion" />.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="callback">The callback to create the uncommitted aggregate events.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
         Task<CommitEventsForAggregateResult> CommitForAggregate(
+            EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
             AggregateRootVersion expectedVersion,
-            EventSourceId eventSourceId,
             Action<UncommittedAggregateEventsBuilder> callback,
             CancellationToken cancellationToken = default);
 

@@ -8,6 +8,7 @@ using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
