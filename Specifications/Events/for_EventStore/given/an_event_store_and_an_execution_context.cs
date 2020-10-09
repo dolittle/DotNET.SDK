@@ -19,6 +19,10 @@ namespace Dolittle.SDK.Events.for_EventStore.given
     {
         protected static Mock<IPerformMethodCalls> caller;
         protected static Mock<IEventConverter> converter;
+        protected static Mock<IConvertEventsToProtobuf> events_to_protobuf_converter;
+        protected static Mock<IConvertAggregateEventsToProtobuf> aggregate_events_to_protobuf_converter;
+        protected static Mock<IConvertEventResponsestoSDK> events_to_sdk_converter;
+        protected static Mock<IConvertAggregateResponsesToSDK> aggregate_to_sdk_converter;
         protected static Mock<IEventTypes> event_types;
         protected static IEventStore event_store;
         protected static Contracts.CommitEventsRequest commit_events_request;
@@ -31,8 +35,20 @@ namespace Dolittle.SDK.Events.for_EventStore.given
             caller = new Mock<IPerformMethodCalls>();
             event_types = new Mock<IEventTypes>();
             converter = new Mock<IEventConverter>();
+            events_to_protobuf_converter = new Mock<IConvertEventsToProtobuf>();
+            aggregate_events_to_protobuf_converter = new Mock<IConvertAggregateEventsToProtobuf>();
+            events_to_sdk_converter = new Mock<IConvertEventResponsestoSDK>();
+            aggregate_to_sdk_converter = new Mock<IConvertAggregateResponsesToSDK>();
 
-            event_store = new EventStore(caller.Object, converter.Object, execution_context, event_types.Object, Mock.Of<ILogger>());
+            event_store = new EventStore(
+                caller.Object,
+                execution_context,
+                event_types.Object,
+                events_to_protobuf_converter.Object,
+                aggregate_events_to_protobuf_converter.Object,
+                events_to_sdk_converter.Object,
+                aggregate_to_sdk_converter.Object,
+                Mock.Of<ILogger>());
 
             pb_uncommitted_events = new List<Contracts.UncommittedEvent>();
             pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
