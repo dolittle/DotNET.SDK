@@ -6,6 +6,7 @@ using System.Threading;
 using Dolittle.Runtime.EventHorizon.Contracts;
 using Dolittle.SDK.EventHorizon.Internal;
 using Dolittle.SDK.Execution;
+using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Machine.Specifications;
