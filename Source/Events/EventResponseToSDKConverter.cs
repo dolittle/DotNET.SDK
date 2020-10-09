@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.Runtime.Events.Contracts;
+using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
@@ -32,9 +33,7 @@ namespace Dolittle.SDK.Events
 
             if (source.Failure != null)
             {
-                // what happen here, Failure.ToException()?
-                // error = source.Failure;
-                error = null;
+                error = source.Failure.ToException();
                 return false;
             }
 
