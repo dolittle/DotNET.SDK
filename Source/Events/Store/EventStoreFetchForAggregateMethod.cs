@@ -6,7 +6,7 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Store
 {
     /// <summary>
     /// Represents a wrapper for gRPC EventStore.FetchForAggregate.

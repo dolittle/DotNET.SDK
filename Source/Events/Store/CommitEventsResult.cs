@@ -4,19 +4,19 @@
 using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Protobuf;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Store
 {
     /// <summary>
     /// Represents a response to committed events.
     /// </summary>
-    public class CommitEventsForAggregateResult : Value<CommitEventsForAggregateResult>
+    public class CommitEventsResult : Value<CommitEventsResult>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommitEventsForAggregateResult"/> class.
+        /// Initializes a new instance of the <see cref="CommitEventsResult"/> class.
         /// </summary>
-        /// <param name="failure">The <see cref="Failure"/>.</param>
-        /// <param name="committedEvents">The <see cref="CommittedAggregateEvents"/>.</param>
-        public CommitEventsForAggregateResult(Failure failure, CommittedAggregateEvents committedEvents)
+        /// <param name="failure"><see cref="Failure"/>.</param>
+        /// <param name="committedEvents"><see cref="CommittedEvents"/>.</param>
+        public CommitEventsResult(Failure failure, CommittedEvents committedEvents)
         {
             Failure = failure;
             Events = committedEvents;
@@ -30,7 +30,7 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Gets the <see cref="CommittedEvents" />.
         /// </summary>
-        public CommittedAggregateEvents Events { get; }
+        public CommittedEvents Events { get; }
 
         /// <summary>
         /// Gets a value indicating whether the commit failed.

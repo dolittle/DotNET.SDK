@@ -4,19 +4,19 @@
 using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Protobuf;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Store
 {
     /// <summary>
     /// Represents a response to committed events.
     /// </summary>
-    public class FetchForAggregateResult : Value<CommitEventsForAggregateResult>
+    public class CommitEventsForAggregateResult : Value<CommitEventsForAggregateResult>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FetchForAggregateResult"/> class.
+        /// Initializes a new instance of the <see cref="CommitEventsForAggregateResult"/> class.
         /// </summary>
         /// <param name="failure">The <see cref="Failure"/>.</param>
         /// <param name="committedEvents">The <see cref="CommittedAggregateEvents"/>.</param>
-        public FetchForAggregateResult(Failure failure, CommittedAggregateEvents committedEvents)
+        public CommitEventsForAggregateResult(Failure failure, CommittedAggregateEvents committedEvents)
         {
             Failure = failure;
             Events = committedEvents;

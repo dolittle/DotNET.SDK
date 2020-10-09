@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Store
 {
     /// <summary>
     /// Exception that gets thrown when an Event couldn't be deserialized.
