@@ -3,7 +3,7 @@
 
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Protobuf
+namespace Dolittle.SDK.Failures
 {
     /// <summary>
     /// Represents the reason for failure.

@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Concepts;
-using Dolittle.SDK.Protobuf;
+using Dolittle.SDK.Failures;
 
 namespace Dolittle.SDK.Events
 {

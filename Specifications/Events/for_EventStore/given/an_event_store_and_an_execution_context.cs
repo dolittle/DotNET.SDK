@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Protobuf;
+using Dolittle.SDK.Failures;
 using Dolittle.SDK.Services;
 using Machine.Specifications;
 using Microsoft.Extensions.Logging;
