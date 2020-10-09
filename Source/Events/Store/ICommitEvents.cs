@@ -14,69 +14,29 @@ namespace Dolittle.SDK.Events.Store
     public interface ICommitEvents
     {
         /// <summary>
-        /// Commits a single Event with the given content.
-        /// </summary>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits a single Event with the given content.
-        /// </summary>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits a single Event with the given content.
-        /// </summary>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits a single public Event with the given content.
-        /// </summary>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits a single public Event with the given content.
-        /// </summary>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Commits a single public Event with the given content.
-        /// </summary>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-        /// <param name="eventTypeId">The <see cref="EventTypeId"/> the Event is associated with.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Commits an <see cref="UncommittedEvent" />.
         /// </summary>
         /// <param name="callback">The callback for creating the events to commit.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommitEventsResult" />.</returns>
-        Task<CommitEventsResult> Commit(Action<UncommittedEventsBuilder> callback, CancellationToken cancellationToken = default);
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvents" />.</returns>
+        Task<CommittedEvents> Commit(Action<UncommittedEventsBuilder> callback, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvents" />.</returns>
+        Task<CommittedEvents> CommitEvent(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits a single public Event with the given content.
+        /// </summary>
+        /// <param name="content">The content of the Event.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvents" />.</returns>
+        Task<CommittedEvents> CommitPublicEvent(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default);
     }
 }

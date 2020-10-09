@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Events.Store;
 using Microsoft.Extensions.Logging;
 using ICommitAggregateEvents = Dolittle.SDK.Events.Store.Internal.ICommitAggregateEvents;
 
@@ -53,8 +52,8 @@ namespace Dolittle.SDK.Events.Builders
         /// </summary>
         /// <param name="callback">The callback to create the <see cref="UncommittedAggregateEvents" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommitEventsForAggregateResult" />.</returns>
-        public Task<CommitEventsForAggregateResult> Commit(
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedAggregateEvents" />.</returns>
+        public Task<CommittedAggregateEvents> Commit(
             Action<UncommittedAggregateEventsBuilder> callback,
             CancellationToken cancellationToken = default)
         {

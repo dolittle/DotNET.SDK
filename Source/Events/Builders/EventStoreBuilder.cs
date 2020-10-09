@@ -60,30 +60,31 @@ namespace Dolittle.SDK.Events.Builders
 
         ICommitEvents CreateEventCommitter(TenantId tenantId)
             => new EventCommitter(
-                _caller,
-                _eventTypes,
-                _eventConverter,
-                _callContextResolver,
-                _executionContext.ForTenant(tenantId),
-                _loggerFactory.CreateLogger<EventCommitter>());
+                    new Store.Internal.EventCommitter(
+                        _caller,
+                        _eventConverter,
+                        _callContextResolver,
+                        _executionContext.ForTenant(tenantId),
+                        _loggerFactory.CreateLogger<EventCommitter>()),
+                    _eventTypes);
 
         ICommitAggregateEvents CreateAggregateEventCommitter(TenantId tenantId)
             => new AggregateEventCommitter(
-                new Store.Internal.AggregateEventCommitter(
+                    new Store.Internal.AggregateEventCommitter(
+                        _caller,
+                        _eventConverter,
+                        _callContextResolver,
+                        _executionContext.ForTenant(tenantId),
+                        _loggerFactory.CreateLogger<Store.Internal.AggregateEventCommitter>()),
+                    _eventTypes,
+                    _loggerFactory.CreateLogger<AggregateEventCommitter>());
+
+        IFetchEventsForAggregate CreateEventsForAggregateFetcher(TenantId tenantId)
+            => new Store.Internal.EventsForAggregateFetcher(
                     _caller,
                     _eventConverter,
                     _callContextResolver,
                     _executionContext.ForTenant(tenantId),
-                    _loggerFactory.CreateLogger<Store.Internal.AggregateEventCommitter>()),
-                _eventTypes,
-                _loggerFactory.CreateLogger<AggregateEventCommitter>());
-
-        IFetchEventsForAggregate CreateEventsForAggregateFetcher(TenantId tenantId)
-            => new EventsForAggregateFetcher(
-                _caller,
-                _eventConverter,
-                _callContextResolver,
-                _executionContext.ForTenant(tenantId),
-                _loggerFactory.CreateLogger<EventsForAggregateFetcher>());
+                    _loggerFactory.CreateLogger<Store.Internal.EventsForAggregateFetcher>());
     }
 }

@@ -34,159 +34,35 @@ namespace Dolittle.SDK.Events.Store
         }
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(
+        public Task<CommittedEvents> CommitEvent(
             object content,
             EventSourceId eventSourceId,
             CancellationToken cancellationToken = default)
-            => _events.Commit(content, eventSourceId, cancellationToken);
+            => _events.CommitEvent(content, eventSourceId, cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(
-            object content,
-            EventSourceId eventSourceId,
-            EventType eventType,
-            CancellationToken cancellationToken = default)
-            => _events.Commit(content, eventSourceId, eventType, cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(
-            object content,
-            EventSourceId eventSourceId,
-            EventTypeId eventTypeId,
-            CancellationToken cancellationToken = default)
-            => _events.Commit(content, eventSourceId, eventTypeId, cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(
+        public Task<CommittedEvents> Commit(
             Action<UncommittedEventsBuilder> callback,
             CancellationToken cancellationToken = default)
             => _events.Commit(callback, cancellationToken);
 
         /// <inheritdoc/>
-        public CommitForAggregateBuilder CommitForAggregate(
+        public CommitForAggregateBuilder ForAggregate(
             AggregateRootId aggregateRootId,
             CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitForAggregate(
+            => _aggregateEvents.ForAggregate(
                 aggregateRootId,
                 cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(
-            object content,
-            EventSourceId eventSourceId,
-            AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedAggregateRootVersion,
-            CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitForAggregate(
-                content,
-                eventSourceId,
-                aggregateRootId,
-                expectedAggregateRootVersion,
-                cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(
-            object content,
-            EventSourceId eventSourceId,
-            AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedAggregateRootVersion,
-            EventType eventType,
-            CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitForAggregate(
-                content,
-                eventSourceId,
-                aggregateRootId,
-                expectedAggregateRootVersion,
-                eventType,
-                cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(
-            object content,
-            EventSourceId eventSourceId,
-            AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedAggregateRootVersion,
-            EventTypeId eventTypeId,
-            CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitForAggregate(
-                content,
-                eventSourceId,
-                aggregateRootId,
-                expectedAggregateRootVersion,
-                eventTypeId,
-                cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(
+        public Task<CommittedEvents> CommitPublicEvent(
             object content,
             EventSourceId eventSourceId,
             CancellationToken cancellationToken = default)
-            => _events.CommitPublic(content, eventSourceId, cancellationToken);
+            => _events.CommitPublicEvent(content, eventSourceId, cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(
-            object content,
-            EventSourceId eventSourceId,
-            EventType eventType,
-            CancellationToken cancellationToken = default)
-            => _events.CommitPublic(content, eventSourceId, eventType, cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(
-            object content,
-            EventSourceId eventSourceId,
-            EventTypeId eventTypeId,
-            CancellationToken cancellationToken = default)
-            => _events.CommitPublic(content, eventSourceId, eventTypeId, cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(
-            object content,
-            EventSourceId eventSourceId,
-            AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedAggregateRootVersion,
-            CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitPublicForAggregate(
-                content,
-                eventSourceId,
-                aggregateRootId,
-                expectedAggregateRootVersion,
-                cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(
-            object content,
-            EventSourceId eventSourceId,
-            AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedAggregateRootVersion,
-            EventType eventType,
-            CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitPublicForAggregate(
-                content,
-                eventSourceId,
-                aggregateRootId,
-                expectedAggregateRootVersion,
-                eventType,
-                cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(
-            object content,
-            EventSourceId eventSourceId,
-            AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedAggregateRootVersion,
-            EventTypeId eventTypeId,
-            CancellationToken cancellationToken = default)
-            => _aggregateEvents.CommitPublicForAggregate(
-                content,
-                eventSourceId,
-                aggregateRootId,
-                expectedAggregateRootVersion,
-                eventTypeId,
-                cancellationToken);
-
-        /// <inheritdoc/>
-        public Task<FetchForAggregateResult> FetchForAggregate(
+        public Task<CommittedAggregateEvents> FetchForAggregate(
             AggregateRootId aggregateRootId,
             EventSourceId eventSourceId,
             CancellationToken cancellationToken = default)

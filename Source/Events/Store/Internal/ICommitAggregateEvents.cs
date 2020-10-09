@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// <param name="uncommittedAggregateEvents">The <see cref="UncommittedAggregateEvents" /> to commit.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
+        Task<CommittedAggregateEvents> CommitForAggregate(
             UncommittedAggregateEvents uncommittedAggregateEvents,
             CancellationToken cancellationToken = default);
     }
