@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Newtonsoft.Json;
 using Contracts = Dolittle.Runtime.Events.Contracts;
@@ -149,7 +150,7 @@ namespace Dolittle.SDK.Events
 
             if (source.Failure != null)
             {
-                result = new CommitEventsResult(source.Failure, null);
+                result = new CommitEventsResult(source.Failure.ToSDK(), null);
                 error = null;
                 return true;
             }
@@ -239,7 +240,7 @@ namespace Dolittle.SDK.Events
 
             if (source.Failure != null)
             {
-                result = new CommitEventsForAggregateResult(source.Failure, null);
+                result = new CommitEventsForAggregateResult(source.Failure.ToSDK(), null);
                 error = null;
                 return true;
             }
@@ -262,7 +263,7 @@ namespace Dolittle.SDK.Events
 
             if (source.Failure != null)
             {
-                result = new FetchForAggregateResult(source.Failure, null);
+                result = new FetchForAggregateResult(source.Failure.ToSDK(), null);
                 error = null;
                 return true;
             }

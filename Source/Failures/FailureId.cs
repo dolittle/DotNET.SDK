@@ -4,7 +4,7 @@
 using System;
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Protobuf
+namespace Dolittle.SDK.Failures
 {
     /// <summary>
     /// Represents the failure id.
@@ -21,6 +21,12 @@ namespace Dolittle.SDK.Protobuf
         /// </summary>
         /// <param name="id"><see cref="Guid" /> to convert.</param>
         public static implicit operator FailureId(Guid id) => new FailureId { Value = id };
+
+        /// <summary>
+        /// Implicitly converts the <see cref="Guid" /> to <see cref="FailureId" />.
+        /// </summary>
+        /// <param name="id"><see cref="Guid" /> to convert.</param>
+        public static implicit operator FailureId(string id) => new FailureId { Value = Guid.Parse(id) };
 
         /// <summary>
         /// Create a <see cref="FailureId" /> from a<see cref="string" /> representing a <see cref="Guid" /> .
