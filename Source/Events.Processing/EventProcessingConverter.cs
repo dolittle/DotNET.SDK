@@ -13,24 +13,28 @@ namespace Dolittle.SDK.Events.Processing
     /// </summary>
     public class EventProcessingConverter : IEventProcessingConverter
     {
-        readonly IEventConverter _eventConverter;
+        readonly IConvertEventResponsestoSDK _eventResponsestoSDKConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventProcessingConverter"/> class.
         /// </summary>
-        /// <param name="eventConverter">The <see cref="IEventConverter"/> to use for converting to <see cref="CommittedEvent"/>.</param>
-        public EventProcessingConverter(IEventConverter eventConverter)
+        /// <param name="convertEventResponsestoSDK">The <see cref="IConvertEventResponsestoSDK"/>.</param>
+        public EventProcessingConverter(IConvertEventResponsestoSDK convertEventResponsestoSDK)
         {
-            _eventConverter = eventConverter;
+            _eventResponsestoSDKConverter = convertEventResponsestoSDK;
         }
 
         /// <inheritdoc/>
         public bool TryToSDK(PbCommittedEvent source, out CommittedEvent @event, out Exception error)
-            => _eventConverter.TryToSDK(source, out @event, out error);
+            => _eventResponsestoSDKConverter.TryToSDK(source, out @event, out error);
 
         /// <inheritdoc/>
         public CommittedEvent ToSDK(PbCommittedEvent source)
-            => _eventConverter.ToSDK(source);
+        {
+            if (!_eventResponsestoSDKConverter.TryToSDK(source, out var @event, out var error))
+                throw error;
+            return @event;
+        }
 
         /// <inheritdoc/>
         public bool TryToSDK(PbStreamEvent source, out StreamEvent @event, out Exception error)

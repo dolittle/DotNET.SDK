@@ -23,70 +23,84 @@ namespace Dolittle.SDK.Events
         static readonly EventStoreFetchForAggregateMethod _fetchForAggregateMethod = new EventStoreFetchForAggregateMethod();
 
         readonly IPerformMethodCalls _caller;
-        readonly IEventConverter _eventConverter;
         readonly ExecutionContext _executionContext;
         readonly IEventTypes _eventTypes;
+        readonly IConvertEventsToProtobuf _eventsToProtobufConverter;
+        readonly IConvertAggregateEventsToProtobuf _aggregateEventsToProtobufConverter;
+        readonly IConvertEventResponsestoSDK _eventResponsestoSDKConverter;
+        readonly IConvertAggregateResponsesToSDK _aggregateResponsesToSDKConverter;
         readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventStore"/> class.
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
-        /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext"/> to use.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
+        /// <param name="convertEventsToProtobuf">The <see cref="IConvertEventsToProtobuf"/>.</param>
+        /// <param name="convertAggregateEventsToProtobuf">The <see cref="IConvertAggregateEventsToProtobuf"/>.</param>
+        /// <param name="convertEventResponsestoSDK">The <see cref="IConvertEventResponsestoSDK"/>.</param>
+        /// <param name="convertAggregateResponsesToSDK">The <see cref="IConvertAggregateResponsesToSDK"/>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventStore(
             IPerformMethodCalls caller,
-            IEventConverter eventConverter,
             ExecutionContext executionContext,
             IEventTypes eventTypes,
+            IConvertEventsToProtobuf convertEventsToProtobuf,
+            IConvertAggregateEventsToProtobuf convertAggregateEventsToProtobuf,
+            IConvertEventResponsestoSDK convertEventResponsestoSDK,
+            IConvertAggregateResponsesToSDK convertAggregateResponsesToSDK,
             ILogger logger)
         {
             _caller = caller;
-            _eventConverter = eventConverter;
             _executionContext = executionContext;
             _eventTypes = eventTypes;
+            _eventsToProtobufConverter = convertEventsToProtobuf;
+            _aggregateEventsToProtobufConverter = convertAggregateEventsToProtobuf;
+            _eventResponsestoSDKConverter = convertEventResponsestoSDK;
+            _aggregateResponsesToSDKConverter = convertAggregateResponsesToSDK;
             _logger = logger;
         }
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> Commit(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
             => Commit(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> Commit(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
             => Commit(ToUncommittedEvent(content, eventSourceId, eventType, false), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> Commit(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
             => Commit(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> CommitPublic(object content, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
             => CommitPublic(content, eventSourceId, _eventTypes.GetFor(content.GetType()), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> CommitPublic(object content, EventSourceId eventSourceId, EventType eventType, CancellationToken cancellationToken = default)
             => Commit(ToUncommittedEvent(content, eventSourceId, eventType, true), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> CommitPublic(object content, EventSourceId eventSourceId, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
             => CommitPublic(content, eventSourceId, new EventType(eventTypeId), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsResult> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
+        public Task<CommittedEvents> Commit(UncommittedEvent uncommittedEvent, CancellationToken cancellationToken = default)
             => Commit(new UncommittedEvents { uncommittedEvent }, cancellationToken);
 
         /// <inheritdoc/>
-        public async Task<CommitEventsResult> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
+        public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken)
         {
             var response = await CommitInternal(uncommittedEvents, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response);
+            if (!_eventResponsestoSDKConverter.TryToSDK(response, out var committedEvents, out var error))
+                throw error;
+            return committedEvents;
         }
 
         /// <inheritdoc/>
-        public async Task<FetchForAggregateResult> FetchForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        public async Task<CommittedAggregateEvents> FetchForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug(
                 "Fetching events for aggregate root {AggregateRoot} and event source {EventSource}",
@@ -102,52 +116,59 @@ namespace Dolittle.SDK.Events
                 }
             };
             var response = await _caller.Call(_fetchForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response);
+            if (!_aggregateResponsesToSDKConverter.TryToSDK(response, out var committedAggregateEvents, out var error))
+                throw error;
+            return committedAggregateEvents;
         }
 
         /// <inheritdoc/>
-        public async Task<CommitEventsForAggregateResult> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken = default)
+        public async Task<CommittedAggregateEvents> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug(
                 "Committing events for aggregate root {AggregateRoot} with expected version {ExpectedVersion}",
                 uncommittedAggregateEvents.AggregateRootId,
                 uncommittedAggregateEvents.ExpectedAggregateRootVersion);
 
+            if (!_aggregateEventsToProtobufConverter.TryToProtobuf(uncommittedAggregateEvents, out var pbEvents, out var converterError))
+                throw converterError;
+
             var request = new Contracts.CommitAggregateEventsRequest
             {
                 CallContext = GetCurrentCallContext(),
-                Events = _eventConverter.ToProtobuf(uncommittedAggregateEvents)
+                Events = pbEvents
             };
             var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
-            return _eventConverter.ToSDK(response);
+            if (!_aggregateResponsesToSDKConverter.TryToSDK(response, out var committedAggregateEvents, out var runtimeError))
+                throw runtimeError;
+            return committedAggregateEvents;
         }
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
             => CommitForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, _eventTypes.GetFor(content.GetType()), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventType eventType, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventType eventType, CancellationToken cancellationToken = default)
             => CommitForAggregate(ToUncommittedAggregateEvent(content, eventType, false), eventSourceId, aggregateRootId, expectedAggregateRootVersion, cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
             => CommitForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, new EventType(eventTypeId), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
             => CommitPublicForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, _eventTypes.GetFor(content.GetType()), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventType eventType, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventType eventType, CancellationToken cancellationToken = default)
             => CommitForAggregate(ToUncommittedAggregateEvent(content, eventType, true), eventSourceId, aggregateRootId, expectedAggregateRootVersion, cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitPublicForAggregate(object content, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, EventTypeId eventTypeId, CancellationToken cancellationToken = default)
             => CommitPublicForAggregate(content, eventSourceId, aggregateRootId, expectedAggregateRootVersion, new EventType(eventTypeId), cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(UncommittedAggregateEvent uncommittedAggregateEvent, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
+        public Task<CommittedAggregateEvents> CommitForAggregate(UncommittedAggregateEvent uncommittedAggregateEvent, EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion, CancellationToken cancellationToken = default)
             => CommitForAggregate(
                 new UncommittedAggregateEvents(eventSourceId, aggregateRootId, expectedAggregateRootVersion)
                 {
@@ -162,7 +183,9 @@ namespace Dolittle.SDK.Events
             {
                 CallContext = GetCurrentCallContext(),
             };
-            request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
+            if (!_eventsToProtobufConverter.TryToProtobuf(uncommittedEvents, out var pbEvents, out var error))
+                throw error;
+            request.Events.AddRange(pbEvents);
             return _caller.Call(_commitMethod, request, cancellationToken);
         }
 
