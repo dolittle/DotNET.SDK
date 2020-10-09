@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Builders;
@@ -11,22 +10,16 @@ namespace Dolittle.SDK.Events.Store
     /// <summary>
     /// Defines a system that can commit <see cref="UncommittedAggregateEvents" />.
     /// </summary>
-    public interface ICommitAggregateEvents
+    public partial interface ICommitAggregateEvents
     {
         /// <summary>
         /// Commits a single Event for an aggregate with the given content.
         /// </summary>
-        /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="aggregateRootId">The <see cref="AggregateRootId"/> of the aggregate that applied the events to the Event Source.</param>
-        /// <param name="expectedVersion">The expected <see cref="AggregateRootVersion" />.</param>
-        /// <param name="callback">The callback to create the uncommitted aggregate events.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvent" />.</returns>
-        Task<CommitEventsForAggregateResult> CommitForAggregate(
-            EventSourceId eventSourceId,
+        CommitForAggregateBuilder CommitForAggregate(
             AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedVersion,
-            Action<UncommittedAggregateEventsBuilder> callback,
             CancellationToken cancellationToken = default);
 
         /// <summary>

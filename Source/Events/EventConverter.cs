@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Newtonsoft.Json;

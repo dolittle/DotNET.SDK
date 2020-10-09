@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Dolittle.SDK.Events.Store;
 using PbCommitEventsResponse = Dolittle.Runtime.Events.Contracts.CommitEventsResponse;
 using PbCommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.CommittedAggregateEvents;
 using PbCommittedAggregateEventsResponse = Dolittle.Runtime.Events.Contracts.CommitAggregateEventsResponse;

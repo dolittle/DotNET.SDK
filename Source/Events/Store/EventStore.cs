@@ -63,17 +63,11 @@ namespace Dolittle.SDK.Events.Store
             => _events.Commit(callback, cancellationToken);
 
         /// <inheritdoc/>
-        public Task<CommitEventsForAggregateResult> CommitForAggregate(
-            EventSourceId eventSourceId,
+        public CommitForAggregateBuilder CommitForAggregate(
             AggregateRootId aggregateRootId,
-            AggregateRootVersion expectedVersion,
-            Action<UncommittedAggregateEventsBuilder> callback,
             CancellationToken cancellationToken = default)
             => _aggregateEvents.CommitForAggregate(
-                eventSourceId,
                 aggregateRootId,
-                expectedVersion,
-                callback,
                 cancellationToken);
 
         /// <inheritdoc/>
