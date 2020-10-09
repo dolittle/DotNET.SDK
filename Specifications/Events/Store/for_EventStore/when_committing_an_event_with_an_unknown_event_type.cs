@@ -8,7 +8,7 @@ using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Events.for_EventStore
+namespace Dolittle.SDK.Events.Store.for_EventStore
 {
     public class when_committing_an_event_with_an_unknown_event_type : given.an_event_store_and_an_execution_context
     {
@@ -23,9 +23,10 @@ namespace Dolittle.SDK.Events.for_EventStore
             event_source = new EventSourceId("e4799653-eb7d-481b-9548-3156ddb45832");
             event_type = new EventType("c4aa0398-e14a-4867-bd20-318b78d8ccaa");
             event_types.Setup(_ => _.GetFor(content.GetType())).Throws(new NoEventTypeAssociatedWithType(content.GetType()));
+            event_types.Setup(_ => _.HasFor(content.GetType())).Returns(false);
         };
 
-        Because of = () => exception = Catch.Exception(() => event_store.Commit(content, event_source).Result);
+        Because of = () => exception = Catch.Exception(() => event_store.CommitEvent(content, event_source).Result);
 
         It should_thrown_an_unknkown_artifact_exception = () => exception.ShouldBeOfExactType<NoEventTypeAssociatedWithType>();
         It should_not_call_the_converter_to_protobuf = () => converter.Verify(_ => _.ToProtobuf(Moq.It.IsAny<UncommittedEvents>()), Times.Never());

@@ -6,7 +6,7 @@ using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Events.for_EventStore.given
+namespace Dolittle.SDK.Events.Store.for_EventStore.given
 {
     public class an_execution_context
     {

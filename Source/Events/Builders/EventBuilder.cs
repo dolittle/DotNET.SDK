@@ -70,7 +70,13 @@ namespace Dolittle.SDK.Events.Builders
                 eventType = associatedEventType;
             }
 
+            ThrowIfEventTypeNotConfigured(eventType);
             return (_event, eventType, _eventSourceId, _isPublic);
+        }
+
+        void ThrowIfEventTypeNotConfigured(EventType eventType)
+        {
+            if (eventType == default) throw new EventTypeNotConfigured(_typeOfEvent);
         }
 
         void ThrowIfEventTypeMismatch(EventType eventType, EventType associatedEventType)

@@ -13,27 +13,29 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
-namespace Dolittle.SDK.Events.for_EventStore.given
+namespace Dolittle.SDK.Events.Store.for_EventStore.given
 {
     public class an_event_store_and_an_execution_context : an_execution_context
     {
         protected static Mock<IPerformMethodCalls> caller;
         protected static Mock<IEventConverter> converter;
         protected static Mock<IEventTypes> event_types;
+        protected static Mock<IResolveCallContext> call_context_resolver;
         protected static IEventStore event_store;
         protected static Contracts.CommitEventsRequest commit_events_request;
         protected static Contracts.CommitEventsResponse commit_events_response;
         protected static IEnumerable<Contracts.UncommittedEvent> pb_uncommitted_events;
-        protected static CommitEventsResult commit_events_result;
 
         Establish context = () =>
         {
             caller = new Mock<IPerformMethodCalls>();
             event_types = new Mock<IEventTypes>();
             converter = new Mock<IEventConverter>();
-
-            event_store = new EventStore(caller.Object, converter.Object, execution_context, event_types.Object, Mock.Of<ILogger>());
-
+            call_context_resolver = new Mock<IResolveCallContext>();
+            var eventCommitter = new EventCommitter(new Store.Internal.EventCommitter(caller.Object, converter.Object, call_context_resolver.Object, execution_context, Mock.Of<ILogger>()), event_types.Object);
+            var aggregateEventCommitter = new AggregateEventCommitter(new Store.Internal.AggregateEventCommitter(caller.Object, converter.Object, call_context_resolver.Object, execution_context, Mock.Of<ILogger>()), event_types.Object, Mock.Of<ILogger>());
+            var eventsForAggregateFetcher = new Store.Internal.EventsForAggregateFetcher(caller.Object, converter.Object, call_context_resolver.Object, execution_context, Mock.Of<ILogger>());
+            event_store = new EventStore(eventCommitter, aggregateEventCommitter, eventsForAggregateFetcher);
             pb_uncommitted_events = new List<Contracts.UncommittedEvent>();
             pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
             pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
@@ -53,10 +55,9 @@ namespace Dolittle.SDK.Events.for_EventStore.given
 
             var failure = new Failure(Guid.Parse("72ae75dc-cdd7-4413-bf19-66aba13486ad"), "ran out of tacos");
             var committedEvents = new CommittedEvents(new List<CommittedEvent>());
-            commit_events_result = new CommitEventsResult(failure, committedEvents);
 
-            converter.Setup(_ => _.ToSDK(commit_events_response))
-                .Returns(commit_events_result);
+            converter.Setup(_ => _.ToSDK(commit_events_response.Events))
+                .Returns(committedEvents);
         };
     }
 }

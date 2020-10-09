@@ -5,6 +5,7 @@ using System;
 using Dolittle.Protobuf.Contracts;
 using Dolittle.Runtime.Events.Contracts;
 using Dolittle.SDK.Events.for_EventConverter.given;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Machine.Specifications;
