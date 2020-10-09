@@ -8,12 +8,12 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter.given
 {
     public class a_converter
     {
-        protected static Mock<IEventConverter> event_converter;
+        protected static Mock<IConvertEventResponsestoSDK> event_converter;
         protected static EventProcessingConverter event_processing_converter;
 
         Establish context = () =>
         {
-            event_converter = new Mock<IEventConverter>();
+            event_converter = new Mock<IConvertEventResponsestoSDK>();
             event_processing_converter = new EventProcessingConverter(event_converter.Object);
         };
     }

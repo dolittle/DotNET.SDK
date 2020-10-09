@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading;
-using Dolittle.SDK.Events.for_EventConverter.given;
+using Dolittle.SDK.Events.given;
 using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
 using Moq;
