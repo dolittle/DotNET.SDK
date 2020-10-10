@@ -65,40 +65,43 @@ namespace Dolittle.SDK.Events.Store.Builders
         /// <param name="tenantId">The <see cref="TenantId">tenant</see> to create the event store for.</param>
         /// <returns>An <see cref="IEventStore"/>.</returns>
         public IEventStore ForTenant(TenantId tenantId)
-            => new EventStore(
-                CreateEventCommitter(tenantId),
-                CreateAggregateEventCommitter(tenantId),
-                CreateEventsForAggregateFetcher(tenantId));
+        {
+            var executionContext = _executionContext.ForTenant(tenantId);
+            return new EventStore(
+                CreateEventCommitter(executionContext),
+                CreateAggregateEventCommitter(executionContext),
+                CreateEventsForAggregateFetcher(executionContext));
+        }
 
-        ICommitEvents CreateEventCommitter(TenantId tenantId)
+        ICommitEvents CreateEventCommitter(ExecutionContext executionContext)
             => new EventCommitter(
                     new Internal.EventCommitter(
                         _caller,
                         _eventToProtobufConverter,
                         _eventToSDKConverter,
                         _callContextResolver,
-                        _executionContext.ForTenant(tenantId),
+                        executionContext,
                         _loggerFactory.CreateLogger<Internal.EventCommitter>()),
                     _eventTypes);
 
-        ICommitAggregateEvents CreateAggregateEventCommitter(TenantId tenantId)
+        ICommitAggregateEvents CreateAggregateEventCommitter(ExecutionContext executionContext)
             => new AggregateEventCommitter(
                     new Internal.AggregateEventCommitter(
                         _caller,
                         _aggregateEventToProtobufConverter,
                         _aggregateEventToSDKConverter,
                         _callContextResolver,
-                        _executionContext.ForTenant(tenantId),
+                        executionContext,
                         _loggerFactory.CreateLogger<Internal.AggregateEventCommitter>()),
                     _eventTypes,
                     _loggerFactory.CreateLogger<AggregateEventCommitter>());
 
-        IFetchEventsForAggregate CreateEventsForAggregateFetcher(TenantId tenantId)
+        IFetchEventsForAggregate CreateEventsForAggregateFetcher(ExecutionContext executionContext)
             => new Internal.EventsForAggregateFetcher(
                     _caller,
                     _aggregateEventToSDKConverter,
                     _callContextResolver,
-                    _executionContext.ForTenant(tenantId),
+                    executionContext,
                     _loggerFactory.CreateLogger<Internal.EventsForAggregateFetcher>());
     }
 }
