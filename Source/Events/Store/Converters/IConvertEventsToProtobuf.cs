@@ -19,13 +19,6 @@ namespace Dolittle.SDK.Events.Store.Converters
         /// <param name="events">When the method returns, the converted <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>. if conversion was successful, otherwise null.</param>
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
-        bool TryToProtobuf(UncommittedEvents source, out IEnumerable<PbUncommittedEvent> events, out Exception error);
-
-        /// <summary>
-        /// Convert from <see cref="UncommittedEvents" /> to <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.
-        /// </summary>
-        /// <param name="source"><see cref="UncommittedEvents"/>.</param>
-        /// <returns>The converted <see cref="IEnumerable{T}"/> of type <see cref="PbUncommittedEvent"/>.</returns>
-        IEnumerable<PbUncommittedEvent> Convert(UncommittedEvents source);
+        bool TryConvert(UncommittedEvents source, out IEnumerable<PbUncommittedEvent> events, out Exception error);
     }
 }

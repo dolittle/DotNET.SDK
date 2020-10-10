@@ -17,9 +17,9 @@ namespace Dolittle.SDK.Events.Store.Builders
     {
         readonly IPerformMethodCalls _caller;
         readonly IConvertEventsToProtobuf _eventToProtobufConverter;
-        readonly IConvertEventResponsesToSDK _eventResponsesToSDKConverter;
+        readonly IConvertEventsToSDK _eventToSDKConverter;
         readonly IConvertAggregateEventsToProtobuf _aggregateEventToProtobufConverter;
-        readonly IConvertAggregateResponsesToSDK _aggregateResponsesToSDKConverter;
+        readonly IConvertAggregateEventsToSDK _aggregateEventToSDKConverter;
         readonly ExecutionContext _executionContext;
         readonly IResolveCallContext _callContextResolver;
         readonly IEventTypes _eventTypes;
@@ -30,9 +30,9 @@ namespace Dolittle.SDK.Events.Store.Builders
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
         /// <param name="eventToProtobufConverter">The <see cref="IConvertEventsToProtobuf" />.</param>
-        /// <param name="eventResponsesToSDKConverter">The <see cref="IConvertEventResponsesToSDK" />.</param>
+        /// <param name="eventToSDKConverter">The <see cref="IConvertEventsToSDK" />.</param>
         /// <param name="aggregateEventToProtobufConverter">The <see cref="IConvertAggregateEventsToProtobuf" />.</param>
-        /// <param name="aggregateResponsesToSDKConverter">The <see cref="IConvertAggregateResponsesToSDK" />.</param>
+        /// <param name="aggregateEventToSDKConverter">The <see cref="IConvertAggregateEventsToSDK" />.</param>
         /// <param name="executionContext">The base <see cref="ExecutionContext"/> to use.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
@@ -40,9 +40,9 @@ namespace Dolittle.SDK.Events.Store.Builders
         public EventStoreBuilder(
             IPerformMethodCalls caller,
             IConvertEventsToProtobuf eventToProtobufConverter,
-            IConvertEventResponsesToSDK eventResponsesToSDKConverter,
+            IConvertEventsToSDK eventToSDKConverter,
             IConvertAggregateEventsToProtobuf aggregateEventToProtobufConverter,
-            IConvertAggregateResponsesToSDK aggregateResponsesToSDKConverter,
+            IConvertAggregateEventsToSDK aggregateEventToSDKConverter,
             ExecutionContext executionContext,
             IResolveCallContext callContextResolver,
             IEventTypes eventTypes,
@@ -50,9 +50,9 @@ namespace Dolittle.SDK.Events.Store.Builders
         {
             _caller = caller;
             _eventToProtobufConverter = eventToProtobufConverter;
-            _eventResponsesToSDKConverter = eventResponsesToSDKConverter;
+            _eventToSDKConverter = eventToSDKConverter;
             _aggregateEventToProtobufConverter = aggregateEventToProtobufConverter;
-            _aggregateResponsesToSDKConverter = aggregateResponsesToSDKConverter;
+            _aggregateEventToSDKConverter = aggregateEventToSDKConverter;
             _executionContext = executionContext;
             _callContextResolver = callContextResolver;
             _eventTypes = eventTypes;
@@ -75,7 +75,7 @@ namespace Dolittle.SDK.Events.Store.Builders
                     new Internal.EventCommitter(
                         _caller,
                         _eventToProtobufConverter,
-                        _eventResponsesToSDKConverter,
+                        _eventToSDKConverter,
                         _callContextResolver,
                         _executionContext.ForTenant(tenantId),
                         _loggerFactory.CreateLogger<Internal.EventCommitter>()),
@@ -86,7 +86,7 @@ namespace Dolittle.SDK.Events.Store.Builders
                     new Internal.AggregateEventCommitter(
                         _caller,
                         _aggregateEventToProtobufConverter,
-                        _aggregateResponsesToSDKConverter,
+                        _aggregateEventToSDKConverter,
                         _callContextResolver,
                         _executionContext.ForTenant(tenantId),
                         _loggerFactory.CreateLogger<Internal.AggregateEventCommitter>()),
@@ -96,7 +96,7 @@ namespace Dolittle.SDK.Events.Store.Builders
         IFetchEventsForAggregate CreateEventsForAggregateFetcher(TenantId tenantId)
             => new Internal.EventsForAggregateFetcher(
                     _caller,
-                    _aggregateResponsesToSDKConverter,
+                    _aggregateEventToSDKConverter,
                     _callContextResolver,
                     _executionContext.ForTenant(tenantId),
                     _loggerFactory.CreateLogger<Internal.EventsForAggregateFetcher>());

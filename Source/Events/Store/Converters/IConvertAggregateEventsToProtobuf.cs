@@ -18,13 +18,6 @@ namespace Dolittle.SDK.Events.Store.Converters
         /// <param name="events">When the method returns, the converted <see cref="PbUncommittedAggregateEvents"/> if conversion was successful, otherwise null.</param>
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
-        bool TryToProtobuf(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error);
-
-        /// <summary>
-        /// Convert from <see cref="UncommittedAggregateEvents"/> to <see cref="PbUncommittedAggregateEvents"/>.
-        /// </summary>
-        /// <param name="source"><see cref="UncommittedAggregateEvents"/>.</param>
-        /// <returns>The converted <see cref="PbUncommittedAggregateEvents" />.</returns>
-        PbUncommittedAggregateEvents Convert(UncommittedAggregateEvents source);
+        bool TryConvert(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error);
     }
 }

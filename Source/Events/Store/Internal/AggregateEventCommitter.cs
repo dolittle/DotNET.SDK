@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Events.Store.Internal
         static readonly EventStoreCommitForAggregateMethod _commitForAggregateMethod = new EventStoreCommitForAggregateMethod();
         readonly IPerformMethodCalls _caller;
         readonly IConvertAggregateEventsToProtobuf _toProtobuf;
-        readonly IConvertAggregateResponsesToSDK _toSDK;
+        readonly IConvertAggregateEventsToSDK _toSDK;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
@@ -30,14 +30,14 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// </summary>
         /// <param name="caller">The <see cref="IPerformMethodCalls" />.</param>
         /// <param name="toProtobuf">The <see cref="IConvertAggregateEventsToProtobuf" />.</param>
-        /// <param name="toSDK">The <see cref="IConvertAggregateResponsesToSDK" />.</param>
+        /// <param name="toSDK">The <see cref="IConvertAggregateEventsToSDK" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public AggregateEventCommitter(
             IPerformMethodCalls caller,
             IConvertAggregateEventsToProtobuf toProtobuf,
-            IConvertAggregateResponsesToSDK toSDK,
+            IConvertAggregateEventsToSDK toSDK,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
             ILogger logger)
@@ -59,14 +59,27 @@ namespace Dolittle.SDK.Events.Store.Internal
                 uncommittedAggregateEvents.AggregateRootId,
                 uncommittedAggregateEvents.ExpectedAggregateRootVersion);
 
+            if (!_toProtobuf.TryConvert(uncommittedAggregateEvents, out var protobufEvents, out var error))
+            {
+                _logger.LogError(error, "Could not convert {UncommittedAggregateEvents} to Protobuf.", uncommittedAggregateEvents);
+                throw error;
+            }
+
             var request = new Contracts.CommitAggregateEventsRequest
             {
                 CallContext = _callContextResolver.ResolveFrom(_executionContext),
-                Events = _toProtobuf.Convert(uncommittedAggregateEvents)
+                Events = protobufEvents
             };
             var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
-            return _toSDK.Convert(response);
+
+            if (!_toSDK.TryConvert(response.Events, out var committedAggregateEvents, out error))
+            {
+                _logger.LogError(error, "Could not convert {CommittedAggregateEvents} to SDK.", response.Events);
+                throw error;
+            }
+
+            return committedAggregateEvents;
         }
     }
 }

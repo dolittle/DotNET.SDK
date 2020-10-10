@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Events.Store.Internal
     {
         static readonly EventStoreFetchForAggregateMethod _fetchForAggregateMethod = new EventStoreFetchForAggregateMethod();
         readonly IPerformMethodCalls _caller;
-        readonly IConvertAggregateResponsesToSDK _toSDK;
+        readonly IConvertAggregateEventsToSDK _toSDK;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
@@ -29,13 +29,13 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// Initializes a new instance of the <see cref="EventsForAggregateFetcher"/> class.
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
-        /// <param name="toSDK">The <see cref="IConvertAggregateResponsesToSDK" />.</param>
+        /// <param name="toSDK">The <see cref="IConvertAggregateEventsToSDK" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventsForAggregateFetcher(
             IPerformMethodCalls caller,
-            IConvertAggregateResponsesToSDK toSDK,
+            IConvertAggregateEventsToSDK toSDK,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
             ILogger logger)
@@ -66,9 +66,17 @@ namespace Dolittle.SDK.Events.Store.Internal
                     EventSourceId = eventSourceId.Value.ToProtobuf()
                 }
             };
+
             var response = await _caller.Call(_fetchForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
-            return _toSDK.Convert(response);
+
+            if (!_toSDK.TryConvert(response.Events, out var committedAggregateEvents, out var error))
+            {
+                _logger.LogError(error, "Could not convert {CommittedAggregateEvents} to SDK.", response.Events);
+                throw error;
+            }
+
+            return committedAggregateEvents;
         }
     }
 }

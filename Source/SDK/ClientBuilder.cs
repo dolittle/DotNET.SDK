@@ -228,9 +228,9 @@ namespace Dolittle.SDK
 
             var serializer = new EventContentSerializer(eventTypes);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
+            var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
-            var eventToSDKConverter = new EventResponseToSDKConverter(serializer);
-            var aggregateToSDKConverter = new AggregateResponseToSDKConverter(serializer);
+            var aggregateEventToSDKConverter = new AggregateEventToSDKConverter(serializer);
 
             var eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
             var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
@@ -245,7 +245,7 @@ namespace Dolittle.SDK
                 eventToProtobufConverter,
                 eventToSDKConverter,
                 aggregateEventToProtobufConverter,
-                aggregateToSDKConverter,
+                aggregateEventToSDKConverter,
                 executionContext,
                 callContextResolver,
                 eventTypes,

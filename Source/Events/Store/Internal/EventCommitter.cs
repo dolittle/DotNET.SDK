@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Events.Store.Internal
         static readonly EventStoreCommitMethod _commitForAggregateMethod = new EventStoreCommitMethod();
         readonly IPerformMethodCalls _caller;
         readonly IConvertEventsToProtobuf _toProtobuf;
-        readonly IConvertEventResponsesToSDK _toSDK;
+        readonly IConvertEventsToSDK _toSDK;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
@@ -30,14 +30,14 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// </summary>
         /// <param name="caller">The <see cref="IPerformMethodCalls" />.</param>
         /// <param name="toProtobuf">The <see cref="IConvertEventsToProtobuf" />.</param>
-        /// <param name="toSDK">The <see cref="IConvertEventResponsesToSDK" />.</param>
+        /// <param name="toSDK">The <see cref="IConvertEventsToSDK" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventCommitter(
             IPerformMethodCalls caller,
             IConvertEventsToProtobuf toProtobuf,
-            IConvertEventResponsesToSDK toSDK,
+            IConvertEventsToSDK toSDK,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
             ILogger logger)
@@ -55,14 +55,28 @@ namespace Dolittle.SDK.Events.Store.Internal
         {
             _logger.LogDebug("Committing {NumberOfEvents} events", uncommittedEvents.Count);
 
+            if (!_toProtobuf.TryConvert(uncommittedEvents, out var protobufEvents, out var error))
+            {
+                _logger.LogError(error, "Could not convert {UncommittedEvents} to Protobuf.", uncommittedEvents);
+                throw error;
+            }
+
             var request = new Contracts.CommitEventsRequest
             {
                 CallContext = _callContextResolver.ResolveFrom(_executionContext)
             };
-            request.Events.AddRange(_toProtobuf.Convert(uncommittedEvents));
+            request.Events.AddRange(protobufEvents);
+
             var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
-            return _toSDK.Convert(response);
+
+            if (!_toSDK.TryConvert(response.Events, out var committedEvents, out error))
+            {
+                _logger.LogError(error, "Could not convert {CommittedEvents} to SDK. The events have been committed.", response.Events);
+                throw error;
+            }
+
+            return committedEvents;
         }
     }
 }

@@ -1,73 +1,32 @@
-// Copyright (c) Dolittle. All rights reserved.
+﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
-using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
 namespace Dolittle.SDK.Events.Store.Converters
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IConvertAggregateResponsesToSDK"/>.
+    /// Represents an implementation of <see cref="IConvertAggregateEventsToSDK"/>.
     /// </summary>
-    public class AggregateResponseToSDKConverter : IConvertAggregateResponsesToSDK
+    public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
     {
         readonly ISerializeEventContent _serializer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateResponseToSDKConverter"/> class.
+        /// Initializes a new instance of the <see cref="AggregateEventToSDKConverter"/> class.
         /// </summary>
         /// <param name="serializer"><see cref="ISerializeEventContent"/> for deserializing event contents.</param>
-        public AggregateResponseToSDKConverter(ISerializeEventContent serializer) => _serializer = serializer;
-
-        /// <inheritdoc/>
-        public CommittedAggregateEvents Convert(Contracts.CommitAggregateEventsResponse source)
+        public AggregateEventToSDKConverter(ISerializeEventContent serializer)
         {
-            if (!TryToSDK(source, out var events, out var error))
-                ExceptionDispatchInfo.Capture(error);
-            return events;
+            _serializer = serializer;
         }
 
         /// <inheritdoc/>
-        public CommittedAggregateEvents Convert(Contracts.FetchForAggregateResponse source)
-        {
-            if (!TryToSDK(source, out var events, out var error))
-                ExceptionDispatchInfo.Capture(error);
-            return events;
-        }
-
-        /// <inheritdoc/>
-        public bool TryToSDK(Contracts.CommitAggregateEventsResponse source, out CommittedAggregateEvents events, out Exception error)
-        {
-            events = default;
-            if (source.Failure != null)
-            {
-                error = source.Failure.ToException();
-                return false;
-            }
-
-            return TryToSDK(source.Events, out events, out error);
-        }
-
-        /// <inheritdoc/>
-        public bool TryToSDK(Contracts.FetchForAggregateResponse source, out CommittedAggregateEvents events, out Exception error)
-        {
-            events = default;
-
-            if (source.Failure != null)
-            {
-                error = source.Failure.ToException();
-                return false;
-            }
-
-            return TryToSDK(source.Events, out events, out error);
-        }
-
-        bool TryToSDK(Contracts.CommittedAggregateEvents source, out CommittedAggregateEvents events, out Exception error)
+        public bool TryConvert(Contracts.CommittedAggregateEvents source, out CommittedAggregateEvents events, out Exception error)
         {
             events = default;
 
@@ -89,7 +48,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
             }
 
-            if (!TryToSDK(source.Events, eventSourceId, aggregateRootId, source.AggregateRootVersion, out var committedAggregateEventList, out error))
+            if (!TryConvert(source.Events, eventSourceId, aggregateRootId, source.AggregateRootVersion, out var committedAggregateEventList, out error))
                 return false;
 
             events = new CommittedAggregateEvents(eventSourceId, aggregateRootId, committedAggregateEventList);
@@ -101,7 +60,7 @@ namespace Dolittle.SDK.Events.Store.Converters
         /// We have to manually calculate and set the AggregateRootVersion for the events as the
         /// CommittedAggregateEvents.AggregateRootVersion is set to the latest version.
         /// </summary>
-        bool TryToSDK(
+        bool TryConvert(
             IEnumerable<Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent> source,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -117,7 +76,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 var version = aggregateRootVersion + 1u - (ulong)committedEvents.Length + i;
                 var sourceEvent = committedEvents[i];
 
-                if (!TryToSDK(sourceEvent, eventSourceId, aggregateRootId, version, out var @event, out error))
+                if (!TryConvert(sourceEvent, eventSourceId, aggregateRootId, version, out var @event, out error))
                     return false;
 
                 list.Add(@event);
@@ -128,7 +87,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             return true;
         }
 
-        bool TryToSDK(
+        bool TryConvert(
             Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent source,
             EventSourceId eventSourceId,
             AggregateRootId aggregateRootId,
@@ -168,7 +127,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
             }
 
-            if (!_serializer.TryToDeserialize(source.Content, eventType, out var content, out var deserializationError))
+            if (!_serializer.TryDeserialize(eventType, source.EventLogSequenceNumber, source.Content, out var content, out var deserializationError))
             {
                 error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);
                 return false;

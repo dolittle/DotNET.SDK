@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Store.Converters
 {
     /// <summary>
     /// Exception that gets thrown when serialization of the content of an uncommitted event fails.

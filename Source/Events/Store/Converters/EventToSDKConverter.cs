@@ -1,61 +1,31 @@
-// Copyright (c) Dolittle. All rights reserved.
+﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
-using Dolittle.Runtime.Events.Contracts;
-using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
 namespace Dolittle.SDK.Events.Store.Converters
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IConvertEventResponsesToSDK"/>.
+    /// Represents an implementation of <see cref="IConvertEventsToSDK"/>.
     /// </summary>
-    public class EventResponseToSDKConverter : IConvertEventResponsesToSDK
+    public class EventToSDKConverter : IConvertEventsToSDK
     {
         readonly ISerializeEventContent _serializer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventResponseToSDKConverter"/> class.
+        /// Initializes a new instance of the <see cref="EventToSDKConverter"/> class.
         /// </summary>
         /// <param name="serializer"><see cref="ISerializeEventContent"/> for deserializing event contents.</param>
-        public EventResponseToSDKConverter(ISerializeEventContent serializer) => _serializer = serializer;
-
-        /// <inheritdoc/>
-        public CommittedEvents Convert(CommitEventsResponse source)
+        public EventToSDKConverter(ISerializeEventContent serializer)
         {
-            if (!TryToSDK(source, out var events, out var error))
-                ExceptionDispatchInfo.Capture(error);
-            return events;
+            _serializer = serializer;
         }
 
         /// <inheritdoc/>
-        public CommittedEvent Convert(Contracts.CommittedEvent source)
-        {
-            if (!TryToSDK(source, out var @event, out var error))
-                ExceptionDispatchInfo.Capture(error);
-            return @event;
-        }
-
-        /// <inheritdoc/>
-        public bool TryToSDK(CommitEventsResponse source, out CommittedEvents events, out Exception error)
-        {
-            events = default;
-
-            if (source.Failure != null)
-            {
-                error = source.Failure.ToException();
-                return false;
-            }
-
-            return TryToSDK(source.Events, out events, out error);
-        }
-
-        /// <inheritdoc/>
-        public bool TryToSDK(Contracts.CommittedEvent source, out CommittedEvent @event, out Exception error)
+        public bool TryConvert(Contracts.CommittedEvent source, out CommittedEvent @event, out Exception error)
         {
             @event = null;
 
@@ -95,7 +65,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
             }
 
-            if (!_serializer.TryToDeserialize(source.Content, eventType, out var content, out var deserializationError))
+            if (!_serializer.TryDeserialize(eventType, source.EventLogSequenceNumber, source.Content, out var content, out var deserializationError))
             {
                 error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);
                 return false;
@@ -137,7 +107,8 @@ namespace Dolittle.SDK.Events.Store.Converters
             }
         }
 
-        bool TryToSDK(IEnumerable<Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
+        /// <inheritdoc/>
+        public bool TryConvert(IEnumerable<Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
         {
             events = default;
 
@@ -150,7 +121,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             var list = new List<CommittedEvent>();
             foreach (var sourceEvent in source)
             {
-                if (!TryToSDK(sourceEvent, out var @event, out error))
+                if (!TryConvert(sourceEvent, out var @event, out error))
                     return false;
 
                 list.Add(@event);
