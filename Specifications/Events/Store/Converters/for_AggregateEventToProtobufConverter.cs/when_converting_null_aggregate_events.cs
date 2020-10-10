@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConve
         static Exception exception;
         static bool try_result;
 
-        Because of = () => try_result = converter.TryToProtobuf(null, out converted_uncommitted_aggregate_events, out exception);
+        Because of = () => try_result = converter.TryConvert(null, out converted_uncommitted_aggregate_events, out exception);
 
         It should_return_false = () => try_result.ShouldBeFalse();
         It should_out_default_events = () => converted_uncommitted_aggregate_events.ShouldEqual(default);

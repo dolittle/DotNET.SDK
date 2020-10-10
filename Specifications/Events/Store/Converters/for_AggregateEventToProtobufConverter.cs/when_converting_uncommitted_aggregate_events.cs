@@ -57,44 +57,36 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConve
             uncommitted_aggregate_events = new UncommittedAggregateEvents(event_source_id, aggregate_root_id, aggregate_root_version)
             {
                 event_one,
+                event_two,
                 event_two
             };
 
-            serializer
-                .Setup(_ => _.TryToSerialize(event_one.Content, out Moq.It.Ref<string>.IsAny, out Moq.It.Ref<Exception>.IsAny))
-                .Callback(new TryToSerializeCallback((object _, out string jsonString, out Exception error) =>
-                    {
-                        jsonString = content_as_string_one;
-                        error = null;
-                    }))
-                .Returns(true);
-            serializer
-                .Setup(_ => _.TryToSerialize(event_two.Content, out Moq.It.Ref<string>.IsAny, out Moq.It.Ref<Exception>.IsAny))
-                .Callback(new TryToSerializeCallback((object _, out string jsonString, out Exception error) =>
-                    {
-                        jsonString = content_as_string_two;
-                        error = null;
-                    }))
-                .Returns(true);
+            SetupSerializerToReturnJSON(content_one, content_as_string_one);
+            SetupSerializerToReturnJSON(content_two, content_as_string_two);
         };
 
-        Because of = () => try_result = converter.TryToProtobuf(uncommitted_aggregate_events, out converted_uncommitted_events, out exception);
+        Because of = () => try_result = converter.TryConvert(uncommitted_aggregate_events, out converted_uncommitted_events, out exception);
 
         It should_return_true = () => try_result.ShouldBeTrue();
         It should_have_no_exception = () => exception.ShouldBeNull();
-        It should_return_three_events = () => converted_uncommitted_events.Events.Count.ShouldEqual(uncommitted_aggregate_events.Count);
+
+        It should_return_three_events = () => converted_uncommitted_events.Events.Count.ShouldEqual(3);
+        It should_have_called_the_serializer_with_the_three_contents = () => serialized_contents.ShouldContainOnly(content_one, content_two, content_two);
+
         It should_the_same_event_source_id = () => converted_uncommitted_events.EventSourceId.ShouldEqual(event_source_id.ToProtobuf());
         It should_have_the_same_aggregate_root_id = () => converted_uncommitted_events.AggregateRootId.ShouldEqual(aggregate_root_id.ToProtobuf());
         It should_have_the_same_aggregate_root_version = () => converted_uncommitted_events.ExpectedAggregateRootVersion.ShouldEqual(aggregate_root_version.Value);
-        It should_have_the_same_event_type_id_for_the_first_event = () => converted_uncommitted_events.Events.ElementAt(0).Artifact.Id.ShouldEqual(event_type_one.Id.ToProtobuf());
-        It should_have_the_same_event_type_generation_for_the_first_event = () => converted_uncommitted_events.Events.ElementAt(0).Artifact.Generation.ShouldEqual(event_type_one.Generation.Value);
-        It should_have_called_the_serializer_on_the_first_events_content = () => serializer.Verify(_ => _.TryToSerialize(uncommitted_aggregate_events.ElementAt(0).Content, out Moq.It.Ref<string>.IsAny, out Moq.It.Ref<Exception>.IsAny), Times.Once());
-        It should_have_content_set_by_the_serializer_on_the_first_event = () => converted_uncommitted_events.Events.ElementAt(0).Content.ShouldEqual(content_as_string_one);
-        It should_have_the_same_is_public_for_the_first_event = () => converted_uncommitted_events.Events.ElementAt(0).Public.ShouldEqual(is_public_one);
-        It should_have_the_same_event_type_id_for_the_second_event = () => converted_uncommitted_events.Events.ElementAt(1).Artifact.Id.ShouldEqual(event_type_two.Id.ToProtobuf());
-        It should_have_the_same_event_type_generation_for_the_second_event = () => converted_uncommitted_events.Events.ElementAt(1).Artifact.Generation.ShouldEqual(event_type_two.Generation.Value);
-        It should_have_called_the_serializer_on_the_second_events_content = () => serializer.Verify(_ => _.TryToSerialize(uncommitted_aggregate_events.ElementAt(1).Content, out Moq.It.Ref<string>.IsAny, out Moq.It.Ref<Exception>.IsAny), Times.Once());
-        It should_have_content_set_by_the_serializer_on_the_second_event = () => converted_uncommitted_events.Events.ElementAt(1).Content.ShouldEqual(content_as_string_two);
-        It should_have_the_same_is_public_for_the_second_event = () => converted_uncommitted_events.Events.ElementAt(1).Public.ShouldEqual(is_public_two);
+        It should_have_the_same_event_type_id_for_the_first_event = () => converted_uncommitted_events.Events[0].Artifact.Id.ShouldEqual(event_type_one.Id.ToProtobuf());
+        It should_have_the_same_event_type_generation_for_the_first_event = () => converted_uncommitted_events.Events[0].Artifact.Generation.ShouldEqual(event_type_one.Generation.Value);
+        It should_have_content_set_by_the_serializer_on_the_first_event = () => converted_uncommitted_events.Events[0].Content.ShouldEqual(content_as_string_one);
+        It should_have_the_same_is_public_for_the_first_event = () => converted_uncommitted_events.Events[0].Public.ShouldEqual(is_public_one);
+        It should_have_the_same_event_type_id_for_the_second_event = () => converted_uncommitted_events.Events[1].Artifact.Id.ShouldEqual(event_type_two.Id.ToProtobuf());
+        It should_have_the_same_event_type_generation_for_the_second_event = () => converted_uncommitted_events.Events[1].Artifact.Generation.ShouldEqual(event_type_two.Generation.Value);
+        It should_have_content_set_by_the_serializer_on_the_second_event = () => converted_uncommitted_events.Events[1].Content.ShouldEqual(content_as_string_two);
+        It should_have_the_same_is_public_for_the_second_event = () => converted_uncommitted_events.Events[1].Public.ShouldEqual(is_public_two);
+        It should_have_the_same_event_type_id_for_the_third_event = () => converted_uncommitted_events.Events[2].Artifact.Id.ShouldEqual(event_type_two.Id.ToProtobuf());
+        It should_have_the_same_event_type_generation_for_the_third_event = () => converted_uncommitted_events.Events[2].Artifact.Generation.ShouldEqual(event_type_two.Generation.Value);
+        It should_have_content_set_by_the_serializer_on_the_third_event = () => converted_uncommitted_events.Events[2].Content.ShouldEqual(content_as_string_two);
+        It should_have_the_same_is_public_for_the_third_event = () => converted_uncommitted_events.Events[2].Public.ShouldEqual(is_public_two);
     }
 }

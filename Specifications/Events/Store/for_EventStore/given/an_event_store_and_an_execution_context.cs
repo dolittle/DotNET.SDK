@@ -14,9 +14,9 @@ namespace Dolittle.SDK.Events.Store.for_EventStore.given
     {
         protected static Mock<IPerformMethodCalls> caller;
         protected static Mock<IConvertEventsToProtobuf> events_to_protobuf_converter;
+        protected static Mock<IConvertEventsToSDK> events_to_sdk_converter;
         protected static Mock<IConvertAggregateEventsToProtobuf> aggregate_events_to_protobuf_converter;
-        protected static Mock<IConvertEventResponsesToSDK> events_to_sdk_converter;
-        protected static Mock<IConvertAggregateResponsesToSDK> aggregate_to_sdk_converter;
+        protected static Mock<IConvertAggregateEventsToSDK> aggregate_events_to_sdk_converter;
         protected static Mock<IEventTypes> event_types;
         protected static Mock<IResolveCallContext> call_context_resolver;
         protected static IEventStore event_store;

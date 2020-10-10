@@ -40,13 +40,12 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
                 new object(),
                 true);
 
-            event_converter.Setup(_ => _.Convert(committed_event)).Returns(committed_event_to_return);
+            SetupConverterToReturn(committed_event, committed_event_to_return);
         };
 
         Because of = () => converted_committed_event = event_processing_converter.ToSDK(committed_event);
 
-        It should_call_the_event_converter_with_the_committed_event = () => event_converter.Verify(_ => _.Convert(committed_event));
+        It should_call_the_event_converter_with_the_committed_event = () => converted_events.ShouldContainOnly(committed_event);
         It should_return_the_result_from_the_event_converter = () => converted_committed_event.ShouldBeTheSameAs(committed_event_to_return);
-        It should_not_call_the_event_converter_for_anything_else = () => event_converter.VerifyNoOtherCalls();
     }
 }
