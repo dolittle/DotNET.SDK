@@ -3,7 +3,7 @@
 
 using System;
 using System.Threading;
-using Dolittle.SDK.Events.for_EventConverter.given;
+using Dolittle.SDK.Events.given;
 using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;

@@ -8,7 +8,7 @@ using Dolittle.Security.Contracts;
 using Machine.Specifications;
 using Version = Dolittle.Versioning.Contracts.Version;
 
-namespace Dolittle.SDK.Events.for_EventConverter.given
+namespace Dolittle.SDK.Events.for_AggregateResponseToSDKConverter.given
 {
     public class a_converter_and_a_protobuf_execution_context : a_converter
     {

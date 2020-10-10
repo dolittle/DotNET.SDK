@@ -19,6 +19,10 @@ namespace Dolittle.SDK.Events.Store.for_EventStore.given
     {
         protected static Mock<IPerformMethodCalls> caller;
         protected static Mock<IEventConverter> converter;
+        protected static Mock<IConvertEventsToProtobuf> events_to_protobuf_converter;
+        protected static Mock<IConvertAggregateEventsToProtobuf> aggregate_events_to_protobuf_converter;
+        protected static Mock<IConvertEventResponsestoSDK> events_to_sdk_converter;
+        protected static Mock<IConvertAggregateResponsesToSDK> aggregate_to_sdk_converter;
         protected static Mock<IEventTypes> event_types;
         protected static Mock<IResolveCallContext> call_context_resolver;
         protected static IEventStore event_store;
@@ -31,11 +35,29 @@ namespace Dolittle.SDK.Events.Store.for_EventStore.given
             caller = new Mock<IPerformMethodCalls>();
             event_types = new Mock<IEventTypes>();
             converter = new Mock<IEventConverter>();
+            events_to_protobuf_converter = new Mock<IConvertEventsToProtobuf>();
+            aggregate_events_to_protobuf_converter = new Mock<IConvertAggregateEventsToProtobuf>();
+            events_to_sdk_converter = new Mock<IConvertEventResponsestoSDK>();
+            aggregate_to_sdk_converter = new Mock<IConvertAggregateResponsesToSDK>();
+<<<<<<< HEAD:Specifications/Events/Store/for_EventStore/given/an_event_store_and_an_execution_context.cs
             call_context_resolver = new Mock<IResolveCallContext>();
             var eventCommitter = new EventCommitter(new Store.Internal.EventCommitter(caller.Object, converter.Object, call_context_resolver.Object, execution_context, Mock.Of<ILogger>()), event_types.Object);
             var aggregateEventCommitter = new AggregateEventCommitter(new Store.Internal.AggregateEventCommitter(caller.Object, converter.Object, call_context_resolver.Object, execution_context, Mock.Of<ILogger>()), event_types.Object, Mock.Of<ILogger>());
             var eventsForAggregateFetcher = new Store.Internal.EventsForAggregateFetcher(caller.Object, converter.Object, call_context_resolver.Object, execution_context, Mock.Of<ILogger>());
             event_store = new EventStore(eventCommitter, aggregateEventCommitter, eventsForAggregateFetcher);
+=======
+
+            event_store = new EventStore(
+                caller.Object,
+                execution_context,
+                event_types.Object,
+                events_to_protobuf_converter.Object,
+                aggregate_events_to_protobuf_converter.Object,
+                events_to_sdk_converter.Object,
+                aggregate_to_sdk_converter.Object,
+                Mock.Of<ILogger>());
+
+>>>>>>> 987c66364e531f5e3b2d9c3edcbd12c1182f1d9b:Specifications/Events/for_EventStore/given/an_event_store_and_an_execution_context.cs
             pb_uncommitted_events = new List<Contracts.UncommittedEvent>();
             pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
             pb_uncommitted_events.Append(new Contracts.UncommittedEvent());
