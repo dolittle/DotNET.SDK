@@ -76,10 +76,10 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.
         It should_return_true = () => try_result.ShouldBeTrue();
         It should_have_no_exception = () => exception.ShouldBeNull();
         It should_have_the_correct_event_source = () => converted_events.EventSource.ShouldEqual(event_source.To<EventSourceId>());
-        It should_have_the_correct_aggregate_root_id = () => converted_events.AggregateRootId.ShouldEqual(aggregate_root_id.To<AggregateRootId>());
+        It should_have_the_correct_aggregate_root_id = () => converted_events.AggregateRoot.ShouldEqual(aggregate_root_id.To<AggregateRootId>());
         It should_have_the_correct_aggregate_root_version = () => converted_events.AggregateRootVersion.Value.ShouldEqual(aggregate_root_version);
         It should_have_one_event = () => converted_events.Count.ShouldEqual(1);
-        It should_have_one_event_with_the_correct_aggregate_root_id = () => converted_events[0].AggregateRootId.ShouldEqual(aggregate_root_id.To<AggregateRootId>());
+        It should_have_one_event_with_the_correct_aggregate_root_id = () => converted_events[0].AggregateRoot.ShouldEqual(aggregate_root_id.To<AggregateRootId>());
         It should_have_one_event_with_the_correct_aggregate_root_version = () => converted_events[0].AggregateRootVersion.Value.ShouldEqual(aggregate_root_version);
         It should_have_one_event_with_the_correct_occurred = () => converted_events[0].Occurred.ShouldEqual(occured.ToDateTimeOffset());
         It should_have_one_event_with_the_correct_event_source = () => converted_events[0].EventSource.ShouldEqual(event_source.To<EventSourceId>());

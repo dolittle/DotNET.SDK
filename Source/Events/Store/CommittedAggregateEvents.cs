@@ -23,8 +23,11 @@ namespace Dolittle.SDK.Events.Store
         /// <param name="events">The <see cref="CommittedAggregateEvent">events</see>.</param>
         public CommittedAggregateEvents(EventSourceId eventSource, AggregateRootId aggregateRootId, IReadOnlyList<CommittedAggregateEvent> events)
         {
+            ThrowIfEventsSourceIdIsNull(eventSource);
+            ThrowIfAggregateRootIdIsNull(aggregateRootId);
+
             EventSource = eventSource;
-            AggregateRootId = aggregateRootId;
+            AggregateRoot = aggregateRootId;
 
             for (var i = 0; i < events.Count; i++)
             {
@@ -49,7 +52,7 @@ namespace Dolittle.SDK.Events.Store
         /// <summary>
         /// Gets the <see cref="AggregateRootId"/> of the Aggregate Root that applied the Events to the Event Source.
         /// </summary>
-        public AggregateRootId AggregateRootId { get; }
+        public AggregateRootId AggregateRoot { get; }
 
         /// <summary>
         /// Gets the <see cref="AggregateRootVersion"/>  of the Aggregate Root after all the Events was applied.
@@ -73,6 +76,16 @@ namespace Dolittle.SDK.Events.Store
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
 
+        void ThrowIfEventsSourceIdIsNull(EventSourceId eventSource)
+        {
+            if (eventSource == null) throw new EventSourceIdCannotBeNull();
+        }
+
+        void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
+        {
+            if (aggregateRootId == null) throw new AggregateRootIdCannotBeNull();
+        }
+
         void ThrowIfEventIsNull(CommittedAggregateEvent @event)
         {
             if (@event == null) throw new EventCannotBeNull();
@@ -85,7 +98,7 @@ namespace Dolittle.SDK.Events.Store
 
         void ThrowIfEventWasAppliedByOtherAggregateRoot(CommittedAggregateEvent @event)
         {
-            if (@event.AggregateRootId != AggregateRootId) throw new EventWasAppliedByOtherAggregateRoot(@event.AggregateRootId, AggregateRootId);
+            if (@event.AggregateRoot != AggregateRoot) throw new EventWasAppliedByOtherAggregateRoot(@event.AggregateRoot, AggregateRoot);
         }
 
         void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)

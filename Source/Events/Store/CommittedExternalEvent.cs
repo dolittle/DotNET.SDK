@@ -42,6 +42,8 @@ namespace Dolittle.SDK.Events.Store
                 content,
                 isPublic)
         {
+            ThrowIfExternalEventLogSequenceNumberIsNull(externalEventLogSequenceNumber);
+
             ExternalEventLogSequenceNumber = externalEventLogSequenceNumber;
             ExternalEventReceived = externalEventReceived;
         }
@@ -55,5 +57,10 @@ namespace Dolittle.SDK.Events.Store
         /// Gets the <see cref="DateTimeOffset" /> when the Event was received in the external Microservice.
         /// </summary>
         public DateTimeOffset ExternalEventReceived { get; }
+
+        void ThrowIfExternalEventLogSequenceNumberIsNull(EventLogSequenceNumber externalEventLogSequenceNumber)
+        {
+            if (externalEventLogSequenceNumber == null) throw new ExternalEventLogSequenceNumberCannotBeNull();
+        }
     }
 }

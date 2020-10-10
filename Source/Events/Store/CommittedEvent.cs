@@ -30,6 +30,12 @@ namespace Dolittle.SDK.Events.Store
             object content,
             bool isPublic)
         {
+            ThrowIfEventLogSequenceNumberIsNull(eventLogSequenceNumber);
+            ThrowIfEventSourceIdIsNull(eventSourceId);
+            ThrowIfExecutionContextIsNull(executionContext);
+            ThrowIfEventTypeIsNull(eventType);
+            ThrowIfContentIsNull(content);
+
             EventLogSequenceNumber = eventLogSequenceNumber;
             Occurred = occurred;
             EventSource = eventSourceId;
@@ -73,5 +79,30 @@ namespace Dolittle.SDK.Events.Store
         /// Gets a value indicating whether the Event is public or not.
         /// </summary>
         public bool IsPublic { get; }
+
+        void ThrowIfEventLogSequenceNumberIsNull(EventLogSequenceNumber eventLogSequenceNumber)
+        {
+            if (eventLogSequenceNumber == null) throw new EventLogSequenceNumberCannotBeNull();
+        }
+
+        void ThrowIfEventSourceIdIsNull(EventSourceId eventSourceId)
+        {
+            if (eventSourceId == null) throw new EventSourceIdCannotBeNull();
+        }
+
+        void ThrowIfExecutionContextIsNull(ExecutionContext executionContext)
+        {
+            if (executionContext == null) throw new ExecutionContextCannotBeNull();
+        }
+
+        void ThrowIfEventTypeIsNull(EventType eventType)
+        {
+            if (eventType == null) throw new EventTypeCannotBeNull();
+        }
+
+        void ThrowIfContentIsNull(object content)
+        {
+            if (content == null) throw new EventContentCannotBeNull();
+        }
     }
 }

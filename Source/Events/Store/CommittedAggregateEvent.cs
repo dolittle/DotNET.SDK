@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store
         /// <summary>
         /// Initializes a new instance of the <see cref="CommittedAggregateEvent"/> class.
         /// </summary>
-        /// /// <param name="eventLogSequenceNumber">The event log sequence number of the Event.</param>
+        /// <param name="eventLogSequenceNumber">The event log sequence number of the Event.</param>
         /// <param name="occurred">The <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the Event.</param>
         /// <param name="aggregateRootId">The <see cref="AggregateRootId"/> of the Aggregate Root.</param>
@@ -35,18 +35,31 @@ namespace Dolittle.SDK.Events.Store
             bool isPublic)
             : base(eventLogSequenceNumber, occurred, eventSourceId, executionContext, eventType, content, isPublic)
         {
-            AggregateRootId = aggregateRootId;
+            ThrowIfAggregateRootIdIsNull(aggregateRootId);
+            ThrowIfAggregateRootVersionIsNull(aggregateRootVersion);
+
+            AggregateRoot = aggregateRootId;
             AggregateRootVersion = aggregateRootVersion;
         }
 
         /// <summary>
         /// Gets the <see cref="Type"/> of the Aggregate Root that applied the Event to the Event Source.
         /// </summary>
-        public AggregateRootId AggregateRootId { get; }
+        public AggregateRootId AggregateRoot { get; }
 
         /// <summary>
         /// Gets the version of the Aggregate Root that applied the Event.
         /// </summary>
         public AggregateRootVersion AggregateRootVersion { get; }
+
+        void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
+        {
+            if (aggregateRootId == null) throw new AggregateRootIdCannotBeNull();
+        }
+
+        void ThrowIfAggregateRootVersionIsNull(AggregateRootVersion aggregateRootVersion)
+        {
+            if (aggregateRootVersion == null) throw new AggregateRootVersionCannotBeNull();
+        }
     }
 }

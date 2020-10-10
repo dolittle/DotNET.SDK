@@ -6,7 +6,7 @@ using System;
 namespace Dolittle.SDK.Events.Store
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct an <see cref="UncommittedEvent"/> with content that is null.
+    /// Exception that gets thrown when trying to construct an <see cref="UncommittedEvent"/> or <see cref="UncommittedAggregateEvent"/> or <see cref="CommittedEvent"/> with content that is null.
     /// </summary>
     public class EventContentCannotBeNull : Exception
     {
@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store
         /// Initializes a new instance of the <see cref="EventContentCannotBeNull"/> class.
         /// </summary>
         public EventContentCannotBeNull()
-            : base($"The content of an {nameof(UncommittedEvent)} cannot be null")
+            : base($"The content of an {nameof(UncommittedEvent)} or {nameof(UncommittedAggregateEvent)} or {nameof(CommittedEvent)} cannot be null")
         {
         }
     }

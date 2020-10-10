@@ -16,6 +16,9 @@ namespace Dolittle.SDK.Events.Store
         /// <param name="isPublic">Whether the event is public or not.</param>
         public UncommittedAggregateEvent(EventType eventType, object content, bool isPublic)
         {
+            ThrowIfEventTypeIsNull(eventType);
+            ThrowIfContentIsNull(content);
+
             EventType = eventType;
             Content = content;
             IsPublic = isPublic;
@@ -35,5 +38,15 @@ namespace Dolittle.SDK.Events.Store
         /// Gets a value indicating whether the Event is public or not.
         /// </summary>
         public bool IsPublic { get; }
+
+        void ThrowIfEventTypeIsNull(EventType eventType)
+        {
+            if (eventType == null) throw new EventTypeCannotBeNull();
+        }
+
+        void ThrowIfContentIsNull(object content)
+        {
+            if (content == null) throw new EventContentCannotBeNull();
+        }
     }
 }

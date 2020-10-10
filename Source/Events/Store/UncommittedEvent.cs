@@ -47,9 +47,9 @@ namespace Dolittle.SDK.Events.Store
         /// </summary>
         public bool IsPublic { get; }
 
-        void ThrowIfContentIsNull(object content)
+        void ThrowIfEventSourceIsNull(EventSourceId eventSource)
         {
-            if (content == null) throw new EventContentCannotBeNull();
+            if (eventSource == null) throw new EventSourceIdCannotBeNull();
         }
 
         void ThrowIfEventTypeIsNull(EventType eventType)
@@ -57,9 +57,9 @@ namespace Dolittle.SDK.Events.Store
             if (eventType == null) throw new EventTypeCannotBeNull();
         }
 
-        void ThrowIfEventSourceIsNull(EventSourceId eventSource)
+        void ThrowIfContentIsNull(object content)
         {
-            if (eventSource == null) throw new EventSourceIdCannotBeNull();
+            if (content == null) throw new EventContentCannotBeNull();
         }
     }
 }

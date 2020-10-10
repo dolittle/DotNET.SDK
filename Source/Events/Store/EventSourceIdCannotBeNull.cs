@@ -6,7 +6,7 @@ using System;
 namespace Dolittle.SDK.Events.Store
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct an <see cref="UncommittedEvent"/> or <see cref="UncommittedAggregateEvents"/> without an <see cref="EventSourceId"/>.
+    /// Exception that gets thrown when trying to construct an <see cref="UncommittedEvent"/> or <see cref="UncommittedAggregateEvents"/> or <see cref="CommittedEvent"/> or <see cref="CommittedAggregateEvents"/> without an <see cref="EventSourceId"/>.
     /// </summary>
     public class EventSourceIdCannotBeNull : Exception
     {
@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store
         /// Initializes a new instance of the <see cref="EventSourceIdCannotBeNull"/> class.
         /// </summary>
         public EventSourceIdCannotBeNull()
-            : base($"The {nameof(EventSourceId)} of an {nameof(UncommittedEvent)} or {nameof(UncommittedAggregateEvents)} cannot be null")
+            : base($"The {nameof(EventSourceId)} of an {nameof(UncommittedEvent)} or {nameof(UncommittedAggregateEvents)} or {nameof(CommittedEvent)} or {nameof(CommittedAggregateEvents)} cannot be null")
         {
         }
     }
