@@ -61,10 +61,6 @@ namespace Dolittle.SDK.Events.Store.Builders
             _builder = new UncommittedAggregateEventsBuilder(_aggregateRootId, _eventSourceId, _expectedVersion);
             callback(_builder);
             var uncommittedAggregateEvents = _builder.Build(_eventTypes);
-            _logger.LogDebug(
-                "Committing aggregate events for aggregate {AggregateRoot} with expected version {ExpectedVersion}",
-                uncommittedAggregateEvents.AggregateRootId,
-                uncommittedAggregateEvents.ExpectedAggregateRootVersion);
             return _aggregateEvents.CommitForAggregate(uncommittedAggregateEvents, cancellationToken);
         }
     }
