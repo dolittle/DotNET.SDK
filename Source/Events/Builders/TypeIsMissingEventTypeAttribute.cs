@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Builders
 {
     /// <summary>
     /// Exception that gets thrown when an event type <see cref="Type" /> is missing an <see cref="EventTypeAttribute" />.

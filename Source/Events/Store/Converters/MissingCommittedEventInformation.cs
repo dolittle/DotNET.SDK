@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Store.Converters
 {
     /// <summary>
     /// Exception that gets thrown when there is information missing on a committed event.

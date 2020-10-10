@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events.Builders
 {
     /// <summary>
     /// Exception that gets thrown when an <see cref="EventType" /> is being associated to a <see cref="Type" /> that has an <see cref="EventTypeAttribute" /> that specifies another <see cref="EventType"/>.
