@@ -85,7 +85,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventResponseToSDKConverter.w
         It should_return_true = () => try_result.ShouldBeTrue();
         It should_have_no_exception = () => exception.ShouldBeNull();
         It should_have_one_event = () => committed_events.Count.ShouldEqual(1);
-        It should_create_an_internal_committed_event = () => committed_events[0].ShouldBeOfExactType<CommittedEvent>();
+        It should_create_an_internal_committed_event = () => committed_events[0].ShouldBeOfExactType<CommittedExternalEvent>();
         It should_have_the_correct_event_log_sequence_number = () => committed_events[0].EventLogSequenceNumber.ShouldEqual((EventLogSequenceNumber)event_log_sequence_number);
         It should_have_the_correct_occurred = () => committed_events[0].Occurred.ShouldEqual(occured.ToDateTimeOffset());
         It should_have_the_correct_event_source = () => committed_events[0].EventSource.ShouldEqual(event_source.To<EventSourceId>());
