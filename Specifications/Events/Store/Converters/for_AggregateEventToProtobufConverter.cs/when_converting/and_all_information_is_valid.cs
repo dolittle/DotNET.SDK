@@ -1,18 +1,15 @@
-// Copyright (c) Dolittle. All rights reserved.
+﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Linq;
 using Dolittle.SDK.Events.given;
 using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
-using Moq;
-using It = Machine.Specifications.It;
 using PbUncommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents;
 
-namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConverter
+namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConverter.when_converting
 {
-    public class when_converting_uncommitted_aggregate_events : given.a_converter
+    public class and_all_information_is_valid : given.a_converter
     {
         static EventSourceId event_source_id;
         static AggregateRootId aggregate_root_id;
