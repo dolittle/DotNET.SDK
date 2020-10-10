@@ -13,6 +13,8 @@ using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Events.Store.Builders;
+using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Resilience;
@@ -238,7 +240,16 @@ namespace Dolittle.SDK
             _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
             var callContextResolver = new CallContextResolver();
-            var eventStoreBuilder = new EventStoreBuilder(methodCaller, , executionContext, callContextResolver, eventTypes, _loggerFactory);
+            var eventStoreBuilder = new EventStoreBuilder(
+                methodCaller,
+                eventToProtobufConverter,
+                eventToSDKConverter,
+                aggregateEventToProtobufConverter,
+                aggregateToSDKConverter,
+                executionContext,
+                callContextResolver,
+                eventTypes,
+                _loggerFactory);
 
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);

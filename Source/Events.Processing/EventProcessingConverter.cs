@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 using PbStreamEvent = Dolittle.Runtime.Events.Processing.Contracts.StreamEvent;
@@ -13,25 +15,25 @@ namespace Dolittle.SDK.Events.Processing
     /// </summary>
     public class EventProcessingConverter : IEventProcessingConverter
     {
-        readonly IConvertEventResponsestoSDK _eventResponsestoSDKConverter;
+        readonly IConvertEventResponsesToSDK _eventResponsesToSDKConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventProcessingConverter"/> class.
         /// </summary>
-        /// <param name="convertEventResponsestoSDK">The <see cref="IConvertEventResponsestoSDK"/>.</param>
-        public EventProcessingConverter(IConvertEventResponsestoSDK convertEventResponsestoSDK)
+        /// <param name="convertEventResponsesToSDK">The <see cref="IConvertEventResponsesToSDK"/>.</param>
+        public EventProcessingConverter(IConvertEventResponsesToSDK convertEventResponsesToSDK)
         {
-            _eventResponsestoSDKConverter = convertEventResponsestoSDK;
+            _eventResponsesToSDKConverter = convertEventResponsesToSDK;
         }
 
         /// <inheritdoc/>
         public bool TryToSDK(PbCommittedEvent source, out CommittedEvent @event, out Exception error)
-            => _eventResponsestoSDKConverter.TryToSDK(source, out @event, out error);
+            => _eventResponsesToSDKConverter.TryToSDK(source, out @event, out error);
 
         /// <inheritdoc/>
         public CommittedEvent ToSDK(PbCommittedEvent source)
         {
-            if (!_eventResponsestoSDKConverter.TryToSDK(source, out var @event, out var error))
+            if (!_eventResponsesToSDKConverter.TryToSDK(source, out var @event, out var error))
                 throw error;
             return @event;
         }

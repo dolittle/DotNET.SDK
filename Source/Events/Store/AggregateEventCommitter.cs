@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading;
-using Dolittle.SDK.Events.Builders;
+using Dolittle.SDK.Events.Store.Builders;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Store

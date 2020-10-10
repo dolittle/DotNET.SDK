@@ -3,6 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
@@ -19,7 +20,7 @@ namespace Dolittle.SDK.Events.Store.Internal
     {
         static readonly EventStoreFetchForAggregateMethod _fetchForAggregateMethod = new EventStoreFetchForAggregateMethod();
         readonly IPerformMethodCalls _caller;
-        readonly IEventConverter _eventConverter;
+        readonly IConvertAggregateResponsesToSDK _toSDK;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
@@ -28,19 +29,19 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// Initializes a new instance of the <see cref="EventsForAggregateFetcher"/> class.
         /// </summary>
         /// <param name="caller">The caller for unary calls.</param>
-        /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
+        /// <param name="toSDK">The <see cref="IConvertAggregateResponsesToSDK" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventsForAggregateFetcher(
             IPerformMethodCalls caller,
-            IEventConverter eventConverter,
+            IConvertAggregateResponsesToSDK toSDK,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
             ILogger logger)
         {
             _caller = caller;
-            _eventConverter = eventConverter;
+            _toSDK = toSDK;
             _callContextResolver = callContextResolver;
             _executionContext = executionContext;
             _logger = logger;
@@ -67,7 +68,7 @@ namespace Dolittle.SDK.Events.Store.Internal
             };
             var response = await _caller.Call(_fetchForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
-            return _eventConverter.ToSDK(response.Events);
+            return _toSDK.Convert(response);
         }
     }
 }

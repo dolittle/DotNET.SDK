@@ -3,6 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,8 @@ namespace Dolittle.SDK.Events.Store.Internal
     {
         static readonly EventStoreCommitMethod _commitForAggregateMethod = new EventStoreCommitMethod();
         readonly IPerformMethodCalls _caller;
-        readonly IEventConverter _eventConverter;
+        readonly IConvertEventsToProtobuf _toProtobuf;
+        readonly IConvertEventResponsesToSDK _toSDK;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
@@ -27,19 +29,22 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// Initializes a new instance of the <see cref="EventCommitter"/> class.
         /// </summary>
         /// <param name="caller">The <see cref="IPerformMethodCalls" />.</param>
-        /// <param name="eventConverter">The <see cref="IEventConverter" />.</param>
+        /// <param name="toProtobuf">The <see cref="IConvertEventsToProtobuf" />.</param>
+        /// <param name="toSDK">The <see cref="IConvertEventResponsesToSDK" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public EventCommitter(
             IPerformMethodCalls caller,
-            IEventConverter eventConverter,
+            IConvertEventsToProtobuf toProtobuf,
+            IConvertEventResponsesToSDK toSDK,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
             ILogger logger)
         {
             _caller = caller;
-            _eventConverter = eventConverter;
+            _toProtobuf = toProtobuf;
+            _toSDK = toSDK;
             _callContextResolver = callContextResolver;
             _executionContext = executionContext;
             _logger = logger;
@@ -48,16 +53,16 @@ namespace Dolittle.SDK.Events.Store.Internal
         /// <inheritdoc/>
         public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default)
         {
-            _logger.LogDebug("Committing events");
+            _logger.LogDebug("Committing {NumberOfEvents} events", uncommittedEvents.Count);
 
             var request = new Contracts.CommitEventsRequest
             {
                 CallContext = _callContextResolver.ResolveFrom(_executionContext)
             };
-            request.Events.AddRange(_eventConverter.ToProtobuf(uncommittedEvents));
+            request.Events.AddRange(_toProtobuf.Convert(uncommittedEvents));
             var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
-            return _eventConverter.ToSDK(response.Events);
+            return _toSDK.Convert(response);
         }
     }
 }

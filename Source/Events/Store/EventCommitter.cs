@@ -4,7 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Events.Builders;
+using Dolittle.SDK.Events.Store.Builders;
 
 namespace Dolittle.SDK.Events.Store
 {
