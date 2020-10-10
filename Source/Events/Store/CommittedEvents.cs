@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Dolittle.SDK.Events.Store
 {
@@ -11,7 +12,7 @@ namespace Dolittle.SDK.Events.Store
     /// </summary>
     public class CommittedEvents : IReadOnlyList<CommittedEvent>
     {
-        readonly IReadOnlyList<CommittedEvent> _events;
+        readonly ImmutableList<CommittedEvent> _events;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommittedEvents"/> class.
@@ -26,7 +27,7 @@ namespace Dolittle.SDK.Events.Store
                 if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
             }
 
-            _events = events;
+            _events = ImmutableList<CommittedEvent>.Empty.AddRange(events);
         }
 
         /// <summary>

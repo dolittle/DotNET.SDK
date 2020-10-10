@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Dolittle.SDK.Events.Store
 {
@@ -11,7 +12,7 @@ namespace Dolittle.SDK.Events.Store
     /// </summary>
     public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
     {
-        readonly IReadOnlyList<CommittedAggregateEvent> _events;
+        readonly ImmutableList<CommittedAggregateEvent> _events;
         readonly AggregateRootVersion _nextAggregateRootVersion;
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Dolittle.SDK.Events.Store
                 _nextAggregateRootVersion++;
             }
 
-            _events = new List<CommittedAggregateEvent>(events);
+            _events = ImmutableList<CommittedAggregateEvent>.Empty.AddRange(events);
         }
 
         /// <summary>

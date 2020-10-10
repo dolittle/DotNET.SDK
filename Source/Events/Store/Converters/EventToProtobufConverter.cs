@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Dolittle.SDK.Protobuf;
 using Contracts = Dolittle.Runtime.Events.Contracts;
 
@@ -25,7 +26,7 @@ namespace Dolittle.SDK.Events.Store.Converters
         }
 
         /// <inheritdoc/>
-        public bool TryConvert(UncommittedEvents source, out IEnumerable<Contracts.UncommittedEvent> events, out Exception error)
+        public bool TryConvert(UncommittedEvents source, out IReadOnlyList<Contracts.UncommittedEvent> events, out Exception error)
         {
             events = default;
 
@@ -35,7 +36,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
             }
 
-            var list = new List<Contracts.UncommittedEvent>();
+            var list = ImmutableList<Contracts.UncommittedEvent>.Empty.ToBuilder();
             foreach (var sourceEvent in source)
             {
                 if (!TryConvert(sourceEvent, out var @event, out error))
@@ -45,7 +46,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             }
 
             error = null;
-            events = list;
+            events = list.ToImmutable();
             return true;
         }
 

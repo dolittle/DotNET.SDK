@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToProtobufConverter
 {
     public class when_converting_a_null_event : given.a_converter
     {
-        static IEnumerable<PbUncommittedEvent> converted_uncommitted_events;
+        static IReadOnlyList<PbUncommittedEvent> converted_uncommitted_events;
         static Exception exception;
         static bool try_result;
 

@@ -108,7 +108,7 @@ namespace Dolittle.SDK.Events.Store.Converters
         }
 
         /// <inheritdoc/>
-        public bool TryConvert(IEnumerable<Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
+        public bool TryConvert(IReadOnlyList<Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
         {
             events = default;
 

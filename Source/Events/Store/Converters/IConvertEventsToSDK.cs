@@ -28,6 +28,6 @@ namespace Dolittle.SDK.Events.Store.Converters
         /// <param name="events">When the method returns, the converted <see cref="CommittedEvents"/> if conversion was successful, otherwise null.</param>
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
-        bool TryConvert(IEnumerable<PbCommittedEvent> source, out CommittedEvents events, out Exception error);
+        bool TryConvert(IReadOnlyList<PbCommittedEvent> source, out CommittedEvents events, out Exception error);
     }
 }
