@@ -60,7 +60,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.when_conv
             };
 
             object_from_serializer = new object();
-            SetupSerializerToReturnObject(content_string, object_from_serializer);
+            SetupDeserializeToReturnObject(content_string, object_from_serializer);
 
             converted_event_type = new EventType(event_type.Id.To<EventTypeId>(), event_type.Generation);
         };

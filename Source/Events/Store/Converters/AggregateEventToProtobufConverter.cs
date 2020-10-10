@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Protobuf;
+using PbUncommittedAggregateEvent = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent;
 using PbUncommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents;
 
 namespace Dolittle.SDK.Events.Store.Converters
@@ -44,7 +45,10 @@ namespace Dolittle.SDK.Events.Store.Converters
             foreach (var sourceEvent in source)
             {
                 if (!TryConvert(sourceEvent, out var @event, out error))
+                {
+                    events = default;
                     return false;
+                }
 
                 events.Events.Add(@event);
             }
@@ -53,7 +57,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             return true;
         }
 
-        bool TryConvert(UncommittedAggregateEvent source, out PbUncommittedAggregateEvents.Types.UncommittedAggregateEvent @event, out Exception error)
+        bool TryConvert(UncommittedAggregateEvent source, out PbUncommittedAggregateEvent @event, out Exception error)
         {
             @event = default;
 
@@ -67,7 +71,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
 
             error = null;
-            @event = new PbUncommittedAggregateEvents.Types.UncommittedAggregateEvent
+            @event = new PbUncommittedAggregateEvent
             {
                 Artifact = source.EventType.ToProtobuf(),
                 Content = content,

@@ -76,7 +76,7 @@ namespace Dolittle.SDK.Events.Store.Converters.given
                 });
         };
 
-        protected static void SetupSerializerToReturnObject(string source, object toReturn)
+        protected static void SetupDeserializeToReturnObject(string source, object toReturn)
         {
             serializer
                 .Setup(_ => _.TryDeserialize(
@@ -101,7 +101,32 @@ namespace Dolittle.SDK.Events.Store.Converters.given
                 .Returns(true);
         }
 
-        protected static void SetupSerializerToReturnJSON(object source, string toReturn)
+        protected static void SetupDeserializeToFail(string source, Exception toReturn)
+        {
+            serializer
+                .Setup(_ => _.TryDeserialize(
+                    It.IsAny<EventType>(),
+                    It.IsAny<EventLogSequenceNumber>(),
+                    source,
+                    out It.Ref<object>.IsAny,
+                    out It.Ref<Exception>.IsAny))
+                .Callback(new TryDeserialize((
+                    EventType eventType,
+                    EventLogSequenceNumber sequenceNumber,
+                    string source,
+                    out object content,
+                    out Exception error) =>
+                    {
+                        deserialized_event_types.Add(eventType);
+                        deserialized_sequence_numbers.Add(sequenceNumber);
+                        deserialized_contents.Add(source);
+                        content = new object();
+                        error = toReturn;
+                    }))
+                .Returns(false);
+        }
+
+        protected static void SetupSerializeToReturnJSON(object source, string toReturn)
         {
             serializer
                 .Setup(_ => _.TrySerialize(
@@ -118,6 +143,25 @@ namespace Dolittle.SDK.Events.Store.Converters.given
                         error = null;
                     }))
                 .Returns(true);
+        }
+
+        protected static void SetupSerializeToFail(object source, Exception toReturn)
+        {
+            serializer
+                .Setup(_ => _.TrySerialize(
+                    source,
+                    out It.Ref<string>.IsAny,
+                    out It.Ref<Exception>.IsAny))
+                .Callback(new TrySerialize((
+                    object content,
+                    out string json,
+                    out Exception error) =>
+                    {
+                        serialized_contents.Add(content);
+                        json = "";
+                        error = toReturn;
+                    }))
+                .Returns(false);
         }
     }
 }
