@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Events.Store
         /// <param name="aggregateRootId">The <see cref="AggregateRootId" /> of the aggregate root.</param>
         /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
         /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="FetchForAggregateResult" />.</returns>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedAggregateEvents" />.</returns>
         Task<CommittedAggregateEvents> FetchForAggregate(
             AggregateRootId aggregateRootId,
             EventSourceId eventSourceId,
