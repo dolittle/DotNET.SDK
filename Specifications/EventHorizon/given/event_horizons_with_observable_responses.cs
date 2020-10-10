@@ -58,7 +58,7 @@ namespace Dolittle.SDK.EventHorizon.given
                 "2e352cec-f365-44dc-b948-d3ef68647f9c");
 
             consent_id = "a99f46e8-051a-49d8-8727-69805b6fe3c4";
-            failure = new Failure(FailureId.Create("75b7337c-dedc-41e4-9fab-7d8e77c33d2c"), "Something went wrong");
+            failure = new Failure("75b7337c-dedc-41e4-9fab-7d8e77c33d2c", "Something went wrong");
 
             response_subscription_tenant_one_success = new SubscribeResponse(subscription_tenant_one, consent_id, null);
             response_subscription_tenant_one_failure = new SubscribeResponse(subscription_tenant_one, ConsentId.NotSet, failure);

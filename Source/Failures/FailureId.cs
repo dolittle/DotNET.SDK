@@ -12,9 +12,9 @@ namespace Dolittle.SDK.Failures
     public class FailureId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Gets the <see cref="FailureId" /> that represents an undocumented error type.
+        /// The <see cref="FailureId"/> that refers to a failure that is not documented.
         /// </summary>
-        public static FailureId Undocumented => Guid.Parse("05cc1d10-4efc-457b-84a6-a1be0a5f36ba");
+        public static readonly FailureId Undocumented = "05cc1d10-4efc-457b-84a6-a1be0a5f36ba";
 
         /// <summary>
         /// Implicitly converts the <see cref="Guid" /> to <see cref="FailureId" />.
@@ -27,12 +27,5 @@ namespace Dolittle.SDK.Failures
         /// </summary>
         /// <param name="id"><see cref="Guid" /> to convert.</param>
         public static implicit operator FailureId(string id) => new FailureId { Value = Guid.Parse(id) };
-
-        /// <summary>
-        /// Create a <see cref="FailureId" /> from a<see cref="string" /> representing a <see cref="Guid" /> .
-        /// </summary>
-        /// <param name="guidString">The <see cref="Guid" /> <see cref="string" />.</param>
-        /// <returns><see cref="FailureId" />.</returns>
-        public static FailureId Create(string guidString) => Guid.Parse(guidString);
     }
 }

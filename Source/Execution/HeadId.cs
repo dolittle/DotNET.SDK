@@ -12,26 +12,20 @@ namespace Dolittle.SDK.Execution
     public class HeadId : ConceptAs<Guid>
     {
         /// <summary>
-        /// A static singleton instance to represent a "NotSet" <see cref="HeadId"/>.
+        /// The <see cref="HeadId"/> used when an identifier has not been defined.
         /// </summary>
         public static readonly HeadId NotSet = Guid.Empty;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HeadId"/> class.
-        /// </summary>
-        /// <param name="id"><see cref="Guid"/> value.</param>
-        public HeadId(Guid id) => Value = id;
-
-        /// <summary>
         /// Implicitly convert from a <see cref="Guid"/> to an <see cref="HeadId"/>.
         /// </summary>
-        /// <param name="id">HeadId as <see cref="Guid"/>.</param>
-        public static implicit operator HeadId(Guid id) => new HeadId(id);
+        /// <param name="headId">HeadId as <see cref="Guid"/>.</param>
+        public static implicit operator HeadId(Guid headId) => new HeadId { Value = headId };
 
         /// <summary>
         /// Implicitly convert from a <see cref="string"/> to an <see cref="HeadId"/>.
         /// </summary>
-        /// <param name="idString">HeadId as <see cref="string"/>.</param>
-        public static implicit operator HeadId(string idString) => new HeadId(Guid.Parse(idString));
+        /// <param name="headId">HeadId as <see cref="string"/>.</param>
+        public static implicit operator HeadId(string headId) => new HeadId { Value = Guid.Parse(headId) };
     }
 }
