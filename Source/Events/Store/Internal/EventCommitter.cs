@@ -72,7 +72,7 @@ namespace Dolittle.SDK.Events.Store.Internal
 
             if (!_toSDK.TryConvert(response.Events, out var committedEvents, out error))
             {
-                _logger.LogError(error, "Could not convert {CommittedEvents} to SDK. The events have been committed.", response.Events);
+                _logger.LogError(error, "The Runtime acknowledges that the events have been committed, but the returned {CommittedEvents} could not be converted.", response.Events);
                 throw error;
             }
 
