@@ -32,11 +32,7 @@ namespace Dolittle.SDK.Events.Processing
 
         /// <inheritdoc/>
         public CommittedEvent ToSDK(PbCommittedEvent source)
-        {
-            if (!_eventResponsesToSDKConverter.TryToSDK(source, out var @event, out var error))
-                throw error;
-            return @event;
-        }
+            => _eventResponsesToSDKConverter.Convert(source);
 
         /// <inheritdoc/>
         public bool TryToSDK(PbStreamEvent source, out StreamEvent @event, out Exception error)

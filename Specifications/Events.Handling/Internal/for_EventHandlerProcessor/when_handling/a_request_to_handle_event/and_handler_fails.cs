@@ -3,6 +3,7 @@
 
 using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
 

@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using Dolittle.Protobuf.Contracts;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Security;
