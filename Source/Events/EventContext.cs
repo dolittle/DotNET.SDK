@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Concepts;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Execution;
 
 namespace Dolittle.SDK.Events
