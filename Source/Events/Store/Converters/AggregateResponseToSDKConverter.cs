@@ -61,7 +61,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             if (source.Failure != null)
             {
                 error = source.Failure.ToException();
-                return true;
+                return false;
             }
 
             return TryToSDK(source.Events, out events, out error);
