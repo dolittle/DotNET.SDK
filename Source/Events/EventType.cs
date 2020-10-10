@@ -17,6 +17,7 @@ namespace Dolittle.SDK.Events
         public EventType(EventTypeId id)
             : base(id)
         {
+            ThrowIfEventTypeIdIsNull(id);
         }
 
         /// <summary>
@@ -27,6 +28,18 @@ namespace Dolittle.SDK.Events
         public EventType(EventTypeId id, Generation generation)
             : base(id, generation)
         {
+            ThrowIfEventTypeIdIsNull(id);
+            ThrowIfGenerationIsNull(generation);
+        }
+
+        void ThrowIfEventTypeIdIsNull(EventTypeId id)
+        {
+            if (id == null) throw new EventTypeIdCannotBeNull();
+        }
+
+        void ThrowIfGenerationIsNull(Generation generation)
+        {
+            if (generation == null) throw new EventTypeGenerationCannotBeNull();
         }
     }
 }

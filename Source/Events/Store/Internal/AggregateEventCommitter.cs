@@ -54,9 +54,10 @@ namespace Dolittle.SDK.Events.Store.Internal
         public async Task<CommittedAggregateEvents> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug(
-                "Committing {NumberOfEvents} events for aggregate root {AggregateRoot} with expected version {ExpectedVersion}",
+                "Committing {NumberOfEvents} events for aggregate root type {AggregateRoot} and id {EventSource} with expected version {ExpectedVersion}",
                 uncommittedAggregateEvents.Count,
-                uncommittedAggregateEvents.AggregateRootId,
+                uncommittedAggregateEvents.AggregateRoot,
+                uncommittedAggregateEvents.EventSource,
                 uncommittedAggregateEvents.ExpectedAggregateRootVersion);
 
             if (!_toProtobuf.TryConvert(uncommittedAggregateEvents, out var protobufEvents, out var error))

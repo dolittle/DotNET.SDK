@@ -49,7 +49,7 @@ namespace Dolittle.SDK.Events.Store
 
         void ThrowIfEventIsNull(CommittedEvent @event)
         {
-            if (@event == null) throw new EventCanNotBeNull();
+            if (@event == null) throw new EventCannotBeNull();
         }
 
         void ThrowIfEventLogVersionIsOutOfOrder(CommittedEvent @event, CommittedEvent previousEvent)

@@ -21,20 +21,24 @@ namespace Dolittle.SDK.Events.Store
         /// <param name="expectedAggregateRootVersion">The <see cref="AggregateRootVersion"/> of the Aggregate Root that was used to apply the rules that resulted in the Events.</param>
         public UncommittedAggregateEvents(EventSourceId eventSourceId, AggregateRootId aggregateRootId, AggregateRootVersion expectedAggregateRootVersion)
         {
-            EventSourceId = eventSourceId;
-            AggregateRootId = aggregateRootId;
+            ThrowIfEventSourceIdIsNull(eventSourceId);
+            ThrowIfAggregateRootIdIsNull(aggregateRootId);
+            ThrowIfExpectedAggregateRootVersionIsNull(expectedAggregateRootVersion);
+
+            EventSource = eventSourceId;
+            AggregateRoot = aggregateRootId;
             ExpectedAggregateRootVersion = expectedAggregateRootVersion;
         }
 
         /// <summary>
         /// Gets the <see cref="EventSourceId" />.
         /// </summary>
-        public EventSourceId EventSourceId { get; }
+        public EventSourceId EventSource { get; }
 
         /// <summary>
         /// Gets the <see cref="AggregateRootId" /> of the aggregate root that applied the events to the Event Source.
         /// </summary>
-        public AggregateRootId AggregateRootId { get; }
+        public AggregateRootId AggregateRoot { get; }
 
         /// <summary>
         /// Gets the expected <see cref="AggregateRootVersion" />.
@@ -105,9 +109,24 @@ namespace Dolittle.SDK.Events.Store
         /// <inheritdoc/>
         public bool Remove(UncommittedAggregateEvent item) => _events.Remove(item);
 
+        void ThrowIfEventSourceIdIsNull(EventSourceId eventSourceId)
+        {
+            if (eventSourceId == null) throw new EventSourceIdCannotBeNull();
+        }
+
+        void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
+        {
+            if (aggregateRootId == null) throw new AggregateRootIdCannotBeNull();
+        }
+
+        void ThrowIfExpectedAggregateRootVersionIsNull(AggregateRootVersion expectedAggregateRootVersion)
+        {
+            if (expectedAggregateRootVersion == null) throw new ExpectedAggregateRootVersionCannotBeNull();
+        }
+
         void ThrowIfEventIsNull(UncommittedAggregateEvent @event)
         {
-            if (@event == null) throw new EventCanNotBeNull();
+            if (@event == null) throw new EventCannotBeNull();
         }
     }
 }

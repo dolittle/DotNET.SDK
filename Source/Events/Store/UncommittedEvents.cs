@@ -79,7 +79,7 @@ namespace Dolittle.SDK.Events.Store
 
         void ThrowIfEventIsNull(UncommittedEvent @event)
         {
-            if (@event == null) throw new EventCanNotBeNull();
+            if (@event == null) throw new EventCannotBeNull();
         }
     }
 }

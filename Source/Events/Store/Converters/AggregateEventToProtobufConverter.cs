@@ -36,8 +36,8 @@ namespace Dolittle.SDK.Events.Store.Converters
 
             events = new PbUncommittedAggregateEvents
             {
-                EventSourceId = source.EventSourceId.ToProtobuf(),
-                AggregateRootId = source.AggregateRootId.ToProtobuf(),
+                EventSourceId = source.EventSource.ToProtobuf(),
+                AggregateRootId = source.AggregateRoot.ToProtobuf(),
                 ExpectedAggregateRootVersion = source.ExpectedAggregateRootVersion,
             };
 
