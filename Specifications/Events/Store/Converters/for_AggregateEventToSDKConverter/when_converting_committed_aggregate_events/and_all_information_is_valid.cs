@@ -7,7 +7,7 @@ using Machine.Specifications;
 
 namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.when_converting_committed_aggregate_events
 {
-    public class and_all_information_is_valid : given.uncommitted_aggregate_events_and_a_converter
+    public class and_all_information_is_valid : given.committed_aggregate_events_and_a_converter
     {
         static object object_from_serializer;
 

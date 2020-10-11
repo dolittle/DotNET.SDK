@@ -1,4 +1,4 @@
-// Copyright (c) Dolittle. All rights reserved.
+﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -10,7 +10,7 @@ using PbCommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.CommittedAg
 
 namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.given
 {
-    public class uncommitted_aggregate_events_and_a_converter : a_converter_and_a_protobuf_execution_context
+    public class committed_aggregate_events_and_a_converter : a_converter_and_a_protobuf_execution_context
     {
         protected static string content_string;
         protected static bool is_public;

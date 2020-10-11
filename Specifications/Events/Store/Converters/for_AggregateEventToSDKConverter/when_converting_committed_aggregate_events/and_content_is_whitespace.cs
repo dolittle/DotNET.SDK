@@ -9,7 +9,7 @@ using PbCommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.CommittedAg
 
 namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.when_converting_committed_aggregate_events
 {
-    public class and_content_is_whitespace : given.uncommitted_aggregate_events_and_a_converter
+    public class and_content_is_whitespace : given.committed_aggregate_events_and_a_converter
     {
         static object object_from_serializer;
 

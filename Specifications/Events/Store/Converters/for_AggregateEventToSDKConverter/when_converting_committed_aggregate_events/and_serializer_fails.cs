@@ -6,7 +6,7 @@ using Machine.Specifications;
 
 namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.when_converting_committed_aggregate_events
 {
-    public class and_serializer_fails : given.uncommitted_aggregate_events_and_a_converter
+    public class and_serializer_fails : given.committed_aggregate_events_and_a_converter
     {
         static Exception serializer_exception;
 
