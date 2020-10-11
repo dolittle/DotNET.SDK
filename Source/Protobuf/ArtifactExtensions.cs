@@ -42,6 +42,12 @@ namespace Dolittle.SDK.Protobuf
         {
             artifact = default;
 
+            if (source == default)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
+
             if (!source.Id.TryToGuid(out var id, out var idError))
             {
                 error = new CouldNotConvertProtobufArtifact(typeof(TArtifact), source, idError.Message);
