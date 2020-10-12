@@ -25,7 +25,7 @@ namespace Kitchen
                 .ForTenant(TenantId.Development)
                 .Commit(eventsBuilder =>
                     eventsBuilder
-                        .CreateEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"))
+                        .CreateEvent(preparedTaco)
                         .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9"));
 
             // Blocks until the EventHandlers are finished, i.e. forever
