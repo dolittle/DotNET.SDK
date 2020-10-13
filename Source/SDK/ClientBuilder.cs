@@ -8,9 +8,13 @@ using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Events.Store.Builders;
+using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Resilience;
@@ -222,15 +226,30 @@ namespace Dolittle.SDK
                 _loggerFactory,
                 _cancellation);
 
-            var eventConverter = new EventConverter(eventTypes);
-            var eventProcessingConverter = new EventProcessingConverter(eventConverter);
+            var serializer = new EventContentSerializer(eventTypes);
+            var eventToProtobufConverter = new EventToProtobufConverter(serializer);
+            var eventToSDKConverter = new EventToSDKConverter(serializer);
+            var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
+            var aggregateEventToSDKConverter = new AggregateEventToSDKConverter(serializer);
+
+            var eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
             var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _retryPolicy, _loggerFactory.CreateLogger<EventProcessors>());
             _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
             _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
-            var eventStoreBuilder = new EventStoreBuilder(methodCaller, eventConverter, executionContext, eventTypes, _loggerFactory.CreateLogger<EventStore>());
+            var callContextResolver = new CallContextResolver();
+            var eventStoreBuilder = new EventStoreBuilder(
+                methodCaller,
+                eventToProtobufConverter,
+                eventToSDKConverter,
+                aggregateEventToProtobufConverter,
+                aggregateEventToSDKConverter,
+                executionContext,
+                callContextResolver,
+                eventTypes,
+                _loggerFactory);
 
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);

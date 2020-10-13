@@ -1,7 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Protobuf;
+using Dolittle.SDK.Failures;
 using Machine.Specifications;
 
 namespace Dolittle.SDK.EventHorizon.for_SubscriptionCallbacks
@@ -22,7 +22,7 @@ namespace Dolittle.SDK.EventHorizon.for_SubscriptionCallbacks
                 "8e23b449-4fed-494c-a545-50eee80152ea",
                 "9e704dc2-23f7-459d-8698-259d8b2c6e2b");
 
-            failure = new Failure(FailureId.Create("0a1960b6-0c59-41da-9eeb-2be9fa16835e"), "Something went wrong");
+            failure = new Failure("0a1960b6-0c59-41da-9eeb-2be9fa16835e", "Something went wrong");
 
             response = new SubscribeResponse(
                 subscription,

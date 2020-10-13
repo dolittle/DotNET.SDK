@@ -12,19 +12,19 @@ namespace Dolittle.SDK.Tenancy
     public class TenantId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Gets the definition of an unknown tenant.
+        /// The <see cref="TenantId"/> used when it is not possible to resolve a tenant.
         /// </summary>
-        public static readonly TenantId Unknown = Guid.Parse("762a4bd5-2ee8-4d33-af06-95806fb73f4e");
+        public static readonly TenantId Unknown = "762a4bd5-2ee8-4d33-af06-95806fb73f4e";
 
         /// <summary>
-        /// Gets the tenant used when outside the scope of a tenant, typically the system.
+        /// The <see cref="TenantId"/> used outside the scope of a tenant, typically the system.
         /// </summary>
-        public static readonly TenantId System = Guid.Parse("08831584-e016-42f6-bc5e-c4f098fed42b");
+        public static readonly TenantId System = "08831584-e016-42f6-bc5e-c4f098fed42b";
 
         /// <summary>
-        /// Gets the tenant used for development.
+        /// A <see cref="TenantId"/> that can be used for convience during development.
         /// </summary>
-        public static readonly TenantId Development = Guid.Parse("445f8ea8-1a6f-40d7-b2fc-796dba92dc44");
+        public static readonly TenantId Development = "445f8ea8-1a6f-40d7-b2fc-796dba92dc44";
 
         /// <summary>
         /// Implicitly convert from <see cref="Guid"/> to <see cref="TenantId"/>.

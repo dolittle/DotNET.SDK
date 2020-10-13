@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Services;
 

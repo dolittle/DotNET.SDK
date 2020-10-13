@@ -326,7 +326,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
             eventHandlerId = eventHandler.Identifier;
             partitioned = eventHandler.Partitioned;
-            scopeId = eventHandler.ScopeId;
+            scopeId = eventHandler.Scope;
             return true;
         }
 

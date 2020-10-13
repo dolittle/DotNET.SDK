@@ -10,12 +10,14 @@
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
+        <PackageReference Include="System.Collections.Immutable" Version="$(SystemImmutableVersion)" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="../Artifacts/Artifacts.csproj" />
         <ProjectReference Include="../Concepts/Concepts.csproj" />
         <ProjectReference Include="../Execution/Execution.csproj" />
+        <ProjectReference Include="../Failures/Failures.csproj" />
         <ProjectReference Include="../Protobuf/Protobuf.csproj" />
         <ProjectReference Include="../Services/Services.csproj" />
     </ItemGroup>

@@ -14,15 +14,15 @@ namespace Dolittle.SDK.Events.Handling
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to an <see cref="EventHandlerId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="Guid"/> representation.</param>
+        /// <param name="eventHandlerId">The <see cref="Guid"/> representation.</param>
         /// <returns>The converted <see cref="EventHandlerId"/>.</returns>
-        public static implicit operator EventHandlerId(Guid id) => new EventHandlerId { Value = id };
+        public static implicit operator EventHandlerId(Guid eventHandlerId) => new EventHandlerId { Value = eventHandlerId };
 
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="EventHandlerId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <param name="eventHandlerId">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="EventHandlerId"/>.</returns>
-        public static implicit operator EventHandlerId(string id) => new EventHandlerId { Value = Guid.Parse(id) };
+        public static implicit operator EventHandlerId(string eventHandlerId) => new EventHandlerId { Value = Guid.Parse(eventHandlerId) };
     }
 }
