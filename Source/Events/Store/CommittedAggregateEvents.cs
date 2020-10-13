@@ -13,7 +13,6 @@ namespace Dolittle.SDK.Events.Store
     public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
     {
         readonly ImmutableList<CommittedAggregateEvent> _events;
-        readonly AggregateRootVersion _nextAggregateRootVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommittedAggregateEvents"/> class.
@@ -31,14 +30,14 @@ namespace Dolittle.SDK.Events.Store
 
             for (var i = 0; i < events.Count; i++)
             {
-                if (i == 0) _nextAggregateRootVersion = events[0].AggregateRootVersion;
+                if (i == 0) AggregateRootVersion = events[0].AggregateRootVersion;
                 var @event = events[i];
                 ThrowIfEventIsNull(@event);
                 ThrowIfEventWasAppliedToOtherEventSource(@event);
                 ThrowIfEventWasAppliedByOtherAggregateRoot(@event);
                 ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
                 if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
-                _nextAggregateRootVersion++;
+                AggregateRootVersion++;
             }
 
             _events = ImmutableList<CommittedAggregateEvent>.Empty.AddRange(events);
@@ -57,7 +56,7 @@ namespace Dolittle.SDK.Events.Store
         /// <summary>
         /// Gets the <see cref="AggregateRootVersion"/>  of the Aggregate Root after all the Events was applied.
         /// </summary>
-        public AggregateRootVersion AggregateRootVersion => _events.Count == 0 ? AggregateRootVersion.Initial : _events[^1].AggregateRootVersion;
+        public AggregateRootVersion AggregateRootVersion { get; }
 
         /// <summary>
         /// Gets a value indicating whether or not there are any events in the committed sequence.
@@ -103,7 +102,7 @@ namespace Dolittle.SDK.Events.Store
 
         void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
         {
-            if (@event.AggregateRootVersion != _nextAggregateRootVersion) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, _nextAggregateRootVersion);
+            if (@event.AggregateRootVersion != AggregateRootVersion) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, AggregateRootVersion);
         }
 
         void ThrowIfEventLogVersionIsOutOfOrder(CommittedAggregateEvent @event, CommittedAggregateEvent previousEvent)
