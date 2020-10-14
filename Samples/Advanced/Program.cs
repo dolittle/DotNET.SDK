@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK;
+using Dolittle.SDK.Tenancy;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
@@ -34,14 +35,6 @@ namespace Basic
                 .Build();
 
             var myEvent = new MyEvent("test string", 12345);
-            // var commit = client.EventStore
-            //     .ForTenant(TenantId.Development)
-            //     .Commit(eventsBuilder =>
-            //         eventsBuilder
-            //             .CreatePublicEvent(myEvent)
-            //             .FromEventSource("8ac5b16a-0b88-4578-a005-e5247c611777"));
-
-            while (!System.Diagnostics.Debugger.IsAttached) System.Threading.Thread.Sleep(50);
 
             var committedAggregateEvents = client.EventStore
                 .ForTenant(TenantId.Development)
@@ -56,8 +49,9 @@ namespace Basic
                 .ForTenant(TenantId.Development)
                 .FetchForAggregate("b2410210-0ae3-4539-aada-fc962bdd1303", "8ac5b16a-0b88-4578-a005-e5247c611777");
             Console.WriteLine(fetch.Result.Count);
+            Console.WriteLine(fetch.Result.AggregateRootVersion);
 
-            client.Wait();
+            client.Start();
         }
     }
 }

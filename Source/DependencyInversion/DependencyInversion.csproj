@@ -3,4 +3,8 @@
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.DependencyInversion</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Execution/Execution.csproj" />
+  </ItemGroup>
 </Project>

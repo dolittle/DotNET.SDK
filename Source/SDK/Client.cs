@@ -3,11 +3,17 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Filters;
+using Dolittle.SDK.Events.Handling.Builder;
+using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK
 {
@@ -17,7 +23,14 @@ namespace Dolittle.SDK
     public class Client : IDisposable
     {
         readonly ProcessingCoordinator _processingCoordinator;
+        readonly EventHandlersBuilder _eventHandlersBuilder;
+        readonly EventFiltersBuilder _filtersBuilder;
         readonly EventHorizons _eventHorizons;
+        readonly IEventProcessors _eventProcessors;
+        readonly IEventProcessingConverter _eventProcessingConverter;
+        readonly ILoggerFactory _loggerFactory;
+        readonly CancellationToken _cancellation;
+        IContainer _container;
         bool _disposed;
 
         /// <summary>
@@ -27,16 +40,35 @@ namespace Dolittle.SDK
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
         /// <param name="eventHorizons">The <see cref="EventHorizons" />.</param>
         /// <param name="processingCoordinator">The <see cref="ProcessingCoordinator" />.</param>
+        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
+        /// <param name="eventProcessingConverter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="eventHandlersBuilder">The <see cref="EventHandlersBuilder" />.</param>
+        /// <param name="filtersBuilder">The <see cref="EventFiltersBuilder" />.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
             EventHorizons eventHorizons,
-            ProcessingCoordinator processingCoordinator)
+            ProcessingCoordinator processingCoordinator,
+            IEventProcessors eventProcessors,
+            IEventProcessingConverter eventProcessingConverter,
+            EventHandlersBuilder eventHandlersBuilder,
+            EventFiltersBuilder filtersBuilder,
+            ILoggerFactory loggerFactory,
+            CancellationToken cancellationToken)
         {
             EventTypes = eventTypes;
             EventStore = eventStoreBuilder;
             _eventHorizons = eventHorizons;
             _processingCoordinator = processingCoordinator;
+            _eventProcessors = eventProcessors;
+            _eventProcessingConverter = eventProcessingConverter;
+            _eventHandlersBuilder = eventHandlersBuilder;
+            _filtersBuilder = filtersBuilder;
+            _loggerFactory = loggerFactory;
+            _cancellation = cancellationToken;
+            _container = new DefaultContainer();
         }
 
         /// <summary>
@@ -63,13 +95,36 @@ namespace Dolittle.SDK
             => new ClientBuilder(microserviceId);
 
         /// <summary>
-        /// Waits for the pending operations and processing to complete.
+        /// /// Sets the <see cref="IContainer" /> to use for inversion of control.
         /// </summary>
-        /// <remarks>
-        /// Use <see cref="ClientBuilder.WithCancellation(CancellationToken)"/> to cancel the processing.
-        /// </remarks>
-        public void Wait()
-            => _processingCoordinator.Completion.Wait();
+        /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public Client WithContainer(IContainer container)
+        {
+            _container = container;
+            return this;
+        }
+
+        /// <summary>
+        /// Start the client.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> that completes when the client has started. </returns>
+        public Task Start()
+        {
+            _eventHandlersBuilder.BuildAndRegister(
+                _eventProcessors,
+                EventTypes,
+                _eventProcessingConverter,
+                _container,
+                _loggerFactory,
+                _cancellation);
+            _filtersBuilder.BuildAndRegister(
+                _eventProcessors,
+                _eventProcessingConverter,
+                _loggerFactory,
+                _cancellation);
+            return _processingCoordinator.Completion;
+        }
 
         /// <inheritdoc/>
         public void Dispose()
