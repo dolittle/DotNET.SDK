@@ -46,7 +46,7 @@ namespace Basic
             var otherCommit = client.EventStore.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97").CommitPublic(myOtherEvent, "8ac5b16a-0b88-4578-a005-e5247c611777");
             Console.WriteLine(otherCommit.Result.Events);
 
-            client.Wait();
+            client.Start();
         }
     }
 }

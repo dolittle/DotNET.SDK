@@ -26,7 +26,7 @@ namespace Kitchen
                 .Commit(preparedTaco, "bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
 
             // Blocks until the EventHandlers are finished, i.e. forever
-            client.Wait();
+            client.Start().Wait();
         }
     }
 }
