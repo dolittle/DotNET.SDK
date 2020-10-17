@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;
 
 namespace Dolittle.SDK.Aggregates
@@ -87,6 +88,7 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="isPublic">Whether to apply a public event.</param>
         public void Apply(object @event, EventType eventType, bool isPublic)
         {
+            ThrowIfWrongEventType(@event, eventType);
             _uncommittedEvents.Add(new UncommittedAggregateEvent(eventType, @event, isPublic));
             Version++;
             InvokeOnMethod(@event);
@@ -114,6 +116,17 @@ namespace Dolittle.SDK.Aggregates
             if (this.TryGetOnMethod(@event, out var handleMethod))
             {
                 handleMethod.Invoke(this, new[] { @event });
+            }
+        }
+
+        void ThrowIfWrongEventType(object @event, EventType eventType)
+        {
+            var typeOfEvent = @event.GetType();
+            if (_eventTypes.HasFor(typeOfEvent))
+            {
+                var associatedEventType = _eventTypes.GetFor(typeOfEvent);
+                if (eventType != associatedEventType)
+                    throw new ProvidedEventTypeDoesNotMatchEventTypeFromAttribute(eventType, associatedEventType, typeOfEvent);
             }
         }
 
