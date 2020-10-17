@@ -34,7 +34,7 @@ namespace Dolittle.SDK.Aggregates
         {
             var aggregateRootType = typeof(TAggregateRoot);
             ThrowIfInvalidConstructor(aggregateRootType);
-            var constructor = GetPrivateConstructor(aggregateRootType);
+            var constructor = typeof(TAggregateRoot).GetConstructors().Single();
 
             var aggregateRoot = GetInstanceFrom<TAggregateRoot>(eventSourceId, constructor);
             ThrowIfCouldNotCreateAggregateRoot(aggregateRoot);
@@ -47,8 +47,7 @@ namespace Dolittle.SDK.Aggregates
                 new object[]
                 {
                     id,
-                    _eventTypes,
-                    _loggerFactory.CreateLogger(typeof(TAggregateRoot))
+                    _eventTypes
                 }) as TAggregateRoot;
 
         void ThrowIfInvalidConstructor(Type type)
@@ -56,11 +55,6 @@ namespace Dolittle.SDK.Aggregates
             ThrowIfNotOneConstructor(type);
             ThrowIfConstructorIsInvalid(type, type.GetConstructors().Single());
         }
-
-        ConstructorInfo GetPrivateConstructor(Type type)
-            => type
-                .GetConstructors(BindingFlags.FlattenHierarchy | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Single();
 
         void ThrowIfNotOneConstructor(Type type)
         {
@@ -72,6 +66,7 @@ namespace Dolittle.SDK.Aggregates
             var parameters = constructor.GetParameters();
             ThrowIfIncorrectNumberOfParameter(type, parameters);
             ThrowIfIncorrectFirstParameter(type, parameters[0]);
+            ThrowIfIncorrectSecondParameter(type, parameters[1]);
         }
 
         void ThrowIfIncorrectFirstParameter(Type type, ParameterInfo parameter)
@@ -81,9 +76,16 @@ namespace Dolittle.SDK.Aggregates
                 throw new InvalidAggregateRootConstructorSignature(type, $"expected type of first parameter to be {typeof(Guid)} or {typeof(EventSourceId)}");
         }
 
+        void ThrowIfIncorrectSecondParameter(Type type, ParameterInfo parameter)
+        {
+            var parameterType = parameter.ParameterType;
+            if (parameterType != typeof(IEventTypes))
+                throw new InvalidAggregateRootConstructorSignature(type, $"expected type of first parameter to be {typeof(IEventTypes)}");
+        }
+
         void ThrowIfIncorrectNumberOfParameter(Type type, ParameterInfo[] parameters)
         {
-            const int expectedNumberParameters = 1;
+            const int expectedNumberParameters = 2;
             if (parameters.Length != expectedNumberParameters)
                 throw new InvalidAggregateRootConstructorSignature(type, $"expected {expectedNumberParameters} parameters");
         }

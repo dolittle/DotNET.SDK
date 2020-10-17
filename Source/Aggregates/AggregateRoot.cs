@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Aggregates
 {
@@ -21,18 +20,13 @@ namespace Dolittle.SDK.Aggregates
         /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
         /// </summary>
         /// <param name="eventSourceId">The <see cref="Events.EventSourceId" />.</param>
-        public AggregateRoot(EventSourceId eventSourceId)
+        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+        public AggregateRoot(EventSourceId eventSourceId, IEventTypes eventTypes)
         {
             EventSourceId = eventSourceId;
             Version = AggregateRootVersion.Initial;
             _uncommittedEvents = new List<UncommittedAggregateEvent>();
-        }
-
-        AggregateRoot(EventSourceId eventSourceId, IEventTypes eventTypes, ILogger logger)
-            : this(eventSourceId)
-        {
             _eventTypes = eventTypes;
-            Logger = logger;
         }
 
         /// <summary>
@@ -49,11 +43,6 @@ namespace Dolittle.SDK.Aggregates
         /// Gets the <see cref="IEnumerable{T}" /> of events to commit.
         /// </summary>
         public IEnumerable<UncommittedAggregateEvent> UncommittedEvents => _uncommittedEvents;
-
-        /// <summary>
-        /// Gets the <see cref="ILogger" />.
-        /// </summary>
-        protected ILogger Logger { get; }
 
         /// <summary>
         /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -98,12 +87,6 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="isPublic">Whether to apply a public event.</param>
         public void Apply(object @event, EventType eventType, bool isPublic)
         {
-            Logger.LogDebug(
-                "{AggregateRoot} with aggregate root id {AggregateRootId} applying to event source {EventSource} is applying an event with event type {EventType}",
-                GetType(),
-                this.GetAggregateRootId(),
-                EventSourceId,
-                eventType);
             _uncommittedEvents.Add(new UncommittedAggregateEvent(eventType, @event, isPublic));
             InvokeOnMethod(@event);
         }
@@ -129,10 +112,6 @@ namespace Dolittle.SDK.Aggregates
         {
             if (this.TryGetOnMethod(@event, out var handleMethod))
             {
-                Logger.LogTrace(
-                    "Invoking On-method on {AggregateRoot} with aggregate root id {AggregateRootId}",
-                    GetType(),
-                    this.GetAggregateRootId());
                 handleMethod.Invoke(this, new[] { @event });
             }
         }
