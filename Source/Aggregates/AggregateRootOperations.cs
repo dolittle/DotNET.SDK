@@ -17,6 +17,7 @@ namespace Dolittle.SDK.Aggregates
     {
         readonly TAggregate _aggregateRoot;
         readonly IEventStore _eventStore;
+        bool _performed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AggregateRootOperations{TAggregate}"/> class.
@@ -35,9 +36,10 @@ namespace Dolittle.SDK.Aggregates
         /// <inheritdoc/>
         public Task Perform(Action<TAggregate> method)
         {
-            method(_aggregateRoot);
-
             var aggregateRootId = _aggregateRoot.GetAggregateRootId();
+            if (_performed) throw new AggregateRootOperationAlreadyPerformed(typeof(TAggregate), aggregateRootId, _aggregateRoot.EventSourceId);
+            _performed = true;
+            method(_aggregateRoot);
 
             return _eventStore
                     .ForAggregate(aggregateRootId)
