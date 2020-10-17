@@ -18,6 +18,7 @@ namespace Dolittle.SDK.Aggregates
     {
         readonly IEventStore _eventStore;
         readonly IAggregateRootFactory _aggregateRootFactory;
+        readonly ILoggerFactory _loggerFactory;
         readonly ILogger _logger;
 
         /// <summary>
@@ -25,11 +26,12 @@ namespace Dolittle.SDK.Aggregates
         /// </summary>
         /// <param name="eventStore">The <see cref="IEventStore" />.</param>
         /// <param name="aggregateRootFactory">The <see cref="IAggregateRootFactory" />.</param>
-        /// <param name="logger">The <see cref="ILogger" />.</param>
-        public AggregateOf(IEventStore eventStore, IAggregateRootFactory aggregateRootFactory, ILogger logger)
+        /// <param name="loggerFactory">The <see cref="ILogger" />.</param>
+        public AggregateOf(IEventStore eventStore, IAggregateRootFactory aggregateRootFactory, ILoggerFactory loggerFactory)
         {
             _eventStore = eventStore;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<AggregateOf<TAggregateRoot>>();
             _aggregateRootFactory = aggregateRootFactory;
         }
 
@@ -43,7 +45,10 @@ namespace Dolittle.SDK.Aggregates
             if (TryGetAggregateRoot(eventSourceId, out var aggregateRoot, out var exception))
             {
                 ReApplyEvents(aggregateRoot);
-                return new AggregateRootOperations<TAggregateRoot>(_eventStore, aggregateRoot);
+                return new AggregateRootOperations<TAggregateRoot>(
+                    _eventStore,
+                    aggregateRoot,
+                    _loggerFactory.CreateLogger<AggregateRootOperations<TAggregateRoot>>());
             }
 
             throw new CouldNotGetAggregateRoot(typeof(TAggregateRoot), eventSourceId, exception.Message);

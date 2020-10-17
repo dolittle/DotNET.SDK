@@ -20,5 +20,12 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="method"><see cref="Action{T}">Method</see> to perform.</param>
         /// <returns>The <see cref="Task" /> representing the asynchronous operation.</returns>
         Task Perform(Action<TAggregate> method);
+
+        /// <summary>
+        /// Perform an asynchronous operation on an <see cref="AggregateRoot"/>.
+        /// </summary>
+        /// <param name="method"><see cref="Action{T}">Method</see> to perform.</param>
+        /// <returns>The <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task Perform(Func<TAggregate, Task> method);
     }
 }
