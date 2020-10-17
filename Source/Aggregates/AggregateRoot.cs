@@ -104,7 +104,6 @@ namespace Dolittle.SDK.Aggregates
                 this.GetAggregateRootId(),
                 EventSourceId,
                 eventType);
-            ThrowIfEventIsNull(@event);
             _uncommittedEvents.Add(new UncommittedAggregateEvent(eventType, @event, isPublic));
             InvokeOnMethod(@event);
         }
@@ -136,11 +135,6 @@ namespace Dolittle.SDK.Aggregates
                     this.GetAggregateRootId());
                 handleMethod.Invoke(this, new[] { @event });
             }
-        }
-
-        void ThrowIfEventIsNull(object @event)
-        {
-            if (@event == null) throw new EventCannotBeNull();
         }
 
         void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
