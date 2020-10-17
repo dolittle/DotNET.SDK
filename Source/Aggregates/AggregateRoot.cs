@@ -88,6 +88,7 @@ namespace Dolittle.SDK.Aggregates
         public void Apply(object @event, EventType eventType, bool isPublic)
         {
             _uncommittedEvents.Add(new UncommittedAggregateEvent(eventType, @event, isPublic));
+            Version++;
             InvokeOnMethod(@event);
         }
 

@@ -73,7 +73,7 @@ namespace Dolittle.SDK.Aggregates
             return _eventStore
                     .ForAggregate(aggregateRootId)
                     .WithEventSource(_aggregateRoot.EventSourceId)
-                    .ExpectVersion(_aggregateRoot.Version)
+                    .ExpectVersion(_aggregateRoot.Version - (AggregateRootVersion)(uint)_aggregateRoot.UncommittedEvents.Count())
                     .Commit(CreateUncommittedEvents);
         }
 
