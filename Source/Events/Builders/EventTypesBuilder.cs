@@ -8,7 +8,7 @@ using Dolittle.SDK.Artifacts;
 namespace Dolittle.SDK.Events.Builders
 {
     /// <summary>
-    /// Represents a system that registers <see cref="Type" /> to <see cref="EventType" /> associations to an <see cref="EventTypes" /> instance.
+    /// Represents a system that registers <see cref="Type" /> to <see cref="EventType" /> associations to an <see cref="IEventTypes" /> instance.
     /// </summary>
     public class EventTypesBuilder
     {
@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Events.Builders
         /// </summary>
         /// <param name="eventType">The <see cref="EventType" /> that the <see cref="Type" /> is associated to.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         public EventTypesBuilder Associate<T>(EventType eventType)
             where T : class
             => Associate(typeof(T), eventType);
@@ -29,7 +29,7 @@ namespace Dolittle.SDK.Events.Builders
         /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
         /// <param name="eventType">The <see cref="EventType" /> that the <see cref="Type" /> is associated to.</param>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         public EventTypesBuilder Associate(Type type, EventType eventType)
         {
             AddAssociation(type, eventType);
@@ -41,7 +41,7 @@ namespace Dolittle.SDK.Events.Builders
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         public EventTypesBuilder Associate<T>(EventTypeId eventTypeId)
             where T : class
             => Associate(typeof(T), eventTypeId);
@@ -51,7 +51,7 @@ namespace Dolittle.SDK.Events.Builders
         /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         public EventTypesBuilder Associate(Type type, EventTypeId eventTypeId)
             => Associate(type, new EventType(eventTypeId));
 
@@ -61,7 +61,7 @@ namespace Dolittle.SDK.Events.Builders
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="EventType" />.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         public EventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation)
             where T : class
             => Associate(typeof(T), eventTypeId, generation);
@@ -72,7 +72,7 @@ namespace Dolittle.SDK.Events.Builders
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="EventType" />.</param>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         public EventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation)
             => Associate(type, new EventType(eventTypeId, generation));
 
@@ -80,7 +80,7 @@ namespace Dolittle.SDK.Events.Builders
         /// Associate a <see cref="Type" /> with the <see cref="EventType" /> given by an attribute.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type" /> to associate with an <see cref="EventType" />.</typeparam>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         /// <remarks>
         /// The type must have a eventType attribute.
         /// </remarks>
@@ -92,7 +92,7 @@ namespace Dolittle.SDK.Events.Builders
         /// Associate the <see cref="Type" /> with the <see cref="EventType" /> given by an attribute.
         /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
-        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="EventTypes" />.</returns>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
         /// <remarks>
         /// The type must have a eventType attribute.
         /// </remarks>
@@ -105,10 +105,10 @@ namespace Dolittle.SDK.Events.Builders
         }
 
         /// <summary>
-        /// Adds all the <see cref="Type" /> to <see cref="EventType" /> associations to the provided <see cref="EventTypes" />.
+        /// Adds all the <see cref="Type" /> to <see cref="EventType" /> associations to the provided <see cref="IEventTypes" />.
         /// </summary>
-        /// <param name="eventTypes">The <see cref="EventTypes"/> to add associations to.</param>
-        public void AddAssociationsInto(EventTypes eventTypes)
+        /// <param name="eventTypes">The <see cref="IEventTypes"/> to add associations to.</param>
+        public void AddAssociationsInto(IEventTypes eventTypes)
         {
             foreach (var (type, eventType) in _associations)
             {
