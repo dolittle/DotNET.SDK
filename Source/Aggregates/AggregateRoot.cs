@@ -53,7 +53,10 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="event">The event to apply.</param>
         /// <param name="isPublic">Whether to apply a public event.</param>
         public void Apply(object @event, bool isPublic = false)
-            => Apply(@event, _eventTypes.GetFor(@event.GetType()), isPublic);
+        {
+            if (@event == null) throw new EventContentCannotBeNull();
+            Apply(@event, _eventTypes.GetFor(@event.GetType()), isPublic);
+        }
 
         /// <summary>
         /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -86,7 +89,7 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="event">The event to apply.</param>
         /// <param name="eventType">The <see cref="EventType" />.</param>
         /// <param name="isPublic">Whether to apply a public event.</param>
-        public void Apply(object @event, EventType eventType, bool isPublic)
+        public void Apply(object @event, EventType eventType, bool isPublic = false)
         {
             ThrowIfWrongEventType(@event, eventType);
             _uncommittedEvents.Add(new UncommittedAggregateEvent(eventType, @event, isPublic));
@@ -106,8 +109,8 @@ namespace Dolittle.SDK.Aggregates
             foreach (var @event in events)
             {
                 ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
-                InvokeOnMethod(@event.Content);
                 Version++;
+                if (!this.IsStateless()) InvokeOnMethod(@event.Content);
             }
         }
 
