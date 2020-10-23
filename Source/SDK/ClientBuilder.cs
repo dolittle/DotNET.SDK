@@ -37,12 +37,13 @@ namespace Dolittle.SDK
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
+        readonly RetryPolicy _retryPolicy;
         string _host = "localhost";
         ushort _port = 50053;
         Version _version;
         Environment _environment;
         CancellationToken _cancellation;
-        RetryPolicy _retryPolicy;
+        IEventTypes _eventTypes;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -143,6 +144,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the event types through the <see cref="EventTypesBuilder" />.
+        /// </summary>
+        /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventTypes(IEventTypes eventTypes)
+        {
+            _eventTypes = eventTypes;
+            return this;
+        }
+
+        /// <summary>
         /// Sets the filters through the <see cref="EventFiltersBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -201,8 +213,8 @@ namespace Dolittle.SDK
                 CorrelationId.System,
                 Claims.Empty,
                 CultureInfo.InvariantCulture);
-            var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
-            _eventTypesBuilder.AddAssociationsInto(eventTypes);
+            _eventTypes = _eventTypes != default ? _eventTypes : new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
+            _eventTypesBuilder.AddAssociationsInto(_eventTypes);
 
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
@@ -212,7 +224,7 @@ namespace Dolittle.SDK
                 _loggerFactory,
                 _cancellation);
 
-            var serializer = new EventContentSerializer(eventTypes);
+            var serializer = new EventContentSerializer(_eventTypes);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
@@ -232,14 +244,14 @@ namespace Dolittle.SDK
                 aggregateEventToSDKConverter,
                 executionContext,
                 callContextResolver,
-                eventTypes,
+                _eventTypes,
                 _loggerFactory);
 
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
 
             return new Client(
-                eventTypes,
+                _eventTypes,
                 eventStoreBuilder,
                 eventHorizons,
                 processingCoordinator,
