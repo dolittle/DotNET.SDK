@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
     public class EventHandlerBuilder : ICanBuildAndRegisterAnEventHandler
     {
         readonly EventHandlerId _eventHandlerId;
-        EventHandlerMethodsBuilder _methodsBuilder;
+        readonly IList<EventHandlerMethodsBuilder> _methodsBuilders = new List<EventHandlerMethodsBuilder>();
 
         ScopeId _scopeId = ScopeId.Default;
 
@@ -35,8 +35,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Partitioned()
         {
             _partitioned = true;
-            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
-            return _methodsBuilder;
+            var builder = new EventHandlerMethodsBuilder(_eventHandlerId);
+            _methodsBuilders.Add(builder);
+            return builder;
         }
 
         /// <summary>
@@ -46,8 +47,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Unpartitioned()
         {
             _partitioned = false;
-            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
-            return _methodsBuilder;
+            var builder = new EventHandlerMethodsBuilder(_eventHandlerId);
+            _methodsBuilders.Add(builder);
+            return builder;
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
-            if (_methodsBuilder == default)
+            if (_methodsBuilders.Count < 1)
             {
                 loggerFactory
                     .CreateLogger<EventHandlerBuilder>()
@@ -81,14 +83,17 @@ namespace Dolittle.SDK.Events.Handling.Builder
             }
 
             var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
-            if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
+            foreach (var builder in _methodsBuilders)
             {
-                loggerFactory
-                    .CreateLogger<EventHandlerBuilder>()
-                    .LogWarning(
-                        "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
-                        _eventHandlerId);
-                return;
+                if (!builder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
+                {
+                    loggerFactory
+                        .CreateLogger<EventHandlerBuilder>()
+                        .LogWarning(
+                            "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
+                            _eventHandlerId);
+                    return;
+                }
             }
 
             var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
