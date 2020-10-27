@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
     public class EventHandlerBuilder : ICanBuildAndRegisterAnEventHandler
     {
         readonly EventHandlerId _eventHandlerId;
-        readonly IList<EventHandlerMethodsBuilder> _methodsBuilders = new List<EventHandlerMethodsBuilder>();
+        readonly EventHandlerMethodsBuilder _methodsBuilder;
 
         ScopeId _scopeId = ScopeId.Default;
 
@@ -26,7 +26,11 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
         /// </summary>
         /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
-        public EventHandlerBuilder(EventHandlerId eventHandlerId) => _eventHandlerId = eventHandlerId;
+        public EventHandlerBuilder(EventHandlerId eventHandlerId)
+        {
+            _eventHandlerId = eventHandlerId;
+            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
+        }
 
         /// <summary>
         /// Defines the event handler to be partitioned - this is default for an event handler.
@@ -35,9 +39,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Partitioned()
         {
             _partitioned = true;
-            var builder = new EventHandlerMethodsBuilder(_eventHandlerId);
-            _methodsBuilders.Add(builder);
-            return builder;
+            return _methodsBuilder;
         }
 
         /// <summary>
@@ -47,9 +49,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlerMethodsBuilder Unpartitioned()
         {
             _partitioned = false;
-            var builder = new EventHandlerMethodsBuilder(_eventHandlerId);
-            _methodsBuilders.Add(builder);
-            return builder;
+            return _methodsBuilder;
         }
 
         /// <summary>
@@ -72,7 +72,18 @@ namespace Dolittle.SDK.Events.Handling.Builder
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
-            if (_methodsBuilders.Count < 1)
+            var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
+            if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
+            {
+                loggerFactory
+                    .CreateLogger<EventHandlerBuilder>()
+                    .LogWarning(
+                        "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
+                        _eventHandlerId);
+                return;
+            }
+
+            if (eventTypesToMethods.Count < 1)
             {
                 loggerFactory
                     .CreateLogger<EventHandlerBuilder>()
@@ -80,20 +91,6 @@ namespace Dolittle.SDK.Events.Handling.Builder
                         "Failed to build event handler {EventHandlerId}. No event handler methods are configured for event handler",
                         _eventHandlerId);
                 return;
-            }
-
-            var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
-            foreach (var builder in _methodsBuilders)
-            {
-                if (!builder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
-                {
-                    loggerFactory
-                        .CreateLogger<EventHandlerBuilder>()
-                        .LogWarning(
-                            "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
-                            _eventHandlerId);
-                    return;
-                }
             }
 
             var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
