@@ -21,14 +21,12 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// Start building an event handler.
         /// </summary>
         /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
-        /// <param name="callback">Callback for building the event handler.</param>
         /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlersBuilder CreateEventHandler(EventHandlerId eventHandlerId, Action<EventHandlerBuilder> callback)
+        public EventHandlerBuilder CreateEventHandler(EventHandlerId eventHandlerId)
         {
             var builder = new EventHandlerBuilder(eventHandlerId);
-            callback(builder);
             _builders.Add(builder);
-            return this;
+            return builder;
         }
 
         /// <summary>
