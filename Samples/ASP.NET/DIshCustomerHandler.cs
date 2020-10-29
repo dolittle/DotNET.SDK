@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Handling;
 
 namespace ASP.NET

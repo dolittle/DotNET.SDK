@@ -10,7 +10,6 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
@@ -95,7 +94,7 @@ namespace Dolittle.SDK
             => new ClientBuilder(microserviceId);
 
         /// <summary>
-        /// /// Sets the <see cref="IContainer" /> to use for inversion of control.
+        /// Sets the <see cref="IContainer" /> to use for inversion of control.
         /// </summary>
         /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
         /// <returns>The client builder for continuation.</returns>

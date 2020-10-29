@@ -20,7 +20,7 @@ namespace EventHorizon
                     eventHorizons.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97", subscriptions => {
                         subscriptions
                             .FromProducerMicroservice("7a6155dd-9109-4488-8f6f-c57fe4b65bfb")
-                            .FromProducerTenant("900893e7-c4cc-4873-8032-884e965e4b97")
+                            .FromProducerTenant(TenantId.Development)
                             .FromProducerStream("2c087657-b318-40b1-ae92-a400de44e507")
                             .FromProducerPartition("00000000-0000-0000-0000-000000000000")
                             .ToScope("808ddde4-c937-4f5c-9dc2-140580f6919e")

@@ -3,7 +3,6 @@
 
 using System.Threading.Tasks;
 using Dolittle.SDK;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Tenancy;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,10 +25,7 @@ namespace ASP.NET.Kitchen
 
             await _client.EventStore
                 .ForTenant(TenantId.Development)
-                .Commit(eventsBuilder =>
-                    eventsBuilder
-                        .CreateEvent(preparedDish)
-                        .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9"));
+                .Commit(preparedDish, "bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
 
             return Ok();
         }

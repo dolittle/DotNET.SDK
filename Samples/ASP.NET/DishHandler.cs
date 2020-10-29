@@ -4,7 +4,6 @@
 using System;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Handling;
 
 namespace ASP.NET
@@ -22,7 +21,7 @@ namespace ASP.NET
         public async Task Handle(DishPrepared @event, EventContext eventContext)
         {
             Console.WriteLine($"{@event.Chef} has prepared {@event.Dish}. Bon apetite!");
-            await _eventStore.CommitEvent(new DishEaten(@event.Dish, "Jakob"), eventContext.EventSourceId);
+            await _eventStore.Commit(new DishEaten(@event.Dish, "Jakob"), eventContext.EventSourceId);
         }
     }
 }
