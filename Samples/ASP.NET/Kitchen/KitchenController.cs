@@ -17,8 +17,8 @@ namespace ASP.NET.Kitchen
         public KitchenController(Client client)
         {
             _client = client;
-
-            }
+        }
+            
         [HttpPost("prepare")]
         public async Task<IActionResult> Prepare([FromBody]PrepareDish prepareDish)
         {
