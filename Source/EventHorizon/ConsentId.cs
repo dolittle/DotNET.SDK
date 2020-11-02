@@ -19,15 +19,15 @@ namespace Dolittle.SDK.EventHorizon
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to an <see cref="ConsentId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="Guid"/> representation.</param>
+        /// <param name="consentId">The <see cref="Guid"/> representation.</param>
         /// <returns>The converted <see cref="ConsentId"/>.</returns>
-        public static implicit operator ConsentId(Guid id) => new ConsentId { Value = id };
+        public static implicit operator ConsentId(Guid consentId) => new ConsentId { Value = consentId };
 
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="ConsentId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <param name="consentId">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="ConsentId"/>.</returns>
-        public static implicit operator ConsentId(string id) => new ConsentId { Value = Guid.Parse(id) };
+        public static implicit operator ConsentId(string consentId) => new ConsentId { Value = Guid.Parse(consentId) };
     }
 }

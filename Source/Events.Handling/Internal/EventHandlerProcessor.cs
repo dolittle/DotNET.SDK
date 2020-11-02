@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;

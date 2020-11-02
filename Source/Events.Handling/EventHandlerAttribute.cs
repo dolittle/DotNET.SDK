@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Events.Handling
         {
             Identifier = Guid.Parse(eventHandlerId);
             Partitioned = partitioned;
-            ScopeId = inScope == default ? ScopeId.Default : new ScopeId(Guid.Parse(inScope));
+            Scope = inScope == default ? ScopeId.Default : inScope;
         }
 
         /// <summary>
@@ -35,8 +35,8 @@ namespace Dolittle.SDK.Events.Handling
         public bool Partitioned { get; }
 
         /// <summary>
-        /// Gets the <see cref="Events.ScopeId" />.
+        /// Gets the <see cref="ScopeId" />.
         /// </summary>
-        public ScopeId ScopeId { get; }
+        public ScopeId Scope { get; }
     }
 }

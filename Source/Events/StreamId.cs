@@ -12,22 +12,22 @@ namespace Dolittle.SDK.Events
     public class StreamId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Gets the Event Log stream id.
+        /// The <see cref="StreamId"/> that refers to the event log.
         /// </summary>
-        public static StreamId EventLog => new StreamId { Value = Guid.Empty };
+        public static readonly StreamId EventLog = Guid.Empty;
 
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to an <see cref="StreamId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="Guid"/> representation.</param>
+        /// <param name="streamId">The <see cref="Guid"/> representation.</param>
         /// <returns>The converted <see cref="StreamId"/>.</returns>
-        public static implicit operator StreamId(Guid id) => new StreamId { Value = id };
+        public static implicit operator StreamId(Guid streamId) => new StreamId { Value = streamId };
 
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="StreamId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <param name="streamId">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="StreamId"/>.</returns>
-        public static implicit operator StreamId(string id) => new StreamId { Value = Guid.Parse(id) };
+        public static implicit operator StreamId(string streamId) => new StreamId { Value = Guid.Parse(streamId) };
     }
 }

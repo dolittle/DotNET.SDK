@@ -12,32 +12,21 @@ namespace Dolittle.SDK.Events
     public class ScopeId : ConceptAs<Guid>
     {
         /// <summary>
-        /// A static singleton instance to represent a "Default" <see cref="ScopeId" />.
+        /// The <see cref="ScopeId"/> that refers to the default scope.
         /// </summary>
         public static readonly ScopeId Default = Guid.Empty;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScopeId"/> class.
-        /// </summary>
-        public ScopeId() => Value = Guid.Empty;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScopeId"/> class.
-        /// </summary>
-        /// <param name="id"><see cref="Guid"/> value.</param>
-        public ScopeId(Guid id) => Value = id;
 
         /// <summary>
         /// Implicitly convert from a <see cref="Guid"/> to an <see cref="ScopeId"/>.
         /// </summary>
         /// <param name="scopeId">ScopeId as <see cref="Guid"/>.</param>
-        public static implicit operator ScopeId(Guid scopeId) => new ScopeId(scopeId);
+        public static implicit operator ScopeId(Guid scopeId) => new ScopeId { Value = scopeId };
 
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="ScopeId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <param name="scopeId">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="ScopeId"/>.</returns>
-        public static implicit operator ScopeId(string id) => new ScopeId { Value = Guid.Parse(id) };
+        public static implicit operator ScopeId(string scopeId) => new ScopeId { Value = Guid.Parse(scopeId) };
     }
 }

@@ -12,9 +12,9 @@ namespace Dolittle.SDK.Microservices
     public class MicroserviceId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Represents the identifier for a not set microservice.
+        /// The <see cref="MicroserviceId"/> used when an identifier has not been defined.
         /// </summary>
-        public static readonly MicroserviceId NotSet = Guid.Parse("4a5d2bc3-543f-459a-ab0b-e8e924093260");
+        public static readonly MicroserviceId NotSet = "4a5d2bc3-543f-459a-ab0b-e8e924093260";
 
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to a <see cref="MicroserviceId"/>.

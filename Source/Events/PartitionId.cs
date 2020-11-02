@@ -12,22 +12,22 @@ namespace Dolittle.SDK.Events
     public class PartitionId : ConceptAs<Guid>
     {
         /// <summary>
-        /// Gets the unspecified partition id.
+        /// The <see cref="PartitionId"/> that refers to no partition.
         /// </summary>
-        public static PartitionId Unspecified => new PartitionId { Value = Guid.Empty };
+        public static readonly PartitionId Unspecified = Guid.Empty;
 
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to an <see cref="PartitionId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="Guid"/> representation.</param>
+        /// <param name="partitionId">The <see cref="Guid"/> representation.</param>
         /// <returns>The converted <see cref="PartitionId"/>.</returns>
-        public static implicit operator PartitionId(Guid id) => new PartitionId { Value = id };
+        public static implicit operator PartitionId(Guid partitionId) => new PartitionId { Value = partitionId };
 
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="PartitionId"/>.
         /// </summary>
-        /// <param name="id">The <see cref="string"/> representation.</param>
+        /// <param name="partitionId">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="PartitionId"/>.</returns>
-        public static implicit operator PartitionId(string id) => new PartitionId { Value = Guid.Parse(id) };
+        public static implicit operator PartitionId(string partitionId) => new PartitionId { Value = Guid.Parse(partitionId) };
     }
 }

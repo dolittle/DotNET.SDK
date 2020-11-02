@@ -43,7 +43,13 @@ namespace Dolittle.SDK.Protobuf
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
         public static bool TryToExecutionContext(this PbExecutionContext source, out ExecutionContext executionContext, out Exception error)
         {
-            executionContext = null;
+            executionContext = default;
+
+            if (source == default)
+            {
+                error = new ArgumentNullException(nameof(source));
+                return false;
+            }
 
             if (!source.MicroserviceId.TryTo<MicroserviceId>(out var microserviceId, out var microserviceError))
             {
@@ -57,7 +63,7 @@ namespace Dolittle.SDK.Protobuf
                 return false;
             }
 
-            if (source.Version == null)
+            if (source.Version == default)
             {
                 error = new MissingExecutionContextInformation(nameof(source.Version));
                 return false;
