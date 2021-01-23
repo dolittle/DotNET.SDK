@@ -16,6 +16,11 @@ namespace EventHorizon
                 .WithEventTypes(eventTypes =>
                     eventTypes
                         .Associate<MyEvent>("f42529b3-d980-4b55-8fbe-65101a6141a3"))
+                .WithEventHandlers(_ =>
+                    _.CreateEventHandler("6c3d358f-3ecc-4c92-a91e-5fc34cacf27e")
+                        .InScope("808ddde4-c937-4f5c-9dc2-140580f6919e")
+                        .Partitioned()
+                        .Handle<MyEvent>((@event, context) => Console.WriteLine($"Handled event {@event} with sequence number {context.SequenceNumber}")))
                 .WithEventHorizons(eventHorizons => {
                     eventHorizons.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97", subscriptions => {
                         subscriptions
@@ -33,7 +38,7 @@ namespace EventHorizon
                 })
                 .Build();
 
-            while (true) Thread.Sleep(1000);
+            client.Start().Wait();
         }
     }
 }
