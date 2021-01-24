@@ -62,9 +62,9 @@ jobs:
       env:
         FILE_PATH: ${{ github.workspace }}/${{ env.COVERAGE_FOLDER }}/coverage.opencover.xml
     - name: Cascade
-      uses: dolittle/cascade-action@v1
+      uses: dolittle/cascade-action@v2
       if: ${{ steps.context.outputs.should-publish == 'true' && env.CASCADES != '' }}
       with:
         token: ${{ secrets.BUILD_PAT }}
         version: ${{ steps.increment-version.outputs-next-version }}
-        cascades: ${{ env.CASCADES }}
+        body: ${{ steps.context.outputs.pr-body }}
