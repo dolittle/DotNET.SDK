@@ -12,6 +12,7 @@
 <p align="center">
     <a href="https://hub.docker.com/r/dolittle/runtime"><img src="https://img.shields.io/nuget/v/Dolittle.SDK?logo=Nuget" alt="Latest Nuget package"></a>
     <a href="https://github.com/dolittle/DotNET.SDK/workflows/.NET%20Library%20CI/CD/badge.svg)"><img src="https://github.com/dolittle/DotNET.SDK/workflows/.NET%20Library%20CI/CD/badge.svg" alt="Build status"></a>
+    <a href="https://github.com/dolittle/DotNET.SDK/actions?query=workflow%3ACodeQL"><img src="https://github.com/dolittle/DotNET.SDK/workflows/CodeQL/badge.svg" alt="CodeQL status"></a>
 </p>
 
 Dolittle is a decentralized, distributed, event-driven microservice platform built to harness the power of events.
