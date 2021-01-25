@@ -4,7 +4,7 @@ Replace this text with a short Description
 ### Environment
 * Operating System and version
 * Development Environment
-* Runtime Environment, framework versions
+* Runtime Environment, SDK versions
 
 ### Steps to recreate
 1. Replace this
