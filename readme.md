@@ -1,43 +1,41 @@
-# DotNET SDK
+<h1 align="center"><img src="https://raw.githubusercontent.com/dolittle/Runtime/master/Documentation/dolittle_negativ_horisontal_RGB.svg" alt="Dolittle"></h1>
 
-[![Build Status](https://dolittle.visualstudio.com/Dolittle%20open-source%20repositories/_apis/build/status/dolittle-runtime.DotNET.SDK?branchName=master)](https://dolittle.visualstudio.com/Dolittle%20open-source%20repositories/_build/latest?definitionId=10&branchName=master)
+<h4 align="center">
+    <a href="https:/dolittle.io">Documentation</a> |
+    <a href="https://dolittle.io/docs/tutorials/getting_started/">Tutorial</a> |
+    <a href="https:/github.com/dolittle/Runtime">Runtime</a> |
+    <a href="https:/github.com/dolittle/JavaScript.SDK">JavaScript SDK</a>
+</h4>
 
-## Cloning
+---
 
-This repository has sub modules, clone it with:
+<p align="center">
+    <a href="https://hub.docker.com/r/dolittle/runtime"><img src="https://img.shields.io/nuget/v/Dolittle.SDK?logo=Nuget" alt="Latest Nuget package"></a>
+    <a href="https://github.com/dolittle/DotNET.SDK/workflows/.NET%20Library%20CI/CD/badge.svg)"><img src="https://github.com/dolittle/DotNET.SDK/workflows/.NET%20Library%20CI/CD/badge.svg" alt="Build status"></a>
+</p>
 
+Dolittle is a decentralized, distributed, event-driven microservice platform built to harness the power of events.
+
+This is our C# SDK, install it with:
 ```shell
-$ git clone --recursive <repository url>
+dotnet add package Dolittle.SDK 
 ```
 
-If you've already cloned it, you can get the submodules by doing the following:
+# Get Started
+- Try our [tutorial](https://dolittle.io/docs/tutorials/)
+- Check out our [documentation](https://dolittle.io)
 
-```shell
-$ git submodule update --init --recursive
-```
 
 ## Building
-
-All the build things are from a submodule.
-To build, run one of the following:
-
-Windows:
-
 ```shell
-$ Build\build.cmd
+dotnet build
 ```
 
-Linux / macOS
-
+## Running
 ```shell
-$ Build\build.sh
+cd Source/Server
+dotnet run
 ```
-
-## Packages
-
-| Platform | Production   | From CI  |
-| ------- | ------- | ------ |
-| .NET SDK | [![NuGet](https://img.shields.io/nuget/v/dolittle.svg)](https://www.nuget.org/packages?q=dolittle) | [![MyGet](https://img.shields.io/myget/dolittle/vpre/dolittle.svg)](https://www.myget.org/gallery/dolittle) |
 
 ## Visual Studio
 
@@ -45,22 +43,17 @@ You can open the `.sln` file in the root of the repository and just build direct
 
 ## VSCode
 
-From the `Build` submdoule there is also a .vscode folder that gets a symbolic link for the root. This means you can open the
-root of the repository directly in Visual Studio Code and start building. There are quite a few build tasks, so click F1 and type "Run Tasks" and select the "Tasks: Run Tasks"
-option and then select the build task you want to run. It is folder sensitive and will look for the nearest `.csproj` file based on the file you have open.
+We have readymade tasks for VSCode. Press `F1` and type `Run Tasks` and select `Tasks: Run Tasks` to see the tasks.
+They are folder sensitive and will look for the nearest `.csproj` file based on the file you have open.
 If it doesn't find it, it will pick the `.sln` file instead.
 
-## More details
-
-To learn more about the projects of Dolittle and how to contribute, please go [here](https://github.com/dolittle/Home).
-
-## Getting Started
+## More
 
 Go to our [documentation site](http://www.dolittle.io) and learn more about the project and how to get started.
-Samples can also be found [here](https://github.com/Dolittle-Samples).
-You can find entropy projects [here](https://github.com/Dolittle-Entropy).
+Samples can be found in [dolittle-samples](https://github.com/Dolittle-Samples).
+Our entropy projects are in [dolittle-entropy](https://github.com/Dolittle-Entropy).
 
 # Issues and Contributing
-To learn how to contribute please read our [contributing](https://dolittle.io/contributing/) guide.
+Issues and contributions are always welcome!
 
-File issues to our [Home](https://github.com/dolittle/Home/issues) repository.
+To learn how to contribute, please read our [contributing](https://dolittle.io/docs/contributing/) guide.
