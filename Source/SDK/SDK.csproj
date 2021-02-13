@@ -12,7 +12,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="../**/*.csproj" Exclude="../SDK/SDK.csproj;../Aggregates/Aggregates.csproj" />
+    <ProjectReference Include="../**/*.csproj" Exclude="../SDK/SDK.csproj" />
   </ItemGroup>
 
 </Project>

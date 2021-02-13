@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
@@ -17,7 +19,7 @@ namespace Dolittle.SDK.Aggregates
         where TAggregateRoot : AggregateRoot
     {
         readonly IEventStore _eventStore;
-        readonly IAggregateRootFactory _aggregateRootFactory;
+        readonly IEventTypes _eventTypes;
         readonly ILoggerFactory _loggerFactory;
         readonly ILogger _logger;
 
@@ -25,14 +27,14 @@ namespace Dolittle.SDK.Aggregates
         /// Initializes a new instance of the <see cref="AggregateOf{T}"/> class.
         /// </summary>
         /// <param name="eventStore">The <see cref="IEventStore" />.</param>
-        /// <param name="aggregateRootFactory">The <see cref="IAggregateRootFactory" />.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="loggerFactory">The <see cref="ILogger" />.</param>
-        public AggregateOf(IEventStore eventStore, IAggregateRootFactory aggregateRootFactory, ILoggerFactory loggerFactory)
+        public AggregateOf(IEventStore eventStore, IEventTypes eventTypes, ILoggerFactory loggerFactory)
         {
+            _eventTypes = eventTypes;
             _eventStore = eventStore;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<AggregateOf<TAggregateRoot>>();
-            _aggregateRootFactory = aggregateRootFactory;
         }
 
         /// <inheritdoc/>
@@ -48,6 +50,7 @@ namespace Dolittle.SDK.Aggregates
                 return new AggregateRootOperations<TAggregateRoot>(
                     _eventStore,
                     aggregateRoot,
+                    _eventTypes,
                     _loggerFactory.CreateLogger<AggregateRootOperations<TAggregateRoot>>());
             }
 
@@ -63,7 +66,7 @@ namespace Dolittle.SDK.Aggregates
                     "Getting aggregate root {AggregateRoot} with event source id {EventSource}",
                     typeof(TAggregateRoot),
                     eventSourceId);
-                aggregateRoot = _aggregateRootFactory.Create<TAggregateRoot>(eventSourceId);
+                aggregateRoot = CreateAggregateRoot(eventSourceId);
                 return true;
             }
             catch (Exception ex)
@@ -94,6 +97,65 @@ namespace Dolittle.SDK.Aggregates
             {
                 _logger.LogTrace("No events to re-apply");
             }
+        }
+
+        TAggregateRoot CreateAggregateRoot(EventSourceId eventSourceId)
+        {
+            var aggregateRootType = typeof(TAggregateRoot);
+            ThrowIfInvalidConstructor(aggregateRootType);
+            var constructor = typeof(TAggregateRoot).GetConstructors().Single();
+
+            var aggregateRoot = GetInstanceFrom(eventSourceId, constructor);
+            ThrowIfCouldNotCreateAggregateRoot(aggregateRoot);
+            return aggregateRoot;
+        }
+
+        TAggregateRoot GetInstanceFrom(EventSourceId id, ConstructorInfo constructor)
+            => constructor.Invoke(
+                new object[]
+                {
+                    id
+                }) as TAggregateRoot;
+
+        void ThrowIfInvalidConstructor(Type type)
+        {
+            ThrowIfNotOneConstructor(type);
+            ThrowIfConstructorIsInvalid(type, type.GetConstructors().Single());
+        }
+
+        void ThrowIfNotOneConstructor(Type type)
+        {
+            if (type.GetConstructors().Length != 1)
+                throw new InvalidAggregateRootConstructorSignature(type, "expected only a single constructor");
+        }
+
+        void ThrowIfConstructorIsInvalid(Type type, ConstructorInfo constructor)
+        {
+            var parameters = constructor.GetParameters();
+            ThrowIfIncorrectNumberOfParameter(type, parameters);
+            ThrowIfIncorrectParameter(type, parameters);
+        }
+
+        void ThrowIfIncorrectParameter(Type type, ParameterInfo[] parameters)
+        {
+            if (parameters.Length != 1 ||
+                parameters[0].ParameterType != typeof(Guid) ||
+                parameters[0].ParameterType != typeof(EventSourceId))
+            {
+                throw new InvalidAggregateRootConstructorSignature(type, $"expected only one parameter and it must be of type {typeof(Guid)} or {typeof(EventSourceId)}");
+            }
+        }
+
+        void ThrowIfIncorrectNumberOfParameter(Type type, ParameterInfo[] parameters)
+        {
+            const int expectedNumberParameters = 1;
+            if (parameters.Length != expectedNumberParameters)
+                throw new InvalidAggregateRootConstructorSignature(type, $"expected {expectedNumberParameters} parameter");
+        }
+
+        void ThrowIfCouldNotCreateAggregateRoot(TAggregateRoot aggregateRoot)
+        {
+            if (aggregateRoot == default) throw new CouldNotCreateAggregateRootInstance(typeof(TAggregateRoot));
         }
     }
 }

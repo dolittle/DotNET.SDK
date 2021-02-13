@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;
 
 namespace Dolittle.SDK.Aggregates
@@ -14,20 +13,17 @@ namespace Dolittle.SDK.Aggregates
     /// </summary>
     public class AggregateRoot
     {
-        readonly IList<UncommittedAggregateEvent> _uncommittedEvents;
-        readonly IEventTypes _eventTypes;
+        readonly IList<AppliedEvent> _appliedEvents;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
         /// </summary>
         /// <param name="eventSourceId">The <see cref="Events.EventSourceId" />.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        public AggregateRoot(EventSourceId eventSourceId, IEventTypes eventTypes)
+        public AggregateRoot(EventSourceId eventSourceId)
         {
             EventSourceId = eventSourceId;
             Version = AggregateRootVersion.Initial;
-            _uncommittedEvents = new List<UncommittedAggregateEvent>();
-            _eventTypes = eventTypes;
+            _appliedEvents = new List<AppliedEvent>();
         }
 
         /// <summary>
@@ -41,9 +37,9 @@ namespace Dolittle.SDK.Aggregates
         public EventSourceId EventSourceId { get; }
 
         /// <summary>
-        /// Gets the <see cref="IEnumerable{T}" /> of events to commit.
+        /// Gets the <see cref="IEnumerable{T}" /> of applied events to commit.
         /// </summary>
-        public IEnumerable<UncommittedAggregateEvent> UncommittedEvents => _uncommittedEvents;
+        public IEnumerable<AppliedEvent> AppliedEvents => _appliedEvents;
 
         /// <summary>
         /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -55,7 +51,7 @@ namespace Dolittle.SDK.Aggregates
         public void Apply(object @event, bool isPublic = false)
         {
             if (@event == null) throw new EventContentCannotBeNull();
-            Apply(@event, _eventTypes.GetFor(@event.GetType()), isPublic);
+            Apply(@event, default(EventType), isPublic);
         }
 
         /// <summary>
@@ -91,8 +87,7 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="isPublic">Whether to apply a public event.</param>
         public void Apply(object @event, EventType eventType, bool isPublic = false)
         {
-            ThrowIfWrongEventType(@event, eventType);
-            _uncommittedEvents.Add(new UncommittedAggregateEvent(eventType, @event, isPublic));
+            _appliedEvents.Add(new AppliedEvent(@event, eventType, isPublic));
             Version++;
             InvokeOnMethod(@event);
         }
@@ -119,17 +114,6 @@ namespace Dolittle.SDK.Aggregates
             if (this.TryGetOnMethod(@event, out var handleMethod))
             {
                 handleMethod.Invoke(this, new[] { @event });
-            }
-        }
-
-        void ThrowIfWrongEventType(object @event, EventType eventType)
-        {
-            var typeOfEvent = @event.GetType();
-            if (_eventTypes.HasFor(typeOfEvent))
-            {
-                var associatedEventType = _eventTypes.GetFor(typeOfEvent);
-                if (eventType != associatedEventType)
-                    throw new ProvidedEventTypeDoesNotMatchEventTypeFromAttribute(eventType, associatedEventType, typeOfEvent);
             }
         }
 
