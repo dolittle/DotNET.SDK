@@ -18,6 +18,6 @@ namespace Dolittle.SDK.Aggregates.for_AggregateRoot.when_reapplying
         It should_be_at_version_three = () => statefull_aggregate_root.Version.ShouldEqual<AggregateRootVersion>(3);
         It should_handle_simple_event_two_times = () => statefull_aggregate_root.AnEventOnCalled.ShouldEqual(2);
         It should_handle_another_event_one_time = () => statefull_aggregate_root.AnotherEventOnCalled.ShouldEqual(1);
-        It should_have_no_uncommitted_events = () => statefull_aggregate_root.UncommittedEvents.ShouldBeEmpty();
+        It should_have_no_uncommitted_events = () => statefull_aggregate_root.AppliedEvents.ShouldBeEmpty();
     }
 }

@@ -10,10 +10,10 @@ namespace Dolittle.SDK.Aggregates.for_AggregateRoot
     {
         static given.StatelessAggregateRoot aggregate_root;
 
-        Because of = () => aggregate_root = new given.StatelessAggregateRoot(event_source_id, event_types);
+        Because of = () => aggregate_root = new given.StatelessAggregateRoot(event_source_id);
 
         It should_be_the_correct_event_source_id = () => aggregate_root.EventSourceId.ShouldEqual(event_source_id);
         It should_have_the_initial_version = () => aggregate_root.Version.ShouldEqual(AggregateRootVersion.Initial);
-        It should_have_no_uncommitted_events = () => aggregate_root.UncommittedEvents.ShouldBeEmpty();
+        It should_have_no_uncommitted_events = () => aggregate_root.AppliedEvents.ShouldBeEmpty();
     }
 }

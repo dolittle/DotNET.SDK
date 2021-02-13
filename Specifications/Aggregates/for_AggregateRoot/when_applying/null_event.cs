@@ -16,6 +16,6 @@ namespace Dolittle.SDK.Aggregates.for_AggregateRoot.when_applying
 
         It should_fail_because_event_content_is_null = () => exception.ShouldBeOfExactType<EventContentCannotBeNull>();
         It should_not_increment_the_version = () => stateless_aggregate_root.Version.ShouldEqual(AggregateRootVersion.Initial);
-        It should_have_no_uncommitted_events = () => stateless_aggregate_root.UncommittedEvents.ShouldBeEmpty();
+        It should_have_no_uncommitted_events = () => stateless_aggregate_root.AppliedEvents.ShouldBeEmpty();
     }
 }

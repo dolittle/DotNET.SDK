@@ -16,6 +16,6 @@ namespace Dolittle.SDK.Aggregates.for_AggregateRoot.when_reapplying
         Because of = () => stateless_aggregate_root.ReApply(events);
 
         It should_be_at_version_three = () => stateless_aggregate_root.Version.ShouldEqual<AggregateRootVersion>(3);
-        It should_have_no_uncommitted_events = () => stateless_aggregate_root.UncommittedEvents.ShouldBeEmpty();
+        It should_have_no_uncommitted_events = () => stateless_aggregate_root.AppliedEvents.ShouldBeEmpty();
     }
 }

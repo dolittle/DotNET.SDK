@@ -18,8 +18,8 @@ namespace Dolittle.SDK.Aggregates.for_AggregateRoot.given
         Establish context = () =>
         {
             event_source_id = "244762a3-38bc-422c-8197-99c0ca33b5d6";
-            stateless_aggregate_root = new StatelessAggregateRoot(event_source_id, event_types);
-            statefull_aggregate_root = new StatefulAggregateRoot(event_source_id, event_types);
+            stateless_aggregate_root = new StatelessAggregateRoot(event_source_id);
+            statefull_aggregate_root = new StatefulAggregateRoot(event_source_id);
         };
     }
 }

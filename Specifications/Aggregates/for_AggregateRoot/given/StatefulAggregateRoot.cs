@@ -9,8 +9,8 @@ namespace Dolittle.SDK.Aggregates.for_AggregateRoot.given
     [AggregateRoot("bab0924f-0dfc-4d79-8bab-ace680d6648c")]
     public class StatefulAggregateRoot : AggregateRoot
     {
-        public StatefulAggregateRoot(EventSourceId eventSource, IEventTypes eventTypes)
-            : base(eventSource, eventTypes)
+        public StatefulAggregateRoot(EventSourceId eventSource)
+            : base(eventSource)
         {
             AnEventOnCalled = 0;
             AnotherEventOnCalled = 0;
