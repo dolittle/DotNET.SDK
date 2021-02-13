@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Aggregates
     /// </summary>
     /// <typeparam name="TAggregate"><see cref="AggregateRoot"/> type.</typeparam>
     public interface IAggregateRootOperations<TAggregate>
-        where TAggregate : class
+        where TAggregate : AggregateRoot
     {
         /// <summary>
         /// Perform an operation on an <see cref="AggregateRoot"/>.
