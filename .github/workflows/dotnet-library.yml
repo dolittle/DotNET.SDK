@@ -26,8 +26,8 @@ jobs:
         dotnet-version: '3.1.301'
     - name: Build
       run: dotnet build --configuration Release
-    - name: Test and report coverage
-      run: dotnet test --configuration Release --no-build /p:CollectCoverage=true /p:CoverletOutput=${{ github.workspace }}/${{ env.COVERAGE_FOLDER }}/ /p:MergeWith=${{ github.workspace }}/${{ env.COVERAGE_FOLDER }}/coverage.json /p:CoverletOutputFormat=\"opencover,json\" -m:1
+    - name: Test
+      run: dotnet test --configuration Release --no-build
     - name: Establish context
       id: context
       uses: dolittle/establish-context-action@v2
@@ -45,26 +45,25 @@ jobs:
       if: ${{ steps.context.outputs.should-publish == 'true' }}
       run: dotnet pack --no-build --configuration Release -o ${{ env.NUGET_OUTPUT }} /p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 
+    - name: Prepend to Changelog
+      if: ${{ steps.context.outputs.should-publish == 'true' }}
+      uses: dolittle/add-to-changelog-action@v2
+      with:
+        version: ${{ steps.increment-version.outputs.next-version }}
+        body: ${{ steps.context.outputs.pr-body }}
+        pr-url: ${{ steps.context.outputs.pr-url }}
+        changelog-path: CHANGELOG.md
+        user-email: build@dolittle.com
+        user-name: dolittle-build
+
     - name: Create GitHub Release
-      uses: dolittle/github-release-action@v1
+      uses: dolittle/github-release-action@v2
       if: ${{ steps.context.outputs.should-publish == 'true' }}
       with:
-        cascading-release: ${{ steps.context.outputs.cascading-release }}
         version: ${{ steps.increment-version.outputs.next-version }}
+        body: ${{ steps.context.outputs.pr-body }}
 
     - name: Push NuGet packages
       if: ${{ steps.context.outputs.should-publish == 'true' }}
       run: dotnet nuget push --skip-duplicate '${{ env.NUGET_OUTPUT }}/*.nupkg' --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-    
-    - name: Upload coverage to CodeCov
-      if: ${{ steps.context.outputs.should-publish == 'true' }}
-      run: bash <(curl -s https://codecov.io/bash) -f "$FILE_PATH"
-      env:
-        FILE_PATH: ${{ github.workspace }}/${{ env.COVERAGE_FOLDER }}/coverage.opencover.xml
-    - name: Cascade
-      uses: dolittle/cascade-action@v1
-      if: ${{ steps.context.outputs.should-publish == 'true' && env.CASCADES != '' }}
-      with:
-        token: ${{ secrets.BUILD_PAT }}
-        version: ${{ steps.increment-version.outputs-next-version }}
-        cascades: ${{ env.CASCADES }}
+

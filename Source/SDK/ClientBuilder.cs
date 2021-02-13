@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -44,7 +43,6 @@ namespace Dolittle.SDK
         Environment _environment;
         CancellationToken _cancellation;
         RetryPolicy _retryPolicy;
-        IContainer _container;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -68,7 +66,6 @@ namespace Dolittle.SDK
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
-            _container = new DefaultContainer();
             _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 
@@ -131,17 +128,6 @@ namespace Dolittle.SDK
         public ClientBuilder WithCancellation(CancellationToken cancellation)
         {
             _cancellation = cancellation;
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the <see cref="IContainer" /> to use for inversion of control.
-        /// </summary>
-        /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
-        /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithContainer(IContainer container)
-        {
-            _container = container;
             return this;
         }
 
@@ -236,8 +222,6 @@ namespace Dolittle.SDK
             var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
 
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _retryPolicy, _loggerFactory.CreateLogger<EventProcessors>());
-            _eventFiltersBuilder.BuildAndRegister(eventProcessors, eventProcessingConverter, _loggerFactory, _cancellation);
-            _eventHandlersBuilder.BuildAndRegister(eventProcessors, eventTypes, eventProcessingConverter, _container, _loggerFactory, _cancellation);
 
             var callContextResolver = new CallContextResolver();
             var eventStoreBuilder = new EventStoreBuilder(
@@ -254,7 +238,17 @@ namespace Dolittle.SDK
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
 
-            return new Client(eventTypes, eventStoreBuilder, eventHorizons, processingCoordinator);
+            return new Client(
+                eventTypes,
+                eventStoreBuilder,
+                eventHorizons,
+                processingCoordinator,
+                eventProcessors,
+                eventProcessingConverter,
+                _eventHandlersBuilder,
+                _eventFiltersBuilder,
+                _loggerFactory,
+                _cancellation);
         }
     }
 }
