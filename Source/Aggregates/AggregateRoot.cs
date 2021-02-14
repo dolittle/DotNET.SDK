@@ -47,12 +47,17 @@ namespace Dolittle.SDK.Aggregates
         /// </summary>
         /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
         /// <param name="event">The event to apply.</param>
-        /// <param name="isPublic">Whether to apply a public event.</param>
-        public void Apply(object @event, bool isPublic = false)
-        {
-            if (@event == null) throw new EventContentCannotBeNull();
-            Apply(@event, default(EventType), isPublic);
-        }
+        public void Apply(object @event)
+            => Apply(@event, default, false);
+
+        /// <summary>
+        /// Apply the public event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
+        /// when <see cref="IAggregateRootOperations{TAggregate}.Perform(System.Action{TAggregate})" /> is invoked on the <see cref="AggregateRoot" />.
+        /// </summary>
+        /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
+        /// <param name="event">The event to apply.</param>
+        public void ApplyPublic(object @event)
+            => Apply(@event, default, true);
 
         /// <summary>
         /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -61,9 +66,18 @@ namespace Dolittle.SDK.Aggregates
         /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
         /// <param name="event">The event to apply.</param>
         /// <param name="eventTypeId">The <see cref="EventTypeId" />.</param>
-        /// <param name="isPublic">Whether to apply a public event.</param>
-        public void Apply(object @event, EventTypeId eventTypeId, bool isPublic = false)
-            => Apply(@event, new EventType(eventTypeId), isPublic);
+        public void Apply(object @event, EventTypeId eventTypeId)
+            => Apply(@event, new EventType(eventTypeId));
+
+        /// <summary>
+        /// Apply the public event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
+        /// when <see cref="IAggregateRootOperations{TAggregate}.Perform(System.Action{TAggregate})" /> is invoked on the <see cref="AggregateRoot" />.
+        /// </summary>
+        /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
+        /// <param name="event">The event to apply.</param>
+        /// <param name="eventTypeId">The <see cref="EventTypeId" />.</param>
+        public void ApplyPublic(object @event, EventTypeId eventTypeId)
+            => ApplyPublic(@event, new EventType(eventTypeId));
 
         /// <summary>
         /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -73,9 +87,19 @@ namespace Dolittle.SDK.Aggregates
         /// <param name="event">The event to apply.</param>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event type.</param>
         /// <param name="generation">The <see cref="Generation" /> of the event type.</param>
-        /// <param name="isPublic">Whether to apply a public event.</param>
-        public void Apply(object @event, EventTypeId eventTypeId, Generation generation, bool isPublic = false)
-            => Apply(@event, new EventType(eventTypeId, generation), isPublic);
+        public void Apply(object @event, EventTypeId eventTypeId, Generation generation)
+            => Apply(@event, new EventType(eventTypeId, generation));
+
+        /// <summary>
+        /// Apply the public event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
+        /// when <see cref="IAggregateRootOperations{TAggregate}.Perform(System.Action{TAggregate})" /> is invoked on the <see cref="AggregateRoot" />.
+        /// </summary>
+        /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
+        /// <param name="event">The event to apply.</param>
+        /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event type.</param>
+        /// <param name="generation">The <see cref="Generation" /> of the event type.</param>
+        public void ApplyPublic(object @event, EventTypeId eventTypeId, Generation generation)
+            => ApplyPublic(@event, new EventType(eventTypeId, generation));
 
         /// <summary>
         /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -84,13 +108,18 @@ namespace Dolittle.SDK.Aggregates
         /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
         /// <param name="event">The event to apply.</param>
         /// <param name="eventType">The <see cref="EventType" />.</param>
-        /// <param name="isPublic">Whether to apply a public event.</param>
-        public void Apply(object @event, EventType eventType, bool isPublic = false)
-        {
-            _appliedEvents.Add(new AppliedEvent(@event, eventType, isPublic));
-            Version++;
-            InvokeOnMethod(@event);
-        }
+        public void Apply(object @event, EventType eventType)
+            => Apply(@event, eventType, false);
+
+        /// <summary>
+        /// Apply the public event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
+        /// when <see cref="IAggregateRootOperations{TAggregate}.Perform(System.Action{TAggregate})" /> is invoked on the <see cref="AggregateRoot" />.
+        /// </summary>
+        /// <remarks>The state of the <see cref="AggregateRoot" /> is changed by calling the appropriate On-methods for the applied events.</remarks>
+        /// <param name="event">The event to apply.</param>
+        /// <param name="eventType">The <see cref="EventType" />.</param>
+        public void ApplyPublic(object @event, EventType eventType)
+            => Apply(@event, eventType, true);
 
         /// <summary>
         /// Re-apply events from the Event Store.
@@ -107,6 +136,14 @@ namespace Dolittle.SDK.Aggregates
                 Version++;
                 if (!this.IsStateless()) InvokeOnMethod(@event.Content);
             }
+        }
+
+        void Apply(object @event, EventType eventType, bool isPublic)
+        {
+            if (@event == null) throw new EventContentCannotBeNull();
+            _appliedEvents.Add(new AppliedEvent(@event, eventType, isPublic));
+            Version++;
+            InvokeOnMethod(@event);
         }
 
         void InvokeOnMethod(object @event)
