@@ -1,3 +1,19 @@
+# [8.1.0] - 2021-2-14 [PR: #36](https://github.com/dolittle/DotNET.SDK/pull/36)
+## Summary
+
+Adds aggregates to the SDK in a barebones matter, agnostic to whether there is IoC or not.
+
+### Added
+
+- System for working with aggregates and aggregate roots
+- AggregateOf<> method on Client for creating an aggregate root operation on a specific aggregate
+- Small sample showcasing the aggregates system
+- Specs around AggregateRoot
+
+### Changed
+- docker-compose in samples run with latest runtime versions
+
+
 # Changelog
 All notable changes to this project will be documented in this file.
 
