@@ -132,25 +132,17 @@ namespace Dolittle.SDK.Aggregates
         void ThrowIfConstructorIsInvalid(Type type, ConstructorInfo constructor)
         {
             var parameters = constructor.GetParameters();
-            ThrowIfIncorrectNumberOfParameter(type, parameters);
             ThrowIfIncorrectParameter(type, parameters);
         }
 
         void ThrowIfIncorrectParameter(Type type, ParameterInfo[] parameters)
         {
             if (parameters.Length != 1 ||
-                parameters[0].ParameterType != typeof(Guid) ||
-                parameters[0].ParameterType != typeof(EventSourceId))
+                (parameters[0].ParameterType != typeof(Guid) &&
+                parameters[0].ParameterType != typeof(EventSourceId)))
             {
                 throw new InvalidAggregateRootConstructorSignature(type, $"expected only one parameter and it must be of type {typeof(Guid)} or {typeof(EventSourceId)}");
             }
-        }
-
-        void ThrowIfIncorrectNumberOfParameter(Type type, ParameterInfo[] parameters)
-        {
-            const int expectedNumberParameters = 1;
-            if (parameters.Length != expectedNumberParameters)
-                throw new InvalidAggregateRootConstructorSignature(type, $"expected {expectedNumberParameters} parameter");
         }
 
         void ThrowIfCouldNotCreateAggregateRoot(TAggregateRoot aggregateRoot)
