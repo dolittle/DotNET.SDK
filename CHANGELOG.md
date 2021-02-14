@@ -1,3 +1,17 @@
+# [8.1.1] - 2021-2-14 [PR: #48](https://github.com/dolittle/DotNET.SDK/pull/48)
+## Summary
+
+Add more spec coverage around aggregates
+
+### Added
+
+- Specs around AggregateOf
+
+### Changed
+
+- Changed the structure a bit for specifications for Aggregates
+
+
 # [8.1.0] - 2021-2-14 [PR: #36](https://github.com/dolittle/DotNET.SDK/pull/36)
 ## Summary
 
