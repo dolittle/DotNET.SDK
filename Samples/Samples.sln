@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kitchen", "Kitchen\Kitchen.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advanced", "Advanced\Advanced.csproj", "{48350006-3777-42D6-ACAE-080747D1050A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregates", "Aggregates\Aggregates.csproj", "{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,17 @@ Global
 		{48350006-3777-42D6-ACAE-080747D1050A}.Release|x64.Build.0 = Release|Any CPU
 		{48350006-3777-42D6-ACAE-080747D1050A}.Release|x86.ActiveCfg = Release|Any CPU
 		{48350006-3777-42D6-ACAE-080747D1050A}.Release|x86.Build.0 = Release|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Debug|x64.Build.0 = Debug|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Release|x64.ActiveCfg = Release|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Release|x64.Build.0 = Release|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6DD51ED4-6CA5-43CC-BF56-10AF4715B26A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

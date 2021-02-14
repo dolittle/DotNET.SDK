@@ -4,7 +4,7 @@
 
 using Dolittle.SDK.Events;
 
-namespace Kitchen 
+namespace Kitchen
 {
     [EventType("1844473f-d714-4327-8b7f-5b3c2bdfc26a")]
     public class DishPrepared
