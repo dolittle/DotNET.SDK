@@ -4,7 +4,7 @@
 using System.Reflection;
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Aggregates.for_AggregateRoot.given
+namespace Dolittle.SDK.Aggregates.given
 {
     [AggregateRoot("bab0924f-0dfc-4d79-8bab-ace680d6648c")]
     public class StatefulAggregateRoot : AggregateRoot
