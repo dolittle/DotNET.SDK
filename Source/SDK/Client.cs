@@ -4,12 +4,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Services;
@@ -125,6 +127,29 @@ namespace Dolittle.SDK
                 _cancellation);
             return _processingCoordinator.Completion;
         }
+
+        /// <summary>
+        /// Gets the <see cref="IAggregateRootOperations{TAggregate}" /> for a new aggregate of the specificied <typeparamref name="TAggregateRoot"/>.
+        /// </summary>
+        /// <param name="buildEventStore">The <see cref="Func{T, TResult}" /> for creating the <see cref="IEventStore" />.</param>
+        /// <typeparam name="TAggregateRoot">The <see cref="Type" /> of the <see cref="AggregateRoot" />.</typeparam>
+        /// <returns>The <see cref="IAggregateRootOperations{TAggregate}" />.</returns>
+        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<EventStoreBuilder, IEventStore> buildEventStore)
+            where TAggregateRoot : AggregateRoot
+            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _loggerFactory)
+                    .Create();
+
+        /// <summary>
+        /// Gets the <see cref="IAggregateRootOperations{TAggregate}" /> for a new aggregate of the specificied <typeparamref name="TAggregateRoot"/>.
+        /// </summary>
+        /// <param name="eventSource">The <see cref="EventSourceId" />.</param>
+        /// <param name="buildEventStore">The <see cref="Func{T, TResult}" /> for creating the <see cref="IEventStore" />.</param>
+        /// <typeparam name="TAggregateRoot">The <see cref="Type" /> of the <see cref="AggregateRoot" />.</typeparam>
+        /// <returns>The <see cref="IAggregateRootOperations{TAggregate}" />.</returns>
+        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<EventStoreBuilder, IEventStore> buildEventStore)
+            where TAggregateRoot : AggregateRoot
+            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _loggerFactory)
+                    .Get(eventSource);
 
         /// <inheritdoc/>
         public void Dispose()
