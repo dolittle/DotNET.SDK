@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Events.Builders
@@ -105,6 +107,21 @@ namespace Dolittle.SDK.Events.Builders
         }
 
         /// <summary>
+        /// Registers all event type classes from an <see cref="Assembly" />.
+        /// </summary>
+        /// <param name="assembly">The <see cref="Assembly" /> to register the event type classes from.</param>
+        /// <returns>The <see cref="EventTypesBuilder" /> for continuation.</returns>
+        public EventTypesBuilder RegisterAllFrom(Assembly assembly)
+        {
+            foreach (var type in assembly.ExportedTypes.Where(IsEventType))
+            {
+                Register(type);
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Adds all the <see cref="Type" /> to <see cref="EventType" /> associations to the provided <see cref="IEventTypes" />.
         /// </summary>
         /// <param name="eventTypes">The <see cref="IEventTypes"/> to add associations to.</param>
@@ -115,6 +132,9 @@ namespace Dolittle.SDK.Events.Builders
                 eventTypes.Associate(type, eventType);
             }
         }
+
+        bool IsEventType(Type type)
+            => type.GetCustomAttributes(typeof(EventTypeAttribute), true).FirstOrDefault() as EventTypeAttribute != default;
 
         void AddAssociation(Type type, EventType eventType)
         {
