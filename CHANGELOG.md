@@ -1,3 +1,13 @@
+# [8.2.0] - 2021-2-17 [PR: #49](https://github.com/dolittle/DotNET.SDK/pull/49)
+## Summary
+
+Adds the ability to register event handlers and event types from an Assembly.
+
+### Added
+
+- RegisterAllFrom(Assembly) to the EventHandlersBuilder and EventTypesBuilder
+
+
 # [8.1.1] - 2021-2-14 [PR: #48](https://github.com/dolittle/DotNET.SDK/pull/48)
 ## Summary
 
