@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Processing;
@@ -63,6 +65,21 @@ namespace Dolittle.SDK.Events.Handling.Builder
         }
 
         /// <summary>
+        /// Registers all event handler classes from an <see cref="Assembly" />.
+        /// </summary>
+        /// <param name="assembly">The <see cref="Assembly" /> to register the event handler classes from.</param>
+        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
+        public EventHandlersBuilder RegisterAllFrom(Assembly assembly)
+        {
+            foreach (var type in assembly.ExportedTypes.Where(IsEventHandler))
+            {
+                RegisterEventHandler(type);
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Build and registers event handlers.
         /// </summary>
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
@@ -84,5 +101,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, loggerFactory, cancellation);
             }
         }
+
+        bool IsEventHandler(Type type)
+            => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() as EventHandlerAttribute != default;
     }
 }
