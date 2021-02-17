@@ -19,6 +19,7 @@ namespace Dolittle.SDK.Events.Store
         public static EventContext GetEventContext(this CommittedEvent @event, ExecutionContext currentExecutionContext)
             => new EventContext(
                 @event.EventLogSequenceNumber,
+                @event.EventType,
                 @event.EventSource,
                 @event.Occurred,
                 @event.ExecutionContext,
