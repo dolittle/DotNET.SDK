@@ -16,6 +16,7 @@ namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling.given
         {
             event_context = new EventContext(
                 3,
+                new EventType("8b9d6262-0e37-4f87-934a-1d6bccf8fc55"),
                 "7d387632-68d8-4187-aa8a-b7d191a1b130",
                 DateTimeOffset.UtcNow,
                 new Execution.ExecutionContext(
