@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Services;
@@ -66,7 +67,10 @@ namespace Dolittle.SDK.Events.Store.Builders
         /// <returns>An <see cref="IEventStore"/>.</returns>
         public IEventStore ForTenant(TenantId tenantId)
         {
-            var executionContext = _executionContext.ForTenant(tenantId);
+            var executionContext = _executionContext
+                .ForTenant(tenantId)
+                .ForCorrelation(Guid.NewGuid());
+
             return new EventStore(
                 CreateEventCommitter(executionContext),
                 CreateAggregateEventCommitter(executionContext),
