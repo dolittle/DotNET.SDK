@@ -1,3 +1,16 @@
+# [8.3.1] - 2021-2-22 [PR: #51](https://github.com/dolittle/DotNET.SDK/pull/51)
+## Summary
+
+The CorrelationId of the ExecutionContext was never changed, which means that everything would happen under the same CorrelationId. 
+
+This fixes it by setting the CorrelationId to a new guid whenever doing ForTenant on EventStoreBuilder  
+
+
+### Changed
+
+- Create new execution context with random guid when doing ForTenant on EventStoreBuilder
+
+
 # [8.3.0] - 2021-2-17 [PR: #50](https://github.com/dolittle/DotNET.SDK/pull/50)
 ## Summary
 
