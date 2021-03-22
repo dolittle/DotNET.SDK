@@ -20,7 +20,7 @@ namespace Kitchen
                 .Build();
 
             client
-                .AggregateOf<Kitchen>("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9", _ => _.ForTenant("900893e7-c4cc-4873-8032-884e965e4b97"))
+                .AggregateOf<Kitchen>("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9", _ => _.ForTenant(TenantId.Development))
                 .Perform(kitchen => kitchen.PrepareDish("Bean Blaster Taco", "Mr. Taco"));
 
             // Blocks until the EventHandlers are finished, i.e. forever
