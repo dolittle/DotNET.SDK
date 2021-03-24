@@ -1,3 +1,13 @@
+# [8.3.2] - 2021-3-24 [PR: #52](https://github.com/dolittle/DotNET.SDK/pull/52)
+## Summary
+
+Following async/await guidelines the RunContinuationsAsynchronously flag should always be set when creating TaskCompletionSource
+
+### Changed
+
+- Create all TaskCompletionSource with TaskCreationOptions.RunContinuationsAsynchronously
+
+
 # [8.3.1] - 2021-2-22 [PR: #51](https://github.com/dolittle/DotNET.SDK/pull/51)
 ## Summary
 
