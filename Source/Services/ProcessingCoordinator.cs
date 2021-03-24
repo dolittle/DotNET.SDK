@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Services
     /// </summary>
     public class ProcessingCoordinator : ICoordinateProcessing, IDisposable
     {
-        readonly TaskCompletionSource<Unit> _taskCompletionSource = new TaskCompletionSource<Unit>();
+        readonly TaskCompletionSource<Unit> _taskCompletionSource = new TaskCompletionSource<Unit>(TaskCreationOptions.RunContinuationsAsynchronously);
         readonly Subject<IObservable<Unit>> _processors = new Subject<IObservable<Unit>>();
         readonly ILogger _logger;
         readonly CancellationToken _cancellationToken;
