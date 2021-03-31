@@ -48,8 +48,7 @@ namespace Dolittle.SDK.Projections.Builder
         public ProjectionsBuilder RegisterProjection(Type type)
         {
             var builder = Activator.CreateInstance(
-                    typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
-                    type) as ICanBuildAndRegisterAProjection;
+                    typeof(ConventionProjectionBuilder<>).MakeGenericType(type)) as ICanBuildAndRegisterAProjection;
             _builders.Add(builder);
             return this;
         }

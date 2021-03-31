@@ -89,8 +89,9 @@ namespace Dolittle.SDK.Projections.Builder
             if (@event is TEvent typedEvent)
             {
                 var resultType = await _method(readModel, typedEvent, context).TryTask().ConfigureAwait(false);
-                if (resultType.Exception != null) return new Try<ProjectionResult<TProjection>>(readModel);
-                return resultType.Exception;
+                if (resultType.Exception != null) return resultType.Exception;
+                var result = new Try<ProjectionResult<TProjection>>(readModel);
+                return result;
             }
 
             return new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());

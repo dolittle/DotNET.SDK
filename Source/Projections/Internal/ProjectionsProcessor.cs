@@ -60,7 +60,7 @@ namespace Dolittle.SDK.Projections.Internal
                         KeySelector = new ProjectionEventKeySelector
                         {
                             Type = _.KeySelector.Type.ToProtobuf(),
-                            Expression = _.KeySelector.Expression
+                            Expression = _.KeySelector.Expression ?? string.Empty
                         }
                     };
                 }).ToArray());

@@ -38,7 +38,7 @@ namespace Dolittle.SDK.Projections.Builder
 
             if (!HasParameterlessConstructor())
             {
-                logger.LogWarning("The projection class {ProjectionType} has no deafult/parameterless constructor");
+                logger.LogWarning("The projection class {ProjectionType} has no deafult/parameterless constructor", _projectionType);
                 return;
             }
 
@@ -74,7 +74,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         bool HasParameterlessConstructor()
-            => _projectionType.GetConstructor(Type.EmptyTypes) == null;
+            => _projectionType.GetConstructors().Any(t => t.GetParameters().Length == 0);
 
         bool TryBuildOnMethods(
             ProjectionId projectionId,
