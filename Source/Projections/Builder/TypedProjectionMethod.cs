@@ -9,11 +9,11 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// An implementation of <see cref="IOnMethod{TReadModel}" /> for a projection method on an event of a specific type.
+    /// An implementation of <see cref="IProjectionMethod{TReadModel}" /> for a projection method on an event of a specific type.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
     /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
-    public class TypedProjectionMethod<TReadModel, TEvent> : IOnMethod<TReadModel>
+    public class TypedProjectionMethod<TReadModel, TEvent> : IProjectionMethod<TReadModel>
         where TReadModel : class, new()
         where TEvent : class
     {

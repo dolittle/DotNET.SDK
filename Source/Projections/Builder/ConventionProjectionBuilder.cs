@@ -56,7 +56,7 @@ namespace Dolittle.SDK.Projections.Builder
                 scopeId,
                 _projectionType);
 
-            var eventTypesToMethods = new Dictionary<EventType, IOnMethod<TProjection>>();
+            var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TProjection>>();
 
             if (!TryBuildOnMethods(projectionId, eventTypes, eventTypesToMethods, logger))
             {
@@ -81,7 +81,7 @@ namespace Dolittle.SDK.Projections.Builder
         bool TryBuildOnMethods(
             ProjectionId projectionId,
             IEventTypes eventTypes,
-            IDictionary<EventType, IOnMethod<TProjection>> eventTypesToMethods,
+            IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
             ILogger logger)
         {
             var allMethods = _projectionType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
@@ -117,7 +117,7 @@ namespace Dolittle.SDK.Projections.Builder
         bool TryAddDecoratedOnMethods(
             IEnumerable<MethodInfo> methods,
             ProjectionId projectionId,
-            IDictionary<EventType, IOnMethod<TProjection>> eventTypesToMethods,
+            IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
             ILogger logger)
         {
             var allMethodsAdded = true;
@@ -181,7 +181,7 @@ namespace Dolittle.SDK.Projections.Builder
             IEnumerable<MethodInfo> methods,
             ProjectionId projectionId,
             IEventTypes eventTypes,
-            IDictionary<EventType, IOnMethod<TProjection>> eventTypesToMethods,
+            IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
             ILogger logger)
         {
             var allMethodsAdded = true;
@@ -253,31 +253,45 @@ namespace Dolittle.SDK.Projections.Builder
             return allMethodsAdded;
         }
 
-        IOnMethod<TProjection> CreateUntypedOnMethod(MethodInfo method, EventType eventType, KeySelector keySelector)
+        IProjectionMethod<TProjection> CreateUntypedOnMethod(MethodInfo method, EventType eventType, KeySelector keySelector)
         {
-            var projectionSignatureType = method.ReturnType == typeof(Task) ?
-                                    typeof(TaskProjectionMethodSignature<>)
-                                    : typeof(SyncProjectionMethodSignature<>);
+            var projectionSignatureType = GetSignature(method);
             var projectionSignature = method.CreateDelegate(projectionSignatureType.MakeGenericType(_projectionType), null);
             return Activator.CreateInstance(
                 typeof(ClassProjectionMethod<>).MakeGenericType(_projectionType),
                 projectionSignature,
                 eventType,
-                keySelector) as IOnMethod<TProjection>;
+                keySelector) as IProjectionMethod<TProjection>;
         }
 
-        IOnMethod<TProjection> CreateTypedOnMethod(Type eventParameterType, MethodInfo method, KeySelector keySelector)
+        IProjectionMethod<TProjection> CreateTypedOnMethod(Type eventParameterType, MethodInfo method, KeySelector keySelector)
         {
-            var projectionSignatureGenericTypeDefinition = method.ReturnType == typeof(Task) ?
-                                                typeof(TaskProjectionMethodSignature<,>)
-                                                : typeof(SyncProjectionMethodSignature<,>);
+            var projectionSignatureGenericTypeDefinition = GetTypedSignature(method);
             var projectionSignatureType = projectionSignatureGenericTypeDefinition.MakeGenericType(_projectionType, eventParameterType);
             var projectionSignature = method.CreateDelegate(projectionSignatureType, null);
 
             return Activator.CreateInstance(
                 typeof(TypedClassProjectionMethod<,>).MakeGenericType(_projectionType, eventParameterType),
                 projectionSignature,
-                keySelector) as IOnMethod<TProjection>;
+                keySelector) as IProjectionMethod<TProjection>;
+        }
+
+        Type GetSignature(MethodInfo method)
+        {
+            if (MethodReturnsTask(method)) return typeof(TaskProjectionMethodSignature<>);
+            if (MethodReturnsTaskResultType(method)) return typeof(TaskResultProjectionMethodSignature<>);
+            if (MethodReturnsVoid(method)) return typeof(SyncProjectionMethodSignature<>);
+            if (MethodReturnsResultType(method)) return typeof(SyncResultProjectionMethodSignature<>);
+            throw new InvalidProjectionMethodReturnType(method.ReturnType);
+        }
+
+        Type GetTypedSignature(MethodInfo method)
+        {
+            if (MethodReturnsTask(method)) return typeof(TaskProjectionMethodSignature<,>);
+            if (MethodReturnsTaskResultType(method)) return typeof(TaskResultProjectionMethodSignature<,>);
+            if (MethodReturnsVoid(method)) return typeof(SyncProjectionMethodSignature<,>);
+            if (MethodReturnsResultType(method)) return typeof(SyncResultProjectionMethodSignature<,>);
+            throw new InvalidProjectionMethodReturnType(method.ReturnType);
         }
 
         bool ParametersAreOkay(MethodInfo method, ILogger logger)
@@ -303,15 +317,18 @@ namespace Dolittle.SDK.Projections.Builder
                     typeof(ProjectionContext));
             }
 
-            if (MethodReturnsAsyncVoid(method) || (!MethodReturnsVoid(method) && !MethodReturnsTask(method)))
+            if (MethodReturnsAsyncVoid(method)
+                || (!MethodReturnsVoid(method) && !MethodReturnsResultType(method) && !MethodReturnsTask(method) && !MethodReturnsTaskResultType(method)))
             {
                 okay = false;
                 logger.LogWarning(
-                    "Projection method {Method} on projection {ProjectionType} needs to return either {Void} or {Task}",
+                    "Projection method {Method} on projection {ProjectionType} needs to return either {Void}, {ResultType}, {Task}, {TaskResultType}",
                     method,
                     _projectionType,
                     typeof(void),
-                    typeof(Task));
+                    typeof(ProjectionResultType),
+                    typeof(Task),
+                    typeof(Task<ProjectionResultType>));
             }
 
             return okay;
@@ -380,8 +397,14 @@ namespace Dolittle.SDK.Projections.Builder
         bool MethodReturnsTask(MethodInfo method)
             => method.ReturnType == typeof(Task);
 
+        bool MethodReturnsTaskResultType(MethodInfo method)
+            => method.ReturnType == typeof(Task<ProjectionResultType>);
+
         bool MethodReturnsVoid(MethodInfo method)
             => method.ReturnType == typeof(void);
+
+        bool MethodReturnsResultType(MethodInfo method)
+            => method.ReturnType == typeof(ProjectionResultType);
 
         bool MethodReturnsAsyncVoid(MethodInfo method)
         {

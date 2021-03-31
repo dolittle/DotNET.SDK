@@ -9,22 +9,22 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// An implementation of <see cref="IOnMethod{TReadModel}" />.
+    /// An implementation of <see cref="IProjectionMethod{TReadModel}" />.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    public class OnMethod<TReadModel> : IOnMethod<TReadModel>
+    public class ProjectionMethod<TReadModel> : IProjectionMethod<TReadModel>
         where TReadModel : class, new()
     {
         readonly TaskProjectionSignature<TReadModel> _method;
         readonly EventType _eventType;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OnMethod{TReadModel}"/> class.
+        /// Initializes a new instance of the <see cref="ProjectionMethod{TReadModel}"/> class.
         /// </summary>
         /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
         /// <param name="eventType">The <see cref="EventType" />.</param>
         /// <param name="keySelector">The <see cref="KeySelector" />.</param>
-        public OnMethod(TaskProjectionSignature<TReadModel> method, EventType eventType, KeySelector keySelector)
+        public ProjectionMethod(TaskProjectionSignature<TReadModel> method, EventType eventType, KeySelector keySelector)
         {
             _method = method;
             _eventType = eventType;
@@ -32,12 +32,12 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OnMethod{TReadModel}"/> class.
+        /// Initializes a new instance of the <see cref="ProjectionMethod{TReadModel}"/> class.
         /// </summary>
         /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
         /// <param name="eventType">The <see cref="EventType" />.</param>
         /// <param name="keySelector">The <see cref="KeySelector" />.</param>
-        public OnMethod(SyncProjectionSignature<TReadModel> method, EventType eventType, KeySelector keySelector)
+        public ProjectionMethod(SyncProjectionSignature<TReadModel> method, EventType eventType, KeySelector keySelector)
             : this(
                 (readModel, @event, context) => Task.FromResult(method(readModel, @event, context)),
                 eventType,

@@ -70,7 +70,7 @@ namespace Dolittle.SDK.Projections.Builder
     /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-    public delegate Task<ProjectionResult<TProjection>> TaskProjectionMethodSignature<TProjection>(TProjection instanceAndReadModel, object @event, ProjectionContext projectionContext)
+    public delegate Task TaskProjectionMethodSignature<TProjection>(TProjection instanceAndReadModel, object @event, ProjectionContext projectionContext)
         where TProjection : class, new();
 
     /// <summary>
@@ -81,7 +81,28 @@ namespace Dolittle.SDK.Projections.Builder
     /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-    public delegate Task<ProjectionResult<TProjection>> TaskProjectionMethodSignature<TProjection, TEvent>(TProjection instanceAndReadModel, TEvent @event, ProjectionContext projectionContext)
+    public delegate Task TaskProjectionMethodSignature<TProjection, TEvent>(TProjection instanceAndReadModel, TEvent @event, ProjectionContext projectionContext)
+        where TProjection : class, new()
+        where TEvent : class;
+
+    /// <summary>
+    /// Represents the signature for a projection.
+    /// </summary>
+    /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
+    /// <param name="event">The event to handle.</param>
+    /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
+    public delegate Task<ProjectionResultType> TaskResultProjectionMethodSignature<TProjection>(TProjection instanceAndReadModel, object @event, ProjectionContext projectionContext)
+        where TProjection : class, new();
+
+    /// <summary>
+    /// Represents the signature for a projection.
+    /// </summary>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
+    /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
+    /// <param name="event">The event to handle.</param>
+    /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
+    public delegate Task<ProjectionResultType> TaskResultProjectionMethodSignature<TProjection, TEvent>(TProjection instanceAndReadModel, TEvent @event, ProjectionContext projectionContext)
         where TProjection : class, new()
         where TEvent : class;
 
@@ -92,7 +113,7 @@ namespace Dolittle.SDK.Projections.Builder
     /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-    public delegate ProjectionResult<TProjection> SyncProjectionMethodSignature<TProjection>(TProjection instanceAndReadModel, object @event, ProjectionContext projectionContext)
+    public delegate void SyncProjectionMethodSignature<TProjection>(TProjection instanceAndReadModel, object @event, ProjectionContext projectionContext)
         where TProjection : class, new();
 
     /// <summary>
@@ -103,7 +124,29 @@ namespace Dolittle.SDK.Projections.Builder
     /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
     /// <param name="event">The event to handle.</param>
     /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-    public delegate ProjectionResult<TProjection> SyncProjectionMethodSignature<TProjection, TEvent>(TProjection instanceAndReadModel, TEvent @event, ProjectionContext projectionContext)
+    public delegate void SyncProjectionMethodSignature<TProjection, TEvent>(TProjection instanceAndReadModel, TEvent @event, ProjectionContext projectionContext)
+        where TProjection : class, new()
+        where TEvent : class;
+
+    /// <summary>
+    /// Represents the signature for a projection.
+    /// </summary>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
+    /// <param name="event">The event to handle.</param>
+    /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
+    public delegate ProjectionResultType SyncResultProjectionMethodSignature<TProjection>(TProjection instanceAndReadModel, object @event, ProjectionContext projectionContext)
+        where TProjection : class, new();
+
+    /// <summary>
+    /// Represents the signature for a projection.
+    /// </summary>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
+    /// <param name="instanceAndReadModel">The instance of the projection to invoke the method on and the read model.</param>
+    /// <param name="event">The event to handle.</param>
+    /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
+    public delegate ProjectionResultType SyncResultProjectionMethodSignature<TProjection, TEvent>(TProjection instanceAndReadModel, TEvent @event, ProjectionContext projectionContext)
         where TProjection : class, new()
         where TEvent : class;
 }

@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Projections.Builder
     public class ProjectionMethodsForReadModelBuilder<TReadModel> : ICanBuildAndRegisterAProjection
         where TReadModel : class, new()
     {
-        readonly IList<IOnMethod<TReadModel>> _methods = new List<IOnMethod<TReadModel>>();
+        readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
         readonly ProjectionId _projectionId;
         readonly ScopeId _scopeId;
 
@@ -72,7 +72,7 @@ namespace Dolittle.SDK.Projections.Builder
         /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
         public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
         {
-            _methods.Add(new OnMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
+            _methods.Add(new ProjectionMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
             return this;
         }
 
@@ -85,7 +85,7 @@ namespace Dolittle.SDK.Projections.Builder
         /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
         public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
         {
-            _methods.Add(new OnMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
+            _methods.Add(new ProjectionMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
             return this;
         }
 
@@ -135,10 +135,10 @@ namespace Dolittle.SDK.Projections.Builder
         /// Builds the projection methods.
         /// </summary>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="eventTypesToMethods">The output <see cref="IDictionary{TKey, TValue}" /> of <see cref="EventType" /> to <see cref="IOnMethod{TReadModel}" /> map.</param>
+        /// <param name="eventTypesToMethods">The output <see cref="IDictionary{TKey, TValue}" /> of <see cref="EventType" /> to <see cref="IProjectionMethod{TReadModel}" /> map.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         /// <returns>Whether all the projection methods could be built.</returns>
-        public bool TryAddOnMethods(IEventTypes eventTypes, IDictionary<EventType, IOnMethod<TReadModel>> eventTypesToMethods, ILogger logger)
+        public bool TryAddOnMethods(IEventTypes eventTypes, IDictionary<EventType, IProjectionMethod<TReadModel>> eventTypesToMethods, ILogger logger)
         {
             var okay = true;
             foreach (var method in _methods)
@@ -167,7 +167,7 @@ namespace Dolittle.SDK.Projections.Builder
             CancellationToken cancellation)
         {
             var logger = loggerFactory.CreateLogger<ProjectionMethodsForReadModelBuilder<TReadModel>>();
-            var eventTypesToMethods = new Dictionary<EventType, IOnMethod<TReadModel>>();
+            var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TReadModel>>();
             if (!TryAddOnMethods(eventTypes, eventTypesToMethods, logger))
             {
                 logger.LogWarning(

@@ -9,13 +9,13 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// An implementation of <see cref="IOnMethod{TProjection}" /> that invokes a method on a projection instance for an event of a specific type.
+    /// An implementation of <see cref="IProjectionMethod{TProjection}" /> that invokes a method on a projection instance for an event of a specific type.
     /// </summary>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
-    public class ClassProjectionMethod<TProjection> : IOnMethod<TProjection>
+    public class ClassProjectionMethod<TProjection> : IProjectionMethod<TProjection>
         where TProjection : class, new()
     {
-        readonly TaskProjectionMethodSignature<TProjection> _method;
+        readonly TaskResultProjectionMethodSignature<TProjection> _method;
         readonly EventType _eventType;
 
         /// <summary>
@@ -25,6 +25,21 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
         /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
         public ClassProjectionMethod(TaskProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
+            : this(
+                (TProjection instanceAndReadModel, object @event, ProjectionContext context)
+                    => method(instanceAndReadModel, @event, context).ContinueWith(_ => ProjectionResultType.Replace, TaskScheduler.Default),
+                eventType,
+                keySelector)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassProjectionMethod{TEventHandler}"/> class.
+        /// </summary>
+        /// <param name="method">The <see cref="TaskResultProjectionMethodSignature{TProjection}"/> method to invoke.</param>
+        /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
+        /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
+        public ClassProjectionMethod(TaskResultProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
         {
             _method = method;
             KeySelector = keySelector;
@@ -38,6 +53,24 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
         /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
         public ClassProjectionMethod(SyncProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
+            : this(
+                (TProjection instanceAndReadModel, object @event, ProjectionContext context) =>
+                {
+                    method(instanceAndReadModel, @event, context);
+                    return ProjectionResultType.Replace;
+                },
+                eventType,
+                keySelector)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassProjectionMethod{TEventHandler}"/> class.
+        /// </summary>
+        /// <param name="method">The <see cref="SyncResultProjectionMethodSignature{TEvent, TProjection}" /> method to invoke.</param>
+        /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
+        /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
+        public ClassProjectionMethod(SyncResultProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
             : this(
                 (TProjection instanceAndReadModel, object @event, ProjectionContext context)
                     => Task.FromResult(method(instanceAndReadModel, @event, context)),
@@ -54,7 +87,11 @@ namespace Dolittle.SDK.Projections.Builder
             => _eventType;
 
         /// <inheritdoc/>
-        public Task<Try<ProjectionResult<TProjection>>> TryOn(TProjection readModel, object @event, ProjectionContext context)
-            => _method(readModel, @event, context).TryTask();
+        public async Task<Try<ProjectionResult<TProjection>>> TryOn(TProjection readModel, object @event, ProjectionContext context)
+        {
+            var resultType = await _method(readModel, @event, context).TryTask().ConfigureAwait(false);
+            if (resultType.Exception != null) return new Try<ProjectionResult<TProjection>>(readModel);
+            return resultType.Exception;
+        }
     }
 }

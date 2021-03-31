@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Projections
     public class Projection<TReadModel> : IProjection<TReadModel>
         where TReadModel : class, new()
     {
-        readonly IDictionary<EventType, IOnMethod<TReadModel>> _onMethods;
+        readonly IDictionary<EventType, IProjectionMethod<TReadModel>> _onMethods;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Projection{TReadModel}"/> class.
@@ -28,7 +28,7 @@ namespace Dolittle.SDK.Projections
         public Projection(
             ProjectionId identifier,
             ScopeId scopeId,
-            IDictionary<EventType, IOnMethod<TReadModel>> onMethods)
+            IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods)
         {
             _onMethods = onMethods;
             Identifier = identifier;

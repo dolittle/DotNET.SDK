@@ -8,10 +8,10 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// Defines an on method.
+    /// Defines a projection method.
     /// </summary>
     /// <typeparam name="TReadModel">The type of the read model.</typeparam>
-    public interface IOnMethod<TReadModel>
+    public interface IProjectionMethod<TReadModel>
         where TReadModel : class, new()
     {
         /// <summary>

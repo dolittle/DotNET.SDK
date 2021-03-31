@@ -6,7 +6,7 @@ using System;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// Exception that gets thrown when a <see cref="TypedEventHandlerMethod{T}" /> is invoked on an event of the wrong type.
+    /// Exception that gets thrown when a <see cref="TypedProjectionMethod{TReadModel, TEvent}" /> is invoked on an event of the wrong type.
     /// </summary>
     public class TypedProjectionMethodInvokedOnEventOfWrongType : Exception
     {
