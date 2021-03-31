@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Projections.Internal;
@@ -31,7 +30,6 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            IContainer container,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {

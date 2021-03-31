@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Dolittle.SDK.Artifacts;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Projections.Internal;
@@ -162,7 +161,6 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            IContainer container,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {

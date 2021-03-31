@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.Logging;
@@ -63,9 +62,8 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            IContainer container,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
-            => _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, loggerFactory, cancellation);
+            => _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, loggerFactory, cancellation);
     }
 }
