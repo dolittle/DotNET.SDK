@@ -9,6 +9,7 @@ namespace Kitchen
     [EventType("bc6a3511-aea8-421a-b7da-4e8df30be966")]
     public class ChefFired
     {
-        public string Chef;
+        public ChefFired(string chef) => Chef = chef;
+        public string Chef { get; }
     }
 }

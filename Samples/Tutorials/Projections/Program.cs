@@ -3,6 +3,7 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/projections/
 
 using Dolittle.SDK;
+using Dolittle.SDK.Projections;
 using Dolittle.SDK.Tenancy;
 
 namespace Kitchen
@@ -22,17 +23,17 @@ namespace Kitchen
                 {
                     projections.CreateProjection("4a4c5b13-d4dd-4665-a9df-27b8e9b2054c")
                         .ForReadModel<Chef>()
-                        .on(DishPrepared, _ => _.KeyFromProperty(_ => _.Chef), (chef, @event, ctx) =>
+                        .On<DishPrepared>(_ => _.KeyFromProperty(_ => _.Chef), (chef, @event, ctx) =>
                         {
                             chef.Name = @event.Chef;
                             chef.Dishes.Add(@event.Dish);
                             return chef;
                         })
-                        .on(ChefFired, _ => _.KeyFromProperty(_ => _.Chef), (chef, @event, ctx) =>
+                        .On<ChefFired>(_ => _.KeyFromProperty(_ => _.Chef), (chef, @event, ctx) =>
                         {
                             return ProjectionResult<Chef>.Delete;
                         });
-                    projections.Register<Menu>();
+                    projections.RegisterProjection<Menu>();
                 })
                 .Build();
 
@@ -40,7 +41,7 @@ namespace Kitchen
             var avocadoArtillery = new DishPrepared("Avocado Artillery Tortilla", "Mr. Taco");
             var chiliCannon = new DishPrepared("Chili Cannon Wrap", "Ms. TexMex");
             var mrTacoFired = new ChefFired("Mr. Taco");
-
+            new Menu();
             client.EventStore
                 .ForTenant(TenantId.Development)
                 .Commit(eventsBuilder =>
