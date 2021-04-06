@@ -49,6 +49,7 @@ namespace Dolittle.SDK
         /// <param name="eventHandlersBuilder">The <see cref="EventHandlersBuilder" />.</param>
         /// <param name="filtersBuilder">The <see cref="EventFiltersBuilder" />.</param>
         /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
+        /// <param name="projectionStoreBuilder">The <see cref="Projections.Store.Builders.ProjectionsBuilder" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -61,6 +62,7 @@ namespace Dolittle.SDK
             EventHandlersBuilder eventHandlersBuilder,
             EventFiltersBuilder filtersBuilder,
             ProjectionsBuilder projectionsBuilder,
+            Projections.Store.Builders.ProjectionsBuilder projectionStoreBuilder,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -73,6 +75,7 @@ namespace Dolittle.SDK
             _eventHandlersBuilder = eventHandlersBuilder;
             _filtersBuilder = filtersBuilder;
             _projectionsBuilder = projectionsBuilder;
+            Projections = projectionStoreBuilder;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -87,6 +90,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="EventStoreBuilder" />.
         /// </summary>
         public EventStoreBuilder EventStore { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Projections.Store.Builders.ProjectionsBuilder" />.
+        /// </summary>
+        public Projections.Store.Builders.ProjectionsBuilder Projections { get; }
 
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.
