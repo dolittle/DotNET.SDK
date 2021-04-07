@@ -31,7 +31,7 @@ namespace Dolittle.SDK.Projections.Store.Converters
         /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
         /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
         /// <returns>A value indicating whether or not the conversion was successful.</returns>
-        bool TryConvert<TProjection>(IReadOnlyList<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
+        bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
             where TProjection : class, new();
     }
 }
