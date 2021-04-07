@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// Represents a building event handler methods.
+    /// Represents a builder for building projection on-methods.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
     public class ProjectionMethodsForReadModelBuilder<TReadModel> : ICanBuildAndRegisterAProjection
