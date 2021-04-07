@@ -7,7 +7,6 @@ using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
-using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Projections.Store.Builders
 {
