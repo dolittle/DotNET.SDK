@@ -31,7 +31,7 @@ namespace Dolittle.SDK.Projections.Builder
         where TReadModel : class, new();
 
     /// <summary>
-    /// Represents the signature for a projection.
+    /// Represents the signature for a projection on-method.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
     /// <typeparam name="TEvent">The <see cref="Type" /> of the event to handle.</typeparam>
