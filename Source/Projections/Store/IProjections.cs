@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Projections.Store
     /// <summary>
     /// Defines an interface for working directly with Projections.
     /// </summary>
-    public interface IProjections
+    public interface IProjectionStore
     {
         /// <summary>
         /// Gets a projection state.
