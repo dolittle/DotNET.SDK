@@ -366,11 +366,11 @@ namespace Dolittle.SDK.Projections.Builder
         {
             projectionId = default;
             scopeId = default;
-            var eventHandler = _projectionType.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() as ProjectionAttribute;
-            if (eventHandler == default) return false;
+            var projection = _projectionType.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() as ProjectionAttribute;
+            if (projection == default) return false;
 
-            projectionId = eventHandler.Identifier;
-            scopeId = eventHandler.Scope;
+            projectionId = projection.Identifier;
+            scopeId = projection.Scope;
             return true;
         }
 
