@@ -64,6 +64,13 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessingConverter processingConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
-            => _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, loggerFactory, cancellation);
+        {
+            if (_methodsBuilder == null)
+            {
+                throw new ProjectionNeedsToBeForReadModel(_projectionId);
+            }
+
+            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, loggerFactory, cancellation);
+        }
     }
 }
