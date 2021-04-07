@@ -26,8 +26,11 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
         public ClassProjectionMethod(TaskProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
             : this(
-                (TProjection instanceAndReadModel, object @event, ProjectionContext context)
-                    => method(instanceAndReadModel, @event, context).ContinueWith(_ => ProjectionResultType.Replace, TaskScheduler.Default),
+                async (TProjection instanceAndReadModel, object @event, ProjectionContext context) =>
+                {
+                    await method(instanceAndReadModel, @event, context).ConfigureAwait(false);
+                    return ProjectionResultType.Replace;
+                },
                 eventType,
                 keySelector)
         {
@@ -90,7 +93,12 @@ namespace Dolittle.SDK.Projections.Builder
         public async Task<Try<ProjectionResult<TProjection>>> TryOn(TProjection readModel, object @event, ProjectionContext context)
         {
             var resultType = await _method(readModel, @event, context).TryTask().ConfigureAwait(false);
-            return resultType.Exception ?? new Try<ProjectionResult<TProjection>>(readModel);
+            return resultType switch
+            {
+                { Success: true, Result: ProjectionResultType.Delete } => ProjectionResult<TProjection>.Delete,
+                { Success: true, Result: ProjectionResultType.Replace } => new Try<ProjectionResult<TProjection>>(readModel),
+                _ => resultType.Exception
+            };
         }
     }
 }

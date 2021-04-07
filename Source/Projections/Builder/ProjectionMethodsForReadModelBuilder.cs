@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// Represents a building event handler methods.
+    /// Represents a builder for building projection on-methods.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
     public class ProjectionMethodsForReadModelBuilder<TReadModel> : ICanBuildAndRegisterAProjection
@@ -35,7 +35,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
@@ -49,7 +49,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
@@ -63,7 +63,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature"/> used to build the <see cref="KeySelector"/> for the event.</param>
@@ -76,7 +76,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
@@ -89,7 +89,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
@@ -99,7 +99,7 @@ namespace Dolittle.SDK.Projections.Builder
             => On(new EventType(eventTypeId), selectorCallback, method);
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
@@ -109,7 +109,7 @@ namespace Dolittle.SDK.Projections.Builder
             => On(new EventType(eventTypeId), selectorCallback, method);
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
@@ -120,7 +120,7 @@ namespace Dolittle.SDK.Projections.Builder
             => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
         /// <summary>
-        /// Add a handler method for handling the event.
+        /// Add a method for updating a projection on an event.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>

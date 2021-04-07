@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// Represents a builder building projections.
+    /// Represents a builder for building projections.
     /// </summary>
     public class ProjectionBuilder : ICanBuildAndRegisterAProjection
     {
@@ -33,7 +33,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Defines the event handler to operate on a specific <see cref="_scopeId" />.
+        /// Defines the projection to operate in a specific <see cref="_scopeId" />.
         /// </summary>
         /// <param name="scopeId">The <see cref="_scopeId" />.</param>
         /// <returns>The builder for continuation.</returns>
@@ -70,6 +70,13 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessingConverter processingConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
-            => _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, loggerFactory, cancellation);
+        {
+            if (_methodsBuilder == null)
+            {
+                throw new ProjectionNeedsToBeForReadModel(_projectionId);
+            }
+
+            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, loggerFactory, cancellation);
+        }
     }
 }

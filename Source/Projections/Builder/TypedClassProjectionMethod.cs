@@ -26,8 +26,11 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
         public TypedClassProjectionMethod(TaskProjectionMethodSignature<TProjection, TEvent> method, KeySelector keySelector)
             : this(
-                (TProjection instanceAndReadModel, TEvent @event, ProjectionContext context)
-                    => method(instanceAndReadModel, @event, context).ContinueWith(_ => ProjectionResultType.Replace, TaskScheduler.Default),
+                async (TProjection instanceAndReadModel, TEvent @event, ProjectionContext context) =>
+                {
+                    await method(instanceAndReadModel, @event, context).ConfigureAwait(false);
+                    return ProjectionResultType.Replace;
+                },
                 keySelector)
         {
         }
@@ -89,9 +92,12 @@ namespace Dolittle.SDK.Projections.Builder
             if (@event is TEvent typedEvent)
             {
                 var resultType = await _method(readModel, typedEvent, context).TryTask().ConfigureAwait(false);
-                if (resultType.Exception != null) return resultType.Exception;
-                var result = new Try<ProjectionResult<TProjection>>(readModel);
-                return result;
+                return resultType switch
+                {
+                    { Success: true, Result: ProjectionResultType.Delete } => ProjectionResult<TProjection>.Delete,
+                    { Success: true, Result: ProjectionResultType.Replace } => new Try<ProjectionResult<TProjection>>(readModel),
+                    _ => resultType.Exception
+                };
             }
 
             return new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
