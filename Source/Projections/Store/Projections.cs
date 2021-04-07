@@ -78,7 +78,7 @@ namespace Dolittle.SDK.Projections.Store
 
             if (!_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
             {
-                _logger.LogError(error, "The Runtime acknowledges that the projection state was returned, but the returned {State} could not be converted.", response.State);
+                _logger.LogError(error, "The Runtime returned the projection state '{State}'. But it could not be converted to {typeof(TProjection)}.", response.State);
                 throw error;
             }
 
