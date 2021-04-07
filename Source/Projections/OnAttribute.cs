@@ -8,7 +8,7 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Projections
 {
     /// <summary>
-    /// Decorates a method to indicate the <see cref="EventType" /> that projection is modified on.
+    /// Decorates a method to indicate the <see cref="EventType" /> it should be called with.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class OnAttribute : Attribute

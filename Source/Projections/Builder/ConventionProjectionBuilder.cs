@@ -102,7 +102,7 @@ namespace Dolittle.SDK.Projections.Builder
             if (eventTypesToMethods.Count == 0)
             {
                 logger.LogWarning(
-                    "There are no projection methods to register in projection {ProjectionType}. An projection method either needs to be decorated with [{OnAttribute}] or have the name {MethodName}",
+                    "There are no projection methods to register in projection {ProjectionType}. A projection method either needs to be decorated with [{OnAttribute}] or have the name {MethodName}",
                     _projectionType,
                     typeof(OnAttribute).Name,
                     MethodName);
@@ -132,7 +132,7 @@ namespace Dolittle.SDK.Projections.Builder
                 if (!TryGetEventParameterType(method, out var eventParameterType))
                 {
                     logger.LogWarning(
-                        "Projection method {Method} on projection {Projection} has no parameters, but is decorated with [{OnAttribute}]. A projection method should take in as paramters a read model, an event and a {ProjectionContext}",
+                        "Projection method {Method} on projection {Projection} has no parameters, but is decorated with [{OnAttribute}]. A projection method should take in as parameters an event and a {ProjectionContext}",
                         method,
                         _projectionType,
                         typeof(OnAttribute).Name,
@@ -366,11 +366,11 @@ namespace Dolittle.SDK.Projections.Builder
         {
             projectionId = default;
             scopeId = default;
-            var eventHandler = _projectionType.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() as ProjectionAttribute;
-            if (eventHandler == default) return false;
+            var projection = _projectionType.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() as ProjectionAttribute;
+            if (projection == default) return false;
 
-            projectionId = eventHandler.Identifier;
-            scopeId = eventHandler.Scope;
+            projectionId = projection.Identifier;
+            scopeId = projection.Scope;
             return true;
         }
 

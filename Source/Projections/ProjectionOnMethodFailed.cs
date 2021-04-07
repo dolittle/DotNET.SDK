@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Projections
         /// <param name="event">The event that failed handling.</param>
         /// <param name="exception">The <see cref="Exception" /> that caused the handling to fail.</param>
         public ProjectionOnMethodFailed(ProjectionId projection, EventType eventType, object @event, Exception exception)
-            : base($"Event handler {projection} failed to handle event {@event} with event type {eventType} ", exception)
+            : base($"Projection {projection} failed to handle event {@event} with event type {eventType} ", exception)
         {
         }
     }
