@@ -18,17 +18,27 @@ namespace Dolittle.SDK.Projections.Store
         public CurrentState(TProjection state, CurrentStateType type)
         {
             State = state;
-            Type = type;
+            WasCreatedFromInitialState = type switch
+            {
+                CurrentStateType.CreatedFromInitialState => true,
+                _ => false
+            };
         }
 
         /// <summary>
-        /// Gets the <see cref="CurrentStateType" />.
+        /// Gets a value indicating whether the state was created from initial state.
         /// </summary>
-        public CurrentStateType Type { get; }
+        public bool WasCreatedFromInitialState { get; }
 
         /// <summary>
         /// Gets the state.
         /// </summary>
         public TProjection State { get; }
+
+        /// <summary>
+        /// Implicitly converts a <see cref="CurrentState{TProjection}" /> to the underlying <typeparamref name="TProjection"/>.
+        /// </summary>
+        /// <param name="currentState">The <see cref="CurrentState{TProjection}" /> to convert.</param>
+        public static implicit operator TProjection(CurrentState<TProjection> currentState) => currentState.State;
     }
 }
