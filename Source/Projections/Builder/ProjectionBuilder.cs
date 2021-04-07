@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Projections.Builder
 {
     /// <summary>
-    /// Represents a builder building projections.
+    /// Represents a builder for building projections.
     /// </summary>
     public class ProjectionBuilder : ICanBuildAndRegisterAProjection
     {
