@@ -9,7 +9,7 @@ namespace Dolittle.SDK.Projections.Store
     /// <summary>
     /// Defines a associations for projections.
     /// </summary>
-    public interface IProjectionAssociations
+    public interface IProjectionReadModelTypeAssociations
     {
         /// <summary>
         /// Associate a projection.
