@@ -1,3 +1,13 @@
+# [8.4.0-projections.1] - 2021-4-7 [PR: #56](https://github.com/dolittle/DotNET.SDK/pull/56)
+## Summary
+
+Adds the ability to get projections.
+
+### Added
+
+- API for getting one or all projections of a specific projection type
+
+
 # [8.4.0-projections.0] - 2021-4-7 [PR: #55](https://github.com/dolittle/DotNET.SDK/pull/55)
 ## Summary
 
