@@ -18,7 +18,7 @@ namespace Dolittle.SDK.Projections.Store.Converters
         /// <param name="type">The <see cref="ProjectionCurrentStateType" />.</param>
         /// <param name="innerException">The inner deserialization <see cref="Exception" />.</param>
         public CouldNotDeserializeProjection(string state, ProjectionCurrentStateType type, Exception innerException)
-            : base($"Could ont deserialize projection with current state type {type}. State is {state}", innerException)
+            : base($"Could not deserialize projection with state type {type} and state '{state}'", innerException)
         {
         }
     }
