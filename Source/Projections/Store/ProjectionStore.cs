@@ -78,7 +78,7 @@ namespace Dolittle.SDK.Projections.Store
 
             if (!_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
             {
-                _logger.LogError(error, "The Runtime returned the projection state '{State}'. But it could not be converted to {typeof(TProjection)}.", response.State);
+                _logger.LogError(error, "The Runtime returned the projection state '{State}'. But it could not be converted to {ProjectionType}.", response.State, typeof(TProjection));
                 throw error;
             }
 
@@ -109,7 +109,7 @@ namespace Dolittle.SDK.Projections.Store
 
             if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
             {
-                _logger.LogError(error, "The Runtime acknowledges that the projection states was returned, but the returned {States} could not be converted.", response.States);
+                _logger.LogError(error, "The Runtime returned the projection states '{States}'. But it could not be converted to {ProjectionType}.", response.States, typeof(TProjection));
                 throw error;
             }
 
