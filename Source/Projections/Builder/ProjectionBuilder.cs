@@ -29,7 +29,7 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Defines the event handler to operate on a specific <see cref="_scopeId" />.
+        /// Defines the projection to operate in a specific <see cref="_scopeId" />.
         /// </summary>
         /// <param name="scopeId">The <see cref="_scopeId" />.</param>
         /// <returns>The builder for continuation.</returns>
