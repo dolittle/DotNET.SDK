@@ -102,7 +102,7 @@ namespace Dolittle.SDK.Projections.Builder
             if (eventTypesToMethods.Count == 0)
             {
                 logger.LogWarning(
-                    "There are no projection methods to register in projection {ProjectionType}. An projection method either needs to be decorated with [{OnAttribute}] or have the name {MethodName}",
+                    "There are no projection methods to register in projection {ProjectionType}. A projection method either needs to be decorated with [{OnAttribute}] or have the name {MethodName}",
                     _projectionType,
                     typeof(OnAttribute).Name,
                     MethodName);
