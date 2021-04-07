@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Projections.Store;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder
@@ -15,6 +16,7 @@ namespace Dolittle.SDK.Projections.Builder
     public class ProjectionBuilder : ICanBuildAndRegisterAProjection
     {
         readonly ProjectionId _projectionId;
+        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
         ICanBuildAndRegisterAProjection _methodsBuilder;
 
         ScopeId _scopeId = ScopeId.Default;
@@ -23,9 +25,11 @@ namespace Dolittle.SDK.Projections.Builder
         /// Initializes a new instance of the <see cref="ProjectionBuilder"/> class.
         /// </summary>
         /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
-        public ProjectionBuilder(ProjectionId projectionId)
+        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations" />.</param>
+        public ProjectionBuilder(ProjectionId projectionId, IProjectionReadModelTypeAssociations projectionAssociations)
         {
             _projectionId = projectionId;
+            _projectionAssociations = projectionAssociations;
         }
 
         /// <summary>
@@ -49,9 +53,10 @@ namespace Dolittle.SDK.Projections.Builder
         {
             if (_methodsBuilder != default)
             {
-                // Throw exceptionee c
+                throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
             }
 
+            _projectionAssociations.Associate<TReadModel>(_projectionId, _scopeId);
             var builder = new ProjectionMethodsForReadModelBuilder<TReadModel>(_projectionId, _scopeId);
             _methodsBuilder = builder;
             return builder;

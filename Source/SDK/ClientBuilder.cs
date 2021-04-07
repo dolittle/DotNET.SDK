@@ -11,12 +11,14 @@ using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Projections.Builder;
+using Dolittle.SDK.Projections.Store;
+using Dolittle.SDK.Projections.Store.Builders;
+using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
@@ -39,6 +41,7 @@ namespace Dolittle.SDK
         readonly ProjectionsBuilder _projectionsBuilder;
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
+        readonly ProjectionReadModelTypeAssociations _projectionAssociations;
         string _host = "localhost";
         ushort _port = 50053;
         Version _version;
@@ -65,10 +68,12 @@ namespace Dolittle.SDK
             _cancellation = CancellationToken.None;
             _retryPolicy = (IObservable<Exception> exceptions) => exceptions.Delay(TimeSpan.FromSeconds(1));
 
+            _projectionAssociations = new ProjectionReadModelTypeAssociations();
+
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
-            _projectionsBuilder = new ProjectionsBuilder();
+            _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
             _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 
@@ -231,6 +236,7 @@ namespace Dolittle.SDK
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
             var aggregateEventToSDKConverter = new AggregateEventToSDKConverter(serializer);
+            var projectionsToSDKConverter = new ProjectionsToSDKConverter();
 
             var eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
             var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
@@ -238,6 +244,7 @@ namespace Dolittle.SDK
             var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _retryPolicy, _loggerFactory.CreateLogger<EventProcessors>());
 
             var callContextResolver = new CallContextResolver();
+
             var eventStoreBuilder = new EventStoreBuilder(
                 methodCaller,
                 eventToProtobufConverter,
@@ -252,6 +259,14 @@ namespace Dolittle.SDK
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
 
+            var projectionStoreBuilder = new ProjectionStoreBuilder(
+                methodCaller,
+                executionContext,
+                callContextResolver,
+                _projectionAssociations,
+                projectionsToSDKConverter,
+                _loggerFactory);
+
             return new Client(
                 eventTypes,
                 eventStoreBuilder,
@@ -262,6 +277,7 @@ namespace Dolittle.SDK
                 _eventHandlersBuilder,
                 _eventFiltersBuilder,
                 _projectionsBuilder,
+                projectionStoreBuilder,
                 _loggerFactory,
                 _cancellation);
         }

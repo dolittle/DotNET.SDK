@@ -6,7 +6,7 @@ using Dolittle.SDK.Protobuf;
 using Dolittle.Services.Contracts;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Services
 {
     /// <summary>
     /// Represents an implementation of <see cref="IResolveCallContext" />.
@@ -16,9 +16,9 @@ namespace Dolittle.SDK.Events.Store
         /// <inheritdoc/>
         public CallRequestContext ResolveFrom(ExecutionContext executionContext)
             => new CallRequestContext
-                {
-                    HeadId = HeadId.NotSet.Value.ToProtobuf(),
-                    ExecutionContext = executionContext.ToProtobuf()
-                };
+            {
+                HeadId = HeadId.NotSet.Value.ToProtobuf(),
+                ExecutionContext = executionContext.ToProtobuf()
+            };
     }
 }

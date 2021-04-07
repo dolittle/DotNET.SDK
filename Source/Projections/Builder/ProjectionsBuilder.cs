@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Projections.Store;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder
@@ -18,6 +19,16 @@ namespace Dolittle.SDK.Projections.Builder
     public class ProjectionsBuilder
     {
         readonly IList<ICanBuildAndRegisterAProjection> _builders = new List<ICanBuildAndRegisterAProjection>();
+        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProjectionsBuilder"/> class.
+        /// </summary>
+        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations"/>.</param>
+        public ProjectionsBuilder(IProjectionReadModelTypeAssociations projectionAssociations)
+        {
+            _projectionAssociations = projectionAssociations;
+        }
 
         /// <summary>
         /// Start building an projection.
@@ -26,7 +37,7 @@ namespace Dolittle.SDK.Projections.Builder
         /// <returns>The <see cref="ProjectionBuilder" /> for continuation.</returns>
         public ProjectionBuilder CreateProjection(ProjectionId projectionId)
         {
-            var builder = new ProjectionBuilder(projectionId);
+            var builder = new ProjectionBuilder(projectionId, _projectionAssociations);
             _builders.Add(builder);
             return builder;
         }
@@ -48,8 +59,10 @@ namespace Dolittle.SDK.Projections.Builder
         public ProjectionsBuilder RegisterProjection(Type type)
         {
             var builder = Activator.CreateInstance(
-                    typeof(ConventionProjectionBuilder<>).MakeGenericType(type)) as ICanBuildAndRegisterAProjection;
+                    typeof(ConventionProjectionBuilder<>).MakeGenericType(type))
+                    as ICanBuildAndRegisterAProjection;
             _builders.Add(builder);
+            _projectionAssociations.Associate(type);
             return this;
         }
 
