@@ -28,8 +28,6 @@ namespace Dolittle.SDK.Projections.Builder
         public ProjectionsBuilder(IProjectionAssociations projectionAssociations)
         {
             _projectionAssociations = projectionAssociations;
-
-            Console.WriteLine($"Projections builder associations hash {_projectionAssociations.GetHashCode()}");
         }
 
         /// <summary>
