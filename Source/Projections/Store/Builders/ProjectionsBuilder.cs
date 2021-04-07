@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Projections.Store.Builders
     /// <summary>
     /// Represents a builder for building <see cref="Projections"/>.
     /// </summary>
-    public class ProjectionsBuilder
+    public class ProjectionStoreBuilder
     {
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
