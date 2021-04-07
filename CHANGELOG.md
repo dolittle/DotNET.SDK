@@ -1,3 +1,13 @@
+# [8.4.0-projections.0] - 2021-4-7 [PR: #55](https://github.com/dolittle/DotNET.SDK/pull/55)
+## Summary
+
+Adds projections
+
+### Added
+
+- Support for building and registering projections
+
+
 # [8.3.2] - 2021-3-24 [PR: #52](https://github.com/dolittle/DotNET.SDK/pull/52)
 ## Summary
 
