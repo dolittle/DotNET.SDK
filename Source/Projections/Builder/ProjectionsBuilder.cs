@@ -19,13 +19,13 @@ namespace Dolittle.SDK.Projections.Builder
     public class ProjectionsBuilder
     {
         readonly IList<ICanBuildAndRegisterAProjection> _builders = new List<ICanBuildAndRegisterAProjection>();
-        readonly IProjectionAssociations _projectionAssociations;
+        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectionsBuilder"/> class.
         /// </summary>
-        /// <param name="projectionAssociations">The <see cref="IProjectionAssociations"/>.</param>
-        public ProjectionsBuilder(IProjectionAssociations projectionAssociations)
+        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations"/>.</param>
+        public ProjectionsBuilder(IProjectionReadModelTypeAssociations projectionAssociations)
         {
             _projectionAssociations = projectionAssociations;
         }

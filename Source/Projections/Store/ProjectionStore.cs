@@ -14,33 +14,33 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Projections.Store
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IProjections" />.
+    /// Represents an implementation of <see cref="IProjectionStore" />.
     /// </summary>
-    public class Projections : IProjections
+    public class ProjectionStore : IProjectionStore
     {
         static readonly ProjectionsGetOne _getOneMethod = new ProjectionsGetOne();
         static readonly ProjectionsGetAll _getAllMethod = new ProjectionsGetAll();
         readonly IPerformMethodCalls _caller;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
-        readonly IProjectionAssociations _projectionAssociations;
+        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
         readonly IConvertProjectionsToSDK _toSDK;
         readonly ILogger _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Projections"/> class.
+        /// Initializes a new instance of the <see cref="ProjectionStore"/> class.
         /// </summary>
         /// <param name="caller">The <see cref="IPerformMethodCalls" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
-        /// <param name="projectionAssociations">The <see cref="IProjectionAssociations" />.</param>
+        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations" />.</param>
         /// <param name="toSDK">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        public Projections(
+        public ProjectionStore(
             IPerformMethodCalls caller,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
-            IProjectionAssociations projectionAssociations,
+            IProjectionReadModelTypeAssociations projectionAssociations,
             IConvertProjectionsToSDK toSDK,
             ILogger logger)
         {

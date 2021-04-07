@@ -1,23 +1,22 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections.Store
 {
     /// <summary>
-    /// Represents a projection that is associated with a <see cref="Type" />.
+    /// Represents an identifier for a scoped projection.
     /// </summary>
-    public class ProjectionAssociation : Value<ProjectionAssociation>
+    public class ScopedProjectionIdentifier : Value<ScopedProjectionIdentifier>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectionAssociation"/> class.
+        /// Initializes a new instance of the <see cref="ScopedProjectionIdentifier"/> class.
         /// </summary>
         /// <param name="identifier">The <see cref="ProjectionId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-        public ProjectionAssociation(ProjectionId identifier, ScopeId scopeId)
+        public ScopedProjectionIdentifier(ProjectionId identifier, ScopeId scopeId)
         {
             Identifier = identifier;
             ScopeId = scopeId;

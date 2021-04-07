@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Projections.Store.Converters
             => TryDeserializeWithSettings(source, out state, out error);
 
         /// <inheritdoc/>
-        public bool TryConvert<TProjection>(IReadOnlyList<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
+        public bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
             where TProjection : class, new()
         {
             error = null;

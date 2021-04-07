@@ -45,16 +45,8 @@ namespace Dolittle.SDK.Projections.Store
         /// Try get the <see cref="ProjectionId" /> associated with <typeparamref name="TProjection"/>.
         /// </summary>
         /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
-        /// <returns>The <see cref="ProjectionAssociation" />.</returns>
-        ProjectionAssociation GetFor<TProjection>()
+        /// <returns>The <see cref="ScopedProjectionIdentifier" />.</returns>
+        ScopedProjectionIdentifier GetFor<TProjection>()
             where TProjection : class, new();
-
-        /// <summary>
-        /// Try get the <see cref="Type" /> associated with <see cref="ProjectionId" />..
-        /// </summary>
-        /// <param name="projection">The <see cref="ProjectionId" />.</param>
-        /// <param name="scope">The <see cref="ScopeId"/> of the projection.</param>
-        /// <returns>The <see cref="Type" /> of the projection.</returns>
-        Type GetType(ProjectionId projection, ScopeId scope);
     }
 }

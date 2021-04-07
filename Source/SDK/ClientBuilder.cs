@@ -17,6 +17,7 @@ using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
+using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Security;
@@ -40,7 +41,7 @@ namespace Dolittle.SDK
         readonly ProjectionsBuilder _projectionsBuilder;
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
-        readonly ProjectionAssociations _projectionAssociations;
+        readonly ProjectionReadModelTypeAssociations _projectionAssociations;
         string _host = "localhost";
         ushort _port = 50053;
         Version _version;
@@ -67,7 +68,7 @@ namespace Dolittle.SDK
             _cancellation = CancellationToken.None;
             _retryPolicy = (IObservable<Exception> exceptions) => exceptions.Delay(TimeSpan.FromSeconds(1));
 
-            _projectionAssociations = new ProjectionAssociations();
+            _projectionAssociations = new ProjectionReadModelTypeAssociations();
 
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
@@ -258,7 +259,7 @@ namespace Dolittle.SDK
             var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
 
-            var projectionStoreBuilder = new Projections.Store.Builders.ProjectionsBuilder(
+            var projectionStoreBuilder = new ProjectionStoreBuilder(
                 methodCaller,
                 executionContext,
                 callContextResolver,

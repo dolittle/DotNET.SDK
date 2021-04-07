@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Projections.Builder
     public class ProjectionBuilder : ICanBuildAndRegisterAProjection
     {
         readonly ProjectionId _projectionId;
-        readonly IProjectionAssociations _projectionAssociations;
+        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
         ICanBuildAndRegisterAProjection _methodsBuilder;
 
         ScopeId _scopeId = ScopeId.Default;
@@ -25,8 +25,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// Initializes a new instance of the <see cref="ProjectionBuilder"/> class.
         /// </summary>
         /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
-        /// <param name="projectionAssociations">The <see cref="IProjectionAssociations" />.</param>
-        public ProjectionBuilder(ProjectionId projectionId, IProjectionAssociations projectionAssociations)
+        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations" />.</param>
+        public ProjectionBuilder(ProjectionId projectionId, IProjectionReadModelTypeAssociations projectionAssociations)
         {
             _projectionId = projectionId;
             _projectionAssociations = projectionAssociations;
@@ -53,8 +53,7 @@ namespace Dolittle.SDK.Projections.Builder
         {
             if (_methodsBuilder != default)
             {
-                var genericType = _methodsBuilder.GetType().GetGenericArguments()[0];
-                throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, genericType);
+                throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
             }
 
             _projectionAssociations.Associate<TReadModel>(_projectionId, _scopeId);

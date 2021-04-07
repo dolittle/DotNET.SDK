@@ -9,22 +9,17 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Projections.Store
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IProjectionAssociations" />.
+    /// Represents an implementation of <see cref="IProjectionReadModelTypeAssociations" />.
     /// </summary>
-    public class ProjectionAssociations : IProjectionAssociations
+    public class ProjectionReadModelTypeAssociations : IProjectionReadModelTypeAssociations
     {
-        readonly Dictionary<ProjectionAssociation, Type> _associationsToType = new Dictionary<ProjectionAssociation, Type>();
-        readonly Dictionary<Type, ProjectionAssociation> _typeToAssociations = new Dictionary<Type, ProjectionAssociation>();
+        readonly Dictionary<Type, ScopedProjectionIdentifier> _typeToAssociations = new Dictionary<Type, ScopedProjectionIdentifier>();
 
         /// <inheritdoc/>
         public void Associate(ProjectionId projection, Type projectionType, ScopeId scope)
         {
-            var association = new ProjectionAssociation(projection, scope);
-            ThrowIfMultipleTypesAssociatedWithProjection(association, projectionType);
             ThrowIfMultipleProjectionsAssociatedWithType(projectionType, projection);
-
-            _associationsToType.Add(association, projectionType);
-            _typeToAssociations.Add(projectionType, association);
+            _typeToAssociations.Add(projectionType, new ScopedProjectionIdentifier(projection, scope));
         }
 
         /// <inheritdoc/>
@@ -52,7 +47,7 @@ namespace Dolittle.SDK.Projections.Store
         }
 
         /// <inheritdoc/>
-        public ProjectionAssociation GetFor<TProjection>()
+        public ScopedProjectionIdentifier GetFor<TProjection>()
             where TProjection : class, new()
         {
             if (!_typeToAssociations.TryGetValue(typeof(TProjection), out var association))
@@ -63,30 +58,11 @@ namespace Dolittle.SDK.Projections.Store
             return association;
         }
 
-        /// <inheritdoc/>
-        public Type GetType(ProjectionId projection, ScopeId scope)
-        {
-            if (!_associationsToType.TryGetValue(new ProjectionAssociation(projection, scope), out var type))
-            {
-                throw new NoTypeAssociatedWithProjection(projection, scope);
-            }
-
-            return type;
-        }
-
         void ThrowIfMultipleProjectionsAssociatedWithType(Type projectionType, ProjectionId projection)
         {
             if (_typeToAssociations.TryGetValue(projectionType, out var existing))
             {
                 throw new CannotAssociateMultipleProjectionsWithType(projectionType, projection, existing.Identifier);
-            }
-        }
-
-        void ThrowIfMultipleTypesAssociatedWithProjection(ProjectionAssociation association, Type projectionType)
-        {
-            if (_associationsToType.TryGetValue(association, out var existing))
-            {
-                throw new CannotAssociateMultipleTypesWithProjection(association.Identifier, projectionType, existing);
             }
         }
     }
