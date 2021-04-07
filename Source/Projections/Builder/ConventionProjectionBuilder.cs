@@ -42,6 +42,12 @@ namespace Dolittle.SDK.Projections.Builder
                 return;
             }
 
+            if (HasMoreThanOneConstructor())
+            {
+                logger.LogWarning("The projection class {ProjectionType} has more than one constructor. It must only have one, parameterless, constructor", _projectionType);
+                return;
+            }
+
             if (!TryGetProjectionInformation(out var projectionId, out var scopeId))
             {
                 logger.LogWarning("The projection class {ProjectionType} needs to be decorated with an [{ProjectionAttribute}]", _projectionType, typeof(ProjectionAttribute).Name);
@@ -72,6 +78,9 @@ namespace Dolittle.SDK.Projections.Builder
                 new ProjectionsProtocol(),
                 cancellation);
         }
+
+        bool HasMoreThanOneConstructor()
+            => _projectionType.GetConstructors().Length > 1;
 
         bool HasParameterlessConstructor()
             => _projectionType.GetConstructors().Any(t => t.GetParameters().Length == 0);
