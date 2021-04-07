@@ -16,6 +16,7 @@ using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
@@ -35,6 +36,7 @@ namespace Dolittle.SDK
         readonly EventTypesBuilder _eventTypesBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly EventHandlersBuilder _eventHandlersBuilder;
+        readonly ProjectionsBuilder _projectionsBuilder;
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
         string _host = "localhost";
@@ -66,6 +68,7 @@ namespace Dolittle.SDK
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
+            _projectionsBuilder = new ProjectionsBuilder();
             _eventHorizonsBuilder = new SubscriptionsBuilder();
         }
 
@@ -165,6 +168,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the event handlers through the <see cref="ProjectionsBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithProjections(Action<ProjectionsBuilder> callback)
+        {
+            callback(_projectionsBuilder);
+            return this;
+        }
+
+        /// <summary>
         /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -247,6 +261,7 @@ namespace Dolittle.SDK
                 eventProcessingConverter,
                 _eventHandlersBuilder,
                 _eventFiltersBuilder,
+                _projectionsBuilder,
                 _loggerFactory,
                 _cancellation);
         }

@@ -14,6 +14,7 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
@@ -27,6 +28,7 @@ namespace Dolittle.SDK
         readonly ProcessingCoordinator _processingCoordinator;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly EventFiltersBuilder _filtersBuilder;
+        readonly ProjectionsBuilder _projectionsBuilder;
         readonly EventHorizons _eventHorizons;
         readonly IEventProcessors _eventProcessors;
         readonly IEventProcessingConverter _eventProcessingConverter;
@@ -46,6 +48,7 @@ namespace Dolittle.SDK
         /// <param name="eventProcessingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="eventHandlersBuilder">The <see cref="EventHandlersBuilder" />.</param>
         /// <param name="filtersBuilder">The <see cref="EventFiltersBuilder" />.</param>
+        /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -57,6 +60,7 @@ namespace Dolittle.SDK
             IEventProcessingConverter eventProcessingConverter,
             EventHandlersBuilder eventHandlersBuilder,
             EventFiltersBuilder filtersBuilder,
+            ProjectionsBuilder projectionsBuilder,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -68,6 +72,7 @@ namespace Dolittle.SDK
             _eventProcessingConverter = eventProcessingConverter;
             _eventHandlersBuilder = eventHandlersBuilder;
             _filtersBuilder = filtersBuilder;
+            _projectionsBuilder = projectionsBuilder;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -122,6 +127,12 @@ namespace Dolittle.SDK
                 _cancellation);
             _filtersBuilder.BuildAndRegister(
                 _eventProcessors,
+                _eventProcessingConverter,
+                _loggerFactory,
+                _cancellation);
+            _projectionsBuilder.BuildAndRegister(
+                _eventProcessors,
+                EventTypes,
                 _eventProcessingConverter,
                 _loggerFactory,
                 _cancellation);
