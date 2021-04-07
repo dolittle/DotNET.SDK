@@ -93,7 +93,12 @@ namespace Dolittle.SDK.Projections.Builder
         public async Task<Try<ProjectionResult<TProjection>>> TryOn(TProjection readModel, object @event, ProjectionContext context)
         {
             var resultType = await _method(readModel, @event, context).TryTask().ConfigureAwait(false);
-            return resultType.Exception ?? new Try<ProjectionResult<TProjection>>(readModel);
+            return resultType switch
+            {
+                { Success: true, Result: ProjectionResultType.Delete } => ProjectionResult<TProjection>.Delete,
+                { Success: true, Result: ProjectionResultType.Replace } => new Try<ProjectionResult<TProjection>>(readModel),
+                _ => resultType.Exception
+            };
         }
     }
 }
