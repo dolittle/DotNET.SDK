@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.Runtime.Events.Processing.Contracts;
+using Dolittle.Runtime.Projections.Contracts;
 
 namespace Dolittle.SDK.Projections.Store.Converters
 {
@@ -16,9 +16,10 @@ namespace Dolittle.SDK.Projections.Store.Converters
         /// </summary>
         /// <param name="state">The current projection state.</param>
         /// <param name="type">The <see cref="ProjectionCurrentStateType" />.</param>
+        /// <param name="key">The <see cref="Key" />.</param>
         /// <param name="innerException">The inner deserialization <see cref="Exception" />.</param>
-        public CouldNotDeserializeProjection(string state, ProjectionCurrentStateType type, Exception innerException)
-            : base($"Could not deserialize projection with state type {type} and state '{state}'", innerException)
+        public CouldNotDeserializeProjection(string state, ProjectionCurrentStateType type, Key key, Exception innerException)
+            : base($"Could not deserialize projection with key {key}, type {type} and state '{state}'", innerException)
         {
         }
     }

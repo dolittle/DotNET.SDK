@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
+using Dolittle.Runtime.Projections.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
@@ -73,7 +74,7 @@ namespace Dolittle.SDK.Projections.Internal
         {
             var committedEvent = _converter.ToSDK(request.Event).Event;
             var eventContext = committedEvent.GetEventContext(executionContext);
-            var projectionContext = new ProjectionContext(request.CurrentState.Type == ProjectionCurrentStateType.CreatedFromInitialState, request.Key, eventContext);
+            var projectionContext = new ProjectionContext(request.CurrentState.Type == ProjectionCurrentStateType.CreatedFromInitialState, request.CurrentState.Key, eventContext);
 
             var result = await _projection
                 .On(
