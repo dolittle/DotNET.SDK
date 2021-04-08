@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Projections.Builder
     {
         readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
         readonly ProjectionId _projectionId;
-        readonly ScopeId _scopeId;
+        ScopeId _scopeId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}"/> class.
@@ -32,6 +32,17 @@ namespace Dolittle.SDK.Projections.Builder
         {
             _projectionId = projectionId;
             _scopeId = scopeId;
+        }
+
+        /// <summary>
+        /// Defines the projection to operate in a specific <see cref="_scopeId" />.
+        /// </summary>
+        /// <param name="scopeId">The <see cref="_scopeId" />.</param>
+        /// <returns>The builder for continuation.</returns>
+        public ProjectionMethodsForReadModelBuilder<TReadModel> InScope(ScopeId scopeId)
+        {
+            _scopeId = scopeId;
+            return this;
         }
 
         /// <summary>
