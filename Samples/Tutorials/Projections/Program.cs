@@ -88,14 +88,6 @@ namespace Kitchen
             var menu = await client.Projections.ForTenant(TenantId.Development).Get<Menu>("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9").ConfigureAwait(false);
             Console.WriteLine($"Menu consists of: {string.Join(", ", menu.State.Dishes)}");
 
-            Console.WriteLine("Getting menu but specify projection and convert to chef");
-            try {
-                var specificMenu = await client.Projections.ForTenant(TenantId.Development).Get<Chef>("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9", "0405b93f-1461-472c-bdc2-f89e0afd4dfe", ScopeId.Default).ConfigureAwait(false);
-                Console.WriteLine($"Specific menu is: {specificMenu.State.Name}");
-            } catch {
-                Console.WriteLine("Getting menu as chef failed as it should");
-            }
-
             Console.WriteLine("Getting untyped menu");
             var untypedMenu = await client.Projections.ForTenant(TenantId.Development).Get("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9", "0405b93f-1461-472c-bdc2-f89e0afd4dfe").ConfigureAwait(false);
             Console.WriteLine($"Menu is ({untypedMenu.State.GetType()}) {untypedMenu.State}");
@@ -105,6 +97,12 @@ namespace Kitchen
             {
                 var chef = state.State;
                 Console.WriteLine($"Chef name: {chef.Name} and prepared dishes: {string.Join(",", chef.Dishes)}");
+            }
+
+            Console.WriteLine("Getting all chefs as menus");
+            foreach (var (key, state) in await client.Projections.ForTenant(TenantId.Development).GetAll<Menu>("4a4c5b13-d4dd-4665-a9df-27b8e9b2054c").ConfigureAwait(false))
+            {
+                Console.WriteLine($"Menu {key} consists of: {string.Join(", ", state.State.Dishes)}");
             }
 
             await started.ConfigureAwait(false);
