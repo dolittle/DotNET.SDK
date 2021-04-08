@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,18 +54,7 @@ namespace Dolittle.SDK.Projections.Internal
                     ScopeId = _projection.ScopeId.ToProtobuf(),
                     InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None)
                 };
-                registrationRequest.Events.AddRange(_projection.Events.Select(_ =>
-                {
-                    return new ProjectionEventSelector
-                    {
-                        EventType = _.EventType.ToProtobuf(),
-                        KeySelector = new ProjectionEventKeySelector
-                        {
-                            Type = _.KeySelector.Type.ToProtobuf(),
-                            Expression = _.KeySelector.Expression ?? string.Empty
-                        }
-                    };
-                }).ToArray());
+                registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());
                 return registrationRequest;
             }
         }
@@ -85,12 +75,12 @@ namespace Dolittle.SDK.Projections.Internal
                     cancellation)
                 .ConfigureAwait(false);
 
-            var response = new ProjectionResponse
+            return result.Type switch
             {
-                NextState = new ProjectionNextState { Type = result.Type.ToProtobuf() }
+                ProjectionResultType.Replace => new ProjectionResponse { Replace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None) } },
+                ProjectionResultType.Delete => new ProjectionResponse { Delete = new ProjectionDeleteResponse() },
+                _ => throw new UnknownProjectionResultType(result.Type)
             };
-            if (result.Type == ProjectionResultType.Replace) response.NextState.Value = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None);
-            return response;
         }
 
         /// <inheritdoc/>
@@ -100,5 +90,24 @@ namespace Dolittle.SDK.Projections.Internal
         /// <inheritdoc/>
         protected override ProjectionResponse CreateResponseFromFailure(ProcessorFailure failure)
             => new ProjectionResponse { Failure = failure };
+
+        ProjectionEventSelector CreateProjectionEventSelector(EventSelector eventSelector)
+        {
+            static ProjectionEventSelector WithEventType(EventSelector eventSelector, Action<ProjectionEventSelector> callback)
+            {
+                var message = new ProjectionEventSelector();
+                callback(message);
+                message.EventType = eventSelector.EventType.ToProtobuf();
+                return message;
+            }
+
+            return eventSelector.KeySelector.Type switch
+            {
+                KeySelectorType.EventSourceId => WithEventType(eventSelector, _ => _.EventSourceKeySelector = new EventSourceIdKeySelector()),
+                KeySelectorType.PartitionId => WithEventType(eventSelector, _ => _.PartitionKeySelector = new PartitionIdKeySelector()),
+                KeySelectorType.Property => WithEventType(eventSelector, _ => _.EventPropertyKeySelector = new EventPropertyKeySelector { PropertyName = eventSelector.KeySelector.Expression ?? string.Empty }),
+                _ => throw new UnknownKeySelectorType(eventSelector.KeySelector.Type)
+            };
+        }
     }
 }
