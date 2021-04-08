@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Projections.Builder
     /// Represents a builder for building projection on-methods.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    public class ProjectionMethodsForReadModelBuilder<TReadModel> : ICanBuildAndRegisterAProjection
+    public class ProjectionBuilderForReadModel<TReadModel> : ICanBuildAndRegisterAProjection
         where TReadModel : class, new()
     {
         readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
@@ -24,11 +24,11 @@ namespace Dolittle.SDK.Projections.Builder
         ScopeId _scopeId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}"/> class.
+        /// Initializes a new instance of the <see cref="ProjectionBuilderForReadModel{TReadModel}"/> class.
         /// </summary>
         /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
         /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-        public ProjectionMethodsForReadModelBuilder(ProjectionId projectionId, ScopeId scopeId)
+        public ProjectionBuilderForReadModel(ProjectionId projectionId, ScopeId scopeId)
         {
             _projectionId = projectionId;
             _scopeId = scopeId;
@@ -39,7 +39,7 @@ namespace Dolittle.SDK.Projections.Builder
         /// </summary>
         /// <param name="scopeId">The <see cref="_scopeId" />.</param>
         /// <returns>The builder for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> InScope(ScopeId scopeId)
+        public ProjectionBuilderForReadModel<TReadModel> InScope(ScopeId scopeId)
         {
             _scopeId = scopeId;
             return this;
@@ -51,8 +51,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel, TEvent}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, TaskProjectionSignature<TReadModel, TEvent> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, TaskProjectionSignature<TReadModel, TEvent> method)
             where TEvent : class
         {
             _methods.Add(new TypedProjectionMethod<TReadModel, TEvent>(method, selectorCallback(new KeySelectorBuilder<TEvent>())));
@@ -65,8 +65,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="SyncProjectionSignature{T}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
             where TEvent : class
         {
             _methods.Add(new TypedProjectionMethod<TReadModel, TEvent>(method, selectorCallback(new KeySelectorBuilder<TEvent>())));
@@ -79,8 +79,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
         {
             _methods.Add(new ProjectionMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
             return this;
@@ -92,8 +92,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
         {
             _methods.Add(new ProjectionMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
             return this;
@@ -105,8 +105,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
             => On(new EventType(eventTypeId), selectorCallback, method);
 
         /// <summary>
@@ -115,8 +115,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
             => On(new EventType(eventTypeId), selectorCallback, method);
 
         /// <summary>
@@ -126,8 +126,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
             => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
         /// <summary>
@@ -137,8 +137,8 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
         /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
         /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
             => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace Dolittle.SDK.Projections.Builder
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
-            var logger = loggerFactory.CreateLogger<ProjectionMethodsForReadModelBuilder<TReadModel>>();
+            var logger = loggerFactory.CreateLogger<ProjectionBuilderForReadModel<TReadModel>>();
             var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TReadModel>>();
             if (!TryAddOnMethods(eventTypes, eventTypesToMethods, logger))
             {

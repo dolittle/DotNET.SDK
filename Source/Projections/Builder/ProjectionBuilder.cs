@@ -44,11 +44,11 @@ namespace Dolittle.SDK.Projections.Builder
         }
 
         /// <summary>
-        /// Creates a <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for the specified read model type.
+        /// Creates a <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for the specified read model type.
         /// </summary>
         /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-        /// <returns>The <see cref="ProjectionMethodsForReadModelBuilder{TReadModel}" /> for continuation.</returns>
-        public ProjectionMethodsForReadModelBuilder<TReadModel> ForReadModel<TReadModel>()
+        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        public ProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
             where TReadModel : class, new()
         {
             if (_methodsBuilder != default)
@@ -57,7 +57,7 @@ namespace Dolittle.SDK.Projections.Builder
             }
 
             _projectionAssociations.Associate<TReadModel>(_projectionId, _scopeId);
-            var builder = new ProjectionMethodsForReadModelBuilder<TReadModel>(_projectionId, _scopeId);
+            var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId);
             _methodsBuilder = builder;
             return builder;
         }
