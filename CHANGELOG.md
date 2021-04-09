@@ -1,39 +1,3 @@
-# [8.4.0-projections.2] - 2021-4-9 [PR: #57](https://github.com/dolittle/DotNET.SDK/pull/57)
-## Summary
-
-Upgrade to latest contracts prerelease, more flexible methods for getting projections through `IProjectionStore`, and make code a bit more robust in the `ProjectionProcesssor`.
-
-### Added
-
-- Overloads to IProjectionStore to get _untyped_ projection states.
-- Allow setting scope for a projection with the inline API after choosing readmodel type.
-
-### Changed
-
-- Adhere to new structure of contracts (prerelease 11)
-- Reuse more robust converter (from Projections.Store) in ProjectionProcessor
-
-
-# [8.4.0-projections.1] - 2021-4-7 [PR: #56](https://github.com/dolittle/DotNET.SDK/pull/56)
-## Summary
-
-Adds the ability to get projections.
-
-### Added
-
-- API for getting one or all projections of a specific projection type
-
-
-# [8.4.0-projections.0] - 2021-4-7 [PR: #55](https://github.com/dolittle/DotNET.SDK/pull/55)
-## Summary
-
-Adds projections
-
-### Added
-
-- Support for building and registering projections
-
-
 # [8.3.2] - 2021-3-24 [PR: #52](https://github.com/dolittle/DotNET.SDK/pull/52)
 ## Summary
 
