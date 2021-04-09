@@ -1,3 +1,84 @@
+# [8.4.0] - 2021-4-9 [PR: #54](https://github.com/dolittle/DotNET.SDK/pull/54)
+## Summary
+
+Adds Projections, that are a special type of event handler dealing with read models. Projections can be defined either inline in the client build steps, or declaratively with `[Projection()]` attribute.
+
+Example of writing a Projection inline and registering a declared one:
+```csharp
+var client = Client
+    .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
+    .WithEventTypes(eventTypes =>
+    {
+        eventTypes.Register<DishPrepared>();
+        eventTypes.Register<ChefFired>();
+    })
+    .WithProjections(projections =>
+    {
+        projections.CreateProjection("4a4c5b13-d4dd-4665-a9df-27b8e9b2054c")
+            .ForReadModel<Chef>()
+            .On<DishPrepared>(_ => _.KeyFromProperty(_ => _.Chef), (chef, @event, ctx) =>
+            {
+                chef.Name = @event.Chef;
+                chef.Dishes.Add(@event.Dish);
+                return chef;
+            })
+            .On<ChefFired>(_ => _.KeyFromProperty(_ => _.Chef), (chef, @event, ctx) =>
+            {
+                return ProjectionResult<Chef>.Delete;
+            });
+        projections.RegisterProjection<Menu>();
+    })
+    .Build();
+```
+
+Example of a declared projection:
+```csharp
+[Projection("0405b93f-1461-472c-bdc2-f89e0afd4dfe")]
+public class Menu
+{
+    public List<string> Dishes = new List<string>();
+
+    [KeyFromEventSource]
+    public void On(DishPrepared @event, ProjectionContext context)
+    {
+        if (!Dishes.Contains(@event.Dish)) Dishes.Add(@event.Dish);
+    }
+}
+```
+
+Example of getting projections:
+```csharp
+var menu = await client.Projections
+    .ForTenant(TenantId.Development)
+    .Get<Menu>("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9")
+    .ConfigureAwait(false);
+
+System.Console.WriteLine($"Menu consists of: {string.Join(", ", menu.State.Dishes)}");
+
+var allChefs = await client.Projections
+    .ForTenant(TenantId.Development)
+    .GetAll<Chef>()
+    .ConfigureAwait(false);
+
+foreach (var chef in allChefs)
+{
+    System.Console.WriteLine($"Chef name: {chef.State.Name} and prepared dishes: {string.Join(",", chef.State.Dishes)}");
+}
+```
+
+### Added
+
+- New `client.WithProjections()` to build Projections inline in the clients build steps.
+- Classes can be attributed with`[Projection('projectionId')]` to declare them as Projections (just like you can do with EventHandlers). The class itself becomes the readmodel for the projection.
+- `On()` methods are the handlers for a Projection. They can be decorated with different attributes to declare the key to the projection.
+- Get the state of a Projection with `client.Projections.Get<ReadModel>(key)` and `client.Projections.GetAll<ReadModel>()` (+ other overloads).
+- Sample for how to use Projections in _Samples/Tutorials/Projections_.
+
+### Changed
+
+- Sample directory structure and moved the tutorials around
+
+
 # [8.3.2] - 2021-3-24 [PR: #52](https://github.com/dolittle/DotNET.SDK/pull/52)
 ## Summary
 
