@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -23,22 +25,26 @@ namespace Dolittle.SDK.Projections.Internal
         where TReadModel : class, new()
     {
         readonly IProjection<TReadModel> _projection;
-        readonly IEventProcessingConverter _converter;
+        readonly IEventProcessingConverter _eventConverter;
+        readonly IConvertProjectionsToSDK _projectionConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectionsProcessor{TReadModel}"/> class.
         /// </summary>
         /// <param name="projection">The <see cref="IProjection{TReadModel}" />.</param>
-        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="eventConverter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public ProjectionsProcessor(
             IProjection<TReadModel> projection,
-            IEventProcessingConverter converter,
+            IEventProcessingConverter eventConverter,
+            IConvertProjectionsToSDK projectionConverter,
             ILogger logger)
             : base("Projection", projection.Identifier, logger)
         {
             _projection = projection;
-            _converter = converter;
+            _eventConverter = eventConverter;
+            _projectionConverter = projectionConverter;
         }
 
         /// <inheritdoc/>
@@ -52,18 +58,7 @@ namespace Dolittle.SDK.Projections.Internal
                     ScopeId = _projection.ScopeId.ToProtobuf(),
                     InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None)
                 };
-                registrationRequest.Events.AddRange(_projection.Events.Select(_ =>
-                {
-                    return new ProjectionEventSelector
-                    {
-                        EventType = _.EventType.ToProtobuf(),
-                        KeySelector = new ProjectionEventKeySelector
-                        {
-                            Type = _.KeySelector.Type.ToProtobuf(),
-                            Expression = _.KeySelector.Expression ?? string.Empty
-                        }
-                    };
-                }).ToArray());
+                registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());
                 return registrationRequest;
             }
         }
@@ -71,25 +66,30 @@ namespace Dolittle.SDK.Projections.Internal
         /// <inheritdoc/>
         protected override async Task<ProjectionResponse> Process(ProjectionRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
-            var committedEvent = _converter.ToSDK(request.Event).Event;
+            if (!_projectionConverter.TryConvert<TReadModel>(request.CurrentState, out var currentState, out var error))
+            {
+                throw error;
+            }
+
+            var committedEvent = _eventConverter.ToSDK(request.Event).Event;
             var eventContext = committedEvent.GetEventContext(executionContext);
-            var projectionContext = new ProjectionContext(request.CurrentState.Type == ProjectionCurrentStateType.CreatedFromInitialState, request.Key, eventContext);
+            var projectionContext = new ProjectionContext(currentState.WasCreatedFromInitialState, currentState.Key, eventContext);
 
             var result = await _projection
                 .On(
-                    JsonConvert.DeserializeObject<TReadModel>(request.CurrentState.State),
+                    currentState.State,
                     committedEvent.Content,
                     committedEvent.EventType,
                     projectionContext,
                     cancellation)
                 .ConfigureAwait(false);
 
-            var response = new ProjectionResponse
+            return result.Type switch
             {
-                NextState = new ProjectionNextState { Type = result.Type.ToProtobuf() }
+                ProjectionResultType.Replace => new ProjectionResponse { Replace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None) } },
+                ProjectionResultType.Delete => new ProjectionResponse { Delete = new ProjectionDeleteResponse() },
+                _ => throw new UnknownProjectionResultType(result.Type)
             };
-            if (result.Type == ProjectionResultType.Replace) response.NextState.Value = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None);
-            return response;
         }
 
         /// <inheritdoc/>
@@ -99,5 +99,24 @@ namespace Dolittle.SDK.Projections.Internal
         /// <inheritdoc/>
         protected override ProjectionResponse CreateResponseFromFailure(ProcessorFailure failure)
             => new ProjectionResponse { Failure = failure };
+
+        ProjectionEventSelector CreateProjectionEventSelector(EventSelector eventSelector)
+        {
+            static ProjectionEventSelector WithEventType(EventSelector eventSelector, Action<ProjectionEventSelector> callback)
+            {
+                var message = new ProjectionEventSelector();
+                callback(message);
+                message.EventType = eventSelector.EventType.ToProtobuf();
+                return message;
+            }
+
+            return eventSelector.KeySelector.Type switch
+            {
+                KeySelectorType.EventSourceId => WithEventType(eventSelector, _ => _.EventSourceKeySelector = new EventSourceIdKeySelector()),
+                KeySelectorType.PartitionId => WithEventType(eventSelector, _ => _.PartitionKeySelector = new PartitionIdKeySelector()),
+                KeySelectorType.Property => WithEventType(eventSelector, _ => _.EventPropertyKeySelector = new EventPropertyKeySelector { PropertyName = eventSelector.KeySelector.Expression ?? string.Empty }),
+                _ => throw new UnknownKeySelectorType(eventSelector.KeySelector.Type)
+            };
+        }
     }
 }

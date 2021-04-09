@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Events.Store.Converters;
 using Newtonsoft.Json;
-using PbCurrentState = Dolittle.Runtime.Events.Processing.Contracts.ProjectionCurrentState;
-using PbCurrentStateType = Dolittle.Runtime.Events.Processing.Contracts.ProjectionCurrentStateType;
+using PbCurrentState = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentState;
+using PbCurrentStateType = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentStateType;
 
 namespace Dolittle.SDK.Projections.Store.Converters
 {
@@ -50,11 +50,11 @@ namespace Dolittle.SDK.Projections.Store.Converters
             var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
 
             if (exceptionCatcher.Failed)
-                deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, exceptionCatcher.Error);
+                deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error);
             else
                 deserializationError = null;
 
-            projectionState = new CurrentState<TProjection>(state, stateType);
+            projectionState = new CurrentState<TProjection>(state, stateType, currentState.Key);
 
             return !exceptionCatcher.Failed;
         }

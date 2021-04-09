@@ -4,6 +4,7 @@
 using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder
@@ -19,12 +20,14 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
+            IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation);
     }

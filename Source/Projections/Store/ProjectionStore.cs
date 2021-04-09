@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Projections.Contracts;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Projections.Store.Converters;
@@ -53,27 +55,46 @@ namespace Dolittle.SDK.Projections.Store
         }
 
         /// <inheritdoc/>
-        public async Task<CurrentState<TProjection>> Get<TProjection>(Key key, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<CurrentState<TProjection>> Get<TProjection>(Key key, System.Threading.CancellationToken cancellation = default)
             where TProjection : class, new()
         {
             var projection = _projectionAssociations.GetFor<TProjection>();
+            return await Get<TProjection>(key, projection.Identifier, projection.ScopeId, cancellation).ConfigureAwait(false);
+        }
 
+        /// <inheritdoc/>
+        public Task<CurrentState<TProjection>> Get<TProjection>(Key key, ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+            where TProjection : class, new()
+            => Get<TProjection>(key, projectionId, ScopeId.Default, cancellation);
+
+        /// <inheritdoc/>
+        public Task<CurrentState<object>> Get(Key key, ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+            => Get<object>(key, projectionId, ScopeId.Default, cancellation);
+
+        /// <inheritdoc/>
+        public Task<CurrentState<object>> Get(Key key, ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+            => Get<object>(key, projectionId, scopeId, cancellation);
+
+        /// <inheritdoc/>
+        public async Task<CurrentState<TProjection>> Get<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+            where TProjection : class, new()
+        {
             _logger.LogDebug(
                 "Getting current projection state with key {Key} for projection of {ProjectionType} with id {ProjectionId} in scope {Scope}",
                 key,
                 typeof(TProjection),
-                projection.Identifier,
-                projection.ScopeId);
+                projectionId,
+                scopeId);
 
             var request = new GetOneRequest
             {
                 CallContext = _callContextResolver.ResolveFrom(_executionContext),
                 Key = key,
-                ProjectionId = projection.Identifier.ToProtobuf(),
-                ScopeId = projection.ScopeId.ToProtobuf()
+                ProjectionId = projectionId.ToProtobuf(),
+                ScopeId = scopeId.ToProtobuf()
             };
 
-            var response = await _caller.Call(_getOneMethod, request, cancellationToken).ConfigureAwait(false);
+            var response = await _caller.Call(_getOneMethod, request, cancellation).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
 
             if (!_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
@@ -86,25 +107,44 @@ namespace Dolittle.SDK.Projections.Store
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<CurrentState<TProjection>>> GetAll<TProjection>(System.Threading.CancellationToken cancellationToken = default)
+        public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(System.Threading.CancellationToken cancellation = default)
             where TProjection : class, new()
         {
             var projection = _projectionAssociations.GetFor<TProjection>();
+            return await GetAll<TProjection>(projection.Identifier, projection.ScopeId, cancellation).ConfigureAwait(false);
+        }
 
+        /// <inheritdoc/>
+        public Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+            where TProjection : class, new()
+            => GetAll<TProjection>(projectionId, ScopeId.Default, cancellation);
+
+        /// <inheritdoc/>
+        public Task<IDictionary<Key, CurrentState<object>>> GetAll(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+            => GetAll<object>(projectionId, ScopeId.Default, cancellation);
+
+        /// <inheritdoc/>
+        public Task<IDictionary<Key, CurrentState<object>>> GetAll(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+            => GetAll<object>(projectionId, scopeId, cancellation);
+
+        /// <inheritdoc/>
+        public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+            where TProjection : class, new()
+        {
             _logger.LogDebug(
                 "Getting all current projection states for projection of {ProjectionType} with id {ProjectionId} in scope {Scope}",
                 typeof(TProjection),
-                projection.Identifier,
-                projection.ScopeId);
+                projectionId,
+                scopeId);
 
             var request = new GetAllRequest
             {
                 CallContext = _callContextResolver.ResolveFrom(_executionContext),
-                ProjectionId = projection.Identifier.ToProtobuf(),
-                ScopeId = projection.ScopeId.ToProtobuf()
+                ProjectionId = projectionId.ToProtobuf(),
+                ScopeId = scopeId.ToProtobuf()
             };
 
-            var response = await _caller.Call(_getAllMethod, request, cancellationToken).ConfigureAwait(false);
+            var response = await _caller.Call(_getAllMethod, request, cancellation).ConfigureAwait(false);
             response.Failure.ThrowIfFailureIsSet();
 
             if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
@@ -113,7 +153,7 @@ namespace Dolittle.SDK.Projections.Store
                 throw error;
             }
 
-            return states;
+            return states.ToDictionary(_ => _.Key);
         }
     }
 }

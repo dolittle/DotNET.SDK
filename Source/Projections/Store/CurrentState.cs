@@ -15,7 +15,8 @@ namespace Dolittle.SDK.Projections.Store
         /// </summary>
         /// <param name="state">The current <typeparamref name="TProjection"/> state.</param>
         /// <param name="type">The <see cref="CurrentStateType" />.</param>
-        public CurrentState(TProjection state, CurrentStateType type)
+        /// <param name="key">The <see cref="Key" />.</param>
+        public CurrentState(TProjection state, CurrentStateType type, Key key)
         {
             State = state;
             WasCreatedFromInitialState = type switch
@@ -23,6 +24,7 @@ namespace Dolittle.SDK.Projections.Store
                 CurrentStateType.CreatedFromInitialState => true,
                 _ => false
             };
+            Key = key;
         }
 
         /// <summary>
@@ -34,6 +36,11 @@ namespace Dolittle.SDK.Projections.Store
         /// Gets the state.
         /// </summary>
         public TProjection State { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Key" />.
+        /// </summary>
+        public Key Key { get; }
 
         /// <summary>
         /// Implicitly converts a <see cref="CurrentState{TProjection}" /> to the underlying <typeparamref name="TProjection"/>.

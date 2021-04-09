@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using PbCurrentState = Dolittle.Runtime.Events.Processing.Contracts.ProjectionCurrentState;
+using PbCurrentState = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentState;
 
 namespace Dolittle.SDK.Projections.Store.Converters
 {
