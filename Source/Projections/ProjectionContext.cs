@@ -17,10 +17,7 @@ namespace Dolittle.SDK.Projections
         /// <param name="wasCreatedFromInitialState">A value indicating whether the projection was created from the initial state or retrieved from a persisted state.</param>
         /// <param name="key">The projection <see cref="Key"/>.</param>
         /// <param name="eventContext">The <see cref="EventContext"/> in which the event occurred.</param>
-        public ProjectionContext(
-            bool wasCreatedFromInitialState,
-            Key key,
-            EventContext eventContext)
+        public ProjectionContext(bool wasCreatedFromInitialState, Key key, EventContext eventContext)
         {
             WasCreatedFromInitialState = wasCreatedFromInitialState;
             Key = key;

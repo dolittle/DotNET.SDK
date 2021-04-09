@@ -276,6 +276,7 @@ namespace Dolittle.SDK
                 eventProcessingConverter,
                 _eventHandlersBuilder,
                 _eventFiltersBuilder,
+                projectionsToSDKConverter,
                 _projectionsBuilder,
                 projectionStoreBuilder,
                 _loggerFactory,

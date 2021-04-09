@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Projections.Store
         /// </summary>
         /// <param name="state">The current <typeparamref name="TProjection"/> state.</param>
         /// <param name="type">The <see cref="CurrentStateType" />.</param>
-        /// <param name="key">The <see cref="Projections.Key" />.</param>
+        /// <param name="key">The <see cref="Key" />.</param>
         public CurrentState(TProjection state, CurrentStateType type, Key key)
         {
             State = state;
@@ -38,7 +38,7 @@ namespace Dolittle.SDK.Projections.Store
         public TProjection State { get; }
 
         /// <summary>
-        /// Gets the <see cref="Projections.Key" />.
+        /// Gets the <see cref="Key" />.
         /// </summary>
         public Key Key { get; }
 

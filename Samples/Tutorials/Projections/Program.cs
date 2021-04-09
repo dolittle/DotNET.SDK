@@ -62,23 +62,23 @@ namespace Kitchen
             var chiliCannon = new DishPrepared("Chili Cannon Wrap", "Ms. TexMex");
             // var mrTacoFired = new ChefFired("Mr. Taco");
 
-            // await client.EventStore
-            //     .ForTenant(TenantId.Development)
-            //     .Commit(eventsBuilder =>
-            //     {
-            //         eventsBuilder
-            //             .CreateEvent(preparedTaco)
-            //             .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
-            //         eventsBuilder
-            //             .CreateEvent(avocadoArtillery)
-            //             .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
-            //         eventsBuilder
-            //             .CreateEvent(chiliCannon)
-            //             .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
-            //         // eventsBuilder
-            //         //     .CreateEvent(mrTacoFired)
-            //         //     .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
-            //     }).ConfigureAwait(false);
+            await client.EventStore
+                .ForTenant(TenantId.Development)
+                .Commit(eventsBuilder =>
+                {
+                    eventsBuilder
+                        .CreateEvent(preparedTaco)
+                        .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
+                    eventsBuilder
+                        .CreateEvent(avocadoArtillery)
+                        .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
+                    eventsBuilder
+                        .CreateEvent(chiliCannon)
+                        .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
+                    // eventsBuilder
+                    //     .CreateEvent(mrTacoFired)
+                    //     .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9");
+                }).ConfigureAwait(false);
 
             var started = client.Start();
 

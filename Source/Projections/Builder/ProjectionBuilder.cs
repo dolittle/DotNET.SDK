@@ -6,6 +6,7 @@ using System.Threading;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Projections.Store;
+using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder
@@ -67,6 +68,7 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
+            IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
@@ -75,7 +77,7 @@ namespace Dolittle.SDK.Projections.Builder
                 throw new ProjectionNeedsToBeForReadModel(_projectionId);
             }
 
-            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, loggerFactory, cancellation);
+            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, projectionConverter, loggerFactory, cancellation);
         }
     }
 }

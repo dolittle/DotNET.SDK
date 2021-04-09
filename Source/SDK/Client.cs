@@ -16,6 +16,7 @@ using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
+using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
@@ -29,6 +30,7 @@ namespace Dolittle.SDK
         readonly ProcessingCoordinator _processingCoordinator;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly EventFiltersBuilder _filtersBuilder;
+        readonly IConvertProjectionsToSDK _projectionConverter;
         readonly ProjectionsBuilder _projectionsBuilder;
         readonly EventHorizons _eventHorizons;
         readonly IEventProcessors _eventProcessors;
@@ -49,6 +51,7 @@ namespace Dolittle.SDK
         /// <param name="eventProcessingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="eventHandlersBuilder">The <see cref="EventHandlersBuilder" />.</param>
         /// <param name="filtersBuilder">The <see cref="EventFiltersBuilder" />.</param>
+        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
         /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
@@ -62,6 +65,7 @@ namespace Dolittle.SDK
             IEventProcessingConverter eventProcessingConverter,
             EventHandlersBuilder eventHandlersBuilder,
             EventFiltersBuilder filtersBuilder,
+            IConvertProjectionsToSDK projectionConverter,
             ProjectionsBuilder projectionsBuilder,
             ProjectionStoreBuilder projectionStoreBuilder,
             ILoggerFactory loggerFactory,
@@ -75,6 +79,7 @@ namespace Dolittle.SDK
             _eventProcessingConverter = eventProcessingConverter;
             _eventHandlersBuilder = eventHandlersBuilder;
             _filtersBuilder = filtersBuilder;
+            _projectionConverter = projectionConverter;
             _projectionsBuilder = projectionsBuilder;
             Projections = projectionStoreBuilder;
             _loggerFactory = loggerFactory;
@@ -143,6 +148,7 @@ namespace Dolittle.SDK
                 _eventProcessors,
                 EventTypes,
                 _eventProcessingConverter,
+                _projectionConverter,
                 _loggerFactory,
                 _cancellation);
             return _processingCoordinator.Completion;

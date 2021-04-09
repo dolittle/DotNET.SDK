@@ -6,10 +6,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
-using Dolittle.Runtime.Projections.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -25,22 +25,26 @@ namespace Dolittle.SDK.Projections.Internal
         where TReadModel : class, new()
     {
         readonly IProjection<TReadModel> _projection;
-        readonly IEventProcessingConverter _converter;
+        readonly IEventProcessingConverter _eventConverter;
+        readonly IConvertProjectionsToSDK _projectionConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectionsProcessor{TReadModel}"/> class.
         /// </summary>
         /// <param name="projection">The <see cref="IProjection{TReadModel}" />.</param>
-        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="eventConverter">The <see cref="IEventProcessingConverter" />.</param>
+        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
         public ProjectionsProcessor(
             IProjection<TReadModel> projection,
-            IEventProcessingConverter converter,
+            IEventProcessingConverter eventConverter,
+            IConvertProjectionsToSDK projectionConverter,
             ILogger logger)
             : base("Projection", projection.Identifier, logger)
         {
             _projection = projection;
-            _converter = converter;
+            _eventConverter = eventConverter;
+            _projectionConverter = projectionConverter;
         }
 
         /// <inheritdoc/>
@@ -62,13 +66,18 @@ namespace Dolittle.SDK.Projections.Internal
         /// <inheritdoc/>
         protected override async Task<ProjectionResponse> Process(ProjectionRequest request, ExecutionContext executionContext, CancellationToken cancellation)
         {
-            var committedEvent = _converter.ToSDK(request.Event).Event;
+            if (!_projectionConverter.TryConvert<TReadModel>(request.CurrentState, out var currentState, out var error))
+            {
+                throw error;
+            }
+
+            var committedEvent = _eventConverter.ToSDK(request.Event).Event;
             var eventContext = committedEvent.GetEventContext(executionContext);
-            var projectionContext = new ProjectionContext(request.CurrentState.Type == ProjectionCurrentStateType.CreatedFromInitialState, request.CurrentState.Key, eventContext);
+            var projectionContext = new ProjectionContext(currentState.WasCreatedFromInitialState, currentState.Key, eventContext);
 
             var result = await _projection
                 .On(
-                    JsonConvert.DeserializeObject<TReadModel>(request.CurrentState.State),
+                    currentState.State,
                     committedEvent.Content,
                     committedEvent.EventType,
                     projectionContext,

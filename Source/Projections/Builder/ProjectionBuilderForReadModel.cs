@@ -8,6 +8,7 @@ using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Projections.Internal;
+using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder
@@ -172,6 +173,7 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
+            IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
@@ -194,7 +196,12 @@ namespace Dolittle.SDK.Projections.Builder
             }
 
             var projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods);
-            var projectionProcessor = new ProjectionsProcessor<TReadModel>(projection, processingConverter, loggerFactory.CreateLogger<ProjectionsProcessor<TReadModel>>());
+            var projectionProcessor = new ProjectionsProcessor<TReadModel>(
+                projection,
+                processingConverter,
+                projectionConverter,
+                loggerFactory.CreateLogger<ProjectionsProcessor<TReadModel>>());
+
             eventProcessors.Register(
                 projectionProcessor,
                 new ProjectionsProtocol(),
