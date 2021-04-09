@@ -46,7 +46,7 @@ jobs:
         run: dotnet pack --no-build --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 
       - name: Prepend to Changelog
-        if: ${{ steps.context.outputs.should-publish == 'true' }}
+        if: ${{ steps.context.outputs.should-publish == 'true' && steps.context.outputs.release-type != 'prerelease' }}
         uses: dolittle/add-to-changelog-action@v2
         with:
           version: ${{ steps.increment-version.outputs.next-version }}
