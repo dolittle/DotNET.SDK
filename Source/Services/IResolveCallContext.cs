@@ -4,7 +4,7 @@
 using Dolittle.Services.Contracts;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Services
 {
     /// <summary>
     /// Defines a system that can resolve <see cref="CallRequestContext" />.

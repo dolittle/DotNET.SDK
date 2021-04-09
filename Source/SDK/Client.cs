@@ -14,6 +14,9 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Microservices;
+using Dolittle.SDK.Projections.Builder;
+using Dolittle.SDK.Projections.Store.Builders;
+using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 
@@ -27,6 +30,8 @@ namespace Dolittle.SDK
         readonly ProcessingCoordinator _processingCoordinator;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly EventFiltersBuilder _filtersBuilder;
+        readonly IConvertProjectionsToSDK _projectionConverter;
+        readonly ProjectionsBuilder _projectionsBuilder;
         readonly EventHorizons _eventHorizons;
         readonly IEventProcessors _eventProcessors;
         readonly IEventProcessingConverter _eventProcessingConverter;
@@ -46,6 +51,9 @@ namespace Dolittle.SDK
         /// <param name="eventProcessingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="eventHandlersBuilder">The <see cref="EventHandlersBuilder" />.</param>
         /// <param name="filtersBuilder">The <see cref="EventFiltersBuilder" />.</param>
+        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
+        /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
+        /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -57,6 +65,9 @@ namespace Dolittle.SDK
             IEventProcessingConverter eventProcessingConverter,
             EventHandlersBuilder eventHandlersBuilder,
             EventFiltersBuilder filtersBuilder,
+            IConvertProjectionsToSDK projectionConverter,
+            ProjectionsBuilder projectionsBuilder,
+            ProjectionStoreBuilder projectionStoreBuilder,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -68,6 +79,9 @@ namespace Dolittle.SDK
             _eventProcessingConverter = eventProcessingConverter;
             _eventHandlersBuilder = eventHandlersBuilder;
             _filtersBuilder = filtersBuilder;
+            _projectionConverter = projectionConverter;
+            _projectionsBuilder = projectionsBuilder;
+            Projections = projectionStoreBuilder;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -82,6 +96,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="EventStoreBuilder" />.
         /// </summary>
         public EventStoreBuilder EventStore { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ProjectionStoreBuilder" />.
+        /// </summary>
+        public ProjectionStoreBuilder Projections { get; }
 
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.
@@ -123,6 +142,13 @@ namespace Dolittle.SDK
             _filtersBuilder.BuildAndRegister(
                 _eventProcessors,
                 _eventProcessingConverter,
+                _loggerFactory,
+                _cancellation);
+            _projectionsBuilder.BuildAndRegister(
+                _eventProcessors,
+                EventTypes,
+                _eventProcessingConverter,
+                _projectionConverter,
                 _loggerFactory,
                 _cancellation);
             return _processingCoordinator.Completion;
