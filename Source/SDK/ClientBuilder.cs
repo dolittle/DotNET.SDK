@@ -43,6 +43,7 @@ namespace Dolittle.SDK
         readonly MicroserviceId _microserviceId;
         readonly ProjectionReadModelTypeAssociations _projectionAssociations;
         string _host = "localhost";
+        TimeSpan _timeout = TimeSpan.FromSeconds(5);
         ushort _port = 50053;
         Version _version;
         Environment _environment;
@@ -85,6 +86,17 @@ namespace Dolittle.SDK
         public ClientBuilder WithVersion(Version version)
         {
             _version = version;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the ping timeout for communicating with the microservice.
+        /// </summary>
+        /// <param name="timeout">The ping timeout.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithTimeout(TimeSpan timeout)
+        {
+            _timeout = timeout;
             return this;
         }
 
@@ -225,7 +237,7 @@ namespace Dolittle.SDK
 
             var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
-                TimeSpan.FromSeconds(5),
+                _timeout,
                 methodCaller,
                 executionContext,
                 _loggerFactory,
