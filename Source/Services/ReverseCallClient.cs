@@ -104,6 +104,10 @@ namespace Dolittle.SDK.Services
             var connectResponseAndErrors = MergeConnectResponseWithErrorsFromServer(connectResponse, toClientMessages);
             connectResponseAndErrors.Subscribe(observer);
 
+            toClientMessages
+                .Where(MessageIsPing)
+                .Subscribe(_ => Thread.Sleep(20));
+
             var subscription = _caller.Call(_protocol, toServerMessages, _cancellationToken).Subscribe(toClientMessages);
 
             return Disposable.Create(() =>

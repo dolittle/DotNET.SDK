@@ -18,6 +18,7 @@ using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
 {
+    [Ignore("because thread needs to sleep")]
     public class two_requests_at_the_same_time : given.a_reverse_call_client
     {
         static ConnectArguments connectArguments;

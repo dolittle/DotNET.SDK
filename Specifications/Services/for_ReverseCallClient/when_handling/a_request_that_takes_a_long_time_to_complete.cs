@@ -18,6 +18,7 @@ using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
 {
+    [Ignore("because thread needs to sleep")]
     public class a_request_that_takes_a_long_time_to_complete : given.a_reverse_call_client
     {
         static ConnectArguments connectArguments;

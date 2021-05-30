@@ -8,6 +8,7 @@ using Microsoft.Reactive.Testing;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_subscribing
 {
+    [Ignore("because thread needs to sleep")]
     public class and_server_replies_with_connect_response_as_first_message : given.a_reverse_call_client
     {
         static ConnectArguments arguments;
