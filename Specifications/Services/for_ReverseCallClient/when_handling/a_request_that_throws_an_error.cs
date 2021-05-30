@@ -18,6 +18,7 @@ using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
 {
+    [Ignore("because thread needs to sleep")]
     public class a_request_that_throws_an_error : given.a_reverse_call_client
     {
         static ConnectArguments connectArguments;
