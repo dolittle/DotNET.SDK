@@ -240,8 +240,7 @@ namespace Dolittle.SDK
                 _timeout,
                 methodCaller,
                 executionContext,
-                _loggerFactory,
-                _cancellation);
+                _loggerFactory);
 
             var serializer = new EventContentSerializer(eventTypes);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
@@ -251,9 +250,9 @@ namespace Dolittle.SDK
             var projectionsToSDKConverter = new ProjectionsToSDKConverter();
 
             var eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
-            var processingCoordinator = new ProcessingCoordinator(_loggerFactory.CreateLogger<ProcessingCoordinator>(), _cancellation);
+            var processingCoordinator = new ProcessingCoordinator();
 
-            var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _retryPolicy, _loggerFactory.CreateLogger<EventProcessors>());
+            var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _loggerFactory.CreateLogger<EventProcessors>());
 
             var callContextResolver = new CallContextResolver();
 
