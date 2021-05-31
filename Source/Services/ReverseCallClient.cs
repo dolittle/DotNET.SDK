@@ -89,9 +89,9 @@ namespace Dolittle.SDK.Services
         /// <inheritdoc/>
         public IDisposable Subscribe(IObserver<TConnectResponse> observer)
         {
-#pragma warning disable CA2000
+            #pragma warning disable CA2000
             var toClientMessages = new Subject<TServerMessage>();
-#pragma warning restore CA2000
+            #pragma warning restore CA2000
 
             var connectResponse = GetConnectResponseFromFirstMessageOrError(toClientMessages);
             var timeout = TimeoutAfterPingIntervalAfterFirstMessageIsReceived(toClientMessages);
@@ -103,6 +103,10 @@ namespace Dolittle.SDK.Services
 
             var connectResponseAndErrors = MergeConnectResponseWithErrorsFromServer(connectResponse, toClientMessages);
             connectResponseAndErrors.Subscribe(observer);
+
+            toClientMessages
+                .Where(MessageIsPing)
+                .Subscribe(_ => Thread.Sleep(20));
 
             var subscription = _caller.Call(_protocol, toServerMessages, _cancellationToken).Subscribe(toClientMessages);
 
@@ -212,7 +216,7 @@ namespace Dolittle.SDK.Services
 
             var response = await Handler.Handle(request, executionContext, token).ConfigureAwait(false);
 
-            var responseContext = new ReverseCallResponseContext { CallId = requestContext.CallId };
+            var responseContext = new ReverseCallResponseContext { CallId = requestContext.CallId };
             _protocol.SetResponseContextIn(responseContext, response);
 
             return response;
@@ -220,10 +224,10 @@ namespace Dolittle.SDK.Services
 
         ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
             => new ReverseCallArgumentsContext
-            {
-                HeadId = Guid.NewGuid().ToProtobuf(),
-                ExecutionContext = _executionContext.ToProtobuf(),
-                PingInterval = Duration.FromTimeSpan(_pingInterval),
-            };
+                {
+                    HeadId = Guid.NewGuid().ToProtobuf(),
+                    ExecutionContext = _executionContext.ToProtobuf(),
+                    PingInterval = Duration.FromTimeSpan(_pingInterval),
+                };
     }
 }

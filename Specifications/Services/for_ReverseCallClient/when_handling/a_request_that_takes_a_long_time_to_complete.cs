@@ -18,6 +18,7 @@ using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
 {
+    [Ignore("because thread needs to sleep")]
     public class a_request_that_takes_a_long_time_to_complete : given.a_reverse_call_client
     {
         static ConnectArguments connectArguments;
@@ -69,7 +70,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
                 .Returns(slowResponse);
 
             serverToClientMessages = scheduler.CreateHotObservable(
-                OnNext(100, new ServerMessage { Response = connectResponse }),
+                OnNext(100, new ServerMessage { Response = connectResponse }),
                 OnNext(110, new ServerMessage { Request = request }),
                 OnNext(140, new ServerMessage { Ping = new Ping() }),
                 OnNext(180, new ServerMessage { Ping = new Ping() }),
