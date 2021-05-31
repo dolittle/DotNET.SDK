@@ -18,7 +18,6 @@ using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
 {
-    [Ignore("because thread needs to sleep")]
     public class two_requests_at_the_same_time : given.a_reverse_call_client
     {
         static ConnectArguments connectArguments;
@@ -104,7 +103,7 @@ namespace Dolittle.SDK.Services.for_ReverseCallClient.when_handling
                 .Returns(secondSlowResponse);
 
             serverToClientMessages = scheduler.CreateHotObservable(
-                OnNext(100, new ServerMessage { Response = connectResponse }),
+                OnNext(100, new ServerMessage { Response = connectResponse }),
                 OnNext(110, new ServerMessage { Request = firstRequest }),
                 OnNext(120, new ServerMessage { Request = secondRequest }),
                 OnCompleted<ServerMessage>(250));
