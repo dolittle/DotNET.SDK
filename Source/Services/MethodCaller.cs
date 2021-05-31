@@ -71,8 +71,8 @@ namespace Dolittle.SDK.Services
                     _ => { },
                     error =>
                     {
-                        observer.OnError(error);
                         tcs.Cancel();
+                        observer.OnError(error);
                     });
 
         async Task ReceiveAllMessagesFromServer<T>(IObserver<T> observer, IAsyncStreamReader<T> reader, CancellationToken token)
