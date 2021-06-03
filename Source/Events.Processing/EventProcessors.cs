@@ -83,12 +83,12 @@ namespace Dolittle.SDK.Events.Processing
                     var connectFailure = protocol.GetFailureFromConnectResponse(client.ConnectResponse);
                     if (connectFailure != null)
                     {
-                        _logger.LogWarning("{Kind} {Identifier} received a failure from the Runtime, retrying in 1s. {FailureReason}", eventProcessor.Kind, eventProcessor.Identifier, connectFailure.Reason);
+                        _logger.LogWarning("{Kind} {Identifier} received a failure from the Runtime, retrying in 1s {FailureReason}", eventProcessor.Kind, eventProcessor.Identifier, connectFailure.Reason);
                         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                         continue;
                     }
 
-                    _logger.LogDebug("{Kind} {Identifier} registered with the Runtime, start handling requests.", eventProcessor.Kind, eventProcessor.Identifier);
+                    _logger.LogDebug("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
                     await client.Handle(eventProcessor, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception exception)
