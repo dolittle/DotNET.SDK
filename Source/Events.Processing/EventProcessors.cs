@@ -75,7 +75,7 @@ namespace Dolittle.SDK.Events.Processing
                     var connected = await client.Connect(eventProcessor.RegistrationRequest, cancellationToken).ConfigureAwait(false);
                     if (!connected)
                     {
-                        _logger.LogWarning("{Kind} {Identifier} failed to connect to the Runtime, retrying in 1s", eventProcessor.Kind, eventProcessor.Identifier);
+                        _logger.LogWarning("{Kind} {Identifier} failed to connect to the Runtime, retrying in 1s.", eventProcessor.Kind, eventProcessor.Identifier);
                         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                         continue;
                     }
@@ -83,7 +83,7 @@ namespace Dolittle.SDK.Events.Processing
                     var connectFailure = protocol.GetFailureFromConnectResponse(client.ConnectResponse);
                     if (connectFailure != null)
                     {
-                        _logger.LogWarning("{Kind} {Identifier} received a failure from the Runtime, retrying in 1s {FailureReason}", eventProcessor.Kind, eventProcessor.Identifier, connectFailure.Reason);
+                        _logger.LogWarning("{Kind} {Identifier} received a failure from the Runtime, retrying in 1s. {FailureReason}", eventProcessor.Kind, eventProcessor.Identifier, connectFailure.Reason);
                         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                         continue;
                     }
