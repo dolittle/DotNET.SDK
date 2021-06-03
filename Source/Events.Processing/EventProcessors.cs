@@ -75,7 +75,7 @@ namespace Dolittle.SDK.Events.Processing
                     var connected = await client.Connect(eventProcessor.RegistrationRequest, cancellationToken).ConfigureAwait(false);
                     if (!connected)
                     {
-                        _logger.LogWarning("{Kind} {Identifier} failed to connect to the Runtime, retrying in 1s", eventProcessor.Kind, eventProcessor.Identifier);
+                        _logger.LogWarning("{Kind} {Identifier} failed to connect to the Runtime, retrying in 1s.", eventProcessor.Kind, eventProcessor.Identifier);
                         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                         continue;
                     }
@@ -88,7 +88,7 @@ namespace Dolittle.SDK.Events.Processing
                         continue;
                     }
 
-                    _logger.LogDebug("{Kind} {Identifier} registered with the Runtime, start handling requests.", eventProcessor.Kind, eventProcessor.Identifier);
+                    _logger.LogDebug("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
                     await client.Handle(eventProcessor, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception exception)

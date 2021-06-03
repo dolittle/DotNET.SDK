@@ -90,19 +90,26 @@ namespace Dolittle.SDK.Services
             _serverToClient = streamingCall.ResponseStream;
             var callContext = CreateReverseCallArgumentsContext();
             _protocol.SetConnectArgumentsContextIn(callContext, connectArguments);
-            var message = _protocol.CreateMessageFrom(connectArguments);
+            var connectMessage = _protocol.CreateMessageFrom(connectArguments);
 
-            await _clientToServer.WriteAsync(message).ConfigureAwait(false);
+            await _clientToServer.WriteAsync(connectMessage).ConfigureAwait(false);
 
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             linkedCts.CancelAfter(_pingInterval.Multiply(3));
 
             try
             {
-                if (await _serverToClient.MoveNext(linkedCts.Token).ConfigureAwait(false))
+                while (await _serverToClient.MoveNext(linkedCts.Token).ConfigureAwait(false))
                 {
-                    var response = _protocol.GetConnectResponseFrom(_serverToClient.Current);
-                    if (response != null)
+                    var message = _serverToClient.Current;
+                    var ping = _protocol.GetPingFrom(message);
+                    var response = _protocol.GetConnectResponseFrom(message);
+                    if (ping != null)
+                    {
+                        _logger.LogTrace("Received ping");
+                        await WritePong(cancellationToken).ConfigureAwait(false);
+                    }
+                    else if (response != null)
                     {
                         _logger.LogTrace("Received connect response");
                         ConnectResponse = response;
@@ -111,14 +118,13 @@ namespace Dolittle.SDK.Services
                     }
                     else
                     {
-                        _logger.LogWarning("Did not receive connect response. Server message did not contain the connect response");
+                        _logger.LogWarning("Received a message from Reverse Call Dispatcher while connecting, but it was not a registration response or a ping");
                     }
-                }
-                else
-                {
-                    _logger.LogWarning("Did not receive connect response. Server stream was empty");
+
+                    linkedCts.CancelAfter(_pingInterval.Multiply(3));
                 }
 
+                _logger.LogWarning("No messages received from the server, connection timed out.");
                 await _clientToServer.CompleteAsync().ConfigureAwait(false);
                 return false;
             }
@@ -168,7 +174,7 @@ namespace Dolittle.SDK.Services
                     }
                     else
                     {
-                        _logger.LogWarning("Received message from Reverse Call Dispatcher, but it was not a request or a ping");
+                        _logger.LogWarning("Received message from Reverse Call Dispatcher while handling, but it was not a request or a ping");
                     }
 
                     linkedCts.CancelAfter(_pingInterval.Multiply(3));
