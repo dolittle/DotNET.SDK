@@ -1,14 +1,16 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Globalization;
-using Dolittle.SDK.Microservices;
+using System.Threading.Tasks;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
+using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.EventHorizon.for_EventHorizons.given
 {
@@ -37,7 +39,12 @@ namespace Dolittle.SDK.EventHorizon.for_EventHorizons.given
 
             var logger = Mock.Of<ILogger>();
 
-            event_horizons = new EventHorizons(caller.Object, execution_context, logger);
+            event_horizons = new EventHorizons(caller.Object, execution_context, RetryPolicy, logger);
         };
+
+        static async Task RetryPolicy(Subscription subscription, ILogger logger, Func<Task> method)
+        {
+            await method().ConfigureAwait(false);
+        }
     }
 }
