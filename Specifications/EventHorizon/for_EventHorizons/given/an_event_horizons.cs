@@ -42,7 +42,7 @@ namespace Dolittle.SDK.EventHorizon.for_EventHorizons.given
             event_horizons = new EventHorizons(caller.Object, execution_context, RetryPolicy, logger);
         };
 
-        static async Task RetryPolicy(Subscription subscription, ILogger logger, Func<Task> method)
+        static async Task RetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> method)
         {
             await method().ConfigureAwait(false);
         }

@@ -298,14 +298,12 @@ namespace Dolittle.SDK
                 _cancellation);
         }
 
-        async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task> methodToPerform)
+        async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
         {
             var retryCount = 0;
 
-            while (true)
+            while (!await methodToPerform().ConfigureAwait(false))
             {
-                await methodToPerform().ConfigureAwait(false);
-
                 retryCount++;
                 var timeout = 1000 * retryCount;
                 logger.LogDebug(
