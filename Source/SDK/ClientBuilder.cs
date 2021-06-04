@@ -305,9 +305,10 @@ namespace Dolittle.SDK
             while (!await methodToPerform().ConfigureAwait(false))
             {
                 retryCount++;
-                var timeout = 1000 * retryCount;
+                var timeout = TimeSpan.FromSeconds(5);
                 logger.LogDebug(
-                    "Retrying processing subscription to events in {Timeout}ms from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}",
+                    "Retry attempt {retryCount} processing subscription to events in {Timeout}ms () from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}",
+                    retryCount,
                     timeout,
                     subscription.ProducerMicroservice,
                     subscription.ProducerTenant,
