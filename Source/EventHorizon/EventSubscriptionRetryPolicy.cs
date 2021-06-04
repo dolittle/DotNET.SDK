@@ -13,5 +13,5 @@ namespace Dolittle.SDK.EventHorizon
     /// <param name="subscription">Subscription that we want to have a retry policy for.</param>
     /// <param name="logger">Logger.</param>
     /// <param name="methodToPerform">Method to perform.</param>
-    public delegate Task RetryEventSubscriptionPolicy(Subscription subscription, ILogger logger, Func<Task> methodToPerform);
+    public delegate Task EventSubscriptionRetryPolicy(Subscription subscription, ILogger logger, Func<Task> methodToPerform);
 }

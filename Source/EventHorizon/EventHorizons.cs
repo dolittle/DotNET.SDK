@@ -30,7 +30,7 @@ namespace Dolittle.SDK.EventHorizon
         readonly ReplaySubject<SubscribeResponse> _responses = new ReplaySubject<SubscribeResponse>();
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
-        readonly RetryEventSubscriptionPolicy _retryEventSubscription;
+        readonly EventSubscriptionRetryPolicy _retryEventSubscription;
         readonly ILogger _logger;
         bool _disposed;
 
@@ -39,12 +39,12 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
         /// <param name="executionContext">Tha base <see cref="ExecutionContext"/>.</param>
-        /// <param name="retryEventSubscription"><see cref="RetryEventSubscriptionPolicy"/> for retrying if subscription failed or has an exception.</param>
+        /// <param name="retryEventSubscription"><see cref="EventSubscriptionRetryPolicy"/> for retrying if subscription failed or has an exception.</param>
         /// <param name="logger">The <see cref="ILogger"/> to use.</param>
         public EventHorizons(
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
-            RetryEventSubscriptionPolicy retryEventSubscription,
+            EventSubscriptionRetryPolicy retryEventSubscription,
             ILogger logger)
         {
             _caller = caller;

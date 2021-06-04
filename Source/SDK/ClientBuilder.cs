@@ -50,7 +50,7 @@ namespace Dolittle.SDK
         Environment _environment;
         CancellationToken _cancellation;
         RetryPolicy _retryPolicy;
-        RetryEventSubscriptionPolicy _eventHorizonRetryPolicy;
+        EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
