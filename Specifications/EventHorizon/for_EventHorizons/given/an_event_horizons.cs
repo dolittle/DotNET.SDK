@@ -20,6 +20,8 @@ namespace Dolittle.SDK.EventHorizon.for_EventHorizons.given
         protected static ExecutionContext execution_context;
         protected static EventHorizons event_horizons;
 
+        protected static bool method_result;
+
         Establish context = () =>
         {
             caller = new Mock<IPerformMethodCalls>();
@@ -44,7 +46,7 @@ namespace Dolittle.SDK.EventHorizon.for_EventHorizons.given
 
         static async Task RetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> method)
         {
-            await method().ConfigureAwait(false);
+            method_result = await method().ConfigureAwait(false);
         }
     }
 }
