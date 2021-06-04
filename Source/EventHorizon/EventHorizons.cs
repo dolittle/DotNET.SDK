@@ -30,6 +30,7 @@ namespace Dolittle.SDK.EventHorizon
         readonly ReplaySubject<SubscribeResponse> _responses = new ReplaySubject<SubscribeResponse>();
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
+        readonly RetryEventSubscriptionPolicy _retryEventSubscription;
         readonly ILogger _logger;
         bool _disposed;
 
@@ -38,14 +39,17 @@ namespace Dolittle.SDK.EventHorizon
         /// </summary>
         /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
         /// <param name="executionContext">Tha base <see cref="ExecutionContext"/>.</param>
+        /// <param name="retryEventSubscription"><see cref="RetryEventSubscriptionPolicy"/> for retrying if subscription failed or has an exception.</param>
         /// <param name="logger">The <see cref="ILogger"/> to use.</param>
         public EventHorizons(
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
+            RetryEventSubscriptionPolicy retryEventSubscription,
             ILogger logger)
         {
             _caller = caller;
             _executionContext = executionContext;
+            _retryEventSubscription = retryEventSubscription;
             _logger = logger;
 
             SetupSubscriptionProcessing();
@@ -114,56 +118,59 @@ namespace Dolittle.SDK.EventHorizon
         }
 
         SubscribeResponse CreateResponseFromRuntimeResponse(Subscription subscription, SubscriptionResponse response)
-            => new SubscribeResponse(subscription, response.ConsentId?.To<ConsentId>() ?? ConsentId.NotSet, response.Failure.ToSDK());
+            => new SubscribeResponse(subscription, response.ConsentId?.To<ConsentId>() ?? ConsentId.NotSet, response.Failure.ToSDK());
 
         async Task<SubscribeResponse> ProcessSubscriptionRequest(Subscription subscription, SubscriptionRequest request, CancellationToken cancellationToken)
         {
-            try
-            {
-                _logger.LogDebug(
-                    "Subscribing to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}",
-                    subscription.ProducerMicroservice,
-                    subscription.ProducerTenant,
-                    subscription.ProducerStream,
-                    subscription.ProducerPartition,
-                    subscription.ConsumerTenant,
-                    subscription.ConsumerScope);
+            SubscribeResponse response = null;
+            await _retryEventSubscription(subscription, _logger, async () =>
+           {
+               try
+               {
+                   _logger.LogDebug(
+                       "Subscribing to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}",
+                       subscription.ProducerMicroservice,
+                       subscription.ProducerTenant,
+                       subscription.ProducerStream,
+                       subscription.ProducerPartition,
+                       subscription.ConsumerTenant,
+                       subscription.ConsumerScope);
 
-                var runtimeResponse = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
-                var response = CreateResponseFromRuntimeResponse(subscription, runtimeResponse);
+                   var runtimeResponse = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
+                   response = CreateResponseFromRuntimeResponse(subscription, runtimeResponse);
 
-                if (response.Failed)
-                {
-                    _logger.LogWarning(
-                        "Failed to subscribe to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope} because {Reason}",
-                        subscription.ProducerMicroservice,
-                        subscription.ProducerTenant,
-                        subscription.ProducerStream,
-                        subscription.ProducerPartition,
-                        subscription.ConsumerTenant,
-                        subscription.ConsumerScope,
-                        response.Failure.Reason);
-                }
-                else
-                {
-                    _logger.LogDebug(
-                        "Successfully subscribed to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope} with {Consent}",
-                        subscription.ProducerMicroservice,
-                        subscription.ProducerTenant,
-                        subscription.ProducerStream,
-                        subscription.ProducerPartition,
-                        subscription.ConsumerTenant,
-                        subscription.ConsumerScope,
-                        response.Consent);
-                }
+                   if (response.Failed)
+                   {
+                       _logger.LogWarning(
+                           "Failed to subscribe to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope} because {Reason}",
+                           subscription.ProducerMicroservice,
+                           subscription.ProducerTenant,
+                           subscription.ProducerStream,
+                           subscription.ProducerPartition,
+                           subscription.ConsumerTenant,
+                           subscription.ConsumerScope,
+                           response.Failure.Reason);
+                   }
+                   else
+                   {
+                       _logger.LogDebug(
+                           "Successfully subscribed to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope} with {Consent}",
+                           subscription.ProducerMicroservice,
+                           subscription.ProducerTenant,
+                           subscription.ProducerStream,
+                           subscription.ProducerPartition,
+                           subscription.ConsumerTenant,
+                           subscription.ConsumerScope,
+                           response.Consent);
+                   }
+               }
+               catch (Exception ex)
+               {
+                   _logger.LogWarning(ex, "An exception was thrown while registering an event horizon subscription.");
+               }
+           }).ConfigureAwait(false);
 
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "An exception whas thrown while registering an event horizon subscription.");
-                return new SubscribeResponse(subscription, ConsentId.NotSet, new Failure(FailureId.Undocumented, ex.Message));
-            }
+            return response;
         }
     }
 }
