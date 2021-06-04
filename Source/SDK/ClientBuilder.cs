@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -49,6 +50,7 @@ namespace Dolittle.SDK
         Environment _environment;
         CancellationToken _cancellation;
         RetryPolicy _retryPolicy;
+        EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -68,6 +70,7 @@ namespace Dolittle.SDK
             _environment = Environment.Undetermined;
             _cancellation = CancellationToken.None;
             _retryPolicy = (IObservable<Exception> exceptions) => exceptions.Delay(TimeSpan.FromSeconds(1));
+            _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
             _projectionAssociations = new ProjectionReadModelTypeAssociations();
 
@@ -267,7 +270,7 @@ namespace Dolittle.SDK
                 eventTypes,
                 _loggerFactory);
 
-            var eventHorizons = new EventHorizons(methodCaller, executionContext, _loggerFactory.CreateLogger<EventHorizons>());
+            var eventHorizons = new EventHorizons(methodCaller, executionContext, _eventHorizonRetryPolicy, _loggerFactory.CreateLogger<EventHorizons>());
             _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
 
             var projectionStoreBuilder = new ProjectionStoreBuilder(
@@ -292,6 +295,29 @@ namespace Dolittle.SDK
                 projectionStoreBuilder,
                 _loggerFactory,
                 _cancellation);
+        }
+
+        async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
+        {
+            var retryCount = 0;
+
+            while (!await methodToPerform().ConfigureAwait(false))
+            {
+                retryCount++;
+                var timeout = TimeSpan.FromSeconds(5);
+                logger.LogDebug(
+                    "Retry attempt {retryCount} processing subscription to events in {Timeout}ms () from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}",
+                    retryCount,
+                    timeout,
+                    subscription.ProducerMicroservice,
+                    subscription.ProducerTenant,
+                    subscription.ProducerStream,
+                    subscription.ProducerPartition,
+                    subscription.ConsumerTenant,
+                    subscription.ConsumerScope);
+
+                await Task.Delay(timeout).ConfigureAwait(false);
+            }
         }
     }
 }
