@@ -195,7 +195,6 @@ namespace Dolittle.SDK
             if (disposeManagedResources)
             {
                 _eventHorizons.Dispose();
-                _processingCoordinator.Dispose();
             }
 
             _disposed = true;
