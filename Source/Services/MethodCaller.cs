@@ -1,8 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
@@ -39,16 +37,12 @@ namespace Dolittle.SDK.Services
         }
 
         /// <inheritdoc/>
-        public IObservable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, IObservable<TClientMessage> requests, CancellationToken token)
+        public AsyncDuplexStreamingCall<TClientMessage, TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage> method, CancellationToken token)
             where TClientMessage : IMessage
             where TServerMessage : IMessage
-            => Observable.Create<TServerMessage>((observer) =>
-                {
-                    var tcs = CancellationTokenSource.CreateLinkedTokenSource(token);
-                    var call = method.Call(CreateChannel(), CreateCallOptions(tcs.Token));
-                    SendMessagesToServer(observer, requests, call.RequestStream, tcs);
-                    return ReceiveAllMessagesFromServer(observer, call.ResponseStream, tcs.Token);
-                });
+        {
+            return method.Call(CreateChannel(), CreateCallOptions(token));
+        }
 
         /// <inheritdoc/>
         public Task<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAUnaryMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
@@ -61,39 +55,5 @@ namespace Dolittle.SDK.Services
         Channel CreateChannel() => new Channel(_host, _port, _channelCredentials, _channelOptions);
 
         CallOptions CreateCallOptions(CancellationToken token) => new CallOptions(cancellationToken: token);
-
-        void SendMessagesToServer<TClientMessage, TServerMessage>(IObserver<TClientMessage> observer, IObservable<TServerMessage> messages, IClientStreamWriter<TServerMessage> writer, CancellationTokenSource tcs)
-            => messages
-                .Select(message => Observable.FromAsync(() => writer.WriteAsync(message)))
-                .Concat()
-                .Concat(Observable.FromAsync(() => writer.CompleteAsync()))
-                .Subscribe(
-                    _ => { },
-                    error =>
-                    {
-                        observer.OnError(error);
-                        tcs.Cancel();
-                    });
-
-        async Task ReceiveAllMessagesFromServer<T>(IObserver<T> observer, IAsyncStreamReader<T> reader, CancellationToken token)
-        {
-            try
-            {
-                while (await reader.MoveNext(token).ConfigureAwait(false))
-                {
-                    observer.OnNext(reader.Current);
-                }
-            }
-            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled && token.IsCancellationRequested)
-            {
-            }
-            catch (Exception ex)
-            {
-                observer.OnError(ex);
-                return;
-            }
-
-            observer.OnCompleted();
-        }
     }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading.Tasks;
 
 namespace Dolittle.SDK.Services
@@ -17,10 +16,9 @@ namespace Dolittle.SDK.Services
         Task Completion { get; }
 
         /// <summary>
-        /// Start processing by subscribing to the given <see cref="IObservable{T}"/>.
+        /// Register a processor to wait for.
         /// </summary>
-        /// <param name="processor">The processor to start.</param>
-        /// <typeparam name="T">The type of items the processor returns.</typeparam>
-        void StartProcessor<T>(IObservable<T> processor);
+        /// <param name="processor">The <see cref="Task"/> that represents processor to wait for.</param>
+        void RegisterProcessor(Task processor);
     }
 }

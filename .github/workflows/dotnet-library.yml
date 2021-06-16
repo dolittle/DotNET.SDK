@@ -1,7 +1,7 @@
 name: .NET Library CI/CD
 
 env:
-  PRERELEASE_BRANCHES: experimental,alpha,beta,rc,projections # Comma separated list of prerelease branch names. 'alpha,rc, ...'
+  PRERELEASE_BRANCHES: experimental,alpha,beta,rc,projections,timeout # Comma separated list of prerelease branch names. 'alpha,rc, ...'
   CASCADES: "" # Comma separated list of cascading repos. 'dolittle/DotNet.SDK,...'
   NUGET_OUTPUT: Artifacts/NuGet
   COVERAGE_FOLDER: Coverage

@@ -13,8 +13,6 @@ namespace Dolittle.SDK.Services
         /// <summary>
         /// Create a reverse call client given the provided arguments, handler, method and converter.
         /// </summary>
-        /// <param name="arguments">The <typeparamref name="TConnectArguments"/> to send to the server to start the reverse call protocol.</param>
-        /// <param name="handler">The handler that will handle requests from the server.</param>
         /// <param name="protocol">The protocol for this reverse call.</param>
         /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
         /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
@@ -24,8 +22,6 @@ namespace Dolittle.SDK.Services
         /// <typeparam name="TResponse">Type of the responses received from the client.</typeparam>
         /// <returns>A new reverse call client.</returns>
         IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
-            TConnectArguments arguments,
-            IReverseCallHandler<TRequest, TResponse> handler,
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol)
             where TClientMessage : class, IMessage
             where TServerMessage : class, IMessage
