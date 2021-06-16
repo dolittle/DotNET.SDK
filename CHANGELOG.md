@@ -1,7 +1,7 @@
 # [9.0.0] - 2021-6-16 [PR: #61](https://github.com/dolittle/DotNET.SDK/pull/61)
 ## Summary
 
-Changes the behavior of the pinging system to be more reliable and to be ready to receive pings immediately upon connecting to the Runtime. This is a **breaking behavioral change** and it's related to the [release of version `6.0.0`](https://github.com/dolittle/Runtime/pull/532) of the Runtime. You have to update to version `6.*` of the Runtime, older versions wont work with this release of the SDK. For this we've added a [compatibility table](https://dolittle.io/docs/reference/runtime/compatibility).
+Changes the behavior of the pinging system to be more reliable and to be ready to receive pings immediately upon connecting to the Runtime. This is to deal with a bug that was causing connections between the SDK and the Runtime to be dropped. This is a **breaking behavioral change** and it's related to the [release of version `6.0.0`](https://github.com/dolittle/Runtime/pull/532) of the Runtime. You have to update to version `6.*` of the Runtime, older versions wont work with this release of the SDK. For this we've added a [compatibility table](https://dolittle.io/docs/reference/runtime/compatibility).
 
 Also adds a new way of specifying the ping interval period, which defines how often the client expects a ping from the Runtime. If the Runtime fails to ping after 3 attempts, the client will disconnect. The default value of the interval is 5 seconds.
 
