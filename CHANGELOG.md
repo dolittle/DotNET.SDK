@@ -1,3 +1,25 @@
+# [9.0.0] - 2021-6-16 [PR: #61](https://github.com/dolittle/DotNET.SDK/pull/61)
+## Summary
+
+Changes the behavior of the pinging system to be more reliable and to be ready to receive pings immediately upon connecting to the Runtime. This is a **breaking behavioral change** and it's related to the [release of version `6.0.0`](https://github.com/dolittle/Runtime/pull/532) of the Runtime. You have to update to version `6.*` of the Runtime, older versions wont work with this release of the SDK. For this we've added a [compatibility table](https://dolittle.io/docs/reference/runtime/compatibility).
+
+Also adds a new way of specifying the ping interval period, which defines how often the client expects a ping from the Runtime. If the Runtime fails to ping after 3 attempts, the client will disconnect. The default value of the interval is 5 seconds.
+
+### Added
+
+- You can now specify the ping interval during client building with the `WithPingInterval(TimeSpan)` call. By default it's 5 seconds.
+
+### Changed
+
+- The reverse call connections are now ready to start receiving pings and writing pong immediately upon connecting.
+- Changed back to the old implementation of the reverse call clients without RX.
+
+### Fixed
+
+- Event Horizon connections will now keep retrying forever properly.
+- Pinging system should now timeout a lot less than before.
+
+
 # [8.4.0] - 2021-4-9 [PR: #54](https://github.com/dolittle/DotNET.SDK/pull/54)
 ## Summary
 
