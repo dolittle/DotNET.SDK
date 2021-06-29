@@ -11,13 +11,10 @@ namespace Dolittle.SDK.Embeddings.Internal
         where TReadModel : class, new()
     {
         /// <summary>
-        /// Gets a <see cref="ProjectionResult{TReadModel}" /> that signifies that the read model should be deleted.
+        /// Gets a <see cref="EmbeddingResult{TReadModel}" /> that signifies that the read model should be deleted.
         /// </summary>
         public static EmbeddingResult<TReadModel> Delete
-            => new EmbeddingResult<TReadModel>
-            {
-                Type = EmbeddingResultType.Delete
-            };
+            => new EmbeddingResult<TReadModel> { Type = EmbeddingResultType.Delete };
 
         /// <summary>
         /// Gets the updated read model.

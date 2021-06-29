@@ -16,6 +16,6 @@ namespace Dolittle.SDK.Embeddings.Internal
         /// <summary>
         /// Deletes the read model.
         /// </summary>
-        Delete,
+        Delete = 1,
     }
 }

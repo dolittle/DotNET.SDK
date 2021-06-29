@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Store;
 
 namespace Dolittle.SDK.Embeddings.Internal
 {
@@ -40,5 +41,24 @@ namespace Dolittle.SDK.Embeddings.Internal
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns a <see cref="EmbeddingResult{TReadModel}"/>.</returns>
         Task<EmbeddingResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, EmbeddingProjectContext context, CancellationToken cancellation);
+
+        /// <summary>
+        /// Compares the received state and current state.
+        /// </summary>
+        /// <param name="receivedState">The received state.</param>
+        /// <param name="currentState">The current state.</param>
+        /// <param name="context">The context of the embedding.</param>
+        /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="UncommittedEvents"/> to commit.</returns>
+        Task<UncommittedEvents> Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
+
+        /// <summary>
+        /// Called, when the readmodel should get deleted. Returns events that should result in the readmodels deletion.
+        /// </summary>
+        /// <param name="currentState">The current state.</param>
+        /// <param name="context">The context of the embedding.</param>
+        /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
+        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="UncommittedEvents"/> to commit.</returns>
+        Task<UncommittedEvents> Delete(TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
     }
 }
