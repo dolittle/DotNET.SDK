@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
@@ -54,6 +55,7 @@ namespace Dolittle.SDK
         /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
         /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
+        /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -68,6 +70,7 @@ namespace Dolittle.SDK
             IConvertProjectionsToSDK projectionConverter,
             ProjectionsBuilder projectionsBuilder,
             ProjectionStoreBuilder projectionStoreBuilder,
+            IEmbeddings embeddings,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -82,6 +85,7 @@ namespace Dolittle.SDK
             _projectionConverter = projectionConverter;
             _projectionsBuilder = projectionsBuilder;
             Projections = projectionStoreBuilder;
+            Embeddings = embeddings;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -101,6 +105,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="ProjectionStoreBuilder" />.
         /// </summary>
         public ProjectionStoreBuilder Projections { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEmbeddings" />.
+        /// </summary>
+        public IEmbeddings Embeddings { get; }
 
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.

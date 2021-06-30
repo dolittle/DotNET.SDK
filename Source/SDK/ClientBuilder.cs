@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -43,6 +44,7 @@ namespace Dolittle.SDK
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
         readonly MicroserviceId _microserviceId;
         readonly ProjectionReadModelTypeAssociations _projectionAssociations;
+        readonly EmbeddingReadModelTypeAssociations _embeddingAssociations;
         string _host = "localhost";
         TimeSpan _pingInterval = TimeSpan.FromSeconds(5);
         ushort _port = 50053;
@@ -73,6 +75,7 @@ namespace Dolittle.SDK
             _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
             _projectionAssociations = new ProjectionReadModelTypeAssociations();
+            _embeddingAssociations = new EmbeddingReadModelTypeAssociations();
 
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
@@ -280,6 +283,13 @@ namespace Dolittle.SDK
                 _projectionAssociations,
                 projectionsToSDKConverter,
                 _loggerFactory);
+            var embeddings = new Embeddings.Embeddings(
+                methodCaller,
+                callContextResolver,
+                _embeddingAssociations,
+                projectionsToSDKConverter,
+                executionContext,
+                _loggerFactory);
 
             return new Client(
                 eventTypes,
@@ -293,6 +303,7 @@ namespace Dolittle.SDK
                 projectionsToSDKConverter,
                 _projectionsBuilder,
                 projectionStoreBuilder,
+                embeddings,
                 _loggerFactory,
                 _cancellation);
         }
