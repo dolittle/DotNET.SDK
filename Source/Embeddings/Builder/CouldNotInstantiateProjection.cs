@@ -4,7 +4,7 @@
 using System;
 using Dolittle.SDK.DependencyInversion;
 
-namespace Dolittle.SDK.Projections.Builder
+namespace Dolittle.SDK.Embeddings.Builder
 {
     /// <summary>
     /// Exception that gets thrown when <see cref="IContainer" /> could not instantitate projection.

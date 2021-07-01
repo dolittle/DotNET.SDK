@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,24 +20,28 @@ namespace Dolittle.SDK.Embeddings.Internal
     public class Embedding<TReadModel> : IEmbedding<TReadModel>
         where TReadModel : class, new()
     {
-        readonly IDictionary<EventType, IEmbeddingOnMethod<TReadModel>> _onMethods;
-        readonly IEmbeddingCompareMethod<TReadModel> _compareMethod;
-        readonly IEmbeddingRemoveMethod<TReadModel> _removeMethod;
+        readonly IEventTypes _eventTypes;
+        readonly IDictionary<EventType, IOnMethod<TReadModel>> _onMethods;
+        readonly ICompareMethod<TReadModel> _compareMethod;
+        readonly IRemoveMethod<TReadModel> _removeMethod;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Embedding{TReadModel}"/> class.
         /// </summary>
-        /// <param name="identifier">The <see cref="ProjectionId" />.</param>
+        /// <param name="identifier">The <see cref="EmbeddingId" />.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
         /// <param name="compareMethod">The compare method.</param>
         /// <param name="removeMethod">The remove method.</param>
         public Embedding(
             EmbeddingId identifier,
-            IDictionary<EventType, IEmbeddingOnMethod<TReadModel>> onMethods,
-            IEmbeddingCompareMethod<TReadModel> compareMethod,
-            IEmbeddingRemoveMethod<TReadModel> removeMethod)
+            IEventTypes eventTypes,
+            IDictionary<EventType, IOnMethod<TReadModel>> onMethods,
+            ICompareMethod<TReadModel> compareMethod,
+            IRemoveMethod<TReadModel> removeMethod)
         {
             _onMethods = onMethods;
+            _eventTypes = eventTypes;
             Identifier = identifier;
             Events = onMethods.Select(_ => _.Key);
             _compareMethod = compareMethod;
@@ -53,28 +58,39 @@ namespace Dolittle.SDK.Embeddings.Internal
         public IEnumerable<EventType> Events { get; }
 
         /// <inheritdoc/>
-        public async Task<UncommittedEvents> Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
+        public UncommittedEvents Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
         {
-            var tryCompare = await _compareMethod.TryCompare(receivedState, currentState, context).ConfigureAwait(false);
+            var tryCompare = _compareMethod.TryCompare(receivedState, currentState, context);
             if (tryCompare.Exception != default) throw new EmbeddingCompareMethodFailed(Identifier, context, tryCompare.Exception);
-            return tryCompare.Result;
+            return CreateUncommittedEvents(tryCompare.Result);
         }
 
         /// <inheritdoc/>
-        public async Task<UncommittedEvents> Delete(TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
+        public UncommittedEvents Delete(TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
         {
-            var tryRemove = await _removeMethod.TryRemove(currentState, context).ConfigureAwait(false);
+            var tryRemove = _removeMethod.TryRemove(currentState, context);
             if (tryRemove.Exception != default) throw new EmbeddingRemoveMethodFailed(Identifier, context, tryRemove.Exception);
-            return tryRemove.Result;
+            return CreateUncommittedEvents(tryRemove.Result);
         }
 
         /// <inheritdoc/>
-        public async Task<EmbeddingResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, EmbeddingProjectContext context, CancellationToken cancellation)
+        public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, EmbeddingProjectContext context, CancellationToken cancellation)
         {
             if (!_onMethods.TryGetValue(eventType, out var method)) throw new MissingOnMethodForEventType(eventType);
             var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
             if (tryOn.Exception != default) throw new EmbeddingOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
             return tryOn.Result;
+        }
+
+        UncommittedEvents CreateUncommittedEvents(IEnumerable<object> events)
+        {
+            var result = new UncommittedEvents();
+            foreach (var @event in events)
+            {
+                result.Add(new UncommittedEvent(Guid.Empty, _eventTypes.GetFor(@event.GetType()), @event, true));
+            }
+
+            return result;
         }
     }
 }

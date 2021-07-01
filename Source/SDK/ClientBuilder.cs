@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
@@ -42,6 +43,7 @@ namespace Dolittle.SDK
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly ProjectionsBuilder _projectionsBuilder;
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
+        readonly EmbeddingsBuilder _embeddingsBuilder;
         readonly MicroserviceId _microserviceId;
         readonly ProjectionReadModelTypeAssociations _projectionAssociations;
         readonly EmbeddingReadModelTypeAssociations _embeddingAssociations;
@@ -82,6 +84,7 @@ namespace Dolittle.SDK
             _eventHandlersBuilder = new EventHandlersBuilder();
             _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
             _eventHorizonsBuilder = new SubscriptionsBuilder();
+            _embeddingsBuilder = new EmbeddingsBuilder(_projectionAssociations);
         }
 
         /// <summary>
@@ -221,6 +224,18 @@ namespace Dolittle.SDK
         public ClientBuilder WithLogging(ILoggerFactory factory)
         {
             _loggerFactory = factory;
+            return this;
+        }
+
+
+        /// <summary>
+        /// Set the embeddings through the <see cref="EmbeddingsBuilder"/>.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
+        {
+            callback(_embeddingsBuilder);
             return this;
         }
 

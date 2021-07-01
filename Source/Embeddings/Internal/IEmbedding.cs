@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Projections;
 
 namespace Dolittle.SDK.Embeddings.Internal
 {
@@ -39,8 +40,8 @@ namespace Dolittle.SDK.Embeddings.Internal
         /// <param name="eventType">The artifact representign the event type.</param>
         /// <param name="context">The context of the embedding projection.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns a <see cref="EmbeddingResult{TReadModel}"/>.</returns>
-        Task<EmbeddingResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, EmbeddingProjectContext context, CancellationToken cancellation);
+        /// <returns>A <see cref="Task"/> that, when resolved, returns a <see cref="ProjectionResult{TReadModel}"/>.</returns>
+        Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, EmbeddingProjectContext context, CancellationToken cancellation);
 
         /// <summary>
         /// Compares the received state and current state.
@@ -50,7 +51,7 @@ namespace Dolittle.SDK.Embeddings.Internal
         /// <param name="context">The context of the embedding.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="UncommittedEvents"/> to commit.</returns>
-        Task<UncommittedEvents> Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
+        UncommittedEvents Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
 
         /// <summary>
         /// Called, when the readmodel should get deleted. Returns events that should result in the readmodels deletion.
@@ -59,6 +60,6 @@ namespace Dolittle.SDK.Embeddings.Internal
         /// <param name="context">The context of the embedding.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="UncommittedEvents"/> to commit.</returns>
-        Task<UncommittedEvents> Delete(TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
+        UncommittedEvents Delete(TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
     }
 }

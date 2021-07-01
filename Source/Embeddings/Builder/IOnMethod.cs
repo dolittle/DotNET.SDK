@@ -3,8 +3,8 @@
 
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
-using Dolittle.SDK.Embeddings.Internal;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections;
 
 namespace Dolittle.SDK.Embeddings.Builder
 {
@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Embeddings.Builder
     /// Defines an embedding on-method.
     /// </summary>
     /// <typeparam name="TReadModel">The type of the read model.</typeparam>
-    public interface IEmbeddingOnMethod<TReadModel>
+    public interface IOnMethod<TReadModel>
         where TReadModel : class, new()
     {
         /// <summary>
@@ -21,8 +21,8 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// <param name="readModel">The read model.</param>
         /// <param name="event">The event.</param>
         /// <param name="context">The context of the embedding projection.</param>
-        /// <returns>A <see cref="Task" /> that, when resolved, returns a <see cref="Try{TResult}" /> with <see cref="EmbeddingResult{TReadModel}" />.</returns>
-        Task<Try<EmbeddingResult<TReadModel>>> TryOn(TReadModel readModel, object @event, EmbeddingProjectContext context);
+        /// <returns>A <see cref="Task" /> that, when resolved, returns a <see cref="Try{TResult}" /> with <see cref="ProjectionResult{TReadModel}" />.</returns>
+        Task<Try<ProjectionResult<TReadModel>>> TryOn(TReadModel readModel, object @event, EmbeddingProjectContext context);
 
         /// <summary>
         /// Gets the <see cref="EventType" />.

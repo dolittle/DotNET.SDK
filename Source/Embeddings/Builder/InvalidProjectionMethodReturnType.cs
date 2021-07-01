@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections.Builder
+namespace Dolittle.SDK.Embeddings.Builder
 {
     /// <summary>
     /// Exception that gets thrown when a projection method has an invalid return type.

@@ -13,6 +13,7 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Converters;
+using Dolittle.SDK.Projections;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
@@ -75,8 +76,8 @@ namespace Dolittle.SDK.Embeddings.Internal
         protected override Task<EmbeddingResponse> Process(EmbeddingRequest request, ExecutionContext executionContext, CancellationToken cancellation)
             => request switch
             {
-                { RequestCase: EmbeddingRequest.RequestOneofCase.Compare } => HandleCompareRequest(request.Compare, executionContext, cancellation),
-                { RequestCase: EmbeddingRequest.RequestOneofCase.Delete } => HandleDeleteRequest(request.Delete, executionContext, cancellation),
+                { RequestCase: EmbeddingRequest.RequestOneofCase.Compare } => Task.FromResult(HandleCompareRequest(request.Compare, executionContext, cancellation)),
+                { RequestCase: EmbeddingRequest.RequestOneofCase.Delete } => Task.FromResult(HandleDeleteRequest(request.Delete, executionContext, cancellation)),
                 { RequestCase: EmbeddingRequest.RequestOneofCase.Projection } => HandleProjectionRequest(request.Projection, executionContext, cancellation),
                 _ => throw new MissingEmbeddingInformation("Request")
             };
@@ -89,7 +90,7 @@ namespace Dolittle.SDK.Embeddings.Internal
         protected override EmbeddingResponse CreateResponseFromFailure(ProcessorFailure failure)
             => new EmbeddingResponse { ProcessorFailure = failure };
 
-        Task<EmbeddingResponse> HandleCompareRequest(EmbeddingCompareRequest request, ExecutionContext executionContext, CancellationToken cancellation)
+        EmbeddingResponse HandleCompareRequest(EmbeddingCompareRequest request, ExecutionContext executionContext, CancellationToken cancellation)
             => HandleDeleteOrCompare(
                 false,
                 request.ProjectionState,
@@ -102,7 +103,7 @@ namespace Dolittle.SDK.Embeddings.Internal
                     return response;
                 });
 
-        Task<EmbeddingResponse> HandleDeleteRequest(EmbeddingDeleteRequest request, ExecutionContext executionContext, CancellationToken cancellation)
+        EmbeddingResponse HandleDeleteRequest(EmbeddingDeleteRequest request, ExecutionContext executionContext, CancellationToken cancellation)
             => HandleDeleteOrCompare(
                 true,
                 request.ProjectionState,
@@ -115,11 +116,11 @@ namespace Dolittle.SDK.Embeddings.Internal
                     return response;
                 });
 
-        async Task<EmbeddingResponse> HandleDeleteOrCompare(
+        EmbeddingResponse HandleDeleteOrCompare(
             bool isDelete,
             ProjectionCurrentState protobufCurrentState,
             ExecutionContext executionContext,
-            Func<CurrentState<TReadModel>, EmbeddingContext, Task<UncommittedEvents>> getEventsToCommit,
+            Func<CurrentState<TReadModel>, EmbeddingContext, UncommittedEvents> getEventsToCommit,
             Func<IReadOnlyList<Runtime.Events.Contracts.UncommittedEvent>, EmbeddingResponse> createResponse)
         {
             if (!_projectionConverter.TryConvert<TReadModel>(protobufCurrentState, out var currentState, out var error))
@@ -128,7 +129,7 @@ namespace Dolittle.SDK.Embeddings.Internal
             }
 
             var context = new EmbeddingContext(currentState.WasCreatedFromInitialState, currentState.Key, isDelete, executionContext);
-            var result = await getEventsToCommit(currentState, context).ConfigureAwait(false);
+            var result = getEventsToCommit(currentState, context);
             if (!_eventsToProtobuf.TryConvert(result, out var protobufEvents, out error))
             {
                 throw error;
@@ -156,9 +157,9 @@ namespace Dolittle.SDK.Embeddings.Internal
 
             return result.Type switch
             {
-                EmbeddingResultType.Replace => new EmbeddingResponse { ProjectionReplace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None) } },
-                EmbeddingResultType.Delete => new EmbeddingResponse { ProjectionDelete = new ProjectionDeleteResponse() },
-                _ => throw new UnknownEmbeddingResultType(result.Type)
+                ProjectionResultType.Replace => new EmbeddingResponse { ProjectionReplace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None) } },
+                ProjectionResultType.Delete => new EmbeddingResponse { ProjectionDelete = new ProjectionDeleteResponse() },
+                _ => throw new UnknownProjectionResultType(result.Type)
             };
         }
 
