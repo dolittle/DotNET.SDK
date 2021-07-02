@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store.Converters;
@@ -18,18 +19,18 @@ namespace Dolittle.SDK.Embeddings.Builder
     public class EmbeddingBuilder : ICanBuildAndRegisterAnEmbedding
     {
         readonly EmbeddingId _embeddingId;
-        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
+        readonly IEmbeddingReadModelTypeAssociations _embeddingAssociations;
         ICanBuildAndRegisterAnEmbedding _methodsBuilder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmbeddingBuilder"/> class.
         /// </summary>
         /// <param name="embeddingId">The <see cref="EmbeddingId" />.</param>
-        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations" />.</param>
-        public EmbeddingBuilder(EmbeddingId embeddingId, IProjectionReadModelTypeAssociations projectionAssociations)
+        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypeAssociations" />.</param>
+        public EmbeddingBuilder(EmbeddingId embeddingId, IEmbeddingReadModelTypeAssociations embeddingAssociations)
         {
             _embeddingId = embeddingId;
-            _projectionAssociations = projectionAssociations;
+            _embeddingAssociations = embeddingAssociations;
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                 throw new ReadModelAlreadyDefinedForEmbedding(_embeddingId, typeof(TReadModel));
             }
 
-            _projectionAssociations.Associate<TReadModel>(_embeddingId.Value, ScopeId.Default);
+            _embeddingAssociations.Associate<TReadModel>(_embeddingId.Value);
             var builder = new EmbeddingBuilderForReadModel<TReadModel>(_embeddingId);
             _methodsBuilder = builder;
             return builder;

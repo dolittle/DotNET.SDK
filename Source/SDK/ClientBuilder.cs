@@ -84,7 +84,7 @@ namespace Dolittle.SDK
             _eventHandlersBuilder = new EventHandlersBuilder();
             _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
             _eventHorizonsBuilder = new SubscriptionsBuilder();
-            _embeddingsBuilder = new EmbeddingsBuilder(_projectionAssociations);
+            _embeddingsBuilder = new EmbeddingsBuilder(_embeddingAssociations);
         }
 
         /// <summary>

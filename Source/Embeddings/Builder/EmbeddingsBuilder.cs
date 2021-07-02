@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store.Converters;
@@ -21,15 +22,15 @@ namespace Dolittle.SDK.Embeddings.Builder
     public class EmbeddingsBuilder
     {
         readonly IList<ICanBuildAndRegisterAnEmbedding> _builders = new List<ICanBuildAndRegisterAnEmbedding>();
-        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
+        readonly IEmbeddingReadModelTypeAssociations _embeddingAssociations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmbeddingsBuilder"/> class.
         /// </summary>
-        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations"/>.</param>
-        public EmbeddingsBuilder(IProjectionReadModelTypeAssociations projectionAssociations)
+        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypeAssociations"/>.</param>
+        public EmbeddingsBuilder(IEmbeddingReadModelTypeAssociations embeddingAssociations)
         {
-            _projectionAssociations = projectionAssociations;
+            _embeddingAssociations = embeddingAssociations;
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// <returns>The <see cref="EmbeddingBuilder" /> for continuation.</returns>
         public EmbeddingBuilder CreateEmbedding(EmbeddingId projectionId)
         {
-            var builder = new EmbeddingBuilder(projectionId, _projectionAssociations);
+            var builder = new EmbeddingBuilder(projectionId, _embeddingAssociations);
             _builders.Add(builder);
             return builder;
         }
@@ -64,7 +65,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                     typeof(ConventionEmbeddingBuilder<>).MakeGenericType(type))
                     as ICanBuildAndRegisterAnEmbedding;
             _builders.Add(builder);
-            _projectionAssociations.Associate(type);
+            _embeddingAssociations.Associate(type);
             return this;
         }
 

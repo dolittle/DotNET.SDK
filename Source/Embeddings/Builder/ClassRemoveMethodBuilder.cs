@@ -134,11 +134,11 @@ namespace Dolittle.SDK.Embeddings.Builder
         bool RemoveMethodParametersAreOkay(MethodInfo method)
         {
             var okay = true;
-            if (!SecondMethodParameterIsEmbeddingContext(method))
+            if (!FirstMethodParameterIsEmbeddingContext(method))
             {
                 okay = false;
                 _logger.LogWarning(
-                    "Remove method {Method} on embedding {EmbeddingType} needs to have two parameters, where the second parameters is {EmbeddingContext}",
+                    "Remove method {Method} on embedding {EmbeddingType} needs to have only one {EmbeddingContext} parameter",
                     method,
                     EmbeddingType,
                     typeof(EmbeddingContext));
@@ -189,10 +189,13 @@ namespace Dolittle.SDK.Embeddings.Builder
             return typeof(RemoveMethodSignature<>);
         }
 
+        bool FirstMethodParameterIsEmbeddingContext(MethodInfo method)
+            => method.GetParameters().Length > 0 && method.GetParameters()[0].ParameterType == typeof(EmbeddingContext);
+
         bool IsDecoratedRemoveMethod(MethodInfo method)
             => method.GetCustomAttributes(typeof(RemoveAttribute), true).FirstOrDefault() != default;
 
         bool RemoveMethodHasNoExtraParameters(MethodInfo method)
-            => method.GetParameters().Length == 2;
+            => method.GetParameters().Length == 1;
     }
 }

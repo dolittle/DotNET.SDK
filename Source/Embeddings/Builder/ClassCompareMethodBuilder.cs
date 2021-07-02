@@ -70,9 +70,40 @@ namespace Dolittle.SDK.Embeddings.Builder
             }
 
             var decoratedMethod = allMethods.SingleOrDefault(IsDecoratedCompareMethod);
-            CompareMethodIsOkay(decoratedMethod);
+            if (!CompareMethodIsOkay(decoratedMethod))
+            {
+                return false;
+            }
 
             compareMethod = CreateCompareMethod(decoratedMethod);
+            return true;
+        }
+
+        bool TryAddConventionCompareMethod(
+           IEnumerable<MethodInfo> allMethods,
+           out ICompareMethod<TEmbedding> compareMethod)
+        {
+            compareMethod = default;
+
+            if (allMethods.Count(_ => IsDecoratedCompareMethod(_) || _.Name == CompareMethodName) > 1)
+            {
+                _logger.LogWarning(
+                    "More than one Compare method on embedding {EmbeddingType} with id {EmbeddingId}. An embedding can only have one Compare method called {CompareName} or attributed with [{CompareAttribute}}.",
+                    EmbeddingType,
+                    Embedding,
+                    CompareMethodName,
+                    nameof(CompareAttribute));
+                return false;
+            }
+
+            var conventionMethod = allMethods
+                .SingleOrDefault(_ => !IsDecoratedCompareMethod(_) && _.Name == CompareMethodName);
+            if (!CompareMethodIsOkay(conventionMethod))
+            {
+                return false;
+            }
+
+            compareMethod = CreateCompareMethod(conventionMethod);
             return true;
         }
 
@@ -88,7 +119,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                 return false;
             }
 
-            if (!MethodReturnsTaskOrVoid(method))
+            if (MethodReturnsTaskOrVoid(method))
             {
                 _logger.LogWarning(
                     "Compare method {Method} on embedding {EmbeddingType} needs to return either an object or an IEnumerable<object>.",
@@ -125,30 +156,6 @@ namespace Dolittle.SDK.Embeddings.Builder
             return okay;
         }
 
-        bool TryAddConventionCompareMethod(
-            IEnumerable<MethodInfo> allMethods,
-            out ICompareMethod<TEmbedding> compareMethod)
-        {
-            compareMethod = default;
-
-            if (allMethods.Count(_ => IsDecoratedCompareMethod(_) || _.Name == CompareMethodName) > 1)
-            {
-                _logger.LogWarning(
-                    "More than one Compare method on embedding {EmbeddingType} with id {EmbeddingId}. An embedding can only have one Compare method called {CompareName} or attributed with [{CompareAttribute}}.",
-                    EmbeddingType,
-                    Embedding,
-                    CompareMethodName,
-                    nameof(CompareAttribute));
-                return false;
-            }
-
-            var conventionMethod = allMethods
-                .SingleOrDefault(_ => !IsDecoratedCompareMethod(_) && _.Name == CompareMethodName);
-            CompareMethodIsOkay(conventionMethod);
-            compareMethod = CreateCompareMethod(conventionMethod);
-            return true;
-        }
-
         ICompareMethod<TEmbedding> CreateCompareMethod(MethodInfo method)
         {
             var compareSignatureType = GetCompareSignatureType(method);
@@ -170,6 +177,10 @@ namespace Dolittle.SDK.Embeddings.Builder
             }
             return typeof(CompareMethodSignature<>);
         }
+
+        bool SecondMethodParameterIsEmbeddingContext(MethodInfo method)
+            => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EmbeddingContext);
+
 
         bool IsDecoratedCompareMethod(MethodInfo method)
             => method.GetCustomAttributes(typeof(CompareAttribute), true).FirstOrDefault() != default;

@@ -120,14 +120,6 @@ namespace Dolittle.SDK.Embeddings.Builder
         }
 
         /// <summary>
-        /// Whether the methods second parameter is an embedding context.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>Whether the method second parameter is <see cref="EmbeddingContext" />.</returns>
-        protected bool SecondMethodParameterIsEmbeddingContext(MethodInfo method)
-            => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EmbeddingContext);
-
-        /// <summary>
         /// Whether the method returns a task or void.
         /// </summary>
         /// <param name="method">The method.</param>
