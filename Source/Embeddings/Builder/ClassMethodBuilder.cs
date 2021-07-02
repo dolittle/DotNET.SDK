@@ -18,45 +18,6 @@ namespace Dolittle.SDK.Embeddings.Builder
         where TEmbedding : class, new()
     {
         /// <summary>
-        /// Creates a new <see cref="ClassCompareMethodBuilder{TEmbedding}"/>.
-        /// </summary>
-        /// <param name="embedding">The embedding identifier.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="loggerFactory">The logger factory to create the logger from.</param>
-        /// <returns>The <see cref="ClassCompareMethodBuilder{TEmbedding}"/></returns>
-        public static ClassCompareMethodBuilder<TEmbedding> ForCompare(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
-            => new ClassCompareMethodBuilder<TEmbedding>(
-                embedding,
-                eventTypes,
-                loggerFactory.CreateLogger<ClassCompareMethodBuilder<TEmbedding>>());
-
-        /// <summary>
-        /// Creates a new <see cref="ClassRemoveMethodBuilder{TEmbedding}"/>.
-        /// </summary>
-        /// <param name="embedding">The embedding identifier.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="loggerFactory">The logger factory to create the logger from.</param>
-        /// <returns>The <see cref="ClassRemoveMethodBuilder{TEmbedding}"/></returns>
-        public static ClassRemoveMethodBuilder<TEmbedding> ForRemove(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
-            => new ClassRemoveMethodBuilder<TEmbedding>(
-                embedding,
-                eventTypes,
-                loggerFactory.CreateLogger<ClassRemoveMethodBuilder<TEmbedding>>());
-
-        /// <summary>
-        /// Creates a new <see cref="ClassProjectionMethodsBuilder{TEmbedding}"/>.
-        /// </summary>
-        /// <param name="embedding">The embedding identifier.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="loggerFactory">The logger factory to create the logger from.</param>
-        /// <returns>The <see cref="ClassProjectionMethodsBuilder{TEmbedding}"/></returns>
-        public static ClassProjectionMethodsBuilder<TEmbedding> ForProjection(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
-            => new ClassProjectionMethodsBuilder<TEmbedding>(
-                embedding,
-                eventTypes,
-                loggerFactory.CreateLogger<ClassProjectionMethodsBuilder<TEmbedding>>());
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ClassMethodBuilder{TEmbedding}"/> class.
         /// </summary>
         /// <param name="embeddingId">The embedding identifier.</param>
@@ -84,22 +45,51 @@ namespace Dolittle.SDK.Embeddings.Builder
         protected Type EmbeddingType { get; }
 
         /// <summary>
+        /// Creates a new <see cref="ClassCompareMethodBuilder{TEmbedding}"/>.
+        /// </summary>
+        /// <param name="embedding">The embedding identifier.</param>
+        /// <param name="eventTypes">The event types.<see cref="IEventTypes" />.</param>
+        /// <param name="loggerFactory">The logger factory to create the logger from.</param>
+        /// <returns>The <see cref="ClassCompareMethodBuilder{TEmbedding}"/>.</returns>
+        public static ClassCompareMethodBuilder<TEmbedding> ForCompare(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
+            => new ClassCompareMethodBuilder<TEmbedding>(
+                embedding,
+                eventTypes,
+                loggerFactory.CreateLogger<ClassCompareMethodBuilder<TEmbedding>>());
+
+        /// <summary>
+        /// Creates a new <see cref="ClassRemoveMethodBuilder{TEmbedding}"/>.
+        /// </summary>
+        /// <param name="embedding">The embedding identifier.</param>
+        /// <param name="eventTypes">The event types.<see cref="IEventTypes" />.</param>
+        /// <param name="loggerFactory">The logger factory to create the logger from.</param>
+        /// <returns>The <see cref="ClassRemoveMethodBuilder{TEmbedding}"/>.</returns>
+        public static ClassRemoveMethodBuilder<TEmbedding> ForRemove(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
+            => new ClassRemoveMethodBuilder<TEmbedding>(
+                embedding,
+                eventTypes,
+                loggerFactory.CreateLogger<ClassRemoveMethodBuilder<TEmbedding>>());
+
+        /// <summary>
+        /// Creates a new <see cref="ClassProjectionMethodsBuilder{TEmbedding}"/>.
+        /// </summary>
+        /// <param name="embedding">The embedding identifier.</param>
+        /// <param name="eventTypes">The event types.<see cref="IEventTypes" />.</param>
+        /// <param name="loggerFactory">The logger factory to create the logger from.</param>
+        /// <returns>The <see cref="ClassProjectionMethodsBuilder{TEmbedding}"/>.</returns>
+        public static ClassProjectionMethodsBuilder<TEmbedding> ForProjection(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
+            => new ClassProjectionMethodsBuilder<TEmbedding>(
+                embedding,
+                eventTypes,
+                loggerFactory.CreateLogger<ClassProjectionMethodsBuilder<TEmbedding>>());
+
+        /// <summary>
         /// Whether the method returns an enumerable object.
         /// </summary>
         /// <param name="method">The method.</param>
-        /// <returns>A bool.</returns>
+        /// <returns>Whether the method returns an enumerable.</returns>
         protected bool MethodReturnsEnumerableObject(MethodInfo method)
             => typeof(System.Collections.IEnumerable).IsAssignableFrom(method.ReturnType);
-
-        /// <summary>
-        /// Whether the method returns an object.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>Whether the method returns an object.</returns>
-        protected bool MethodReturnsObject(MethodInfo method)
-            => typeof(object).IsAssignableFrom(method.ReturnType)
-                && !MethodReturnsTask(method)
-                && !method.ReturnType.IsGenericType;
 
         /// <summary>
         /// Whether the method returns a Task.
@@ -107,7 +97,7 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// <param name="method">The method.</param>
         /// <returns>Whether the method returns a <see cref="Task" />.</returns>
         protected bool MethodReturnsTask(MethodInfo method)
-            => method.ReturnType == typeof(Task);
+            => typeof(Task).IsAssignableFrom(method.ReturnType);
 
         /// <summary>
         /// Whether the method returns a void.
@@ -136,5 +126,15 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// <returns>Whether the method second parameter is <see cref="EmbeddingContext" />.</returns>
         protected bool SecondMethodParameterIsEmbeddingContext(MethodInfo method)
             => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EmbeddingContext);
+
+        /// <summary>
+        /// Whether the method returns a task or void.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>Whether the method returns a task or void.</returns>
+        protected bool MethodReturnsTaskOrVoid(MethodInfo method) =>
+            MethodReturnsTask(method)
+            || MethodReturnsVoid(method)
+            || MethodReturnsAsyncVoid(method);
     }
 }

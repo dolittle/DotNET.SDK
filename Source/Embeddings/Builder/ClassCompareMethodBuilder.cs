@@ -44,7 +44,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                 && !TryAddConventionCompareMethod(allMethods, out method))
             {
                 _logger.LogWarning(
-                    "No compare method defined for embedding {EmbeddingType} with id {EmbeddingId}. An embeddin needs to have one compare method, which is either named {CompareName} or attributed with [{CompareAttribute}].",
+                    "No compare method defined for embedding {EmbeddingType} with id {EmbeddingId}. An embedding needs to have one compare method, which is either named {CompareName} or attributed with [{CompareAttribute}].",
                     EmbeddingType,
                     Embedding,
                     CompareMethodName,
@@ -70,18 +70,33 @@ namespace Dolittle.SDK.Embeddings.Builder
             }
 
             var decoratedMethod = allMethods.SingleOrDefault(IsDecoratedCompareMethod);
-            if (decoratedMethod == default)
-            {
-                return false;
-            }
-
-            if (!CompareMethodParametersAreOkay(decoratedMethod))
-            {
-                return false;
-            }
+            CompareMethodIsOkay(decoratedMethod);
 
             compareMethod = CreateCompareMethod(decoratedMethod);
-            return false;
+            return true;
+        }
+
+        bool CompareMethodIsOkay(MethodInfo method)
+        {
+            if (method == default)
+            {
+                return false;
+            }
+
+            if (!CompareMethodParametersAreOkay(method))
+            {
+                return false;
+            }
+
+            if (!MethodReturnsTaskOrVoid(method))
+            {
+                _logger.LogWarning(
+                    "Compare method {Method} on embedding {EmbeddingType} needs to return either an object or an IEnumerable<object>.",
+                    method,
+                    EmbeddingType);
+                return false;
+            }
+            return true;
         }
 
         bool CompareMethodParametersAreOkay(MethodInfo method)
@@ -107,15 +122,6 @@ namespace Dolittle.SDK.Embeddings.Builder
                     typeof(EmbeddingContext));
             }
 
-            if (!MethodReturnsEnumerableObject(method) && !MethodReturnsObject(method))
-            {
-                okay = false;
-                _logger.LogWarning(
-                    "Compare method {Method} on embedding {EmbeddingType} needs to return either an object or an IEnumerable<object>.",
-                    method,
-                    EmbeddingType);
-            }
-
             return okay;
         }
 
@@ -136,19 +142,10 @@ namespace Dolittle.SDK.Embeddings.Builder
                 return false;
             }
 
-            var decoratedMethod = allMethods
+            var conventionMethod = allMethods
                 .SingleOrDefault(_ => !IsDecoratedCompareMethod(_) && _.Name == CompareMethodName);
-            if (decoratedMethod == default)
-            {
-                return false;
-            }
-
-            if (!CompareMethodParametersAreOkay(decoratedMethod))
-            {
-                return false;
-            }
-
-            compareMethod = CreateCompareMethod(decoratedMethod);
+            CompareMethodIsOkay(conventionMethod);
+            compareMethod = CreateCompareMethod(conventionMethod);
             return true;
         }
 
@@ -163,10 +160,15 @@ namespace Dolittle.SDK.Embeddings.Builder
 
         Type GetCompareSignatureType(MethodInfo method)
         {
-            // Throw if return type is Task
-            if (MethodReturnsEnumerableObject(method)) return typeof(CompareMethodEnumerableReturnSignature<>);
-            if (MethodReturnsObject(method)) return typeof(CompareMethodSignature<>);
-            throw new InvalidCompareMethodReturnType(method.ReturnType);
+            if (MethodReturnsTaskOrVoid(method))
+            {
+                throw new InvalidCompareMethodReturnType(method.ReturnType);
+            }
+            if (MethodReturnsEnumerableObject(method))
+            {
+                return typeof(CompareMethodEnumerableReturnSignature<>);
+            }
+            return typeof(CompareMethodSignature<>);
         }
 
         bool IsDecoratedCompareMethod(MethodInfo method)

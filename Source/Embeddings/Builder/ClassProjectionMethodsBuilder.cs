@@ -25,9 +25,9 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassProjectionMethodsBuilder{TEmbedding}"/> class.
         /// </summary>
-        /// <param name="embeddingId"></param>
-        /// <param name="eventTypes"></param>
-        /// <param name="logger"></param>
+        /// <param name="embeddingId">The embedding identifier.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+        /// <param name="logger">The <see cref="ILogger" />.>.</param>
         public ClassProjectionMethodsBuilder(EmbeddingId embeddingId, IEventTypes eventTypes, ILogger logger)
             : base(embeddingId, eventTypes)
         {
@@ -94,6 +94,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                     allMethodsAdded = false;
                     continue;
                 }
+
                 if (!eventTypesToMethods.TryAdd(eventType, CreateUntypedOnMethod(method, eventType)))
                 {
                     allMethodsAdded = false;
@@ -243,6 +244,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                         EmbeddingType,
                         nameof(EmbeddingProjectContext));
                 }
+
                 return false;
             }
 
@@ -294,6 +296,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                     EmbeddingType);
                 return false;
             }
+
             return true;
         }
 

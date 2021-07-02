@@ -205,6 +205,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the embeddings through the <see cref="EmbeddingsBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
+        {
+            callback(_embeddingsBuilder);
+            return this;
+        }
+
+        /// <summary>
         /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -224,18 +235,6 @@ namespace Dolittle.SDK
         public ClientBuilder WithLogging(ILoggerFactory factory)
         {
             _loggerFactory = factory;
-            return this;
-        }
-
-
-        /// <summary>
-        /// Set the embeddings through the <see cref="EmbeddingsBuilder"/>.
-        /// </summary>
-        /// <param name="callback">The builder callback.</param>
-        /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
-        {
-            callback(_embeddingsBuilder);
             return this;
         }
 
@@ -316,7 +315,9 @@ namespace Dolittle.SDK
                 _eventHandlersBuilder,
                 _eventFiltersBuilder,
                 projectionsToSDKConverter,
+                eventToProtobufConverter,
                 _projectionsBuilder,
+                _embeddingsBuilder,
                 projectionStoreBuilder,
                 embeddings,
                 _loggerFactory,

@@ -1,4 +1,3 @@
-
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
@@ -45,7 +44,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                 && !TryAddConventionRemoveMethod(allMethods, out method))
             {
                 _logger.LogWarning(
-                    "No compare method defined for embedding {EmbeddingType} with id {EmbeddingId}. An embeddin needs to have one compare method, which is either named {CompareName} or attributed with [{RemoveAttribute}].",
+                    "No remove method defined for embedding {EmbeddingType} with id {EmbeddingId}. An embeddin needs to have one remove method, which is either named {RemoveName} or attributed with [{RemoveAttribute}].",
                     EmbeddingType,
                     Embedding,
                     RemoveMethodName,
@@ -71,18 +70,65 @@ namespace Dolittle.SDK.Embeddings.Builder
             }
 
             var decoratedMethod = allMethods.SingleOrDefault(IsDecoratedRemoveMethod);
-            if (decoratedMethod == default)
+            if (!RemoveMethodIsOkay(decoratedMethod))
             {
                 return false;
             }
-
-            if (!RemoveMethodParametersAreOkay(decoratedMethod))
-            {
-                return false;
-            }
-
             removeMethod = CreateRemoveMethod(decoratedMethod);
-            return false;
+            return true;
+        }
+
+
+        bool TryAddConventionRemoveMethod(
+            IEnumerable<MethodInfo> allMethods,
+            out IRemoveMethod<TEmbedding> removeMethod)
+        {
+            removeMethod = default;
+
+            if (allMethods.Count(_ => IsDecoratedRemoveMethod(_) || _.Name == RemoveMethodName) > 1)
+            {
+                _logger.LogWarning(
+                    "More than one Remove method on embedding {EmbeddingType} with id {EmbeddingId}. An embedding can only have one Remove method called {RemoveName} or attributed with [{RemoveAttribute}}.",
+                    EmbeddingType,
+                    Embedding,
+                    RemoveMethodName,
+                    nameof(RemoveAttribute));
+                return false;
+            }
+
+            var conventionMethod = allMethods
+                .SingleOrDefault(_ => !IsDecoratedRemoveMethod(_) && _.Name == RemoveMethodName);
+            if (!RemoveMethodIsOkay(conventionMethod))
+            {
+                return false;
+            }
+
+            removeMethod = CreateRemoveMethod(conventionMethod);
+            return true;
+        }
+
+        bool RemoveMethodIsOkay(MethodInfo method)
+        {
+            if (method == default)
+            {
+                return false;
+            }
+
+            if (!RemoveMethodParametersAreOkay(method))
+            {
+                return false;
+            }
+
+            if (MethodReturnsTaskOrVoid(method))
+            {
+                _logger.LogWarning(
+                    "Remove method {Method} on embedding {EmbeddingType} needs to return either an object or an IEnumerable<object>.",
+                    method,
+                    EmbeddingType);
+                return false;
+            }
+
+            return true;
         }
 
         bool RemoveMethodParametersAreOkay(MethodInfo method)
@@ -108,49 +154,17 @@ namespace Dolittle.SDK.Embeddings.Builder
                     typeof(EmbeddingContext));
             }
 
-            if (!MethodReturnsEnumerableObject(method) && !MethodReturnsObject(method))
+            if (MethodReturnsTaskOrVoid(method))
             {
-                okay = false;
                 _logger.LogWarning(
-                    "Remove method {Method} on embedding {EmbeddingType} needs to return either an object or an IEnumerable<object>, which represent events.",
+                    "Remove method {Method} on embedding {EmbeddingType} needs to return either an object or an IEnumerable<object>.",
                     method,
                     EmbeddingType);
+                return false;
             }
+
 
             return okay;
-        }
-
-        bool TryAddConventionRemoveMethod(
-            IEnumerable<MethodInfo> allMethods,
-            out IRemoveMethod<TEmbedding> removeMethod)
-        {
-            removeMethod = default;
-
-            if (allMethods.Count(_ => IsDecoratedRemoveMethod(_) || _.Name == RemoveMethodName) > 1)
-            {
-                _logger.LogWarning(
-                    "More than one Remove method on embedding {EmbeddingType} with id {EmbeddingId}. An embedding can only have one Remove method called {RemoveName} or attributed with [{RemoveAttribute}}.",
-                    EmbeddingType,
-                    Embedding,
-                    RemoveMethodName,
-                    nameof(RemoveAttribute));
-                return false;
-            }
-
-            var decoratedMethod = allMethods
-                .SingleOrDefault(_ => !IsDecoratedRemoveMethod(_) && _.Name == RemoveMethodName);
-            if (decoratedMethod == default)
-            {
-                return false;
-            }
-
-            if (!RemoveMethodParametersAreOkay(decoratedMethod))
-            {
-                return false;
-            }
-
-            removeMethod = CreateRemoveMethod(decoratedMethod);
-            return true;
         }
 
         IRemoveMethod<TEmbedding> CreateRemoveMethod(MethodInfo method)
@@ -164,9 +178,15 @@ namespace Dolittle.SDK.Embeddings.Builder
 
         Type GetRemoveSignatureType(MethodInfo method)
         {
-            if (MethodReturnsEnumerableObject(method)) return typeof(RemoveMethodEnumerableReturnSignature<>);
-            if (MethodReturnsObject(method)) return typeof(RemoveMethodSignature<>);
-            throw new InvalidRemoveMethodReturnType(method.ReturnType);
+            if (MethodReturnsTaskOrVoid(method))
+            {
+                throw new InvalidRemoveMethodReturnType(method.ReturnType);
+            }
+            if (MethodReturnsEnumerableObject(method))
+            {
+                return typeof(RemoveMethodEnumerableReturnSignature<>);
+            }
+            return typeof(RemoveMethodSignature<>);
         }
 
         bool IsDecoratedRemoveMethod(MethodInfo method)

@@ -80,7 +80,6 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// </summary>
         /// <param name="method">The <see cref="RemoveSignature{TReadModel}"/>.</param>
         /// <returns>The <see cref="EmbeddingBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-
         public EmbeddingBuilderForReadModel<TReadModel> Remove(RemoveEnumerableReturnSignature<TReadModel> method)
         {
             ThrowIfRemoveMethodSet();
