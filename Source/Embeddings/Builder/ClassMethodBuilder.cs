@@ -18,87 +18,6 @@ namespace Dolittle.SDK.Embeddings.Builder
         where TEmbedding : class, new()
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassMethodBuilder{TEmbedding}"/> class.
-        /// </summary>
-        /// <param name="embeddingId">The embedding identifier.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        protected ClassMethodBuilder(EmbeddingId embeddingId, IEventTypes eventTypes)
-        {
-            Embedding = embeddingId;
-            EventTypes = eventTypes;
-            EmbeddingType = typeof(TEmbedding);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="EmbeddingId" />.
-        /// </summary>
-        protected EmbeddingId Embedding { get; }
-
-        /// <summary>
-        /// Gets the <see cref="IEventTypes" />.
-        /// </summary>
-        protected IEventTypes EventTypes { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Type"/> of the embedding.
-        /// </summary>
-        protected Type EmbeddingType { get;  }
-
-        /// <summary>
-        /// Whether the method returns an enumerable object.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>A bool.</returns>
-        protected bool MethodReturnsEnumerableObject(MethodInfo method)
-            => typeof(System.Collections.IEnumerable).IsAssignableFrom(method.ReturnType);
-
-        /// <summary>
-        /// Whether the method returns an object.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>A bool.
-        protected bool MethodReturnsObject(MethodInfo method)
-            => typeof(object).IsAssignableFrom(method.ReturnType)
-                && !MethodReturnsTask(method)
-                && !method.ReturnType.IsGenericType;
-
-        /// <summary>
-        /// Whether the method returns a Task.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>A bool.
-        protected bool MethodReturnsTask(MethodInfo method)
-            => method.ReturnType == typeof(Task);
-
-        /// <summary>
-        /// Whether the method returns a void.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>A bool.
-        protected bool MethodReturnsVoid(MethodInfo method)
-            => method.ReturnType == typeof(void);
-
-        /// <summary>
-        /// Whether the method returns an async void.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>A bool.
-        protected bool MethodReturnsAsyncVoid(MethodInfo method)
-        {
-            var asyncAttribute = typeof(AsyncStateMachineAttribute);
-            var isAsyncMethod = (AsyncStateMachineAttribute)method.GetCustomAttribute(asyncAttribute) != null;
-            return isAsyncMethod && MethodReturnsVoid(method);
-        }
-
-        /// <summary>
-        /// Whether the methods second parameter is an embedding context.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <returns>A bool.
-        protected bool SecondMethodParameterIsEmbeddingContext(MethodInfo method)
-            => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EmbeddingContext);
-
-        /// <summary>
         /// Creates a new <see cref="ClassCompareMethodBuilder{TEmbedding}"/>.
         /// </summary>
         /// <param name="embedding">The embedding identifier.</param>
@@ -136,5 +55,86 @@ namespace Dolittle.SDK.Embeddings.Builder
                 embedding,
                 eventTypes,
                 loggerFactory.CreateLogger<ClassProjectionMethodsBuilder<TEmbedding>>());
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassMethodBuilder{TEmbedding}"/> class.
+        /// </summary>
+        /// <param name="embeddingId">The embedding identifier.</param>
+        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+        protected ClassMethodBuilder(EmbeddingId embeddingId, IEventTypes eventTypes)
+        {
+            Embedding = embeddingId;
+            EventTypes = eventTypes;
+            EmbeddingType = typeof(TEmbedding);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="EmbeddingId" />.
+        /// </summary>
+        protected EmbeddingId Embedding { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEventTypes" />.
+        /// </summary>
+        protected IEventTypes EventTypes { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Type"/> of the embedding.
+        /// </summary>
+        protected Type EmbeddingType { get; }
+
+        /// <summary>
+        /// Whether the method returns an enumerable object.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>A bool.</returns>
+        protected bool MethodReturnsEnumerableObject(MethodInfo method)
+            => typeof(System.Collections.IEnumerable).IsAssignableFrom(method.ReturnType);
+
+        /// <summary>
+        /// Whether the method returns an object.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>Whether the method returns an object.</returns>
+        protected bool MethodReturnsObject(MethodInfo method)
+            => typeof(object).IsAssignableFrom(method.ReturnType)
+                && !MethodReturnsTask(method)
+                && !method.ReturnType.IsGenericType;
+
+        /// <summary>
+        /// Whether the method returns a Task.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>Whether the method returns a <see cref="Task" />.</returns>
+        protected bool MethodReturnsTask(MethodInfo method)
+            => method.ReturnType == typeof(Task);
+
+        /// <summary>
+        /// Whether the method returns a void.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>Whether the method returns an void.</returns>
+        protected bool MethodReturnsVoid(MethodInfo method)
+            => method.ReturnType == typeof(void);
+
+        /// <summary>
+        /// Whether the method returns an async void.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>Whether the method returns an async void.</returns>
+        protected bool MethodReturnsAsyncVoid(MethodInfo method)
+        {
+            var asyncAttribute = typeof(AsyncStateMachineAttribute);
+            var isAsyncMethod = (AsyncStateMachineAttribute)method.GetCustomAttribute(asyncAttribute) != null;
+            return isAsyncMethod && MethodReturnsVoid(method);
+        }
+
+        /// <summary>
+        /// Whether the methods second parameter is an embedding context.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <returns>Whether the method second parameter is <see cref="EmbeddingContext" />.</returns>
+        protected bool SecondMethodParameterIsEmbeddingContext(MethodInfo method)
+            => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EmbeddingContext);
     }
 }

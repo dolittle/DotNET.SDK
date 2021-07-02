@@ -32,7 +32,6 @@ namespace Dolittle.SDK.Embeddings.Builder
             _logger = logger;
         }
 
-
         /// <summary>
         /// Try to build an <see cref="ICompareMethod{TEmbedding}"/>.
         /// </summary>
@@ -164,6 +163,7 @@ namespace Dolittle.SDK.Embeddings.Builder
 
         Type GetCompareSignatureType(MethodInfo method)
         {
+            // Throw if return type is Task
             if (MethodReturnsEnumerableObject(method)) return typeof(CompareMethodEnumerableReturnSignature<>);
             if (MethodReturnsObject(method)) return typeof(CompareMethodSignature<>);
             throw new InvalidCompareMethodReturnType(method.ReturnType);

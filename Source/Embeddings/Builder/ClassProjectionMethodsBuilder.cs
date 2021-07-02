@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Embeddings.Builder
 {
     /// <summary>
-    /// Builder for building <see cref="ClassProjectionMethods{TEmbedding}"/>.
+    /// Builder for building the <see cref="IOnMethod{TReadModel}"/> on a an embedding class.
     /// </summary>
     /// <typeparam name="TEmbedding">The <see cref="Type" /> of the embedding.</typeparam>
     public class ClassProjectionMethodsBuilder<TEmbedding> : ClassMethodBuilder<TEmbedding>
@@ -35,26 +35,28 @@ namespace Dolittle.SDK.Embeddings.Builder
         }
 
         /// <summary>
-        /// Try to build an <see cref="IProjectionMethod{TEmbedding}"/>.
+        /// Try to build an <see cref="IOnMethod{TEmbedding}"/> for each event type.
         /// </summary>
-        /// <param name="eventTypeToMethods">A dictionary of event types and their respective projection methods..</param>
+        /// <param name="eventTypesToMethods">A dictionary of event types and their respective projection methods.</param>
         /// <returns>A bool indicating whether the build succeeded.</returns>
         public bool TryBuild(out IDictionary<EventType, IOnMethod<TEmbedding>> eventTypesToMethods)
         {
+            eventTypesToMethods = new Dictionary<EventType, IOnMethod<TEmbedding>>();
             var allMethods = EmbeddingType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
             var hasWrongMethods = false;
-            if (!TryAddDecoratedProjectionMethodsInto(allMethods, eventTypesToMethods))
+            if (!TryAddDecoratedProjectionMethodsInto(eventTypesToMethods, allMethods))
             {
                 hasWrongMethods = true;
             }
 
-            if (!TryAddConventionProjectionMethodsInto(allMethods, eventTypesToMethods))
+            if (!TryAddConventionProjectionMethodsInto(eventTypesToMethods, allMethods))
             {
                 hasWrongMethods = true;
             }
 
             if (hasWrongMethods)
             {
+                eventTypesToMethods = default;
                 return false;
             }
 
@@ -65,6 +67,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                     EmbeddingType,
                     nameof(OnAttribute),
                     ProjectionMethodName);
+                eventTypesToMethods = default;
                 return false;
             }
 
@@ -72,8 +75,8 @@ namespace Dolittle.SDK.Embeddings.Builder
         }
 
         bool TryAddDecoratedProjectionMethodsInto(
-            IEnumerable<MethodInfo> methods,
-            IDictionary<EventType, IOnMethod<TEmbedding>> eventTypesToMethods)
+            IDictionary<EventType, IOnMethod<TEmbedding>> eventTypesToMethods,
+            IEnumerable<MethodInfo> methods)
         {
             var allMethodsAdded = true;
             foreach (var method in methods.Where(IsDecoratedOnMethod))
@@ -222,7 +225,7 @@ namespace Dolittle.SDK.Embeddings.Builder
             type = default;
             if (method.GetParameters().Length == 0)
             {
-                var message = $"Projection method {method} on embedding {EmbeddingType} has no parameters{(isDecorated ? ", but is decorated with [{OnAttribute}]" : "")}. A projection method should take in as paramters an event and an {EmbeddingProjectContext}";
+                var message = "Projection method {method} on embedding {EmbeddingType} has no parameters" + $"{(isDecorated ? ", but is decorated with [{OnAttribute}]" : "")}. " + "A projection method should take in as paramters an event and an {EmbeddingProjectContext}";
                 if (isDecorated)
                 {
                     _logger.LogWarning(
@@ -280,6 +283,7 @@ namespace Dolittle.SDK.Embeddings.Builder
 
             return true;
         }
+
         bool IsPublicMethod(MethodInfo method)
         {
             if (!method.IsPublic)
