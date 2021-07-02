@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// </summary>
         /// <param name="returnType">The return <see cref="Type" /> of the projection method.</param>
         public InvalidProjectionMethodReturnType(Type returnType)
-            : base($"{returnType} is not a valid projection method")
+            : base($"{returnType} is not a valid projection method return type.")
         {
         }
     }

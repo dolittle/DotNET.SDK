@@ -11,26 +11,26 @@ namespace Dolittle.SDK.Embeddings.Builder
     /// An implementation of <see cref="IRemoveMethod{TEmbedding}" /> that invokes the remove method on an embedding instance.
     /// </summary>
     /// <typeparam name="TEmbedding">The <see cref="Type" /> of the projection.</typeparam>
-    public class ClassRemovedMethod<TEmbedding> : IRemoveMethod<TEmbedding>
+    public class ClassRemoveMethod<TEmbedding> : IRemoveMethod<TEmbedding>
         where TEmbedding : class, new()
     {
         readonly RemoveMethodEnumerableReturnSignature<TEmbedding> _method;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassRemovedMethod{TEmbedding}"/> class.
+        /// Initializes a new instance of the <see cref="ClassRemoveMethod{TEmbedding}"/> class.
         /// </summary>
         /// <param name="method">The <see cref="RemoveMethodSignature{TEmbedding}"/> method to invoke.</param>
-        public ClassRemovedMethod(RemoveMethodSignature<TEmbedding> method)
+        public ClassRemoveMethod(RemoveMethodSignature<TEmbedding> method)
             : this(
                 (TEmbedding instanceAndCurrentState, EmbeddingContext context) => new[] { method(instanceAndCurrentState, context) })
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassRemovedMethod{TEmbedding}"/> class.
+        /// Initializes a new instance of the <see cref="ClassRemoveMethod{TEmbedding}"/> class.
         /// </summary>
         /// <param name="method">The <see cref="RemoveMethodEnumerableReturnSignature{TEmbedding}"/> method to invoke.</param>
-        public ClassRemovedMethod(RemoveMethodEnumerableReturnSignature<TEmbedding> method)
+        public ClassRemoveMethod(RemoveMethodEnumerableReturnSignature<TEmbedding> method)
         {
             _method = method;
         }
