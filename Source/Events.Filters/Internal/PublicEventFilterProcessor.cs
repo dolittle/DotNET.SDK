@@ -38,10 +38,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
 
         /// <inheritdoc/>
         public override PublicFilterRegistrationRequest RegistrationRequest
-            => new PublicFilterRegistrationRequest
-                {
-                    FilterId = _filterId.ToProtobuf()
-                };
+            => new PublicFilterRegistrationRequest { FilterId = _filterId.ToProtobuf() };
 
         /// <inheritdoc/>
         protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)

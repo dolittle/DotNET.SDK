@@ -16,6 +16,6 @@ namespace Dolittle.SDK.Projections.Store
         /// <summary>
         /// The state was created from the persisted state.
         /// </summary>
-        Persisted
+        Persisted = 1
     }
 }

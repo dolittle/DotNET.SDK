@@ -23,9 +23,9 @@ namespace Dolittle.SDK.Events.Store.Converters
         }
 
         /// <inheritdoc/>
-        public bool TrySerialize(object content, out string jsonString, out Exception error)
+        public bool TrySerialize(object content, out string json, out Exception error)
         {
-            if (!TrySerializeWithSettings(content, out jsonString, out var serializationError))
+            if (!TrySerializeWithSettings(content, out json, out var serializationError))
             {
                 error = new CouldNotSerializeEventContent(content, serializationError);
                 return false;

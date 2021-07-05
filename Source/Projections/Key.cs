@@ -16,5 +16,12 @@ namespace Dolittle.SDK.Projections
         /// <param name="expression">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="Key"/>.</returns>
         public static implicit operator Key(string expression) => new Key { Value = expression };
+
+        /// <summary>
+        /// Implicitly converts from a <see cref="Key"/> to an <see cref="string"/>.
+        /// </summary>
+        /// <param name="key">The <see cref="Key"/>.</param>
+        /// <returns>The converted <see cref="string"/>.</returns>
+        public static implicit operator string(Key key) => key.Value;
     }
 }

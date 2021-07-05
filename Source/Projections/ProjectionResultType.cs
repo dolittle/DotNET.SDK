@@ -16,6 +16,6 @@ namespace Dolittle.SDK.Projections
         /// <summary>
         /// Deletes the read model.
         /// </summary>
-        Delete
+        Delete = 1
     }
 }

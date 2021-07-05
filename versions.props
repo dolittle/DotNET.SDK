@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <ContractsVersion>5.3.0</ContractsVersion>
+        <ContractsVersion>5.4.0</ContractsVersion>
         <MicrosoftExtensionsVersion>3.1.2</MicrosoftExtensionsVersion>
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.14.0</ProtobufVersion>
