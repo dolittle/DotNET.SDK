@@ -171,16 +171,17 @@ namespace Dolittle.SDK.Embeddings.Builder
             {
                 throw new InvalidCompareMethodReturnType(method.ReturnType);
             }
+
             if (MethodReturnsEnumerableObject(method))
             {
                 return typeof(CompareMethodEnumerableReturnSignature<>);
             }
+
             return typeof(CompareMethodSignature<>);
         }
 
         bool SecondMethodParameterIsEmbeddingContext(MethodInfo method)
             => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EmbeddingContext);
-
 
         bool IsDecoratedCompareMethod(MethodInfo method)
             => method.GetCustomAttributes(typeof(CompareAttribute), true).FirstOrDefault() != default;

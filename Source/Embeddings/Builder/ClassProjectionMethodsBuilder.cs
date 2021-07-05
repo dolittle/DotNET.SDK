@@ -226,7 +226,7 @@ namespace Dolittle.SDK.Embeddings.Builder
             type = default;
             if (method.GetParameters().Length == 0)
             {
-                var message = "Projection method {method} on embedding {EmbeddingType} has no parameters" + $"{(isDecorated ? ", but is decorated with [{OnAttribute}]" : "")}. " + "A projection method should take in as paramters an event and an {EmbeddingProjectContext}";
+                var message = "Projection method {method} on embedding {EmbeddingType} has no parameters" + $"{(isDecorated ? ", but is decorated with [{OnAttribute}]" : string.Empty)}. " + "A projection method should take in as paramters an event and an {EmbeddingProjectContext}";
                 if (isDecorated)
                 {
                     _logger.LogWarning(

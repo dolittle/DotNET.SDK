@@ -58,7 +58,7 @@ namespace Dolittle.SDK.Embeddings.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IConvertEventsToProtobuf eventsToProtobufConverter,
-            IConvertProjectionsToSDK projectionConverter,
+            IConvertProjectionsToSDK projectionsConverter,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
@@ -67,7 +67,7 @@ namespace Dolittle.SDK.Embeddings.Builder
                 throw new EmbeddingNeedsToBeForReadModel(_embeddingId);
             }
 
-            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, eventsToProtobufConverter, projectionConverter, loggerFactory, cancellation);
+            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, eventsToProtobufConverter, projectionsConverter, loggerFactory, cancellation);
         }
     }
 }

@@ -42,10 +42,7 @@ namespace Dolittle.SDK.Projections.Store.Converters
         {
             projectionState = null;
             var exceptionCatcher = new JsonSerializerExceptionCatcher();
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Error = exceptionCatcher.OnError,
-            };
+            var serializerSettings = new JsonSerializerSettings { Error = exceptionCatcher.OnError };
             var stateType = GetCurrentStateType(currentState.Type);
             var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
 

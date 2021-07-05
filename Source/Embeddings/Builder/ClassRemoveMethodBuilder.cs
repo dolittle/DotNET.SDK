@@ -74,10 +74,10 @@ namespace Dolittle.SDK.Embeddings.Builder
             {
                 return false;
             }
+
             removeMethod = CreateRemoveMethod(decoratedMethod);
             return true;
         }
-
 
         bool TryAddConventionRemoveMethod(
             IEnumerable<MethodInfo> allMethods,
@@ -163,7 +163,6 @@ namespace Dolittle.SDK.Embeddings.Builder
                 return false;
             }
 
-
             return okay;
         }
 
@@ -182,10 +181,12 @@ namespace Dolittle.SDK.Embeddings.Builder
             {
                 throw new InvalidRemoveMethodReturnType(method.ReturnType);
             }
+
             if (MethodReturnsEnumerableObject(method))
             {
                 return typeof(RemoveMethodEnumerableReturnSignature<>);
             }
+
             return typeof(RemoveMethodSignature<>);
         }
 
