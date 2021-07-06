@@ -87,6 +87,11 @@ namespace Dolittle.SDK.Embeddings.Internal
             var result = new UncommittedEvents();
             foreach (var @event in events)
             {
+                if (@event == default)
+                {
+                    continue;
+                }
+
                 result.Add(new UncommittedEvent(Guid.Empty, _eventTypes.GetFor(@event.GetType()), @event, true));
             }
 
