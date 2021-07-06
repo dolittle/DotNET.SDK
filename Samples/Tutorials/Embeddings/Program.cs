@@ -3,9 +3,10 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/embeddings/
 
 using System;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 using Dolittle.SDK;
+using Dolittle.SDK.Projections;
 using Dolittle.SDK.Tenancy;
 
 namespace Kitchen
@@ -26,15 +27,25 @@ namespace Kitchen
                 .WithEmbeddings(builder =>
                 {
                     builder.RegisterEmbedding<DishCounter>();
-                    // builder
-                    //     .CreateEmbedding("999a6aa4-4412-4eaf-a99b-2842cb191e7c")
-                    //     .ForReadModel<Chef>()
-                    //     .Compare((receivedState, currentState, context) =>
-                    //     {
-                    //         {
-                    //             return new ChefHired(receivedState.Name);
-                    //         }
-                    //     });
+                    builder
+                        .CreateEmbedding("999a6aa4-4412-4eaf-a99b-2842cb191e7c")
+                        .ForReadModel<Chef>()
+                        .Compare((receivedState, currentState, context) =>
+                        {
+                            if (currentState.Name == "")
+                            {
+                                Console.WriteLine($"Hiring a new chef {receivedState.Name}");
+                                return new ChefHired(receivedState.Name);
+                            }
+                            return null;
+                        })
+                        .Remove((currentState, context) => new ChefFired(currentState.Name))
+                        .On<ChefHired>((currentState, @event, projectionContext) =>
+                        {
+                            currentState.Name = @event.Chef;
+                            return currentState;
+                        })
+                        .On<ChefFired>((currentState, @event, projectionContext) => ProjectionResult<Chef>.Delete);
                 })
                 .Build();
             _ = client.Start();
@@ -82,6 +93,41 @@ namespace Kitchen
                 }).ToArray();
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            Console.WriteLine("Hiring some chefs");
+            var mrTaco = new Chef
+            {
+                Name = "Mr. Taco"
+            };
+            var mrsTexMex = new Chef
+            {
+                Name = "Mrs. TexMex"
+            };
+
+            await client.Embeddings
+                .ForTenant(TenantId.Development)
+                .Update(mrTaco.Name, mrTaco);
+            await client.Embeddings
+                .ForTenant(TenantId.Development)
+                .Update(mrsTexMex.Name, mrsTexMex);
+            var mrTacoState = await client.Embeddings
+                .ForTenant(TenantId.Development)
+                .Get<Chef>(mrTaco.Name);
+            Console.WriteLine($"Got Mr. Taco: {mrTacoState.State.Name}");
+
+            var mrsTexMexState = await client.Embeddings
+                .ForTenant(TenantId.Development)
+                .Get<Chef>(mrsTexMex.Name);
+            Console.WriteLine($"Got Mrs. TexMex: {mrsTexMexState.State.Name}");
+
+            await client.Embeddings
+                .ForTenant(TenantId.Development)
+                .Delete<Chef>(mrTaco.Name);
+
+            var deletedState = await client.Embeddings
+                .ForTenant(TenantId.Development)
+                .Get<Chef>(mrTaco.Name);
+            Console.WriteLine($"Got deleted Mr. Taco: {deletedState.State.Name}");
         }
     }
 }

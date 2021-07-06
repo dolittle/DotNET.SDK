@@ -5,11 +5,6 @@ namespace Kitchen
 {
     public class Chef
     {
-        public Chef(string name)
-        {
-            Name = name;
-        }
-
-        public string Name { get; }
+        public string Name { get; set; } = "";
     }
 }
