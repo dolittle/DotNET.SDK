@@ -19,6 +19,7 @@ namespace Kitchen
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
                 {
+                    eventTypes.Register<DishAdded>();
                     eventTypes.Register<DishPrepared>();
                     eventTypes.Register<DishRemoved>();
                     eventTypes.Register<ChefHired>();
@@ -30,20 +31,15 @@ namespace Kitchen
                     builder
                         .CreateEmbedding("999a6aa4-4412-4eaf-a99b-2842cb191e7c")
                         .ForReadModel<Chef>()
-                        .Compare((receivedState, currentState, context) =>
+                        .ResolveUpdateToEvents((updatedState, currentState, context) =>
                         {
-                            if (currentState.Name == "")
-                            {
-                                Console.WriteLine($"Hiring a new chef {receivedState.Name}");
-                                return new ChefHired(receivedState.Name);
-                            }
-                            return null;
+                            return new ChefHired(updatedState.Name);
                         })
-                        .Remove((currentState, context) => new ChefFired(currentState.Name))
-                        .On<ChefHired>((currentState, @event, projectionContext) =>
+                        .ResolveDeletionToEvents((currentState, context) => new ChefFired(currentState.Name))
+                        .On<ChefHired>((updatedState, @event, projectionContext) =>
                         {
-                            currentState.Name = @event.Chef;
-                            return currentState;
+                            updatedState.Name = @event.Chef;
+                            return updatedState;
                         })
                         .On<ChefFired>((currentState, @event, projectionContext) => ProjectionResult<Chef>.Delete);
                 })
@@ -55,7 +51,7 @@ namespace Kitchen
 
         static async Task DoStuffWithEmbeddings(Client client)
         {
-            await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 
             var tacoCounter = new DishCounter
             {

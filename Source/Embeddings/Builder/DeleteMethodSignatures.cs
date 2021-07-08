@@ -7,54 +7,46 @@ using System.Collections.Generic;
 namespace Dolittle.SDK.Embeddings.Builder
 {
     /// <summary>
-    /// Represents the signature for an inline embeddings compare method.
+    /// Represents the signature for an inline embeddings delete method.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    /// <param name="receivedState">The wanted state.</param>
     /// <param name="currentState">The current state.</param>
     /// <param name="context">The <see cref="EmbeddingContext"/>.</param>
     /// <returns>One event.</returns>
-    public delegate object CompareSignature<TReadModel>(
-        TReadModel receivedState,
+    public delegate object DeleteSignature<TReadModel>(
         TReadModel currentState,
         EmbeddingContext context);
 
     /// <summary>
-    /// Represents the signature for an inline embeddings compare method.
+    /// Represents the signature for an inline embeddings deletion method.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    /// <param name="receivedState">The wanted state.</param>
     /// <param name="currentState">The current state.</param>
     /// <param name="context">The <see cref="EmbeddingContext"/>.</param>
     /// <returns>An <see cref="IEnumerable{TResult}"/> of events..</returns>
-    public delegate IEnumerable<object> CompareEnumerableReturnSignature<TReadModel>(
-        TReadModel receivedState,
+    public delegate IEnumerable<object> DeleteEnumerableReturnSignature<TReadModel>(
         TReadModel currentState,
         EmbeddingContext context);
 
     /// <summary>
-    /// Represents the signature for an embedding class's compare method.
+    /// Represents the signature for an embedding class's deletion method.
     /// </summary>
     /// <typeparam name="TEmbedding">The <see cref="Type" /> of the embedding.</typeparam>
     /// <param name="instance">The current state.</param>
-    /// <param name="receivedState">The wanted state.</param>
     /// <param name="context">The <see cref="EmbeddingContext"/>.</param>
     /// <returns>One event.</returns>
-    public delegate object CompareMethodSignature<TEmbedding>(
+    public delegate object DeleteMethodSignature<TEmbedding>(
         TEmbedding instance,
-        TEmbedding receivedState,
         EmbeddingContext context);
 
     /// <summary>
-    /// Represents the signature for an embedding class's compare method.
+    /// Represents the signature for an embedding class's deletion method.
     /// </summary>
     /// <typeparam name="TEmbedding">The <see cref="Type" /> of the embedding.</typeparam>
     /// <param name="instance">The current state.</param>
-    /// <param name="receivedState">The wanted state.</param>
     /// <param name="context">The <see cref="EmbeddingContext"/>.</param>
     /// <returns>An <see cref="IEnumerable{TResult}"/> of events.</returns>
-    public delegate IEnumerable<object> CompareMethodEnumerableReturnSignature<TEmbedding>(
+    public delegate IEnumerable<object> DeleteMethodEnumerableReturnSignature<TEmbedding>(
         TEmbedding instance,
-        TEmbedding receivedState,
         EmbeddingContext context);
 }

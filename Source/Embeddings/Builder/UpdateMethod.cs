@@ -8,34 +8,34 @@ using Dolittle.SDK.Async;
 namespace Dolittle.SDK.Embeddings.Builder
 {
     /// <summary>
-    /// An implementation of <see cref="ICompareMethod{TReadModel}" />.
+    /// An implementation of <see cref="IUpdateMethod{TReadModel}" />.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    public class CompareMethod<TReadModel> : ICompareMethod<TReadModel>
+    public class UpdateMethod<TReadModel> : IUpdateMethod<TReadModel>
         where TReadModel : class, new()
     {
-        readonly CompareEnumerableReturnSignature<TReadModel> _method;
+        readonly UpdateEnumerableReturnSignature<TReadModel> _method;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CompareMethod{TReadModel}"/> class.
+        /// Initializes a new instance of the <see cref="UpdateMethod{TReadModel}"/> class.
         /// </summary>
-        /// <param name="method">The <see cref="CompareEnumerableReturnSignature{TReadModel}" />.</param>
-        public CompareMethod(CompareEnumerableReturnSignature<TReadModel> method)
+        /// <param name="method">The <see cref="UpdateEnumerableReturnSignature{TReadModel}" />.</param>
+        public UpdateMethod(UpdateEnumerableReturnSignature<TReadModel> method)
         {
             _method = method;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CompareMethod{TReadModel}"/> class.
+        /// Initializes a new instance of the <see cref="UpdateMethod{TReadModel}"/> class.
         /// </summary>
         /// <param name="method">The <see cref="SyncOnSignature{TReadModel}" />.</param>
-        public CompareMethod(CompareSignature<TReadModel> method)
+        public UpdateMethod(UpdateSignature<TReadModel> method)
             : this((receivedState, currentState, context) => new[] { method(receivedState, currentState, context) })
         {
         }
 
         /// <inheritdoc/>
-        public Try<IEnumerable<object>> TryCompare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context)
+        public Try<IEnumerable<object>> TryUpdate(TReadModel receivedState, TReadModel currentState, EmbeddingContext context)
         {
             try
             {

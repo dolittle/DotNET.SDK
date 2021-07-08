@@ -8,35 +8,35 @@ using Dolittle.SDK.Async;
 namespace Dolittle.SDK.Embeddings.Builder
 {
     /// <summary>
-    /// An implementation of <see cref="IRemoveMethod{TEmbedding}" /> that invokes the remove method on an embedding instance.
+    /// An implementation of <see cref="IDeleteMethod{TEmbedding}" /> that invokes the delete method on an embedding instance.
     /// </summary>
     /// <typeparam name="TEmbedding">The <see cref="Type" /> of the projection.</typeparam>
-    public class ClassRemoveMethod<TEmbedding> : IRemoveMethod<TEmbedding>
+    public class ClassDeleteMethod<TEmbedding> : IDeleteMethod<TEmbedding>
         where TEmbedding : class, new()
     {
-        readonly RemoveMethodEnumerableReturnSignature<TEmbedding> _method;
+        readonly DeleteMethodEnumerableReturnSignature<TEmbedding> _method;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassRemoveMethod{TEmbedding}"/> class.
+        /// Initializes a new instance of the <see cref="ClassDeleteMethod{TEmbedding}"/> class.
         /// </summary>
-        /// <param name="method">The <see cref="RemoveMethodSignature{TEmbedding}"/> method to invoke.</param>
-        public ClassRemoveMethod(RemoveMethodSignature<TEmbedding> method)
+        /// <param name="method">The <see cref="DeleteMethodSignature{TEmbedding}"/> method to invoke.</param>
+        public ClassDeleteMethod(DeleteMethodSignature<TEmbedding> method)
             : this(
                 (TEmbedding instanceAndCurrentState, EmbeddingContext context) => new[] { method(instanceAndCurrentState, context) })
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassRemoveMethod{TEmbedding}"/> class.
+        /// Initializes a new instance of the <see cref="ClassDeleteMethod{TEmbedding}"/> class.
         /// </summary>
-        /// <param name="method">The <see cref="RemoveMethodEnumerableReturnSignature{TEmbedding}"/> method to invoke.</param>
-        public ClassRemoveMethod(RemoveMethodEnumerableReturnSignature<TEmbedding> method)
+        /// <param name="method">The <see cref="DeleteMethodEnumerableReturnSignature{TEmbedding}"/> method to invoke.</param>
+        public ClassDeleteMethod(DeleteMethodEnumerableReturnSignature<TEmbedding> method)
         {
             _method = method;
         }
 
         /// <inheritdoc/>
-        public Try<IEnumerable<object>> TryRemove(TEmbedding currentState, EmbeddingContext context)
+        public Try<IEnumerable<object>> TryDelete(TEmbedding currentState, EmbeddingContext context)
         {
             try
             {

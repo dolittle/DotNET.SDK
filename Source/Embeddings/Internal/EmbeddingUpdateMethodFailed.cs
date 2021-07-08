@@ -6,18 +6,18 @@ using System;
 namespace Dolittle.SDK.Embeddings.Internal
 {
     /// <summary>
-    /// Exception that gets thrown when an embedding compare-method comparing states.
+    /// Exception that gets thrown when an embeddings update method fails.
     /// </summary>
-    public class EmbeddingRemoveMethodFailed : Exception
+    public class EmbeddingUpdateMethodFailed : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmbeddingRemoveMethodFailed"/> class.
+        /// Initializes a new instance of the <see cref="EmbeddingUpdateMethodFailed"/> class.
         /// </summary>
         /// <param name="embedding">The <see cref="EmbeddingId" />.</param>
         /// <param name="context">The <see cref="EmbeddingContext" />.</param>
         /// <param name="exception">The <see cref="Exception" /> that caused the handling to fail.</param>
-        public EmbeddingRemoveMethodFailed(EmbeddingId embedding, EmbeddingContext context, Exception exception)
-            : base($"Embedding {embedding} failed to delete current state for key {context.Key}", exception)
+        public EmbeddingUpdateMethodFailed(EmbeddingId embedding, EmbeddingContext context, Exception exception)
+            : base($"Embedding {embedding} failed to call its update method with key {context.Key} due to an exception:", exception)
         {
         }
     }

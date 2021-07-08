@@ -22,8 +22,8 @@ namespace Dolittle.SDK.Embeddings.Internal
     {
         readonly IEventTypes _eventTypes;
         readonly IDictionary<EventType, IOnMethod<TReadModel>> _onMethods;
-        readonly ICompareMethod<TReadModel> _compareMethod;
-        readonly IRemoveMethod<TReadModel> _removeMethod;
+        readonly IUpdateMethod<TReadModel> _updateMethod;
+        readonly IDeleteMethod<TReadModel> _removeMethod;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Embedding{TReadModel}"/> class.
@@ -31,20 +31,20 @@ namespace Dolittle.SDK.Embeddings.Internal
         /// <param name="identifier">The <see cref="EmbeddingId" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
-        /// <param name="compareMethod">The compare method.</param>
+        /// <param name="updateMethod">The compare method.</param>
         /// <param name="removeMethod">The remove method.</param>
         public Embedding(
             EmbeddingId identifier,
             IEventTypes eventTypes,
             IDictionary<EventType, IOnMethod<TReadModel>> onMethods,
-            ICompareMethod<TReadModel> compareMethod,
-            IRemoveMethod<TReadModel> removeMethod)
+            IUpdateMethod<TReadModel> updateMethod,
+            IDeleteMethod<TReadModel> removeMethod)
         {
             _onMethods = onMethods;
             _eventTypes = eventTypes;
             Identifier = identifier;
             Events = onMethods.Select(_ => _.Key);
-            _compareMethod = compareMethod;
+            _updateMethod = updateMethod;
             _removeMethod = removeMethod;
         }
 
@@ -58,19 +58,21 @@ namespace Dolittle.SDK.Embeddings.Internal
         public IEnumerable<EventType> Events { get; }
 
         /// <inheritdoc/>
-        public UncommittedEvents Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
+        public UncommittedEvents Update(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
         {
-            var tryCompare = _compareMethod.TryCompare(receivedState, currentState, context);
-            if (tryCompare.Exception != default) throw new EmbeddingCompareMethodFailed(Identifier, context, tryCompare.Exception);
-            return CreateUncommittedEvents(tryCompare.Result);
+            var tryUpdate = _updateMethod.TryUpdate(receivedState, currentState, context);
+            if (tryUpdate.Exception != default) throw new EmbeddingUpdateMethodFailed(Identifier, context, tryUpdate.Exception);
+            if (tryUpdate.Result.All(_ => _ == default)) throw new EmbeddingUpdateMethodDidNotReturnEvents(Identifier, context);
+            return CreateUncommittedEvents(tryUpdate.Result);
         }
 
         /// <inheritdoc/>
         public UncommittedEvents Delete(TReadModel currentState, EmbeddingContext context, CancellationToken cancellation)
         {
-            var tryRemove = _removeMethod.TryRemove(currentState, context);
-            if (tryRemove.Exception != default) throw new EmbeddingRemoveMethodFailed(Identifier, context, tryRemove.Exception);
-            return CreateUncommittedEvents(tryRemove.Result);
+            var tryDelete = _removeMethod.TryDelete(currentState, context);
+            if (tryDelete.Exception != default) throw new EmbeddingDeleteMethodFailed(Identifier, context, tryDelete.Exception);
+            if (tryDelete.Result.All(_ => _ == default)) throw new EmbeddingDeleteMethodDidNotReturnEvents(Identifier, context);
+            return CreateUncommittedEvents(tryDelete.Result);
         }
 
         /// <inheritdoc/>
@@ -87,11 +89,6 @@ namespace Dolittle.SDK.Embeddings.Internal
             var result = new UncommittedEvents();
             foreach (var @event in events)
             {
-                if (@event == default)
-                {
-                    continue;
-                }
-
                 result.Add(new UncommittedEvent(Guid.Empty, _eventTypes.GetFor(@event.GetType()), @event, true));
             }
 

@@ -7,7 +7,6 @@ using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store.Converters;
-using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 

@@ -95,7 +95,7 @@ namespace Dolittle.SDK.Embeddings.Internal
                 false,
                 request.ProjectionState,
                 executionContext,
-                (currentState, context) => _embedding.Compare(CreateReceivedState(request.EntityState), currentState.State, context, cancellation),
+                (currentState, context) => _embedding.Update(CreateReceivedState(request.EntityState), currentState.State, context, cancellation),
                 events =>
                 {
                     var response = new EmbeddingResponse { Compare = new EmbeddingCompareResponse() };

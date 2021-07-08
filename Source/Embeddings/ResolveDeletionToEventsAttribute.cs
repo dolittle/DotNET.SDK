@@ -9,12 +9,12 @@ namespace Dolittle.SDK.Embeddings
     /// Decorates a method to indicate that it's an embeddings remove method.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class RemoveAttribute : Attribute
+    public class ResolveDeletionToEventsAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RemoveAttribute"/> class.
+        /// Initializes a new instance of the <see cref="ResolveDeletionToEventsAttribute"/> class.
         /// </summary>
-        public RemoveAttribute()
+        public ResolveDeletionToEventsAttribute()
         {
         }
     }

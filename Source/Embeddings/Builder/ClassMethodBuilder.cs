@@ -45,30 +45,30 @@ namespace Dolittle.SDK.Embeddings.Builder
         protected Type EmbeddingType { get; }
 
         /// <summary>
-        /// Creates a new <see cref="ClassCompareMethodBuilder{TEmbedding}"/>.
+        /// Creates a new <see cref="ClassUpdateMethodBuilder{TEmbedding}"/>.
         /// </summary>
         /// <param name="embedding">The embedding identifier.</param>
         /// <param name="eventTypes">The event types.<see cref="IEventTypes" />.</param>
         /// <param name="loggerFactory">The logger factory to create the logger from.</param>
-        /// <returns>The <see cref="ClassCompareMethodBuilder{TEmbedding}"/>.</returns>
-        public static ClassCompareMethodBuilder<TEmbedding> ForCompare(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
-            => new ClassCompareMethodBuilder<TEmbedding>(
+        /// <returns>The <see cref="ClassUpdateMethodBuilder{TEmbedding}"/>.</returns>
+        public static ClassUpdateMethodBuilder<TEmbedding> ForUpdate(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
+            => new ClassUpdateMethodBuilder<TEmbedding>(
                 embedding,
                 eventTypes,
-                loggerFactory.CreateLogger<ClassCompareMethodBuilder<TEmbedding>>());
+                loggerFactory.CreateLogger<ClassUpdateMethodBuilder<TEmbedding>>());
 
         /// <summary>
-        /// Creates a new <see cref="ClassRemoveMethodBuilder{TEmbedding}"/>.
+        /// Creates a new <see cref="ClassDeleteMethodBuilder{TEmbedding}"/>.
         /// </summary>
         /// <param name="embedding">The embedding identifier.</param>
         /// <param name="eventTypes">The event types.<see cref="IEventTypes" />.</param>
         /// <param name="loggerFactory">The logger factory to create the logger from.</param>
-        /// <returns>The <see cref="ClassRemoveMethodBuilder{TEmbedding}"/>.</returns>
-        public static ClassRemoveMethodBuilder<TEmbedding> ForRemove(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
-            => new ClassRemoveMethodBuilder<TEmbedding>(
+        /// <returns>The <see cref="ClassDeleteMethodBuilder{TEmbedding}"/>.</returns>
+        public static ClassDeleteMethodBuilder<TEmbedding> ForDelete(EmbeddingId embedding, IEventTypes eventTypes, ILoggerFactory loggerFactory)
+            => new ClassDeleteMethodBuilder<TEmbedding>(
                 embedding,
                 eventTypes,
-                loggerFactory.CreateLogger<ClassRemoveMethodBuilder<TEmbedding>>());
+                loggerFactory.CreateLogger<ClassDeleteMethodBuilder<TEmbedding>>());
 
         /// <summary>
         /// Creates a new <see cref="ClassProjectionMethodsBuilder{TEmbedding}"/>.
@@ -111,7 +111,7 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// Whether the method returns an async void.
         /// </summary>
         /// <param name="method">The method.</param>
-        /// <returns>Whether the method returns an async void.</returns>
+        /// <returns>Whether the method returns async void.</returns>
         protected bool MethodReturnsAsyncVoid(MethodInfo method)
         {
             var asyncAttribute = typeof(AsyncStateMachineAttribute);
@@ -123,7 +123,7 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// Whether the method returns a task or void.
         /// </summary>
         /// <param name="method">The method.</param>
-        /// <returns>Whether the method returns a task or void.</returns>
+        /// <returns>Whether the method returns task or void.</returns>
         protected bool MethodReturnsTaskOrVoid(MethodInfo method) =>
             MethodReturnsTask(method)
             || MethodReturnsVoid(method)

@@ -23,8 +23,8 @@ namespace Dolittle.SDK.Embeddings.Builder
     {
         readonly IList<IOnMethod<TReadModel>> _methods = new List<IOnMethod<TReadModel>>();
         readonly EmbeddingId _embeddingId;
-        ICompareMethod<TReadModel> _compareMethod;
-        IRemoveMethod<TReadModel> _removeMethod;
+        IUpdateMethod<TReadModel> _updateMethod;
+        IDeleteMethod<TReadModel> _deleteMethod;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmbeddingBuilderForReadModel{TReadModel}"/> class.
@@ -36,54 +36,54 @@ namespace Dolittle.SDK.Embeddings.Builder
         }
 
         /// <summary>
-        /// Add the compare method for comparing the received and current state of the embedding.
+        /// Add the update method for resolving the received and current state of the embedding.
         /// The method should return a single event, that changes the current state more towards the received state.
         /// This method will be called until the received state and current state are equal.
         /// </summary>
-        /// <param name="method">The <see cref="CompareSignature{TReadModel}"/>.</param>
+        /// <param name="method">The <see cref="UpdateSignature{TReadModel}"/>.</param>
         /// <returns>The <see cref="EmbeddingBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-        public EmbeddingBuilderForReadModel<TReadModel> Compare(CompareSignature<TReadModel> method)
+        public EmbeddingBuilderForReadModel<TReadModel> ResolveUpdateToEvents(UpdateSignature<TReadModel> method)
         {
-            ThrowIfCompareMethodSet();
-            _compareMethod = new CompareMethod<TReadModel>(method);
+            ThrowIfUpdateMethodSet();
+            _updateMethod = new UpdateMethod<TReadModel>(method);
             return this;
         }
 
         /// <summary>
-        /// Add the compare method for comparing the received and current state of the embedding.
+        /// Add the update method for resolving the received and current state of the embedding.
         /// The method should return an enumerable of  events, that change the current state more towards the received state.
         /// This method will be called until the received state and current state are equal.
         /// </summary>
-        /// <param name="method">The <see cref="CompareEnumerableReturnSignature{TReadModel}"/>.</param>
+        /// <param name="method">The <see cref="UpdateEnumerableReturnSignature{TReadModel}"/>.</param>
         /// <returns>The <see cref="EmbeddingBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-        public EmbeddingBuilderForReadModel<TReadModel> Compare(CompareEnumerableReturnSignature<TReadModel> method)
+        public EmbeddingBuilderForReadModel<TReadModel> ResolveUpdateToEvents(UpdateEnumerableReturnSignature<TReadModel> method)
         {
-            ThrowIfCompareMethodSet();
-            _compareMethod = new CompareMethod<TReadModel>(method);
+            ThrowIfUpdateMethodSet();
+            _updateMethod = new UpdateMethod<TReadModel>(method);
             return this;
         }
 
         /// <summary>
-        /// Add the remove method for comparing the received and current state of the embedding.
+        /// Add the delete method for resolving the events needed to delete the embedding.
         /// </summary>
-        /// <param name="method">The <see cref="RemoveSignature{TReadModel}"/>.</param>
+        /// <param name="method">The <see cref="DeleteSignature{TReadModel}"/>.</param>
         /// <returns>The <see cref="EmbeddingBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-        public EmbeddingBuilderForReadModel<TReadModel> Remove(RemoveSignature<TReadModel> method)
+        public EmbeddingBuilderForReadModel<TReadModel> ResolveDeletionToEvents(DeleteSignature<TReadModel> method)
         {
-            ThrowIfRemoveMethodSet();
-            _removeMethod = new RemoveMethod<TReadModel>(method);
+            ThrowIfDeleteMethodSet();
+            _deleteMethod = new DeleteMethod<TReadModel>(method);
             return this;
         }
 
         /// <summary>
-        /// Add the remove method for comparing the received and current state of the embedding.
+        /// Add the delete method for resolving the events needed to delete the embedding.
         /// </summary>
-        /// <param name="method">The <see cref="RemoveSignature{TReadModel}"/>.</param>
+        /// <param name="method">The <see cref="DeleteSignature{TReadModel}"/>.</param>
         /// <returns>The <see cref="EmbeddingBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-        public EmbeddingBuilderForReadModel<TReadModel> Remove(RemoveEnumerableReturnSignature<TReadModel> method)
+        public EmbeddingBuilderForReadModel<TReadModel> ResolveDeletionToEvents(DeleteEnumerableReturnSignature<TReadModel> method)
         {
-            ThrowIfRemoveMethodSet();
-            _removeMethod = new RemoveMethod<TReadModel>(method);
+            ThrowIfDeleteMethodSet();
+            _deleteMethod = new DeleteMethod<TReadModel>(method);
             return this;
         }
 
@@ -206,8 +206,8 @@ namespace Dolittle.SDK.Embeddings.Builder
                 _embeddingId,
                 eventTypes,
                 eventTypesToMethods,
-                _compareMethod,
-                _removeMethod);
+                _updateMethod,
+                _deleteMethod);
             var embeddingsProcessor = new EmbeddingsProcessor<TReadModel>(
                 embedding,
                 eventsToProtobufConverter,
@@ -240,19 +240,19 @@ namespace Dolittle.SDK.Embeddings.Builder
             return okay;
         }
 
-        void ThrowIfCompareMethodSet()
+        void ThrowIfUpdateMethodSet()
         {
-            if (_compareMethod != default)
+            if (_updateMethod != default)
             {
-                throw new EmbeddingAlreadyHasACompareMethod(_embeddingId);
+                throw new EmbeddingAlreadyHasAnUpdateMethod(_embeddingId);
             }
         }
 
-        void ThrowIfRemoveMethodSet()
+        void ThrowIfDeleteMethodSet()
         {
-            if (_removeMethod != default)
+            if (_deleteMethod != default)
             {
-                throw new EmbeddingAlreadyHasARemoveMethod(_embeddingId);
+                throw new EmbeddingAlreadyHasADeleteMethod(_embeddingId);
             }
         }
     }

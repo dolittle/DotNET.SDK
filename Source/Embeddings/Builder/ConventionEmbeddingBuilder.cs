@@ -65,15 +65,15 @@ namespace Dolittle.SDK.Embeddings.Builder
             }
 
             if (!ClassMethodBuilder<TEmbedding>
-                .ForCompare(embeddingId, eventTypes, loggerFactory)
-                .TryBuild(out var compareMethod))
+                .ForUpdate(embeddingId, eventTypes, loggerFactory)
+                .TryBuild(out var updateMethod))
             {
                 return;
             }
 
             if (!ClassMethodBuilder<TEmbedding>
-                .ForRemove(embeddingId, eventTypes, loggerFactory)
-                .TryBuild(out var removeMethod))
+                .ForDelete(embeddingId, eventTypes, loggerFactory)
+                .TryBuild(out var deleteMethod))
             {
                 return;
             }
@@ -82,8 +82,8 @@ namespace Dolittle.SDK.Embeddings.Builder
                 embeddingId,
                 eventTypes,
                 eventTypesToMethods,
-                compareMethod,
-                removeMethod);
+                updateMethod,
+                deleteMethod);
             var embeddingsProcessor = new EmbeddingsProcessor<TEmbedding>(
                 embedding,
                 eventsToProtobufConverter,

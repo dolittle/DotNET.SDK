@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // Sample code for the tutorial at https://dolittle.io/tutorials/embeddings/
 
+using System;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Projections;
 
@@ -13,25 +14,32 @@ namespace Kitchen
         public int NumberOfTimesPrepared { get; set; } = 0;
         public string Dish { get; set; } = "";
 
-        public object Compare(DishCounter receivedState, EmbeddingContext context)
+        public object ResolveUpdateToEvents(DishCounter updatedState, EmbeddingContext context)
         {
-            if (receivedState.NumberOfTimesPrepared > NumberOfTimesPrepared)
+            if (updatedState.Dish != Dish)
             {
-                return new DishPrepared(receivedState.Dish);
+                return new DishAdded(updatedState.Dish);
+            }
+            else if (updatedState.NumberOfTimesPrepared > NumberOfTimesPrepared)
+            {
+                return new DishPrepared(updatedState.Dish);
             }
 
-            return default;
+            throw new NotImplementedException();
         }
 
-        public object Remove(EmbeddingContext context)
+        public object ResolveDeletionToEvents(EmbeddingContext context)
         {
             return new DishRemoved(context.Key);
         }
 
+        public void On(DishAdded @event, EmbeddingProjectContext context)
+        {
+            Dish = @event.Dish;
+        }
         public void On(DishPrepared @event, EmbeddingProjectContext context)
         {
             NumberOfTimesPrepared++;
-            Dish = @event.Dish;
         }
 
         public ProjectionResultType On(DishRemoved @event, EmbeddingProjectContext context)

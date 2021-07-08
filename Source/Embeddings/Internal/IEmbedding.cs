@@ -33,7 +33,7 @@ namespace Dolittle.SDK.Embeddings.Internal
         IEnumerable<EventType> Events { get; }
 
         /// <summary>
-        /// Handle an event and update a readmodel.
+        /// Handle an event and update the readmodel.
         /// </summary>
         /// <param name="readModel">The read model to update.</param>
         /// <param name="event">The event to handle.</param>
@@ -44,14 +44,15 @@ namespace Dolittle.SDK.Embeddings.Internal
         Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, EmbeddingProjectContext context, CancellationToken cancellation);
 
         /// <summary>
-        /// Compares the received state and current state.
+        /// Called, when the read model should be updated.
+        /// Returns events that should result in the current state matching the received state.
         /// </summary>
         /// <param name="receivedState">The received state.</param>
         /// <param name="currentState">The current state.</param>
         /// <param name="context">The context of the embedding.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="UncommittedEvents"/> to commit.</returns>
-        UncommittedEvents Compare(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
+        UncommittedEvents Update(TReadModel receivedState, TReadModel currentState, EmbeddingContext context, CancellationToken cancellation);
 
         /// <summary>
         /// Called, when the readmodel should get deleted. Returns events that should result in the readmodels deletion.
