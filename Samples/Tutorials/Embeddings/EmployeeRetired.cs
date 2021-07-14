@@ -5,14 +5,11 @@ using Dolittle.SDK.Events;
 
 namespace Kitchen
 {
-    [EventType("991c808e-e3bb-4b3c-873a-4d4acb7c887c")]
-    public class ChefFired
+    [EventType("1932beb4-c8cd-4fee-9a7e-a92af3693510")]
+    public class EmployeeRetired
     {
-        public ChefFired(string chef)
-        {
-            Chef = chef;
-        }
+        public string Name { get; set; }
 
-        public string Chef { get; }
+        public EmployeeRetired(string name) => Name = name;
     }
 }
