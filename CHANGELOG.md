@@ -1,3 +1,13 @@
+# [9.1.0] - 2021-7-14 [PR: #65](https://github.com/dolittle/DotNET.SDK/pull/65)
+## Summary
+
+Adds a new feature, Embeddings! They are similar to Projections, but they are meant to be used to event source changes coming from an external system. Check the [sample](https://github.com/dolittle/DotNET.SDK/tree/master/Samples/Tutorials/Embeddings) for an example.
+
+### Added
+
+- Embeddings! You can use them inline with the `WithEmbeddings()` builder, or by specifying the `ResolveUpdateToEvents`, `ResolveDeletionToEvents` and `On` methods or attributes for a class. The embeddings can be updated, deleted and fetched from the `client.Embeddings` property.
+
+
 # [9.0.0] - 2021-6-16 [PR: #61](https://github.com/dolittle/DotNET.SDK/pull/61)
 ## Summary
 
