@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Embeddings.Builder;
+using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -41,8 +43,10 @@ namespace Dolittle.SDK
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly ProjectionsBuilder _projectionsBuilder;
         readonly SubscriptionsBuilder _eventHorizonsBuilder;
+        readonly EmbeddingsBuilder _embeddingsBuilder;
         readonly MicroserviceId _microserviceId;
         readonly ProjectionReadModelTypeAssociations _projectionAssociations;
+        readonly EmbeddingReadModelTypeAssociations _embeddingAssociations;
         string _host = "localhost";
         TimeSpan _pingInterval = TimeSpan.FromSeconds(5);
         ushort _port = 50053;
@@ -73,12 +77,14 @@ namespace Dolittle.SDK
             _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
             _projectionAssociations = new ProjectionReadModelTypeAssociations();
+            _embeddingAssociations = new EmbeddingReadModelTypeAssociations();
 
             _eventTypesBuilder = new EventTypesBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
             _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
             _eventHorizonsBuilder = new SubscriptionsBuilder();
+            _embeddingsBuilder = new EmbeddingsBuilder(_embeddingAssociations);
         }
 
         /// <summary>
@@ -199,6 +205,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the embeddings through the <see cref="EmbeddingsBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
+        {
+            callback(_embeddingsBuilder);
+            return this;
+        }
+
+        /// <summary>
         /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -280,6 +297,13 @@ namespace Dolittle.SDK
                 _projectionAssociations,
                 projectionsToSDKConverter,
                 _loggerFactory);
+            var embeddings = new Embeddings.Embeddings(
+                methodCaller,
+                callContextResolver,
+                _embeddingAssociations,
+                projectionsToSDKConverter,
+                executionContext,
+                _loggerFactory);
 
             return new Client(
                 eventTypes,
@@ -291,8 +315,11 @@ namespace Dolittle.SDK
                 _eventHandlersBuilder,
                 _eventFiltersBuilder,
                 projectionsToSDKConverter,
+                eventToProtobufConverter,
                 _projectionsBuilder,
+                _embeddingsBuilder,
                 projectionStoreBuilder,
+                embeddings,
                 _loggerFactory,
                 _cancellation);
         }

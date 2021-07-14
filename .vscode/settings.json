@@ -15,6 +15,7 @@
     "dotnet-test-explorer.showCodeLens": true,
     "dotnet-test-explorer.autoExpandTree": true,
     "cSpell.words": [
+        "Dolittle",
         "Grpc",
         "Protobuf"
     ]

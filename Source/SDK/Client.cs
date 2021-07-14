@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Embeddings;
+using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
@@ -13,6 +15,7 @@ using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
+using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
@@ -30,8 +33,10 @@ namespace Dolittle.SDK
         readonly ProcessingCoordinator _processingCoordinator;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly EventFiltersBuilder _filtersBuilder;
+        readonly IConvertEventsToProtobuf _eventsToProtobufConverter;
         readonly IConvertProjectionsToSDK _projectionConverter;
         readonly ProjectionsBuilder _projectionsBuilder;
+        readonly EmbeddingsBuilder _embeddingsBuilder;
         readonly EventHorizons _eventHorizons;
         readonly IEventProcessors _eventProcessors;
         readonly IEventProcessingConverter _eventProcessingConverter;
@@ -52,8 +57,11 @@ namespace Dolittle.SDK
         /// <param name="eventHandlersBuilder">The <see cref="EventHandlersBuilder" />.</param>
         /// <param name="filtersBuilder">The <see cref="EventFiltersBuilder" />.</param>
         /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
+        /// <param name="eventsToProtobufConverter">The <see cref="IConvertEventsToProtobuf" />.</param>
         /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
+        /// <param name="embeddingsBuilder">The <see cref="EmbeddingsBuilder" />.</param>
         /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
+        /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -66,8 +74,11 @@ namespace Dolittle.SDK
             EventHandlersBuilder eventHandlersBuilder,
             EventFiltersBuilder filtersBuilder,
             IConvertProjectionsToSDK projectionConverter,
+            IConvertEventsToProtobuf eventsToProtobufConverter,
             ProjectionsBuilder projectionsBuilder,
+            EmbeddingsBuilder embeddingsBuilder,
             ProjectionStoreBuilder projectionStoreBuilder,
+            IEmbeddings embeddings,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -80,8 +91,11 @@ namespace Dolittle.SDK
             _eventHandlersBuilder = eventHandlersBuilder;
             _filtersBuilder = filtersBuilder;
             _projectionConverter = projectionConverter;
+            _eventsToProtobufConverter = eventsToProtobufConverter;
             _projectionsBuilder = projectionsBuilder;
+            _embeddingsBuilder = embeddingsBuilder;
             Projections = projectionStoreBuilder;
+            Embeddings = embeddings;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -101,6 +115,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="ProjectionStoreBuilder" />.
         /// </summary>
         public ProjectionStoreBuilder Projections { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IEmbeddings" />.
+        /// </summary>
+        public IEmbeddings Embeddings { get; }
 
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.
@@ -148,6 +167,13 @@ namespace Dolittle.SDK
                 _eventProcessors,
                 EventTypes,
                 _eventProcessingConverter,
+                _projectionConverter,
+                _loggerFactory,
+                _cancellation);
+            _embeddingsBuilder.BuildAndRegister(
+                _eventProcessors,
+                EventTypes,
+                _eventsToProtobufConverter,
                 _projectionConverter,
                 _loggerFactory,
                 _cancellation);
