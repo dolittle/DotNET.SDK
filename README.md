@@ -32,12 +32,6 @@ dotnet add package Dolittle.SDK
 dotnet build
 ```
 
-## Running
-```shell
-cd Source/Server
-dotnet run
-```
-
 ## Visual Studio
 
 You can open the `.sln` file in the root of the repository and just build directly.

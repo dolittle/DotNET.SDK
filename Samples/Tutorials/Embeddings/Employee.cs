@@ -8,7 +8,7 @@ using Dolittle.SDK.Projections;
 namespace Kitchen
 {
 
-    [Embedding("be5d325e-8b19-4e23-a781-88ad747e56a2")]
+    [Embedding("e5577d2c-0de7-481c-b5be-6ef613c2fcd6")]
     public class Employee
     {
         public string Name { get; set; } = "";
