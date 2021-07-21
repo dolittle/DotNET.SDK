@@ -17,7 +17,6 @@ namespace Kitchen
                     eventTypes.Register<DishPrepared>())
                 .WithEventHandlers(builder =>
                     builder.RegisterEventHandler<DishHandler>())
-                .WithPingInterval(new TimeSpa)
                 .Build();
 
             var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
