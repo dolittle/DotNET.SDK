@@ -1,0 +1,11 @@
+// [START declaration]
+syntax = "proto3";
+package kitchen;
+
+option csharp_namespace = "Kitchen";
+
+message DishDestroyed {
+    string dish = 1;
+    string chef = 2;
+    string reason = 3;
+}

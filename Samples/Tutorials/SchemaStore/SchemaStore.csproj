@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5</TargetFramework>
+    <Protobuf_NoWarnMissingExpected>true</Protobuf_NoWarnMissingExpected>
+    <DolittleEventTypesProtobuf>EventTypesProtobuf</DolittleEventTypesProtobuf>
+    <DolittleEventTypesProtobufOutput>$(DolittleEventTypesProtobuf)/Generated</DolittleEventTypesProtobufOutput>
+    <DolittleEventTypesJSON>EventTypesJSON</DolittleEventTypesJSON>
+    <DolittleEventTypesJSONOutput>$(DolittleEventTypesJSON)/Generated</DolittleEventTypesJSONOutput>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Source/SDK/SDK.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- <PackageReference Include="Google.Protobuf" Version="3.17.3" /> -->
+    <!-- <PackageReference Include="protobuf-net" Version="3.0.101"/> -->
+    <!-- <PackageReference Include="protobuf-net.BuildTools" Version="3.0.101" PrivateAssets="All" IncludeAssets="runtim;build;native;contentfiles;analyzers;buildtransitive;" /> -->
+    <!-- <PackageReference Include="Google.Protobuf.Tools" Version="3.17.2" /> -->
+    <PackageReference Include="Grpc.Tools" Version="2.38.1" />
+    <PackageReference Include="NJsonSchema" Version="10.4.6" />
+    <PackageReference Include="NSwag.MSBuild" Version="13.12.1" />
+  </ItemGroup>
+
+  <Target Name="DeleteGeneratedFiles" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <FilesToDelete Include="$(DolittleEventTypesProtobufOutput)**/*.cs" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+  </Target>
+
+  <ItemGroup>
+    <!-- <Protobuf Include="$(DolittleEventTypesProtobuf)/**/*.proto" ProtoRoot="$(DolittleEventTypesProtobuf)" OutputDir="$(DolittleEventTypesProtobufOutput)" CompileOutputs="false" GrpcServices="None" /> -->
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="$(NSwagExe) jsonschema2csclient /namespace:Kitchen /name:DishPrepared /input:$(DolittleEventTypesJSON)/DishPrepared.json /output:$(DolittleEventTypesJSONOutput)/DishPrepared.cs" />
+  </Target>
+</Project>
