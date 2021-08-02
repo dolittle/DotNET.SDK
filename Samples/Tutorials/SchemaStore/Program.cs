@@ -13,21 +13,22 @@ namespace Kitchen
     {
         public static void Main()
         {
-            // var client = Client
-            //     .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
-            //     .WithEventTypes(eventTypes =>
-            //     {
-            //         eventTypes.Register<DishPrepared>();
-            //         eventTypes.Register<QuickType.DishPrepared>();
-            //     })
-            //     .WithEventHandlers(builder =>
-            //         builder.RegisterEventHandler<DishHandler>())
-            //     .Build();
+            var client = Client
+                .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
+                .WithEventTypes(eventTypes =>
+                {
+                    // eventTypes.Register<DishPrepared>();
+                    // eventTypes.Register<QuickType.DishPrepared>();
+                    eventTypes.RegisterForSchema<DishCreated>();
+                })
+                // .WithEventHandlers(builder =>
+                //     builder.RegisterEventHandler<DishHandler>())
+                .Build();
 
             // client.Start().Wait();
 
-            var jsonPrepared = new DishPrepared();
-            Console.WriteLine($"Prepared be: {jsonPrepared.EventTypeId}");
+            // var jsonPrepared = new DishPrepared();
+            // Console.WriteLine($"Prepared be: {jsonPrepared.EventTypeId}");
         }
     }
 }

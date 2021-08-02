@@ -11,6 +11,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
         <PackageReference Include="System.Collections.Immutable" Version="$(SystemImmutableVersion)" />
+        <PackageReference Include="NJsonSchema" Version="10.4.6" />
     </ItemGroup>
 
     <ItemGroup>

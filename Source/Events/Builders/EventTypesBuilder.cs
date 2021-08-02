@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Artifacts;
+using NJsonSchema.Generation;
 
 namespace Dolittle.SDK.Events.Builders
 {
@@ -107,6 +109,35 @@ namespace Dolittle.SDK.Events.Builders
         }
 
         /// <summary>
+        /// Associate a <see cref="Type" /> with the <see cref="EventType" /> given by an attribute.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type" /> to associate with an <see cref="EventType" />.</typeparam>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
+        /// <remarks>
+        /// The type must have a eventType attribute.
+        /// </remarks>
+        public EventTypesBuilder RegisterForSchema<T>()
+            where T : class
+            => RegisterForSchema(typeof(T));
+
+        /// <summary>
+        /// Associate the <see cref="Type" /> with the <see cref="EventType" /> given by an attribute.
+        /// </summary>
+        /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
+        /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
+        /// <remarks>
+        /// The type must have a eventType attribute.
+        /// </remarks>
+        public EventTypesBuilder RegisterForSchema(Type type)
+        {
+            ThrowIfTypeIsMissingEventTypeAttribute(type);
+            TryGetEventTypeFromAttribute(type, out var eventType);
+            AddAssociation(type, eventType);
+            CreateSchema(type, eventType);
+            return this;
+        }
+
+        /// <summary>
         /// Registers all event type classes from an <see cref="Assembly" />.
         /// </summary>
         /// <param name="assembly">The <see cref="Assembly" /> to register the event type classes from.</param>
@@ -131,6 +162,24 @@ namespace Dolittle.SDK.Events.Builders
             {
                 eventTypes.Associate(type, eventType);
             }
+        }
+
+        void CreateSchema(Type type, EventType eventType)
+        {
+            var settings = new JsonSchemaGeneratorSettings();
+            var generator = new JsonSchemaGenerator(settings);
+            var schema = generator.Generate(type);
+            schema.ExtensionData = new Dictionary<string, object>
+            {
+                { "EventTypeId", eventType.Id.Value.ToString() },
+                { "EventTypeGeneration", eventType.Generation.Value.ToString() },
+                { "id", $"https://dolittle.io/{type}/{eventType.Generation.Value}" }
+            };
+            var schemaData = schema.ToJson();
+
+            Directory.CreateDirectory("GeneratedJSON");
+
+            File.WriteAllText($"GeneratedJSON/{type}.json", schemaData);
         }
 
         bool IsEventType(Type type)

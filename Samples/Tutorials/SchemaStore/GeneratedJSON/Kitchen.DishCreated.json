@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "DishCreated",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "Dish": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "Chef": {
+      "type": [
+        "null",
+        "string"
+      ]
+    }
+  },
+  "EventTypeId": "551bbdc1-6ef2-4a9d-9a2e-91b380632b59",
+  "EventTypeGeneration": "1",
+  "id": "https://dolittle.io/Kitchen.DishCreated/1"
+}
