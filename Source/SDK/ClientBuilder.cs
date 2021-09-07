@@ -194,6 +194,20 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Registers all event handlers found in all assemblies in <see cref="AppDomain" />.
+        /// </summary>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventHandlers()
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                _eventHandlersBuilder.RegisterAllFrom(assembly);
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Sets the event handlers through the <see cref="ProjectionsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
