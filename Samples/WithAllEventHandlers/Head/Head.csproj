@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Source/SDK/SDK.csproj" />
+    <ProjectReference Include="..\Handlers\Handlers.csproj" />
+    <ProjectReference Include="..\Events\Events.csproj" />
+  </ItemGroup>
+
+</Project>

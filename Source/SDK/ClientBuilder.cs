@@ -2,8 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Embeddings.Builder;
@@ -199,7 +203,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public ClientBuilder WithEventHandlers()
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var assembly in GetAssemblies())
             {
                 _eventHandlersBuilder.RegisterAllFrom(assembly);
             }
@@ -359,6 +363,18 @@ namespace Dolittle.SDK
 
                 await Task.Delay(timeout).ConfigureAwait(false);
             }
+        }
+
+        List<Assembly> GetAssemblies()
+        {
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            var loadedPaths = loadedAssemblies.Select(a => a.Location).ToArray();
+
+            var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
+            var toLoad = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase)).ToList();
+
+            toLoad.ForEach(path => loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path))));
+            return loadedAssemblies;
         }
     }
 }
