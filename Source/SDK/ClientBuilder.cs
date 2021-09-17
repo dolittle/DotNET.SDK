@@ -27,6 +27,7 @@ using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -55,6 +56,7 @@ namespace Dolittle.SDK
         CancellationToken _cancellation;
         RetryPolicy _retryPolicy;
         EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
+        JsonSerializerSettings _jsonSerializerSettings;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -239,6 +241,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the default <see cref="JsonSerializerSettings"/> .
+        /// </summary>
+        /// <param name="jsonSerializerSettings">The default <see cref="JsonSerializerSettings"/>.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithJsonSerializerSettings(JsonSerializerSettings jsonSerializerSettings)
+        {
+            _jsonSerializerSettings = jsonSerializerSettings;
+            return this;
+        }
+
+        /// <summary>
         /// Build the Client.
         /// </summary>
         /// <returns>The <see cref="Client"/>.</returns>
@@ -262,7 +275,7 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
-            var serializer = new EventContentSerializer(eventTypes);
+            var serializer = new EventContentSerializer(eventTypes, _jsonSerializerSettings);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);

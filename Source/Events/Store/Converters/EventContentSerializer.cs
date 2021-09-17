@@ -12,14 +12,22 @@ namespace Dolittle.SDK.Events.Store.Converters
     public class EventContentSerializer : ISerializeEventContent
     {
         readonly IEventTypes _eventTypes;
+        readonly JsonSerializerSettings _jsonSerializerSettings;
+        readonly JsonSerializerExceptionCatcher _exceptionCatcher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventContentSerializer"/> class.
         /// </summary>
         /// <param name="eventTypes"><see cref="IEventTypes"/> for mapping types and artifacts.</param>
-        public EventContentSerializer(IEventTypes eventTypes)
+        /// <param name="jsonSerializerSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
+        public EventContentSerializer(IEventTypes eventTypes, JsonSerializerSettings jsonSerializerSettings = null)
         {
             _eventTypes = eventTypes;
+            _jsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings();
+
+            _exceptionCatcher = new JsonSerializerExceptionCatcher();
+            _jsonSerializerSettings.Error = _exceptionCatcher.OnError;
+            _jsonSerializerSettings.Formatting = Formatting.None;
         }
 
         /// <inheritdoc/>
@@ -41,18 +49,11 @@ namespace Dolittle.SDK.Events.Store.Converters
 
         bool TrySerializeWithSettings(object content, out string json, out Exception serializationError)
         {
-            var exceptionCatcher = new JsonSerializerExceptionCatcher();
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Error = exceptionCatcher.OnError,
-                Formatting = Formatting.None,
-            };
+            json = JsonConvert.SerializeObject(content, _jsonSerializerSettings);
 
-            json = JsonConvert.SerializeObject(content, serializerSettings);
-
-            if (exceptionCatcher.Failed)
+            if (_exceptionCatcher.Failed)
             {
-                serializationError = new CouldNotSerializeEventContent(content, exceptionCatcher.Error);
+                serializationError = new CouldNotSerializeEventContent(content, _exceptionCatcher.Error);
                 return false;
             }
             else
@@ -64,33 +65,27 @@ namespace Dolittle.SDK.Events.Store.Converters
 
         bool TryDeserializeWithSettings(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, out object content, out Exception deserializationError)
         {
-            var exceptionCatcher = new JsonSerializerExceptionCatcher();
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Error = exceptionCatcher.OnError,
-            };
-
             if (_eventTypes.HasTypeFor(eventType))
             {
                 var type = _eventTypes.GetTypeFor(eventType);
-                content = JsonConvert.DeserializeObject(json, type, serializerSettings);
+                content = JsonConvert.DeserializeObject(json, type, _jsonSerializerSettings);
 
-                if (exceptionCatcher.Failed)
-                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error, type);
+                if (_exceptionCatcher.Failed)
+                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, _exceptionCatcher.Error, type);
                 else
                     deserializationError = null;
             }
             else
             {
-                content = JsonConvert.DeserializeObject(json, serializerSettings);
+                content = JsonConvert.DeserializeObject(json, _jsonSerializerSettings);
 
-                if (exceptionCatcher.Failed)
-                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error);
+                if (_exceptionCatcher.Failed)
+                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, _exceptionCatcher.Error);
                 else
                     deserializationError = null;
             }
 
-            return !exceptionCatcher.Failed;
+            return !_exceptionCatcher.Failed;
         }
     }
 }
