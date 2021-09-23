@@ -241,11 +241,11 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the default <see cref="JsonSerializerSettings"/> .
+        /// Sets the <see cref="JsonSerializerSettings"/> for serializing events.
         /// </summary>
         /// <param name="jsonSerializerSettings">The default <see cref="JsonSerializerSettings"/>.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithJsonSerializerSettings(JsonSerializerSettings jsonSerializerSettings)
+        public ClientBuilder WithEventSerializerSettings(JsonSerializerSettings jsonSerializerSettings)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
             return this;
