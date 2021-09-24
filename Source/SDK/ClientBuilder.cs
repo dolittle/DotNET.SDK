@@ -56,7 +56,7 @@ namespace Dolittle.SDK
         CancellationToken _cancellation;
         RetryPolicy _retryPolicy;
         EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
-        Func<JsonSerializerSettings> _jsonSerializerSettingsProvider;
+        Action<JsonSerializerSettings> _jsonSerializerSettingsBuilder;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -243,11 +243,11 @@ namespace Dolittle.SDK
         /// <summary>
         /// Sets the <see cref="JsonSerializerSettings"/> for serializing events.
         /// </summary>
-        /// <param name="jsonSerializerSettingsProvider"><see cref="Func{T}"/> that provides <see cref="JsonSerializerSettings"/>.</param>
+        /// <param name="jsonSerializerSettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="JsonSerializerSettings"/> to modify settings.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventSerializerSettings(Func<JsonSerializerSettings> jsonSerializerSettingsProvider)
+        public ClientBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
         {
-            _jsonSerializerSettingsProvider = jsonSerializerSettingsProvider;
+            _jsonSerializerSettingsBuilder = jsonSerializerSettingsBuilder;
             return this;
         }
 
@@ -275,7 +275,16 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
-            var serializer = new EventContentSerializer(eventTypes, _jsonSerializerSettingsProvider);
+            Func<JsonSerializerSettings> jsonSerializerSettingsProvider = () =>
+            {
+                var settings = new JsonSerializerSettings();
+                _jsonSerializerSettingsBuilder?.Invoke(settings);
+                return settings;
+            };
+
+            var serializer = new EventContentSerializer(
+                eventTypes,
+                jsonSerializerSettingsProvider);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);

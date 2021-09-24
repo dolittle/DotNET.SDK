@@ -23,7 +23,6 @@ namespace Dolittle.SDK.Events.Store.Converters
         {
             _eventTypes = eventTypes;
             _jsonSerializerSettingsProvider = jsonSerializerSettingsProvider;
-            _jsonSerializerSettingsProvider ??= () => new JsonSerializerSettings();
         }
 
         /// <inheritdoc/>
