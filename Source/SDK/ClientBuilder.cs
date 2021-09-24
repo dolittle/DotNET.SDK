@@ -56,7 +56,7 @@ namespace Dolittle.SDK
         CancellationToken _cancellation;
         RetryPolicy _retryPolicy;
         EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
-        JsonSerializerSettings _jsonSerializerSettings;
+        Func<JsonSerializerSettings> _jsonSerializerSettingsProvider;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -243,11 +243,11 @@ namespace Dolittle.SDK
         /// <summary>
         /// Sets the <see cref="JsonSerializerSettings"/> for serializing events.
         /// </summary>
-        /// <param name="jsonSerializerSettings">The default <see cref="JsonSerializerSettings"/>.</param>
+        /// <param name="jsonSerializerSettingsProvider"><see cref="Func{T}"/> that provides <see cref="JsonSerializerSettings"/>.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventSerializerSettings(JsonSerializerSettings jsonSerializerSettings)
+        public ClientBuilder WithEventSerializerSettings(Func<JsonSerializerSettings> jsonSerializerSettingsProvider)
         {
-            _jsonSerializerSettings = jsonSerializerSettings;
+            _jsonSerializerSettingsProvider = jsonSerializerSettingsProvider;
             return this;
         }
 
@@ -275,7 +275,7 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
-            var serializer = new EventContentSerializer(eventTypes, _jsonSerializerSettings);
+            var serializer = new EventContentSerializer(eventTypes, _jsonSerializerSettingsProvider);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);

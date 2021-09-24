@@ -12,22 +12,18 @@ namespace Dolittle.SDK.Events.Store.Converters
     public class EventContentSerializer : ISerializeEventContent
     {
         readonly IEventTypes _eventTypes;
-        readonly JsonSerializerSettings _jsonSerializerSettings;
-        readonly JsonSerializerExceptionCatcher _exceptionCatcher;
+        readonly Func<JsonSerializerSettings> _jsonSerializerSettingsProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventContentSerializer"/> class.
         /// </summary>
         /// <param name="eventTypes"><see cref="IEventTypes"/> for mapping types and artifacts.</param>
-        /// <param name="jsonSerializerSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public EventContentSerializer(IEventTypes eventTypes, JsonSerializerSettings jsonSerializerSettings = null)
+        /// <param name="jsonSerializerSettingsProvider"><see cref="Func{T}"/> that provides <see cref="JsonSerializerSettings"/>.</param>
+        public EventContentSerializer(IEventTypes eventTypes, Func<JsonSerializerSettings> jsonSerializerSettingsProvider = null)
         {
             _eventTypes = eventTypes;
-            _jsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings();
-
-            _exceptionCatcher = new JsonSerializerExceptionCatcher();
-            _jsonSerializerSettings.Error = _exceptionCatcher.OnError;
-            _jsonSerializerSettings.Formatting = Formatting.None;
+            _jsonSerializerSettingsProvider = jsonSerializerSettingsProvider;
+            _jsonSerializerSettingsProvider ??= () => new JsonSerializerSettings();
         }
 
         /// <inheritdoc/>
@@ -49,11 +45,16 @@ namespace Dolittle.SDK.Events.Store.Converters
 
         bool TrySerializeWithSettings(object content, out string json, out Exception serializationError)
         {
-            json = JsonConvert.SerializeObject(content, _jsonSerializerSettings);
+            var exceptionCatcher = new JsonSerializerExceptionCatcher();
+            var serializerSettings = _jsonSerializerSettingsProvider();
+            serializerSettings.Error = exceptionCatcher.OnError;
+            serializerSettings.Formatting = Formatting.None;
 
-            if (_exceptionCatcher.Failed)
+            json = JsonConvert.SerializeObject(content, serializerSettings);
+
+            if (exceptionCatcher.Failed)
             {
-                serializationError = new CouldNotSerializeEventContent(content, _exceptionCatcher.Error);
+                serializationError = new CouldNotSerializeEventContent(content, exceptionCatcher.Error);
                 return false;
             }
             else
@@ -65,27 +66,31 @@ namespace Dolittle.SDK.Events.Store.Converters
 
         bool TryDeserializeWithSettings(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, out object content, out Exception deserializationError)
         {
+            var exceptionCatcher = new JsonSerializerExceptionCatcher();
+            var serializerSettings = _jsonSerializerSettingsProvider();
+            serializerSettings.Error = exceptionCatcher.OnError;
+
             if (_eventTypes.HasTypeFor(eventType))
             {
                 var type = _eventTypes.GetTypeFor(eventType);
-                content = JsonConvert.DeserializeObject(json, type, _jsonSerializerSettings);
+                content = JsonConvert.DeserializeObject(json, type, serializerSettings);
 
-                if (_exceptionCatcher.Failed)
-                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, _exceptionCatcher.Error, type);
+                if (exceptionCatcher.Failed)
+                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error, type);
                 else
                     deserializationError = null;
             }
             else
             {
-                content = JsonConvert.DeserializeObject(json, _jsonSerializerSettings);
+                content = JsonConvert.DeserializeObject(json, serializerSettings);
 
-                if (_exceptionCatcher.Failed)
-                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, _exceptionCatcher.Error);
+                if (exceptionCatcher.Failed)
+                    deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error);
                 else
                     deserializationError = null;
             }
 
-            return !_exceptionCatcher.Failed;
+            return !exceptionCatcher.Failed;
         }
     }
 }
