@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Events.Store.Converters
         /// </summary>
         /// <param name="eventTypes"><see cref="IEventTypes"/> for mapping types and artifacts.</param>
         /// <param name="jsonSerializerSettingsProvider"><see cref="Func{T}"/> that provides <see cref="JsonSerializerSettings"/>.</param>
-        public EventContentSerializer(IEventTypes eventTypes, Func<JsonSerializerSettings> jsonSerializerSettingsProvider = null)
+        public EventContentSerializer(IEventTypes eventTypes, Func<JsonSerializerSettings> jsonSerializerSettingsProvider)
         {
             _eventTypes = eventTypes;
             _jsonSerializerSettingsProvider = jsonSerializerSettingsProvider;
