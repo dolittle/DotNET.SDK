@@ -1,3 +1,24 @@
+# [9.2.0] - 2021-9-29 [PR: #72](https://github.com/dolittle/DotNET.SDK/pull/72)
+## Summary
+
+This PR is combined with PR #71 
+
+Adding the ability to set a default `JsonSerializerSettings` instance for the serialization and deserialization of events. This allows for completely custom settings e.g. adding converters for types or casing configuration or similar. Fixes #70.
+
+Using it would then be as follows during the building of the client:
+
+```csharp
+client
+   .ForMicroservice(...)
+   .WithJsonSerializerSettings(new JsonSerializerSettings { Converters = .... });
+```
+
+### Added
+
+- Ability to set a default `JsonSerializerSettings` instance.
+- `EventContentSerializer` honoring the default `JsonSerializerSettings`.
+
+
 # [9.1.0] - 2021-7-14 [PR: #65](https://github.com/dolittle/DotNET.SDK/pull/65)
 ## Summary
 
