@@ -12,14 +12,17 @@ namespace Dolittle.SDK.Events.Store.Converters
     public class EventContentSerializer : ISerializeEventContent
     {
         readonly IEventTypes _eventTypes;
+        readonly Func<JsonSerializerSettings> _jsonSerializerSettingsProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventContentSerializer"/> class.
         /// </summary>
         /// <param name="eventTypes"><see cref="IEventTypes"/> for mapping types and artifacts.</param>
-        public EventContentSerializer(IEventTypes eventTypes)
+        /// <param name="jsonSerializerSettingsProvider"><see cref="Func{T}"/> that provides <see cref="JsonSerializerSettings"/>.</param>
+        public EventContentSerializer(IEventTypes eventTypes, Func<JsonSerializerSettings> jsonSerializerSettingsProvider)
         {
             _eventTypes = eventTypes;
+            _jsonSerializerSettingsProvider = jsonSerializerSettingsProvider;
         }
 
         /// <inheritdoc/>
@@ -42,11 +45,9 @@ namespace Dolittle.SDK.Events.Store.Converters
         bool TrySerializeWithSettings(object content, out string json, out Exception serializationError)
         {
             var exceptionCatcher = new JsonSerializerExceptionCatcher();
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Error = exceptionCatcher.OnError,
-                Formatting = Formatting.None,
-            };
+            var serializerSettings = _jsonSerializerSettingsProvider();
+            serializerSettings.Error = exceptionCatcher.OnError;
+            serializerSettings.Formatting = Formatting.None;
 
             json = JsonConvert.SerializeObject(content, serializerSettings);
 
@@ -65,10 +66,8 @@ namespace Dolittle.SDK.Events.Store.Converters
         bool TryDeserializeWithSettings(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, out object content, out Exception deserializationError)
         {
             var exceptionCatcher = new JsonSerializerExceptionCatcher();
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Error = exceptionCatcher.OnError,
-            };
+            var serializerSettings = _jsonSerializerSettingsProvider();
+            serializerSettings.Error = exceptionCatcher.OnError;
 
             if (_eventTypes.HasTypeFor(eventType))
             {
