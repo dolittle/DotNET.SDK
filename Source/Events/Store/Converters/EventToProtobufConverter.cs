@@ -67,7 +67,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             @event = new Contracts.UncommittedEvent
             {
                 Artifact = source.EventType.ToProtobuf(),
-                EventSourceId = source.EventSource.ToProtobuf(),
+                EventSourceId = source.EventSource.Value,
                 Public = source.IsPublic,
                 Content = content,
             };
