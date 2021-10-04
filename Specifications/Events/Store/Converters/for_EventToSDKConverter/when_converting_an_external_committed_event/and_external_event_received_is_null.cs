@@ -29,7 +29,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.when_conv
                 Public = is_public,
                 Type = event_type.ToProtobuf(),
                 ExecutionContext = execution_context,
-                EventSourceId = event_source.ToProtobuf(),
+                EventSourceId = event_source.Value,
                 Occurred = Timestamp.FromDateTimeOffset(occured),
                 EventLogSequenceNumber = event_log_sequence_number,
                 ExternalEventReceived = null,
