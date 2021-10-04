@@ -16,11 +16,11 @@ namespace Dolittle.SDK.Projections
         /// <summary>
         /// Gets the key from the partition id metadata.
         /// </summary>
-        PartitionId,
+        PartitionId = 1,
 
         /// <summary>
         /// Gets the key from a named property on the event content.
         /// </summary>
-        Property
+        Property = 2
     }
 }
