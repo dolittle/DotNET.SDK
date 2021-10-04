@@ -15,8 +15,6 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToProtobufConverter.when
         static Exception exception;
         static bool try_result;
 
-        delegate void TryToSerializeCallback(object source, out string jsonString, out Exception error);
-
         Establish context = () =>
         {
             SetupSerializeToReturnJSON(content_one, content_as_string_one);
