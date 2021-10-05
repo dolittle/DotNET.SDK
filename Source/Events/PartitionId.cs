@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// The <see cref="PartitionId"/> that refers to no partition.
         /// </summary>
-        public static readonly PartitionId Unspecified = string.Empty;
+        public static readonly PartitionId Unspecified = Guid.Empty;
 
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to an <see cref="PartitionId"/>.
