@@ -14,10 +14,7 @@ namespace Dolittle.SDK.Projections
         /// Gets a <see cref="ProjectionResult{TReadModel}" /> that signifies that the read model should be deleted.
         /// </summary>
         public static ProjectionResult<TReadModel> Delete
-            => new ProjectionResult<TReadModel>
-            {
-                Type = ProjectionResultType.Delete
-            };
+            => new ProjectionResult<TReadModel> { Type = ProjectionResultType.Delete };
 
         /// <summary>
         /// Gets the updated read model.

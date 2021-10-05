@@ -19,6 +19,7 @@ namespace Dolittle.SDK.Projections.Builder
         /// <typeparam name="TProperty">The property type.</typeparam>
         /// <param name="propertyExpression">The expression for getting the property on the event.</param>
         /// <returns>A <see cref="KeySelector"/>.</returns>
+        /// <exception cref="KeySelectorExpressionWasNotAMemberExpression">Is thrown when the provided property expression is not a member expression.</exception>
         public KeySelector KeyFromProperty<TProperty>(Expression<Func<TEvent, TProperty>> propertyExpression)
         {
             if (propertyExpression.Body is MemberExpression memberExpression)

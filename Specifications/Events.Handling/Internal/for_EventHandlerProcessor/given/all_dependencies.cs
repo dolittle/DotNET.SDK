@@ -42,7 +42,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
             {
                 Content = JsonConvert.SerializeObject(event_to_handle),
                 EventLogSequenceNumber = 3,
-                EventSourceId = Guid.Parse("bf56ce13-a82a-4ce9-b155-8511e485bdb3").ToProtobuf(),
+                EventSourceId = "an-event-source-id",
                 External = false,
                 ExternalEventLogSequenceNumber = 0,
                 ExternalEventReceived = null,
@@ -55,7 +55,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
             {
                 Event = committed_event,
                 Partitioned = partitioned,
-                PartitionId = Guid.Parse("19f78b31-47e3-4032-b267-a3fe01509fec").ToProtobuf(),
+                PartitionId = "a-partition-id",
                 ScopeId = event_handler_scope.ToProtobuf()
             };
             request = new HandleEventRequest

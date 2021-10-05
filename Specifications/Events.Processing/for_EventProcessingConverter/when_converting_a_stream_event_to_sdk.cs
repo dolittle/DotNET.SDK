@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
     public class when_converting_a_stream_event_to_sdk : given.a_converter
     {
         static bool partitioned;
-        static Uuid partition_id;
+        static string partition_id;
         static Uuid scope_id;
 
         static PbCommittedEvent committed_event;
@@ -51,7 +51,7 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
             SetupConverterToReturn(committed_event, committed_event_to_return);
 
             partitioned = true;
-            partition_id = Guid.Parse("8c0e8392-bec0-4fe1-bd7d-df2f555afe55").ToProtobuf();
+            partition_id = "8c0e8392-bec0-4fe1-bd7d-df2f555afe55";
             scope_id = Guid.Parse("2c87312c-c660-48db-a25a-a22622aeb4a0").ToProtobuf();
 
             stream_event = new PbStreamEvent
@@ -68,7 +68,7 @@ namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter
         It should_call_the_event_converter_with_the_committed_event = () => converted_events.ShouldContainOnly(committed_event);
         It should_return_the_result_from_the_event_converter = () => converted_stream_event.Event.ShouldBeTheSameAs(committed_event_to_return);
         It should_have_the_correct_partitioned = () => converted_stream_event.Partitioned.ShouldEqual(partitioned);
-        It should_have_the_correct_partition = () => converted_stream_event.Partition.ShouldEqual(partition_id.To<PartitionId>());
+        It should_have_the_correct_partition = () => converted_stream_event.Partition.Value.ShouldEqual(partition_id);
         It should_have_the_correct_scope = () => converted_stream_event.Scope.ShouldEqual(scope_id.To<ScopeId>());
     }
 }

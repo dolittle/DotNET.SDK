@@ -30,7 +30,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToProtobufConverter.give
         {
             converter = new EventToProtobufConverter(serializer.Object);
 
-            event_source_one = "e7fe623b-5fb7-4699-9b08-7c14d7556e84";
+            event_source_one = "Mamie Burke";
             event_type_one = new EventType("4134d0b4-a13f-4c5d-ae98-8e44903ab147", 2);
             content_one = new an_event("hello world", 42, true);
             is_public_one = true;

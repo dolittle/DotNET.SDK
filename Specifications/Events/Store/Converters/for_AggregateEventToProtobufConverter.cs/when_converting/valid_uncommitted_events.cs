@@ -14,8 +14,6 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConve
         static Exception exception;
         static bool try_result;
 
-        delegate void TryToSerializeCallback(object source, out string jsonString, out Exception error);
-
         Establish context = () =>
         {
             SetupSerializeToReturnJSON(content_one, content_as_string_one);
@@ -30,7 +28,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConve
         It should_return_three_events = () => converted_uncommitted_events.Events.Count.ShouldEqual(3);
         It should_have_called_the_serializer_with_the_three_contents = () => serialized_contents.ShouldContainOnly(content_one, content_two, content_two);
 
-        It should_the_same_event_source_id = () => converted_uncommitted_events.EventSourceId.ShouldEqual(event_source_id.ToProtobuf());
+        It should_the_same_event_source_id = () => converted_uncommitted_events.EventSourceId.ShouldEqual(event_source_id.Value);
         It should_have_the_same_aggregate_root_id = () => converted_uncommitted_events.AggregateRootId.ShouldEqual(aggregate_root_id.ToProtobuf());
         It should_have_the_same_aggregate_root_version = () => converted_uncommitted_events.ExpectedAggregateRootVersion.ShouldEqual(aggregate_root_version.Value);
         It should_have_the_same_event_type_id_for_the_first_event = () => converted_uncommitted_events.Events[0].Artifact.Id.ShouldEqual(event_type_one.Id.ToProtobuf());

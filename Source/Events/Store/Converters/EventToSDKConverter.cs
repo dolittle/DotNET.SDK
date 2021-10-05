@@ -41,12 +41,6 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
             }
 
-            if (!source.EventSourceId.TryTo<EventSourceId>(out var eventSourceId, out var eventSourceError))
-            {
-                error = new InvalidCommittedEventInformation(nameof(source.EventSourceId), eventSourceError);
-                return false;
-            }
-
             if (!source.ExecutionContext.TryToExecutionContext(out var executionContext, out var executionContextError))
             {
                 error = new InvalidCommittedEventInformation(nameof(source.ExecutionContext), executionContextError);
@@ -83,7 +77,7 @@ namespace Dolittle.SDK.Events.Store.Converters
                 @event = new CommittedExternalEvent(
                     source.EventLogSequenceNumber,
                     source.Occurred.ToDateTimeOffset(),
-                    eventSourceId,
+                    source.EventSourceId,
                     executionContext,
                     eventType,
                     content,
@@ -92,19 +86,17 @@ namespace Dolittle.SDK.Events.Store.Converters
                     source.ExternalEventReceived.ToDateTimeOffset());
                 return true;
             }
-            else
-            {
-                error = null;
-                @event = new CommittedEvent(
-                    source.EventLogSequenceNumber,
-                    source.Occurred.ToDateTimeOffset(),
-                    eventSourceId,
-                    executionContext,
-                    eventType,
-                    content,
-                    source.Public);
-                return true;
-            }
+
+            error = null;
+            @event = new CommittedEvent(
+                source.EventLogSequenceNumber,
+                source.Occurred.ToDateTimeOffset(),
+                source.EventSourceId,
+                executionContext,
+                eventType,
+                content,
+                source.Public);
+            return true;
         }
 
         /// <inheritdoc/>
