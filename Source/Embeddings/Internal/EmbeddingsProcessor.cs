@@ -146,7 +146,7 @@ namespace Dolittle.SDK.Embeddings.Internal
             }
 
             var projectionContext = new EmbeddingProjectContext(currentState.WasCreatedFromInitialState, currentState.Key, request.Event.EventSourceId, executionContext);
-            var eventType = request.Event.Artifact.To<EventType, EventTypeId>();
+            var eventType = request.Event.EventType.To<EventType, EventTypeId>();
             var content = DeserializeUncommittedEvent(eventType, request.Event.Content);
             var result = await _embedding.On(
                     currentState.State,

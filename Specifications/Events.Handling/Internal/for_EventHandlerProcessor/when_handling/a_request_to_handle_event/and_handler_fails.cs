@@ -33,7 +33,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
                 .Returns(stream_event);
             event_context = new EventContext(
                 committed_event.EventLogSequenceNumber,
-                committed_event.Type.To<EventType, EventTypeId>(),
+                committed_event.EventType.To<EventType, EventTypeId>(),
                 committed_event.EventSourceId,
                 committed_event.Occurred.ToDateTimeOffset(),
                 execution_context,

@@ -23,7 +23,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.
             {
                 Content = content_string,
                 Public = is_public,
-                Type = null,
+                EventType = null,
                 ExecutionContext = execution_context,
                 Occurred = Timestamp.FromDateTimeOffset(occured),
                 EventLogSequenceNumber = event_log_sequence_number,

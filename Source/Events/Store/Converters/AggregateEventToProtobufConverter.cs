@@ -73,7 +73,7 @@ namespace Dolittle.SDK.Events.Store.Converters
             error = null;
             @event = new PbUncommittedAggregateEvent
             {
-                Artifact = source.EventType.ToProtobuf(),
+                EventType = source.EventType.ToProtobuf(),
                 Content = content,
                 Public = source.IsPublic,
             };
