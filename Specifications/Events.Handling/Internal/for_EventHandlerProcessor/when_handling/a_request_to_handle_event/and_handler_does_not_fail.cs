@@ -21,21 +21,21 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
                 new CommittedEvent(
                     committed_event.EventLogSequenceNumber,
                     committed_event.Occurred.ToDateTimeOffset(),
-                    committed_event.EventSourceId.To<EventSourceId>(),
+                    committed_event.EventSourceId,
                     execution_context,
                     event_type_to_handle,
                     event_to_handle,
                     committed_event.Public),
                 partitioned,
-                request.Event.PartitionId.To<PartitionId>(),
+                request.Event.PartitionId,
                 request.Event.ScopeId.To<ScopeId>());
             event_processing_converter
                 .Setup(_ => _.ToSDK(request.Event))
                 .Returns(stream_event);
             event_context = new EventContext(
                 committed_event.EventLogSequenceNumber,
-                committed_event.Type.To<EventType, EventTypeId>(),
-                committed_event.EventSourceId.To<EventSourceId>(),
+                committed_event.EventType.To<EventType, EventTypeId>(),
+                committed_event.EventSourceId,
                 committed_event.Occurred.ToDateTimeOffset(),
                 execution_context,
                 execution_context);

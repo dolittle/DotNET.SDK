@@ -63,7 +63,7 @@ namespace Dolittle.SDK.Events.Store.Internal
                 Aggregate = new Contracts.Aggregate
                 {
                     AggregateRootId = aggregateRootId.Value.ToProtobuf(),
-                    EventSourceId = eventSourceId.Value.ToProtobuf()
+                    EventSourceId = eventSourceId.Value,
                 }
             };
 

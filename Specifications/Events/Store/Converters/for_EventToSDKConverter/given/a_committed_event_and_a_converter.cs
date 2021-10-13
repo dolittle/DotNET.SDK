@@ -24,7 +24,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.given
             content_string = "medowfecavremru";
             is_public = false;
             event_type = new EventType("926a967f-3833-47ef-82af-95612b826015", 14);
-            event_source = "d5886138-f29b-4684-bf9b-0e5e13894926";
+            event_source = "Jimmy Frank";
             occured = new DateTimeOffset(2018, 5, 12, 22, 17, 19, TimeSpan.Zero);
             event_log_sequence_number = 3448072883;
 
@@ -33,9 +33,9 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.given
                 External = false,
                 Content = content_string,
                 Public = is_public,
-                Type = event_type.ToProtobuf(),
+                EventType = event_type.ToProtobuf(),
                 ExecutionContext = execution_context,
-                EventSourceId = event_source.ToProtobuf(),
+                EventSourceId = event_source.Value,
                 Occurred = Timestamp.FromDateTimeOffset(occured),
                 EventLogSequenceNumber = event_log_sequence_number,
             };

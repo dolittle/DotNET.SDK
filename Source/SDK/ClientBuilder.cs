@@ -3,7 +3,6 @@
 
 using System;
 using System.Globalization;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Embeddings.Builder;
@@ -22,7 +21,6 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
-using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
@@ -48,14 +46,13 @@ namespace Dolittle.SDK
         readonly MicroserviceId _microserviceId;
         readonly ProjectionReadModelTypeAssociations _projectionAssociations;
         readonly EmbeddingReadModelTypeAssociations _embeddingAssociations;
+        readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
         string _host = "localhost";
         TimeSpan _pingInterval = TimeSpan.FromSeconds(5);
         ushort _port = 50053;
         Version _version;
         Environment _environment;
         CancellationToken _cancellation;
-        RetryPolicy _retryPolicy;
-        EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
         Action<JsonSerializerSettings> _jsonSerializerSettingsBuilder;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
@@ -75,7 +72,6 @@ namespace Dolittle.SDK
             _version = Version.NotSet;
             _environment = Environment.Undetermined;
             _cancellation = CancellationToken.None;
-            _retryPolicy = (IObservable<Exception> exceptions) => exceptions.Delay(TimeSpan.FromSeconds(1));
             _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
             _projectionAssociations = new ProjectionReadModelTypeAssociations();

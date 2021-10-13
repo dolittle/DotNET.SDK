@@ -50,7 +50,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor
             registration_request.EventHandlerId.ShouldEqual(event_handler_id.ToProtobuf());
             registration_request.ScopeId.ShouldEqual(event_handler_scope.ToProtobuf());
             registration_request.Partitioned.ShouldEqual(partitioned);
-            registration_request.Types_.ShouldContainOnly(handled_event_types.Select(_ => _.ToProtobuf()));
+            registration_request.EventTypes.ShouldContainOnly(handled_event_types.Select(_ => _.ToProtobuf()));
         };
     }
 }

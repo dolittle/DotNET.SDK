@@ -45,12 +45,6 @@ namespace Dolittle.SDK.Events.Processing
                 return false;
             }
 
-            if (!source.PartitionId.TryTo<PartitionId>(out var partitionId, out var partitionIdError))
-            {
-                error = new InvalidStreamEventInformation(nameof(source.PartitionId), partitionIdError);
-                return false;
-            }
-
             if (!source.ScopeId.TryTo<ScopeId>(out var scopeId, out var scopeIdError))
             {
                 error = new InvalidStreamEventInformation(nameof(source.ScopeId), scopeIdError);
@@ -61,7 +55,7 @@ namespace Dolittle.SDK.Events.Processing
             @event = new StreamEvent(
                 committedEvent,
                 source.Partitioned,
-                partitionId,
+                source.PartitionId,
                 scopeId);
             return true;
         }

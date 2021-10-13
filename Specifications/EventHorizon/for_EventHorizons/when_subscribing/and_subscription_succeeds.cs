@@ -45,7 +45,7 @@ namespace Dolittle.SDK.EventHorizon.for_EventHorizons.when_subscribing
         It should_send_a_request_with_the_correct_microservice_id = () => request.MicroserviceId.ShouldEqual(subscription.ProducerMicroservice.ToProtobuf());
         It should_send_a_request_with_the_correct_tenant_id = () => request.TenantId.ShouldEqual(subscription.ProducerTenant.ToProtobuf());
         It should_send_a_request_with_the_correct_stream_id = () => request.StreamId.ShouldEqual(subscription.ProducerStream.ToProtobuf());
-        It should_send_a_request_with_the_correct_partition_id = () => request.PartitionId.ShouldEqual(subscription.ProducerPartition.ToProtobuf());
+        It should_send_a_request_with_the_correct_partition_id = () => request.PartitionId.ShouldEqual(subscription.ProducerPartition.Value);
         It should_send_a_request_with_the_correct_scope_id = () => request.ScopeId.ShouldEqual(subscription.ConsumerScope.ToProtobuf());
         It should_return_a_response_that_is_not_failed = () => response.Failed.ShouldBeFalse();
         It should_return_the_correct_consent_id = () => response.Consent.ShouldEqual(consent_id.To<ConsentId>());

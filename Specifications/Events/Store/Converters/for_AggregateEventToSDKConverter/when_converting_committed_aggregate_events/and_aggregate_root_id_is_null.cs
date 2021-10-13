@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.
         {
             committed_aggregate_events = new PbCommittedAggregateEvents
             {
-                EventSourceId = event_source.ToProtobuf(),
+                EventSourceId = event_source.Value,
                 AggregateRootId = null,
                 AggregateRootVersion = aggregate_root_version,
                 Events = { committed_aggregate_event }

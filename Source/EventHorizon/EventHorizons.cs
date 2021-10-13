@@ -112,7 +112,7 @@ namespace Dolittle.SDK.EventHorizon
                 MicroserviceId = subscription.ProducerMicroservice.ToProtobuf(),
                 TenantId = subscription.ProducerTenant.ToProtobuf(),
                 StreamId = subscription.ProducerStream.ToProtobuf(),
-                PartitionId = subscription.ProducerPartition.ToProtobuf(),
+                PartitionId = subscription.ProducerPartition.Value,
                 ScopeId = subscription.ConsumerScope.ToProtobuf(),
             };
         }

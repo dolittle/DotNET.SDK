@@ -9,24 +9,24 @@ namespace Dolittle.SDK.Events
     /// <summary>
     /// Represents the identification of an event source.
     /// </summary>
-    public class EventSourceId : ConceptAs<Guid>
+    public class EventSourceId : ConceptAs<string>
     {
         /// <summary>
         /// Implicitly convert from a <see cref="Guid"/> to an <see cref="EventSourceId"/>.
         /// </summary>
         /// <param name="eventSourceId">EventSourceId as <see cref="Guid"/>.</param>
-        public static implicit operator EventSourceId(Guid eventSourceId) => new EventSourceId { Value = eventSourceId };
+        public static implicit operator EventSourceId(Guid eventSourceId) => new EventSourceId { Value = eventSourceId.ToString() };
 
         /// <summary>
         /// Implicitly convert from a <see cref="string"/> to an <see cref="EventSourceId"/>.
         /// </summary>
         /// <param name="eventSourceId">EventSourceId as <see cref="string"/>.</param>
-        public static implicit operator EventSourceId(string eventSourceId) => new EventSourceId { Value = Guid.Parse(eventSourceId) };
+        public static implicit operator EventSourceId(string eventSourceId) => new EventSourceId { Value = eventSourceId };
 
         /// <summary>
         /// Creates a new instance of <see cref="EventSourceId"/> with a unique id.
         /// </summary>
         /// <returns>A new <see cref="EventSourceId"/>.</returns>
-        public static EventSourceId New() => new EventSourceId { Value = Guid.NewGuid() };
+        public static EventSourceId New() => new EventSourceId { Value = Guid.NewGuid().ToString() };
     }
 }
