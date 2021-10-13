@@ -95,9 +95,9 @@ namespace Dolittle.SDK.Events.Store.Converters
                 return false;
             }
 
-            if (!source.Type.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
+            if (!source.EventType.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
             {
-                error = new InvalidCommittedEventInformation(nameof(source.Type), eventTypeError);
+                error = new InvalidCommittedEventInformation(nameof(source.EventType), eventTypeError);
                 return false;
             }
 
