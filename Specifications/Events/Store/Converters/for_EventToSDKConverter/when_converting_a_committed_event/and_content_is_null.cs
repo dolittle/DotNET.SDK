@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.when_conv
             {
                 External = false,
                 Public = is_public,
-                Type = event_type.ToProtobuf(),
+                EventType = event_type.ToProtobuf(),
                 ExecutionContext = execution_context,
                 EventSourceId = event_source.Value,
                 Occurred = Timestamp.FromDateTimeOffset(occured),

@@ -48,7 +48,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
                 ExternalEventReceived = null,
                 Occurred = Timestamp.FromDateTimeOffset(DateTimeOffset.Now),
                 Public = false,
-                Type = event_type_to_handle.ToProtobuf(),
+                EventType = event_type_to_handle.ToProtobuf(),
                 ExecutionContext = execution_context.ToProtobuf()
             };
             stream_event = new PbStreamEvent
