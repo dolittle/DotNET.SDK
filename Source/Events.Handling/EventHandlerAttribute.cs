@@ -17,11 +17,17 @@ namespace Dolittle.SDK.Events.Handling
         /// <param name="eventHandlerId">The unique identifier of the event handler.</param>
         /// <param name="partitioned">Whether the event handler is partitioned.</param>
         /// <param name="inScope">The scope that the event handler handles events in.</param>
-        public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string inScope = default)
+        /// <param name="alias">The alias for the event handler.</param>
+        public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string inScope = default, string alias = default)
         {
             Identifier = Guid.Parse(eventHandlerId);
             Partitioned = partitioned;
-            Scope = inScope == default ? ScopeId.Default : inScope;
+            Scope = inScope ?? ScopeId.Default;
+            if (alias != default)
+            {
+                Alias = alias;
+                HasAlias = true;
+            }
         }
 
         /// <summary>
@@ -32,11 +38,21 @@ namespace Dolittle.SDK.Events.Handling
         /// <summary>
         /// Gets a value indicating whether this event handler is partitioned.
         /// </summary>
-        public bool Partitioned { get; }
+        public bool Partitioned { get; }
 
         /// <summary>
         /// Gets the <see cref="ScopeId" />.
         /// </summary>
         public ScopeId Scope { get; }
+
+        /// <summary>
+        /// Gets the <see cref="EventHandlerAlias"/>.
+        /// </summary>
+        public EventHandlerAlias Alias { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this event handler has an alias.
+        /// </summary>
+        public bool HasAlias { get; }
     }
 }

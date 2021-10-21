@@ -1,10 +1,10 @@
 <Project>
     <PropertyGroup>
-        <ContractsVersion>6.0.0</ContractsVersion>
+        <ContractsVersion>6.1.0</ContractsVersion>
         <MicrosoftExtensionsVersion>3.1.2</MicrosoftExtensionsVersion>
         <RxVersion>4.4.1</RxVersion>
-        <ProtobufVersion>3.14.0</ProtobufVersion>
-        <GrpcVersion>2.35.0</GrpcVersion>
+        <ProtobufVersion>3.18.1</ProtobufVersion>
+        <GrpcVersion>2.41.0</GrpcVersion>
         <NewtonsoftVersion>12.0.3</NewtonsoftVersion>
         <SystemImmutableVersion>1.7.1</SystemImmutableVersion>
     </PropertyGroup>

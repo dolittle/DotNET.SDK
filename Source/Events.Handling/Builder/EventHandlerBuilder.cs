@@ -20,6 +20,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
         ScopeId _scopeId = ScopeId.Default;
 
+        EventHandlerAlias _alias;
+        bool _hasAlias;
         bool _partitioned = true;
 
         /// <summary>
@@ -63,6 +65,18 @@ namespace Dolittle.SDK.Events.Handling.Builder
             return this;
         }
 
+        /// <summary>
+        /// Defines the event handler to have a specific <see cref="EventHandlerAlias" />.
+        /// </summary>
+        /// <param name="alias">The <see cref="EventHandlerAlias" />.</param>
+        /// <returns>The builder for continuation.</returns>
+        public EventHandlerBuilder WithAlias(EventHandlerAlias alias)
+        {
+            _alias = alias;
+            _hasAlias = true;
+            return this;
+        }
+
         /// <inheritdoc/>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
@@ -93,7 +107,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 return;
             }
 
-            var eventHandler = new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
+            var eventHandler = _hasAlias
+                ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
+                : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
             var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingConverter, loggerFactory.CreateLogger<EventHandlerProcessor>());
             eventProcessors.Register(
                 eventHandlerProcessor,

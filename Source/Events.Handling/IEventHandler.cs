@@ -33,10 +33,20 @@ namespace Dolittle.SDK.Events.Handling
         IEnumerable<EventType> HandledEvents { get; }
 
         /// <summary>
+        /// Gets the alias of the event handler.
+        /// </summary>
+        EventHandlerAlias Alias { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the event handler has an alias or not.
+        /// </summary>
+        bool HasAlias { get; }
+
+        /// <summary>
         /// Handle an event.
         /// </summary>
         /// <param name="event">The event to handle.</param>
-        /// <param name="eventType">The artifact representign the event type.</param>
+        /// <param name="eventType">The artifact representing the event type.</param>
         /// <param name="context">The context in which the event is in.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous action.</returns>
