@@ -6,7 +6,7 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.Events.Handling
 {
     /// <summary>
-    /// Represents the concept of the alias for an Event Handler.
+    /// Represents the concept of an alias for an Event Handler.
     /// </summary>
     public class EventHandlerAlias : ConceptAs<string>
     {

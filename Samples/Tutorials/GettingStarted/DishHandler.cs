@@ -13,7 +13,6 @@ namespace Kitchen
     {
         public void Handle(DishPrepared @event, EventContext eventContext)
         {
-            // throw new Exception();
             Console.WriteLine($"{@event.Chef} has prepared {@event.Dish}. Yummm!");
         }
     }
