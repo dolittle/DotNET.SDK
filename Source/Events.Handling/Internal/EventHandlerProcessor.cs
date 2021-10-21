@@ -49,6 +49,11 @@ namespace Dolittle.SDK.Events.Handling.Internal
                         ScopeId = _eventHandler.ScopeId.ToProtobuf(),
                         Partitioned = _eventHandler.Partitioned
                     };
+                    if (_eventHandler.HasAlias)
+                    {
+                        registrationRequest.Alias = _eventHandler.Alias.Value;
+                    }
+
                     registrationRequest.EventTypes.AddRange(_eventHandler.HandledEvents.Select(_ => _.ToProtobuf()).ToArray());
                     return registrationRequest;
                 }
