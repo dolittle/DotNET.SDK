@@ -1,3 +1,19 @@
+# [10.1.0] - 2021-10-21 [PR: #76](https://github.com/dolittle/DotNET.SDK/pull/76)
+## Summary
+
+Updates Grpc, protobuf and contracts dependency versions and adds the possibility to register event handlers with aliases that is useful for when using the Dolittle CLI.
+
+### Added
+
+- `WithAlias` build step on the fluent builder for event handlers.
+- `alias` argument on the `EventHandler` attribute
+- Event handler classes without the `alias` argument gets registered with an alias that is the class name.
+
+### Changed
+
+- Updated Grpc, protobuf and contracts dependency versions
+
+
 # [10.0.0] - 2021-10-13 [PR: #73](https://github.com/dolittle/DotNET.SDK/pull/73)
 ## Summary
 
