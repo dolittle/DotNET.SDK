@@ -91,7 +91,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
             var eventHandler = hasAlias 
                 ? new EventHandler(eventHandlerId, alias, scopeId, partitioned, eventTypesToMethods)
-                : new EventHandler(eventHandlerId, nameof(EventHandlerType), scopeId, partitioned, eventTypesToMethods);
+                : new EventHandler(eventHandlerId, EventHandlerType.Name, scopeId, partitioned, eventTypesToMethods);
             var eventHandlerProcessor = new EventHandlerProcessor(
                 eventHandler,
                 processingConverter,
