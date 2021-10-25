@@ -55,6 +55,14 @@ jobs:
           version: ${{ steps.context.outputs.current-version }}
           release-type: ${{ steps.context.outputs.release-type }}
 
+      - name: Create release notes
+        id: create-release-notes
+        # if: ${{ steps.context.outputs.should-publish == 'true' }}
+        uses: dolittle/create-release-notes-action@v1
+        with:
+          body: ${{ steps.context.outputs.pr-body }}
+          version: ${{ steps.context.outputs.current-version }}
+          changelog-url: https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md
       - name: Create packages
         if: ${{ steps.context.outputs.should-publish == 'true' }}
         run: dotnet pack --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:Version=${{ steps.increment-version.outputs.next-version }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
