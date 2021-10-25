@@ -61,7 +61,7 @@ jobs:
         uses: dolittle/create-release-notes-action@v1
         with:
           body: ${{ steps.context.outputs.pr-body }}
-          version: ${{ steps.context.outputs.current-version }}
+          version: ${{ steps.increment-version.outputs.next-version }}
           changelog-url: https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md
       - name: Create packages
         if: ${{ steps.context.outputs.should-publish == 'true' }}
