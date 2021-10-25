@@ -57,7 +57,7 @@ jobs:
 
       - name: Create packages
         if: ${{ steps.context.outputs.should-publish == 'true' }}
-        run: dotnet pack --no-build --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+        run: dotnet pack --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:Version=${{ steps.increment-version.outputs.next-version }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
 
       - name: Prepend to Changelog
         if: ${{ steps.context.outputs.should-publish == 'true' && steps.context.outputs.release-type != 'prerelease' }}
