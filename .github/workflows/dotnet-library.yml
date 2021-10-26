@@ -65,7 +65,7 @@ jobs:
           changelog-url: https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md
       - name: Create packages
         if: ${{ steps.context.outputs.should-publish == 'true' }}
-        run: dotnet pack --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:Version=${{ steps.increment-version.outputs.next-version }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:PackageReleaseNotes="${{ steps.create-release-notes.outputs.plaintext }}"
+        run: dotnet pack --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:Version=${{ steps.increment-version.outputs.next-version }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:PackageReleaseNotes='${{ steps.create-release-notes.outputs.plaintext }}'
 
       - name: Prepend to Changelog
         if: ${{ steps.context.outputs.should-publish == 'true' && steps.context.outputs.release-type != 'prerelease' }}
