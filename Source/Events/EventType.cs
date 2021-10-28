@@ -13,9 +13,18 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Initializes a new instance of the <see cref="EventType"/> class.
         /// </summary>
-        /// <param name="id">The <see cref="EventTypeId">unique identifer</see> of the <see cref="EventType"/>.</param>
+        /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
+        public EventType(EventTypeId id)
+            : this(id, alias: null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventType"/> class.
+        /// </summary>
+        /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
         /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the <see cref="EventType"/>.</param>
-        public EventType(EventTypeId id, EventTypeAlias alias = default)
+        public EventType(EventTypeId id, EventTypeAlias alias)
             : base(id)
         {
             ThrowIfEventTypeIdIsNull(id);
@@ -27,8 +36,18 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
         /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="EventType"/>.</param>
+        public EventType(EventTypeId id, Generation generation)
+            : this(id, generation, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventType"/> class.
+        /// </summary>
+        /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
+        /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="EventType"/>.</param>
         /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the <see cref="EventType"/>.</param>
-        public EventType(EventTypeId id, Generation generation, EventTypeAlias alias = default)
+        public EventType(EventTypeId id, Generation generation, EventTypeAlias alias)
             : base(id, generation)
         {
             ThrowIfEventTypeIdIsNull(id);

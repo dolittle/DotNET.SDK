@@ -15,8 +15,17 @@ namespace Dolittle.SDK.Aggregates
         /// Initializes a new instance of the <see cref="AggregateRootType"/> class.
         /// </summary>
         /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="AggregateRootType"/>.</param>
+        public AggregateRootType(AggregateRootId id)
+            : this(id, alias: null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AggregateRootType"/> class.
+        /// </summary>
+        /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="AggregateRootType"/>.</param>
         /// <param name="alias"><see cref="AggregateRootAlias">Alias</see> of the <see cref="AggregateRootType"/>.</param>
-        public AggregateRootType(AggregateRootId id, AggregateRootAlias alias = default)
+        public AggregateRootType(AggregateRootId id, AggregateRootAlias alias)
             : base(id)
         {
             ThrowIfAggregateRootTypeIdIsNull(id);
@@ -28,8 +37,18 @@ namespace Dolittle.SDK.Aggregates
         /// </summary>
         /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="AggregateRootType"/>.</param>
         /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="AggregateRootType"/>.</param>
+        public AggregateRootType(AggregateRootId id, Generation generation)
+            : this(id, generation, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AggregateRootType"/> class.
+        /// </summary>
+        /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="AggregateRootType"/>.</param>
+        /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="AggregateRootType"/>.</param>
         /// <param name="alias"><see cref="AggregateRootAlias">Alias</see> of the <see cref="AggregateRootType"/>.</param>
-        public AggregateRootType(AggregateRootId id, Generation generation, AggregateRootAlias alias = default)
+        public AggregateRootType(AggregateRootId id, Generation generation, AggregateRootAlias alias)
             : base(id, generation)
         {
             ThrowIfAggregateRootTypeIdIsNull(id);
