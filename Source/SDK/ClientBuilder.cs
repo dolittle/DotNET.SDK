@@ -5,6 +5,8 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates.Builders;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
@@ -38,6 +40,7 @@ namespace Dolittle.SDK
     public class ClientBuilder
     {
         readonly EventTypesBuilder _eventTypesBuilder;
+        readonly AggregateRootsBuilder _aggregateRootsBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly ProjectionsBuilder _projectionsBuilder;
@@ -78,6 +81,7 @@ namespace Dolittle.SDK
             _embeddingAssociations = new EmbeddingReadModelTypeAssociations();
 
             _eventTypesBuilder = new EventTypesBuilder();
+            _aggregateRootsBuilder = new AggregateRootsBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
             _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
@@ -166,6 +170,17 @@ namespace Dolittle.SDK
         public ClientBuilder WithEventTypes(Action<EventTypesBuilder> callback)
         {
             callback(_eventTypesBuilder);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the event types through the <see cref="EventTypesBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithAggregateRoots(Action<AggregateRootsBuilder> callback)
+        {
+            callback(_aggregateRootsBuilder);
             return this;
         }
 
@@ -265,6 +280,7 @@ namespace Dolittle.SDK
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
             RegisterEventTypes(methodCaller, executionContext, eventTypes);
+            _aggregateRootsBuilder.Build(new AggregateRoots(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
 
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,

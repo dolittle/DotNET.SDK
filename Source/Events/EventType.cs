@@ -19,9 +19,7 @@ namespace Dolittle.SDK.Events
             : base(id)
         {
             ThrowIfEventTypeIdIsNull(id);
-            if (alias == default) return;
             Alias = alias;
-            HasAlias = true;
         }
 
         /// <summary>
@@ -35,9 +33,7 @@ namespace Dolittle.SDK.Events
         {
             ThrowIfEventTypeIdIsNull(id);
             ThrowIfGenerationIsNull(generation);
-            if (alias == default) return;
             Alias = alias;
-            HasAlias = true;
         }
 
         /// <summary>
@@ -48,7 +44,7 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Gets a value indicating whether the Event Type has an alias or not.
         /// </summary>
-        public bool HasAlias { get; }
+        public bool HasAlias => Alias?.Value != default;
 
         static void ThrowIfEventTypeIdIsNull(EventTypeId id)
         {
