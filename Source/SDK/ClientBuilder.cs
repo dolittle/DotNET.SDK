@@ -253,6 +253,7 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="Client"/>.</returns>
         public Client Build()
         {
+            var methodCaller = new MethodCaller(_host, _port);
             var executionContext = new ExecutionContext(
                 _microserviceId,
                 TenantId.System,
@@ -263,8 +264,8 @@ namespace Dolittle.SDK
                 CultureInfo.InvariantCulture);
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
+            RegisterEventTypes(methodCaller, executionContext, eventTypes);
 
-            var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,
                 methodCaller,
@@ -341,6 +342,9 @@ namespace Dolittle.SDK
                 _loggerFactory,
                 _cancellation);
         }
+
+        Task RegisterEventTypes(MethodCaller methodCaller, ExecutionContext executionContext, EventTypes eventTypes)
+            => new Events.Internal.EventTypes(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypes>()).Register(eventTypes, _cancellation);
 
         async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
         {

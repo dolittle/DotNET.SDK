@@ -42,31 +42,34 @@ namespace Dolittle.SDK.Events.Builders
         /// Associate a <see cref="Type" /> with an <see cref="EventType" />.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
+        /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
         /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-        public EventTypesBuilder Associate<T>(EventTypeId eventTypeId)
+        public EventTypesBuilder Associate<T>(EventTypeId eventTypeId, EventTypeAlias alias = default)
             where T : class
-            => Associate(typeof(T), eventTypeId);
+            => Associate(typeof(T), eventTypeId, alias);
 
         /// <summary>
         /// Associate a <see cref="Type" /> with an <see cref="EventType" />.
         /// </summary>
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
+        /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
         /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-        public EventTypesBuilder Associate(Type type, EventTypeId eventTypeId)
-            => Associate(type, new EventType(eventTypeId));
+        public EventTypesBuilder Associate(Type type, EventTypeId eventTypeId, EventTypeAlias alias = default)
+            => Associate(type, new EventType(eventTypeId, alias));
 
         /// <summary>
         /// Associate a <see cref="Type" /> with an <see cref="EventType" />.
         /// </summary>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="EventType" />.</param>
+        /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
         /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
         /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-        public EventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation)
+        public EventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation, EventTypeAlias alias = default)
             where T : class
-            => Associate(typeof(T), eventTypeId, generation);
+            => Associate(typeof(T), eventTypeId, generation, alias);
 
         /// <summary>
         /// Associate a <see cref="Type" /> with an <see cref="EventType" />.
@@ -74,9 +77,10 @@ namespace Dolittle.SDK.Events.Builders
         /// <param name="type">The <see cref="Type" /> to associate with an <see cref="EventType" />.</param>
         /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
         /// <param name="generation">The <see cref="Generation" /> of the <see cref="EventType" />.</param>
+        /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
         /// <returns>The <see cref="EventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-        public EventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation)
-            => Associate(type, new EventType(eventTypeId, generation));
+        public EventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation, EventTypeAlias alias = default)
+            => Associate(type, new EventType(eventTypeId, generation, alias));
 
         /// <summary>
         /// Associate a <see cref="Type" /> with the <see cref="EventType" /> given by an attribute.
@@ -133,8 +137,28 @@ namespace Dolittle.SDK.Events.Builders
             }
         }
 
-        bool IsEventType(Type type)
-            => type.GetCustomAttributes(typeof(EventTypeAttribute), true).FirstOrDefault() as EventTypeAttribute != default;
+        static bool IsEventType(Type type)
+            => type.GetCustomAttributes(typeof(EventTypeAttribute), true).FirstOrDefault() is EventTypeAttribute;
+
+        static void ThrowIfAttributeSpecifiesADifferentEventType(Type type, EventType providedType)
+        {
+            if (TryGetEventTypeFromAttribute(type, out var attributeType) && attributeType != providedType)
+            {
+                throw new ProvidedEventTypeDoesNotMatchEventTypeFromAttribute(providedType, attributeType, type);
+            }
+        }
+
+        static bool TryGetEventTypeFromAttribute(Type type, out EventType eventType)
+        {
+            if (Attribute.GetCustomAttribute(type, typeof(EventTypeAttribute)) is EventTypeAttribute attribute)
+            {
+                eventType = attribute.EventType;
+                return true;
+            }
+
+            eventType = default;
+            return false;
+        }
 
         void AddAssociation(Type type, EventType eventType)
         {
@@ -148,26 +172,6 @@ namespace Dolittle.SDK.Events.Builders
             {
                 throw new TypeIsMissingEventTypeAttribute(type);
             }
-        }
-
-        void ThrowIfAttributeSpecifiesADifferentEventType(Type type, EventType providedType)
-        {
-            if (TryGetEventTypeFromAttribute(type, out var attributeType) && attributeType != providedType)
-            {
-                throw new ProvidedEventTypeDoesNotMatchEventTypeFromAttribute(providedType, attributeType, type);
-            }
-        }
-
-        bool TryGetEventTypeFromAttribute(Type type, out EventType eventType)
-        {
-            if (Attribute.GetCustomAttribute(type, typeof(EventTypeAttribute)) is EventTypeAttribute attribute)
-            {
-                eventType = attribute.EventType;
-                return true;
-            }
-
-            eventType = default;
-            return false;
         }
     }
 }
