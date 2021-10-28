@@ -152,6 +152,12 @@ namespace Dolittle.SDK.Events.Builders
         {
             if (Attribute.GetCustomAttribute(type, typeof(EventTypeAttribute)) is EventTypeAttribute attribute)
             {
+                if (!attribute.EventType.HasAlias)
+                {
+                    eventType = new EventType(attribute.EventType.Id, attribute.EventType.Generation, type.Name);
+                    return true;
+                }
+
                 eventType = attribute.EventType;
                 return true;
             }

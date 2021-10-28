@@ -42,7 +42,7 @@ namespace Dolittle.SDK.Aggregates.Builders
         /// </remarks>
         public AggregateRootsBuilder Register(Type type)
         {
-            ThrowIfTypeIsMissingEventTypeAttribute(type);
+            ThrowIfTypeIsMissingAggregateRootAttribute(type);
             TryGetAggregateRootTypeFromAttribute(type, out var eventType);
             AddAssociation(type, eventType);
             return this;
@@ -87,6 +87,12 @@ namespace Dolittle.SDK.Aggregates.Builders
         {
             if (Attribute.GetCustomAttribute(type, typeof(AggregateRootAttribute)) is AggregateRootAttribute attribute)
             {
+                if (!attribute.Type.HasAlias)
+                {
+                    aggregateRootType = new AggregateRootType(attribute.Type.Id, attribute.Type.Generation, type.Name);
+                    return true;
+                }
+
                 aggregateRootType = attribute.Type;
                 return true;
             }
@@ -101,7 +107,7 @@ namespace Dolittle.SDK.Aggregates.Builders
             _associations.Add((type, aggregateRootType));
         }
 
-        void ThrowIfTypeIsMissingEventTypeAttribute(Type type)
+        void ThrowIfTypeIsMissingAggregateRootAttribute(Type type)
         {
             if (!TryGetAggregateRootTypeFromAttribute(type, out _))
             {
