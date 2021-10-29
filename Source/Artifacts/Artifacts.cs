@@ -31,6 +31,9 @@ namespace Dolittle.SDK.Artifacts
             _typeToArtifactMap = new Dictionary<Type, TArtifact>();
         }
 
+        /// <inheritdoc/>
+        public IEnumerable<TArtifact> All => _artifactToTypeMap.Keys;
+
         /// <inheritdoc />
         public void Associate(Type type, TArtifact artifact)
         {

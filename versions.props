@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <ContractsVersion>6.1.0</ContractsVersion>
+        <ContractsVersion>6.2.0-aragorn.2</ContractsVersion>
         <MicrosoftExtensionsVersion>3.1.2</MicrosoftExtensionsVersion>
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.18.1</ProtobufVersion>
