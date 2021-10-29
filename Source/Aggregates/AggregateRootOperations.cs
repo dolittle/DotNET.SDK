@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -19,71 +21,131 @@ namespace Dolittle.SDK.Aggregates
     public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAggregate>
         where TAggregate : AggregateRoot
     {
-        readonly TAggregate _aggregateRoot;
+        readonly EventSourceId _eventSourceId;
         readonly IEventStore _eventStore;
         readonly ILogger _logger;
         readonly IEventTypes _eventTypes;
-        bool _performed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AggregateRootOperations{TAggregate}"/> class.
         /// </summary>
-        /// <param name="eventStore">
-        /// The <see cref="IEventStore" /> used for committing the <see cref="UncommittedAggregateEvents" />
-        /// when actions are performed on the <typeparamref name="TAggregate">aggregate</typeparamref>.
-        /// </param>
-        /// <param name="aggregateRoot"><see cref="AggregateRoot"/> the operations are for.</param>
+        /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the aggregate root instance.</param>
+        /// <param name="eventStore">The <see cref="IEventStore" /> used for committing the <see cref="UncommittedAggregateEvents" /> when actions are performed on the <typeparamref name="TAggregate">aggregate</typeparamref>. </param>
         /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        public AggregateRootOperations(IEventStore eventStore, TAggregate aggregateRoot, IEventTypes eventTypes, ILogger logger)
+        public AggregateRootOperations(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, ILogger logger)
         {
+            _eventSourceId = eventSourceId;
             _eventTypes = eventTypes;
-            _aggregateRoot = aggregateRoot;
             _eventStore = eventStore;
             _logger = logger;
         }
 
         /// <inheritdoc/>
-        public Task Perform(Action<TAggregate> method)
-            => Perform(aggregate =>
+        public Task Perform(Action<TAggregate> method, CancellationToken cancellationToken)
+            => Perform(
+                aggregate =>
                 {
                     method(aggregate);
                     return Task.CompletedTask;
-                });
+                },
+                cancellationToken);
 
         /// <inheritdoc/>
-        public async Task Perform(Func<TAggregate, Task> method)
+        public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken)
         {
-            var aggregateRootId = _aggregateRoot.GetAggregateRootId();
+            if (!TryGetAggregateRoot(_eventSourceId, out var aggregateRoot, out var exception))
+            {
+                throw new CouldNotGetAggregateRoot(typeof(TAggregate), _eventSourceId, exception.Message);
+            }
+
+            var aggregateRootId = aggregateRoot.GetAggregateRootId();
+
+            await ReApplyEvents(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
+
             _logger.LogDebug(
                 "Performing operation on {AggregateRoot} with aggregate root id {AggregateRootId} applying events to event source {EventSource}",
-                _aggregateRoot.GetType(),
+                aggregateRoot.GetType(),
                 aggregateRootId,
-                _aggregateRoot.EventSourceId);
-            if (_performed) throw new AggregateRootOperationAlreadyPerformed(typeof(TAggregate), aggregateRootId, _aggregateRoot.EventSourceId);
-            _performed = true;
-            await method(_aggregateRoot).ConfigureAwait(false);
-            if (_aggregateRoot.AppliedEvents.Any()) await CommitAppliedEvents(aggregateRootId).ConfigureAwait(false);
+                aggregateRoot.EventSourceId);
+            await method(aggregateRoot).ConfigureAwait(false);
+
+            if (aggregateRoot.AppliedEvents.Any()) await CommitAppliedEvents(aggregateRoot, aggregateRootId).ConfigureAwait(false);
         }
 
-        Task<CommittedAggregateEvents> CommitAppliedEvents(AggregateRootId aggregateRootId)
+        bool TryGetAggregateRoot(EventSourceId eventSourceId, out TAggregate aggregateRoot, out Exception exception)
+        {
+            try
+            {
+                exception = default;
+                _logger.LogDebug(
+                    "Getting aggregate root {AggregateRoot} with event source id {EventSource}",
+                    typeof(TAggregate),
+                    eventSourceId);
+                aggregateRoot = CreateAggregateRoot(eventSourceId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                aggregateRoot = default;
+                exception = ex;
+                return false;
+            }
+        }
+
+        TAggregate CreateAggregateRoot(EventSourceId eventSourceId)
+        {
+            var aggregateRootType = typeof(TAggregate);
+            ThrowIfInvalidConstructor(aggregateRootType);
+            var constructor = typeof(TAggregate).GetConstructors().Single();
+
+            var aggregateRoot = GetInstanceFrom(eventSourceId, constructor);
+            ThrowIfCouldNotCreateAggregateRoot(aggregateRoot);
+            return aggregateRoot;
+        }
+
+        TAggregate GetInstanceFrom(EventSourceId id, ConstructorInfo constructor)
+            => constructor.Invoke(new object[] { id }) as TAggregate;
+
+        async Task ReApplyEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
+        {
+            var eventSourceId = aggregateRoot.EventSourceId;
+            _logger.LogDebug(
+                "Re-applying events for {AggregateRoot} with aggregate root id {AggregateRootId} with event source id {EventSourceId}",
+                typeof(TAggregate),
+                aggregateRootId,
+                eventSourceId);
+
+            var committedEvents = await _eventStore.FetchForAggregate(aggregateRootId, eventSourceId, cancellationToken).ConfigureAwait(false);
+            if (committedEvents.HasEvents)
+            {
+                _logger.LogTrace("Re-applying {NumberOfEvents} events", committedEvents.Count);
+                aggregateRoot.ReApply(committedEvents);
+            }
+            else
+            {
+                _logger.LogTrace("No events to re-apply");
+            }
+        }
+
+        Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)
         {
             _logger.LogDebug(
                 "{AggregateRoot} with aggregate root id {AggregateRootId} is committing {NumberOfEvents} events to event source {EventSource}",
-                _aggregateRoot.GetType(),
+                aggregateRoot.GetType(),
                 aggregateRootId,
-                _aggregateRoot.AppliedEvents.Count(),
-                _aggregateRoot.EventSourceId);
+                aggregateRoot.AppliedEvents.Count(),
+                aggregateRoot.EventSourceId);
             return _eventStore
                     .ForAggregate(aggregateRootId)
-                    .WithEventSource(_aggregateRoot.EventSourceId)
-                    .ExpectVersion(_aggregateRoot.Version.Value - (ulong)_aggregateRoot.AppliedEvents.Count())
-                    .Commit(CreateUncommittedEvents);
+                    .WithEventSource(aggregateRoot.EventSourceId)
+                    .ExpectVersion(aggregateRoot.Version.Value - (ulong)aggregateRoot.AppliedEvents.Count())
+                    .Commit(builder => CreateUncommittedEvents(builder, aggregateRoot));
         }
 
-        void CreateUncommittedEvents(UncommittedAggregateEventsBuilder builder)
+        void CreateUncommittedEvents(UncommittedAggregateEventsBuilder builder, TAggregate aggregateRoot)
         {
-            foreach (var appliedEvent in _aggregateRoot.AppliedEvents)
+            foreach (var appliedEvent in aggregateRoot.AppliedEvents)
             {
                 var uncommittedEvent = ToUncommittedEvent(appliedEvent);
                 var eventBuilder = uncommittedEvent.IsPublic ?
@@ -100,6 +162,39 @@ namespace Dolittle.SDK.Aggregates
             if (appliedEvent.HasEventType) ThrowIfWrongEventType(@event, eventType);
             else eventType = _eventTypes.GetFor(@event.GetType());
             return new UncommittedAggregateEvent(eventType, @event, appliedEvent.Public);
+        }
+
+        void ThrowIfInvalidConstructor(Type type)
+        {
+            ThrowIfNotOneConstructor(type);
+            ThrowIfConstructorIsInvalid(type, type.GetConstructors().Single());
+        }
+
+        void ThrowIfNotOneConstructor(Type type)
+        {
+            if (type.GetConstructors().Length != 1)
+                throw new InvalidAggregateRootConstructorSignature(type, "expected only a single constructor");
+        }
+
+        void ThrowIfConstructorIsInvalid(Type type, ConstructorInfo constructor)
+        {
+            var parameters = constructor.GetParameters();
+            ThrowIfIncorrectParameter(type, parameters);
+        }
+
+        void ThrowIfIncorrectParameter(Type type, ParameterInfo[] parameters)
+        {
+            if (parameters.Length != 1 ||
+                (parameters[0].ParameterType != typeof(Guid) &&
+                 parameters[0].ParameterType != typeof(EventSourceId)))
+            {
+                throw new InvalidAggregateRootConstructorSignature(type, $"expected only one parameter and it must be of type {typeof(Guid)} or {typeof(EventSourceId)}");
+            }
+        }
+
+        void ThrowIfCouldNotCreateAggregateRoot(TAggregate aggregateRoot)
+        {
+            if (aggregateRoot == default) throw new CouldNotCreateAggregateRootInstance(typeof(TAggregate));
         }
 
         void ThrowIfWrongEventType(object @event, EventType eventType)
