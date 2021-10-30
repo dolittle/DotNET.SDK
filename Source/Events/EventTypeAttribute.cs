@@ -17,10 +17,12 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="eventTypeId">The unique identifier of the <see cref="EventType" />.</param>
         /// <param name="generation">The generation of the <see cref="EventType" />..</param>
-        public EventTypeAttribute(string eventTypeId, uint generation = 0)
+        /// <param name="alias">The alias for the <see cref="EventType"/>.</param>
+        public EventTypeAttribute(string eventTypeId, uint generation = 0, string alias = default)
             => EventType = new EventType(
                 Guid.Parse(eventTypeId),
-                generation == 0 ? Generation.First : new Generation { Value = generation });
+                generation == 0 ? Generation.First : new Generation { Value = generation },
+                alias);
 
         /// <summary>
         /// Gets the <see cref="Events.EventType" />.

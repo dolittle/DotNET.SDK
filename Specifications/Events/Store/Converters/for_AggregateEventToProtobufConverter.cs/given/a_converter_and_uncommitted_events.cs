@@ -25,13 +25,15 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConve
         protected static bool is_public_two;
         protected static string content_as_string_one;
 
+        protected static UncommittedAggregateEvent event_one;
+        protected static UncommittedAggregateEvent event_two;
         protected static UncommittedAggregateEvents uncommitted_aggregate_events;
 
         Establish context = () =>
         {
             converter = new AggregateEventToProtobufConverter(serializer.Object);
 
-            event_source_id = "e7fe623b-5fb7-4699-9b08-7c14d7556e84";
+            event_source_id = "Anne Jefferson";
             aggregate_root_id = "d03424cb-34e0-4168-bb43-0c4b06bab5d5";
             aggregate_root_version = AggregateRootVersion.Initial;
 
@@ -45,8 +47,8 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToProtobufConve
             is_public_two = false;
             content_as_string_two = "second event test content string";
 
-            var event_one = new UncommittedAggregateEvent(event_type_one, content_one, is_public_one);
-            var event_two = new UncommittedAggregateEvent(event_type_two, content_two, is_public_two);
+            event_one = new UncommittedAggregateEvent(event_type_one, content_one, is_public_one);
+            event_two = new UncommittedAggregateEvent(event_type_two, content_two, is_public_two);
 
             uncommitted_aggregate_events = new UncommittedAggregateEvents(event_source_id, aggregate_root_id, aggregate_root_version)
             {

@@ -1,3 +1,57 @@
+# [10.1.0] - 2021-10-21 [PR: #76](https://github.com/dolittle/DotNET.SDK/pull/76)
+## Summary
+
+Updates Grpc, protobuf and contracts dependency versions and adds the possibility to register event handlers with aliases that is useful for when using the Dolittle CLI.
+
+### Added
+
+- `WithAlias` build step on the fluent builder for event handlers.
+- `alias` argument on the `EventHandler` attribute
+- Event handler classes without the `alias` argument gets registered with an alias that is the class name.
+
+### Changed
+
+- Updated Grpc, protobuf and contracts dependency versions
+
+
+# [10.0.0] - 2021-10-13 [PR: #73](https://github.com/dolittle/DotNET.SDK/pull/73)
+## Summary
+
+Implementing the changes introduced by https://github.com/dolittle/Contracts/pull/53. Allowing EventSourceID and PartitionID to be strings, to more easily integrate with events from existing systems.
+
+This is considered a breaking change because it requires a Runtime compatible with Contracts v6 to function.
+
+### Added
+
+- EventSourceID is now a string instead of a Guid.
+- PartitionID is now also a string instead of a Guid.
+
+### Fixed
+
+- Aligned names of event type fields throughout messages from Contracts v6.0.0
+
+
+# [9.2.0] - 2021-9-29 [PR: #72](https://github.com/dolittle/DotNET.SDK/pull/72)
+## Summary
+
+This PR is combined with PR #71 
+
+Adding the ability to set a default `JsonSerializerSettings` instance for the serialization and deserialization of events. This allows for completely custom settings e.g. adding converters for types or casing configuration or similar. Fixes #70.
+
+Using it would then be as follows during the building of the client:
+
+```csharp
+client
+   .ForMicroservice(...)
+   .WithJsonSerializerSettings(new JsonSerializerSettings { Converters = .... });
+```
+
+### Added
+
+- Ability to set a default `JsonSerializerSettings` instance.
+- `EventContentSerializer` honoring the default `JsonSerializerSettings`.
+
+
 # [9.1.0] - 2021-7-14 [PR: #65](https://github.com/dolittle/DotNET.SDK/pull/65)
 ## Summary
 

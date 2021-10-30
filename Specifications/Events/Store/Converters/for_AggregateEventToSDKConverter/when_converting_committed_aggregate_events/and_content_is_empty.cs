@@ -23,14 +23,14 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.
             {
                 Content = string.Empty,
                 Public = is_public,
-                Type = event_type.ToProtobuf(),
+                EventType = event_type.ToProtobuf(),
                 ExecutionContext = execution_context,
                 Occurred = Timestamp.FromDateTimeOffset(occured),
                 EventLogSequenceNumber = event_log_sequence_number,
             };
             committed_aggregate_events = new PbCommittedAggregateEvents
             {
-                EventSourceId = event_source.ToProtobuf(),
+                EventSourceId = event_source.Value,
                 AggregateRootId = aggregate_root_id.ToProtobuf(),
                 AggregateRootVersion = aggregate_root_version,
                 Events = { committed_aggregate_event }

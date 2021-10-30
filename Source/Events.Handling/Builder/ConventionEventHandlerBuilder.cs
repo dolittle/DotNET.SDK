@@ -64,7 +64,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             CancellationToken cancellation)
         {
             logger.LogDebug("Building event handler from type {EventHandler}", EventHandlerType);
-            if (!TryGetEventHandlerInformation(out var eventHandlerId, out var partitioned, out var scopeId))
+            if (!TryGetEventHandlerInformation(out var eventHandlerId, out var partitioned, out var scopeId, out var alias, out var hasAlias))
             {
                 logger.LogWarning("The event handler class {EventHandlerType} needs to be decorated with an [{EventHandlerAttribute}]", EventHandlerType, typeof(EventHandlerAttribute).Name);
             }
@@ -89,7 +89,9 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 return;
             }
 
-            var eventHandler = new EventHandler(eventHandlerId, scopeId, partitioned, eventTypesToMethods);
+            var eventHandler = hasAlias 
+                ? new EventHandler(eventHandlerId, alias, scopeId, partitioned, eventTypesToMethods)
+                : new EventHandler(eventHandlerId, EventHandlerType.Name, scopeId, partitioned, eventTypesToMethods);
             var eventHandlerProcessor = new EventHandlerProcessor(
                 eventHandler,
                 processingConverter,
@@ -316,17 +318,24 @@ namespace Dolittle.SDK.Events.Handling.Builder
             return okay;
         }
 
-        bool TryGetEventHandlerInformation(out EventHandlerId eventHandlerId, out bool partitioned, out ScopeId scopeId)
+        bool TryGetEventHandlerInformation(out EventHandlerId eventHandlerId, out bool partitioned, out ScopeId scopeId, out EventHandlerAlias alias, out bool hasAlias)
         {
             eventHandlerId = default;
             partitioned = default;
             scopeId = default;
+            alias = default;
+            hasAlias = default;
             var eventHandler = EventHandlerType.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() as EventHandlerAttribute;
-            if (eventHandler == default) return false;
+            if (eventHandler == default)
+            {
+                return false;
+            }
 
             eventHandlerId = eventHandler.Identifier;
             partitioned = eventHandler.Partitioned;
             scopeId = eventHandler.Scope;
+            alias = eventHandler.Alias;
+            hasAlias = eventHandler.HasAlias;
             return true;
         }
 

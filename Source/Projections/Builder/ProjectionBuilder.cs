@@ -49,6 +49,7 @@ namespace Dolittle.SDK.Projections.Builder
         /// </summary>
         /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
         /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+        /// <exception cref="ReadModelAlreadyDefinedForProjection">Is thrown when called multiple times.</exception>
         public ProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
             where TReadModel : class, new()
         {

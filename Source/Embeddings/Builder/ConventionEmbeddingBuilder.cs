@@ -48,7 +48,7 @@ namespace Dolittle.SDK.Embeddings.Builder
 
             if (!TryGetEmbeddingId(out var embeddingId))
             {
-                logger.LogWarning("The embedding class {EmbeddingType} needs to be decorated with an [{EmbeddingAttribute}]", _embeddingType, typeof(EmbeddingAttribute).Name);
+                logger.LogWarning("The embedding class {EmbeddingType} needs to be decorated with an [{EmbeddingAttribute}]", _embeddingType, nameof(EmbeddingAttribute));
                 return;
             }
 

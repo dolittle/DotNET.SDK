@@ -28,7 +28,7 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.
             content_string = "ojmikemitethulotlidruewim";
             is_public = false;
             event_type = new EventType("18af5922-9cb2-4a26-bab8-513eb5e00d60", 1589312422);
-            event_source = "2844e1b0-2a8b-4b95-bfd7-69809963bf39";
+            event_source = "Rena Pearson";
             aggregate_root_id = "717915c1-bb88-4bec-b1c1-61451c5a6608";
 
             aggregate_root_version = 186206759u;
@@ -39,14 +39,14 @@ namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.
             {
                 Content = content_string,
                 Public = is_public,
-                Type = event_type.ToProtobuf(),
+                EventType = event_type.ToProtobuf(),
                 ExecutionContext = execution_context,
                 Occurred = Timestamp.FromDateTimeOffset(occured),
                 EventLogSequenceNumber = event_log_sequence_number,
             };
             committed_aggregate_events = new PbCommittedAggregateEvents
             {
-                EventSourceId = event_source.ToProtobuf(),
+                EventSourceId = event_source.Value,
                 AggregateRootId = aggregate_root_id.ToProtobuf(),
                 AggregateRootVersion = aggregate_root_version,
                 Events = { committed_aggregate_event }

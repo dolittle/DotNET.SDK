@@ -3,6 +3,9 @@
     
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <RepositoryUrl>https://github.com/dolittle/DotNET.SDK</RepositoryUrl>
+        <PackageProjectUrl>https://dolittle.io</PackageProjectUrl>
+        <PackageReleaseNotes>https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

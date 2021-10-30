@@ -4,12 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates.Builders;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
@@ -26,11 +24,11 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
-using Dolittle.SDK.Resilience;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -43,6 +41,7 @@ namespace Dolittle.SDK
     public class ClientBuilder
     {
         readonly EventTypesBuilder _eventTypesBuilder;
+        readonly AggregateRootsBuilder _aggregateRootsBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly ProjectionsBuilder _projectionsBuilder;
@@ -51,14 +50,14 @@ namespace Dolittle.SDK
         readonly MicroserviceId _microserviceId;
         readonly ProjectionReadModelTypeAssociations _projectionAssociations;
         readonly EmbeddingReadModelTypeAssociations _embeddingAssociations;
+        readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
         string _host = "localhost";
         TimeSpan _pingInterval = TimeSpan.FromSeconds(5);
         ushort _port = 50053;
         Version _version;
         Environment _environment;
         CancellationToken _cancellation;
-        RetryPolicy _retryPolicy;
-        EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
+        Action<JsonSerializerSettings> _jsonSerializerSettingsBuilder;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -77,13 +76,13 @@ namespace Dolittle.SDK
             _version = Version.NotSet;
             _environment = Environment.Undetermined;
             _cancellation = CancellationToken.None;
-            _retryPolicy = (IObservable<Exception> exceptions) => exceptions.Delay(TimeSpan.FromSeconds(1));
             _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
             _projectionAssociations = new ProjectionReadModelTypeAssociations();
             _embeddingAssociations = new EmbeddingReadModelTypeAssociations();
 
             _eventTypesBuilder = new EventTypesBuilder();
+            _aggregateRootsBuilder = new AggregateRootsBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
             _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
@@ -176,6 +175,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the event types through the <see cref="EventTypesBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithAggregateRoots(Action<AggregateRootsBuilder> callback)
+        {
+            callback(_aggregateRootsBuilder);
+            return this;
+        }
+
+        /// <summary>
         /// Sets the filters through the <see cref="EventFiltersBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -257,11 +267,23 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets a callback that configures the <see cref="JsonSerializerSettings"/> for serializing events.
+        /// </summary>
+        /// <param name="jsonSerializerSettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="JsonSerializerSettings"/> to modify settings.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
+        {
+            _jsonSerializerSettingsBuilder = jsonSerializerSettingsBuilder;
+            return this;
+        }
+
+        /// <summary>
         /// Build the Client.
         /// </summary>
         /// <returns>The <see cref="Client"/>.</returns>
         public Client Build()
         {
+            var methodCaller = new MethodCaller(_host, _port);
             var executionContext = new ExecutionContext(
                 _microserviceId,
                 TenantId.System,
@@ -272,15 +294,25 @@ namespace Dolittle.SDK
                 CultureInfo.InvariantCulture);
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
+            RegisterEventTypes(methodCaller, executionContext, eventTypes);
+            _aggregateRootsBuilder.Build(new AggregateRoots(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
 
-            var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,
                 methodCaller,
                 executionContext,
                 _loggerFactory);
 
-            var serializer = new EventContentSerializer(eventTypes);
+            Func<JsonSerializerSettings> jsonSerializerSettingsProvider = () =>
+            {
+                var settings = new JsonSerializerSettings();
+                _jsonSerializerSettingsBuilder?.Invoke(settings);
+                return settings;
+            };
+
+            var serializer = new EventContentSerializer(
+                eventTypes,
+                jsonSerializerSettingsProvider);
             var eventToProtobufConverter = new EventToProtobufConverter(serializer);
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
@@ -341,6 +373,9 @@ namespace Dolittle.SDK
                 _loggerFactory,
                 _cancellation);
         }
+
+        Task RegisterEventTypes(MethodCaller methodCaller, ExecutionContext executionContext, EventTypes eventTypes)
+            => new Events.Internal.EventTypes(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypes>()).Register(eventTypes, _cancellation);
 
         async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
         {

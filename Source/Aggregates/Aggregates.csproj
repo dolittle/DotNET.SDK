@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Aggregates</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Aggregates</RootNamespace>
   </PropertyGroup>
     
   <ItemGroup>

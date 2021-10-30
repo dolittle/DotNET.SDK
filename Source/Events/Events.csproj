@@ -4,10 +4,11 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Events</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)"/>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
         <PackageReference Include="System.Collections.Immutable" Version="$(SystemImmutableVersion)" />

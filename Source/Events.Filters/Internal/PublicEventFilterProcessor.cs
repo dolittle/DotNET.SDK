@@ -48,7 +48,7 @@ namespace Dolittle.SDK.Events.Filters.Internal
         protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
         {
             var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
-            return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.ToProtobuf() };
+            return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.Value };
         }
     }
 }

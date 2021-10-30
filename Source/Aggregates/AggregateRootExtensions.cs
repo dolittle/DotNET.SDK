@@ -46,7 +46,7 @@ namespace Dolittle.SDK.Aggregates
             var aggregateRootType = aggregateRoot.GetType();
             var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
             if (aggregateRootAttribute == null) throw new MissingAggregateRootAttribute(aggregateRootType);
-            return aggregateRootAttribute.Id;
+            return aggregateRootAttribute.Type.Id;
         }
 
         static Dictionary<Type, MethodInfo> GetHandleMethodsFor(Type aggregateRootType)
