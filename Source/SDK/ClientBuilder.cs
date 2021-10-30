@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using BaselineTypeDiscovery;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Embeddings.Builder;
@@ -164,6 +166,25 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Registers all artifacts by scanning all assemblies.
+        /// </summary>
+        /// <param name="assemblyFilter">The filter for assemblies.</param>
+        /// <param name="includeExeFiles">Whether or not to also load assemblies from .exe files.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithAllArtifacts(Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
+            => WithAllScannedAssemblies(
+                asm =>
+                {
+                    _embeddingsBuilder.RegisterAllFrom(asm);
+                    _projectionsBuilder.RegisterAllFrom(asm);
+                    _aggregateRootsBuilder.RegisterAllFrom(asm);
+                    _eventHandlersBuilder.RegisterAllFrom(asm);
+                    _eventTypesBuilder.RegisterAllFrom(asm);
+                },
+                assemblyFilter,
+                includeExeFiles);
+
+        /// <summary>
         /// Sets the event types through the <see cref="EventTypesBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -175,7 +196,16 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the event types through the <see cref="EventTypesBuilder" />.
+        /// Registers all event types by scanning all assemblies.
+        /// </summary>
+        /// <param name="assemblyFilter">The filter for assemblies.</param>
+        /// <param name="includeExeFiles">Whether or not to also load assemblies from .exe files.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEventTypes(Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
+            => WithAllScannedAssemblies(asm => _eventTypesBuilder.RegisterAllFrom(asm), assemblyFilter, includeExeFiles);
+
+        /// <summary>
+        /// Sets the aggregate roots through the <see cref="EventTypesBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
@@ -184,6 +214,15 @@ namespace Dolittle.SDK
             callback(_aggregateRootsBuilder);
             return this;
         }
+
+        /// <summary>
+        /// Registers all aggregate roots by scanning all assemblies.
+        /// </summary>
+        /// <param name="assemblyFilter">The filter for assemblies.</param>
+        /// <param name="includeExeFiles">Whether or not to also load assemblies from .exe files.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithAggregateRoots(Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
+            => WithAllScannedAssemblies(asm => _aggregateRootsBuilder.RegisterAllFrom(asm), assemblyFilter, includeExeFiles);
 
         /// <summary>
         /// Sets the filters through the <see cref="EventFiltersBuilder" />.
@@ -208,18 +247,13 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Registers all event handlers found in all assemblies in <see cref="AppDomain" />.
+        /// Registers all event handlers by scanning all assemblies.
         /// </summary>
+        /// <param name="assemblyFilter">The filter for assemblies.</param>
+        /// <param name="includeExeFiles">Whether or not to also load assemblies from .exe files.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventHandlers()
-        {
-            foreach (var assembly in GetAssemblies())
-            {
-                _eventHandlersBuilder.RegisterAllFrom(assembly);
-            }
-
-            return this;
-        }
+        public ClientBuilder WithEventHandlers(Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
+            => WithAllScannedAssemblies(asm => _eventHandlersBuilder.RegisterAllFrom(asm), assemblyFilter, includeExeFiles);
 
         /// <summary>
         /// Sets the event handlers through the <see cref="ProjectionsBuilder" />.
@@ -233,6 +267,15 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Registers all projections by scanning all assemblies.
+        /// </summary>
+        /// <param name="assemblyFilter">The filter for assemblies.</param>
+        /// <param name="includeExeFiles">Whether or not to also load assemblies from .exe files.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithProjections(Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
+            => WithAllScannedAssemblies(asm => _projectionsBuilder.RegisterAllFrom(asm), assemblyFilter, includeExeFiles);
+
+        /// <summary>
         /// Sets the embeddings through the <see cref="EmbeddingsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -242,6 +285,15 @@ namespace Dolittle.SDK
             callback(_embeddingsBuilder);
             return this;
         }
+
+        /// <summary>
+        /// Registers all embeddings by scanning all assemblies.
+        /// </summary>
+        /// <param name="assemblyFilter">The filter for assemblies.</param>
+        /// <param name="includeExeFiles">Whether or not to also load assemblies from .exe files.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithEmbeddings(Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
+            => WithAllScannedAssemblies(asm => _embeddingsBuilder.RegisterAllFrom(asm), assemblyFilter, includeExeFiles);
 
         /// <summary>
         /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
@@ -374,10 +426,7 @@ namespace Dolittle.SDK
                 _cancellation);
         }
 
-        Task RegisterEventTypes(MethodCaller methodCaller, ExecutionContext executionContext, EventTypes eventTypes)
-            => new Events.Internal.EventTypes(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypes>()).Register(eventTypes, _cancellation);
-
-        async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
+        static async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
         {
             var retryCount = 0;
 
@@ -400,16 +449,26 @@ namespace Dolittle.SDK
             }
         }
 
-        List<Assembly> GetAssemblies()
+        ClientBuilder WithAllScannedAssemblies(Action<Assembly> doWithAssembly, Func<Assembly, bool> assemblyFilter = default, bool includeExeFiles = false)
         {
-            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-            var loadedPaths = loadedAssemblies.Select(a => a.Location).ToArray();
+            foreach (var assembly in GetAssemblies(assemblyFilter, includeExeFiles))
+            {
+                doWithAssembly(assembly);
+            }
 
-            var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
-            var toLoad = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase)).ToList();
+            return this;
+        }
 
-            toLoad.ForEach(path => loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path))));
-            return loadedAssemblies;
+        Task RegisterEventTypes(MethodCaller methodCaller, ExecutionContext executionContext, EventTypes eventTypes)
+            => new Events.Internal.EventTypes(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypes>()).Register(eventTypes, _cancellation);
+
+        IEnumerable<Assembly> GetAssemblies(Func<Assembly, bool> assemblyFilter, bool includeExeFiles)
+        {
+            var logger = _loggerFactory.CreateLogger<ClientBuilder>();
+            return AssemblyFinder.FindAssemblies(
+                failedFile => logger.LogWarning("Failed to load assembly from file {File}", failedFile),
+                assemblyFilter ?? (_ => true),
+                includeExeFiles);
         }
     }
 }
