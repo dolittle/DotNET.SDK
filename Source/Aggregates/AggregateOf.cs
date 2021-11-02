@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace Dolittle.SDK.Aggregates
     {
         readonly IEventStore _eventStore;
         readonly IEventTypes _eventTypes;
+        readonly IAggregateRoots _aggregateRoots;
         readonly ILoggerFactory _loggerFactory;
         readonly ILogger _logger;
 
@@ -24,10 +26,12 @@ namespace Dolittle.SDK.Aggregates
         /// </summary>
         /// <param name="eventStore">The <see cref="IEventStore" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+        /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILogger" />.</param>
-        public AggregateOf(IEventStore eventStore, IEventTypes eventTypes, ILoggerFactory loggerFactory)
+        public AggregateOf(IEventStore eventStore, IEventTypes eventTypes, IAggregateRoots aggregateRoots, ILoggerFactory loggerFactory)
         {
             _eventTypes = eventTypes;
+            _aggregateRoots = aggregateRoots;
             _eventStore = eventStore;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<AggregateOf<TAggregateRoot>>();
@@ -43,6 +47,7 @@ namespace Dolittle.SDK.Aggregates
                 eventSourceId,
                 _eventStore,
                 _eventTypes,
+                _aggregateRoots,
                 _loggerFactory.CreateLogger<AggregateRootOperations<TAggregateRoot>>());
     }
 }
