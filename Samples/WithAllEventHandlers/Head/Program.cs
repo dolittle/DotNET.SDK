@@ -4,6 +4,7 @@
 
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
+using Handlers;
 
 namespace Kitchen
 {
@@ -14,12 +15,11 @@ namespace Kitchen
             var client = Client
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
-                    eventTypes.Register<DishPrepared>())
+                    eventTypes.Register<Events.DishPrepared>())
                 .WithEventHandlers()
                 .Build();
 
-            var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
-
+            var preparedTaco = new Events.DishPrepared("Bean Blaster Taco", "Mr. Taco");
             client.EventStore
                 .ForTenant(TenantId.Development)
                 .Commit(eventsBuilder =>
@@ -29,6 +29,7 @@ namespace Kitchen
 
             // Blocks until the EventHandlers are finished, i.e. forever
             client.Start().Wait();
+            System.Console.WriteLine("Done waiting");
         }
     }
 }

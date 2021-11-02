@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 
 namespace Dolittle.SDK.Artifacts
 {
@@ -14,6 +15,11 @@ namespace Dolittle.SDK.Artifacts
         where TArtifact : Artifact<TId>
         where TId : ArtifactId
     {
+        /// <summary>
+        /// Gets all artifacts.
+        /// </summary>
+        IEnumerable<TArtifact> All { get; }
+
         /// <summary>
         /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
         /// </summary>
