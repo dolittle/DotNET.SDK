@@ -2,91 +2,118 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Dolittle.Runtime.Aggregates.Contracts;
+using System.Reflection;
+using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
-using Dolittle.SDK.Protobuf;
-using Dolittle.SDK.Services;
-using Dolittle.Services.Contracts;
 using Microsoft.Extensions.Logging;
-using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Aggregates.Internal
 {
     /// <summary>
-    /// Represents a system that knows how to register aggregate roots with the Runtime.
+    /// Represents an implementation of <see cref="IAggregateRoots"/>.
     /// </summary>
-    public class AggregateRoots
+    public class AggregateRoots : IAggregateRoots
     {
-        static readonly AggregateRootsRegisterAliasMethod _aliasMethod = new AggregateRootsRegisterAliasMethod();
-        readonly IPerformMethodCalls _caller;
-        readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AggregateRoots"/> class.
         /// </summary>
-        /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
-        /// <param name="executionContext">Tha base <see cref="ExecutionContext"/>.</param>
-        /// <param name="logger">The <see cref="ILogger"/> to use.</param>
-        public AggregateRoots(IPerformMethodCalls caller, ExecutionContext executionContext, ILogger logger)
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public AggregateRoots(ILogger logger)
         {
-            _caller = caller;
-            _executionContext = executionContext;
             _logger = logger;
         }
 
-        /// <summary>
-        /// Registers event types.
-        /// </summary>
-        /// <param name="aggregateRootTypes">The event types to register.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task Register(IEnumerable<AggregateRootType> aggregateRootTypes, CancellationToken cancellationToken)
-            => Task.WhenAll(aggregateRootTypes.Select(CreateRequest).Select(_ => Register(_, cancellationToken)));
-
-        AggregateRootAliasRegistrationRequest CreateRequest(AggregateRootType aggregateRootType)
-            => new AggregateRootAliasRegistrationRequest
-            {
-                Alias = aggregateRootType.HasAlias ? aggregateRootType.Alias : null,
-                AggregateRoot = aggregateRootType.ToProtobuf(),
-                CallContext = new CallRequestContext
-                {
-                    ExecutionContext = _executionContext.ToProtobuf(),
-                    HeadId = HeadId.NotSet.ToProtobuf()
-                }
-            };
-
-        async Task Register(AggregateRootAliasRegistrationRequest request, CancellationToken cancellationToken)
+        /// <inheritdoc />
+        public Try<TAggregate> TryGet<TAggregate>(EventSourceId eventSourceId)
+            where TAggregate : AggregateRoot
         {
             _logger.LogDebug(
-                "Registering Aggregate Root {AggregateRoot} with Alias {Alias}",
-                request.AggregateRoot.Id.ToGuid(),
-                request.Alias);
-            try
+                "Getting aggregate root {AggregateRoot} with event source id {EventSource}",
+                typeof(TAggregate),
+                eventSourceId);
+            if (InvalidConstructor(typeof(TAggregate), out var constructor, out var exception))
             {
-                var response = await _caller.Call(_aliasMethod, request, cancellationToken).ConfigureAwait(false);
-                if (response.Failure != null)
-                {
-                    _logger.LogWarning(
-                        "An error occurred while registering Aggregate Root {AggregateRoot} with Alias {Alias} because {Reason}",
-                        request.AggregateRoot.Id.ToGuid(),
-                        request.Alias,
-                        response.Failure.Reason);
-                }
+                return exception;
             }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(
-                    ex,
-                    "An error occurred while registering Aggregate Root {AggregateRoot} with Alias {Alias}",
-                    request.AggregateRoot.Id.ToGuid(),
-                    request.Alias);
-            }
+
+            return CreateInstance<TAggregate>(eventSourceId, constructor);
         }
+
+        static Try<TAggregate> CreateInstance<TAggregate>(EventSourceId eventSourceId, ConstructorInfo constructor)
+            where TAggregate : AggregateRoot
+        {
+            var aggregateRoot = constructor.Invoke(new object[] { eventSourceId }) as TAggregate;
+            if (CouldNotCreateAggregateRoot(aggregateRoot, out var exception))
+            {
+                return exception;
+            }
+
+            return aggregateRoot;
+        }
+
+        static bool InvalidConstructor(Type type, out ConstructorInfo constructor, out Exception ex)
+        {
+            constructor = default;
+            if (NotOnlyOneConstructor(type, out ex))
+            {
+                return true;
+            }
+
+            constructor = type.GetConstructors().Single();
+            return ConstructorIsInvalid(type, constructor, out ex);
+        }
+
+        static bool NotOnlyOneConstructor(Type type, out Exception ex)
+        {
+            ex = default;
+            if (ThereIsOnlyOneConstructor(type))
+            {
+                return false;
+            }
+
+            ex = new InvalidAggregateRootConstructorSignature(type, "expected only a single constructor");
+            return true;
+        }
+
+        static bool ConstructorIsInvalid(Type type, ConstructorInfo constructor, out Exception ex)
+        {
+            ex = default;
+            return IncorrectParameter(type, constructor.GetParameters(), out ex);
+        }
+
+        static bool IncorrectParameter(Type type, ParameterInfo[] parameters, out Exception ex)
+        {
+            ex = default;
+            if (ThereIsOnlyOneParameter(parameters) && ParameterTypeIsGuidOrEventSourceId(parameters))
+            {
+                return false;
+            }
+
+            ex = new InvalidAggregateRootConstructorSignature(type, $"expected only one parameter and it must be of type {typeof(Guid)} or {typeof(EventSourceId)}");
+            return true;
+        }
+
+        static bool CouldNotCreateAggregateRoot<TAggregate>(TAggregate aggregateRoot, out Exception ex)
+            where TAggregate : AggregateRoot
+        {
+            ex = default;
+            if (aggregateRoot != default)
+            {
+                return false;
+            }
+
+            ex = new CouldNotCreateAggregateRootInstance(typeof(TAggregate));
+            return true;
+        }
+
+        static bool ThereIsOnlyOneConstructor(Type type) => type.GetConstructors().Length == 1;
+
+        static bool ThereIsOnlyOneParameter(ParameterInfo[] parameters) => parameters.Length == 1;
+
+        static bool ParameterTypeIsGuidOrEventSourceId(ParameterInfo[] parameters)
+            => parameters[0].ParameterType == typeof(Guid) || parameters[0].ParameterType == typeof(EventSourceId);
     }
 }
