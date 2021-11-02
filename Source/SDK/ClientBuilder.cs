@@ -347,7 +347,7 @@ namespace Dolittle.SDK
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
             RegisterEventTypes(methodCaller, executionContext, eventTypes);
-            _aggregateRootsBuilder.Build(new AggregateRoots(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
+            _aggregateRootsBuilder.Build(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
 
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,
