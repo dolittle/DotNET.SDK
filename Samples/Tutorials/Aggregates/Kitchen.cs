@@ -11,7 +11,7 @@ namespace Kitchen
     [AggregateRoot("01ad9a9f-711f-47a8-8549-43320f782a1e")]
     public class Kitchen : AggregateRoot
     {
-        int _counter;
+        int _ingredients = 2;
 
         public Kitchen(EventSourceId eventSource)
             : base(eventSource)
@@ -20,11 +20,12 @@ namespace Kitchen
 
         public void PrepareDish(string dish, string chef)
         {
+            if (_ingredients <= 0) throw new Exception("We have run out of ingredients, sorry!");
             Apply(new DishPrepared(dish, chef));
-            Console.WriteLine($"Kitchen Aggregate {EventSourceId} has applied {_counter} {typeof(DishPrepared)} events");
+            Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
         }
 
         void On(DishPrepared @event)
-            => _counter++;
+            => _ingredients--;
     }
 }
