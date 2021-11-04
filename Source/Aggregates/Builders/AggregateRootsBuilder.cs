@@ -75,14 +75,6 @@ namespace Dolittle.SDK.Aggregates.Builders
         static bool IsAggregateRoot(Type type)
             => type.GetCustomAttributes(typeof(AggregateRootAttribute), true).FirstOrDefault() is AggregateRootAttribute;
 
-        static void ThrowIfAttributeSpecifiesADifferentAggregateRootType(Type type, AggregateRootType aggregateRootType)
-        {
-            if (TryGetAggregateRootTypeFromAttribute(type, out var attributeType) && attributeType != aggregateRootType)
-            {
-                throw new ProvidedAggregateRootTypeDoesNotMatchAggregateRootTypeFromAttribute(aggregateRootType, attributeType, type);
-            }
-        }
-
         static bool TryGetAggregateRootTypeFromAttribute(Type type, out AggregateRootType aggregateRootType)
         {
             if (Attribute.GetCustomAttribute(type, typeof(AggregateRootAttribute)) is AggregateRootAttribute attribute)
@@ -103,7 +95,6 @@ namespace Dolittle.SDK.Aggregates.Builders
 
         void AddAssociation(Type type, AggregateRootType aggregateRootType)
         {
-            ThrowIfAttributeSpecifiesADifferentAggregateRootType(type, aggregateRootType);
             _associations.Add((type, aggregateRootType));
         }
 

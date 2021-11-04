@@ -15,8 +15,9 @@ namespace Dolittle.SDK.Events
         /// </summary>
         /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
         public EventType(EventTypeId id)
-            : this(id, alias: null)
+            : base(id)
         {
+            ThrowIfEventTypeIdIsNull(id);
         }
 
         /// <summary>
@@ -29,6 +30,7 @@ namespace Dolittle.SDK.Events
         {
             ThrowIfEventTypeIdIsNull(id);
             Alias = alias;
+            HasAlias = true;
         }
 
         /// <summary>
@@ -37,8 +39,10 @@ namespace Dolittle.SDK.Events
         /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
         /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="EventType"/>.</param>
         public EventType(EventTypeId id, Generation generation)
-            : this(id, generation, null)
+            : base(id, generation)
         {
+            ThrowIfEventTypeIdIsNull(id);
+            ThrowIfGenerationIsNull(generation);
         }
 
         /// <summary>
@@ -53,6 +57,7 @@ namespace Dolittle.SDK.Events
             ThrowIfEventTypeIdIsNull(id);
             ThrowIfGenerationIsNull(generation);
             Alias = alias;
+            HasAlias = true;
         }
 
         /// <summary>
@@ -63,7 +68,7 @@ namespace Dolittle.SDK.Events
         /// <summary>
         /// Gets a value indicating whether the Event Type has an alias or not.
         /// </summary>
-        public bool HasAlias => Alias?.Value != default;
+        public bool HasAlias { get; }
 
         static void ThrowIfEventTypeIdIsNull(EventTypeId id)
         {
