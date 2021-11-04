@@ -340,6 +340,9 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
+            var aggregateRoots = new AggregateRoots(
+                _loggerFactory.CreateLogger<AggregateRoots>());
+
             return new Client(
                 eventTypes,
                 eventStoreBuilder,
@@ -355,6 +358,7 @@ namespace Dolittle.SDK
                 _embeddingsBuilder,
                 projectionStoreBuilder,
                 embeddings,
+                aggregateRoots,
                 _loggerFactory,
                 _cancellation);
         }

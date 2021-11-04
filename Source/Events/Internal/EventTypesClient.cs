@@ -49,9 +49,9 @@ namespace Dolittle.SDK.Events.Internal
             => Task.WhenAll(eventTypes.Select(CreateRequest).Select(_ => Register(_, cancellationToken)));
 
         EventTypeRegistrationRequest CreateRequest(EventType eventType)
-            => new EventTypeRegistrationRequest
+        {
+            var request = new EventTypeRegistrationRequest
             {
-                Alias = eventType.HasAlias ? eventType.Alias : null,
                 EventType = eventType.ToProtobuf(),
                 CallContext = new CallRequestContext
                 {
@@ -59,6 +59,14 @@ namespace Dolittle.SDK.Events.Internal
                     HeadId = HeadId.NotSet.ToProtobuf()
                 }
             };
+
+            if (eventType.HasAlias)
+            {
+                request.Alias = eventType.Alias;
+            }
+
+            return request;
+        }
 
         async Task Register(EventTypeRegistrationRequest request, CancellationToken cancellationToken)
         {

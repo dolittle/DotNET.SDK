@@ -19,14 +19,34 @@ namespace Dolittle.SDK.Events
         /// <param name="generation">The generation of the <see cref="EventType" />..</param>
         /// <param name="alias">The alias for the <see cref="EventType"/>.</param>
         public EventTypeAttribute(string eventTypeId, uint generation = 0, string alias = default)
-            => EventType = new EventType(
-                Guid.Parse(eventTypeId),
-                generation == 0 ? Generation.First : new Generation { Value = generation },
-                alias);
+        {
+            Identifier = Guid.Parse(eventTypeId);
+            Generation = generation == 0 ? Generation.First : new Generation { Value = generation };
+            if (alias != default)
+            {
+                Alias = alias;
+                HasAlias = true;
+            }
+        }
 
         /// <summary>
-        /// Gets the <see cref="Events.EventType" />.
+        /// Gets the unique identifier for this event type.
         /// </summary>
-        public EventType EventType { get; }
+        public EventTypeId Identifier { get; }
+
+        /// <summary>
+        /// Gets the generation for this event type.
+        /// </summary>
+        public Generation Generation { get;  }
+
+        /// <summary>
+        /// Gets the <see cref="EventTypeAlias"/>.
+        /// </summary>
+        public EventTypeAlias Alias { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this event type has an alias.
+        /// </summary>
+        public bool HasAlias { get; }
     }
 }
