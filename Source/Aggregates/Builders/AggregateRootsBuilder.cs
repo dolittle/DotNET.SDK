@@ -69,7 +69,7 @@ namespace Dolittle.SDK.Aggregates.Builders
         /// <param name="aggregateRoots">The <see cref="Internal.AggregateRootsClient"/>.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task Build(Internal.AggregateRootsClient aggregateRoots, CancellationToken cancellationToken)
+        public Task BuildAndRegister(Internal.AggregateRootsClient aggregateRoots, CancellationToken cancellationToken)
             => aggregateRoots.Register(_associations.Select(_ => _.Item2), cancellationToken);
 
         static bool IsAggregateRoot(Type type)

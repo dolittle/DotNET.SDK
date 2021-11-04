@@ -42,7 +42,7 @@ namespace Dolittle.SDK.Aggregates.Internal
         /// <summary>
         /// Registers event types.
         /// </summary>
-        /// <param name="aggregateRootTypes">The event types to register.</param>
+        /// <param name="aggregateRootTypes">The aggregate root types to register.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task Register(IEnumerable<AggregateRootType> aggregateRootTypes, CancellationToken cancellationToken)
