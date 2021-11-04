@@ -15,7 +15,8 @@ namespace Kitchen
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
                     eventTypes.Register<DishPrepared>())
-                .WithEventHandlers()
+                .WithEventHandlers(builder =>
+                    builder.RegisterEventHandler<DishHandler>())
                 .Build();
 
             var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
