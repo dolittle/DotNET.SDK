@@ -163,13 +163,13 @@ namespace Dolittle.SDK.Events.Builders
         {
             if (Attribute.GetCustomAttribute(type, typeof(EventTypeAttribute)) is EventTypeAttribute attribute)
             {
-                if (!attribute.EventType.HasAlias)
+                if (!attribute.HasAlias)
                 {
-                    eventType = new EventType(attribute.EventType.Id, attribute.EventType.Generation, type.Name);
+                    eventType = new EventType(attribute.Identifier, attribute.Generation, type.Name);
                     return true;
                 }
 
-                eventType = attribute.EventType;
+                eventType = new EventType(attribute.Identifier, attribute.Generation, attribute.Alias);
                 return true;
             }
 

@@ -28,6 +28,7 @@ _site
 *.nuget.props
 
 .vs
+.idea
 
 *.fsx_*
 
