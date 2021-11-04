@@ -346,8 +346,8 @@ namespace Dolittle.SDK
                 CultureInfo.InvariantCulture);
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
-            RegisterEventTypes(methodCaller, executionContext, eventTypes);
-            _aggregateRootsBuilder.Build(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
+            _eventTypesBuilder.BuildAndRegister(new Events.Internal.EventTypesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()), _cancellation);
+            _aggregateRootsBuilder.BuildAndRegister(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
 
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,
@@ -458,9 +458,6 @@ namespace Dolittle.SDK
 
             return this;
         }
-
-        Task RegisterEventTypes(MethodCaller methodCaller, ExecutionContext executionContext, EventTypes eventTypes)
-            => new Events.Internal.EventTypes(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypes>()).Register(eventTypes, _cancellation);
 
         IEnumerable<Assembly> GetAssemblies(Func<Assembly, bool> assemblyFilter, bool includeExeFiles)
         {

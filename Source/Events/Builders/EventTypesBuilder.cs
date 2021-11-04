@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Events.Builders
@@ -124,6 +126,15 @@ namespace Dolittle.SDK.Events.Builders
 
             return this;
         }
+
+        /// <summary>
+        /// Builds the event types by registering them with the Runtime.
+        /// </summary>
+        /// <param name="eventTypes">The <see cref="Internal.EventTypesClient"/>.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public Task BuildAndRegister(Internal.EventTypesClient eventTypes, CancellationToken cancellationToken)
+            => eventTypes.Register(_associations.Select(_ => _.Item2), cancellationToken);
 
         /// <summary>
         /// Adds all the <see cref="Type" /> to <see cref="EventType" /> associations to the provided <see cref="IEventTypes" />.
