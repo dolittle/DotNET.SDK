@@ -17,6 +17,8 @@ namespace Kitchen
                     eventTypes.Register<DishPrepared>())
                 .WithEventHandlers(builder =>
                     builder.RegisterEventHandler<DishHandler>())
+                .WithAggregateRoots(builder =>
+                    builder.Register<Kitchen>())
                 .Build();
 
             client
