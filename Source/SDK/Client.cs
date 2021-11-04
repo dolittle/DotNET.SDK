@@ -64,6 +64,7 @@ namespace Dolittle.SDK
         /// <param name="embeddingsBuilder">The <see cref="EmbeddingsBuilder" />.</param>
         /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
         /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
+        /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -81,6 +82,7 @@ namespace Dolittle.SDK
             EmbeddingsBuilder embeddingsBuilder,
             ProjectionStoreBuilder projectionStoreBuilder,
             IEmbeddings embeddings,
+            IAggregateRoots aggregateRoots,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -98,7 +100,7 @@ namespace Dolittle.SDK
             _embeddingsBuilder = embeddingsBuilder;
             Projections = projectionStoreBuilder;
             Embeddings = embeddings;
-            _aggregateRoots = new AggregateRoots(_loggerFactory.CreateLogger<AggregateRoots>());
+            _aggregateRoots = aggregateRoots;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
