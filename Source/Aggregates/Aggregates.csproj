@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Events/Events.csproj" />
-    <ProjectReference Include="..\Async\Async.csproj" />
+    <ProjectReference Include="../Async/Async.csproj" />
   </ItemGroup>
 
 </Project>
