@@ -5,6 +5,8 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates.Builders;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
@@ -38,6 +40,7 @@ namespace Dolittle.SDK
     public class ClientBuilder
     {
         readonly EventTypesBuilder _eventTypesBuilder;
+        readonly AggregateRootsBuilder _aggregateRootsBuilder;
         readonly EventFiltersBuilder _eventFiltersBuilder;
         readonly EventHandlersBuilder _eventHandlersBuilder;
         readonly ProjectionsBuilder _projectionsBuilder;
@@ -78,6 +81,7 @@ namespace Dolittle.SDK
             _embeddingAssociations = new EmbeddingReadModelTypeAssociations();
 
             _eventTypesBuilder = new EventTypesBuilder();
+            _aggregateRootsBuilder = new AggregateRootsBuilder();
             _eventFiltersBuilder = new EventFiltersBuilder();
             _eventHandlersBuilder = new EventHandlersBuilder();
             _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
@@ -170,6 +174,17 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Sets the aggregate roots through the <see cref="EventTypesBuilder" />.
+        /// </summary>
+        /// <param name="callback">The builder callback.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public ClientBuilder WithAggregateRoots(Action<AggregateRootsBuilder> callback)
+        {
+            callback(_aggregateRootsBuilder);
+            return this;
+        }
+
+        /// <summary>
         /// Sets the filters through the <see cref="EventFiltersBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
@@ -214,7 +229,7 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Sets the event handlers through the <see cref="SubscriptionsBuilder" />.
+        /// Sets the event horizons through the <see cref="SubscriptionsBuilder" />.
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
@@ -253,6 +268,7 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="Client"/>.</returns>
         public Client Build()
         {
+            var methodCaller = new MethodCaller(_host, _port);
             var executionContext = new ExecutionContext(
                 _microserviceId,
                 TenantId.System,
@@ -263,8 +279,9 @@ namespace Dolittle.SDK
                 CultureInfo.InvariantCulture);
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
+            _eventTypesBuilder.BuildAndRegister(new Events.Internal.EventTypesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()), _cancellation);
+            _aggregateRootsBuilder.BuildAndRegister(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
 
-            var methodCaller = new MethodCaller(_host, _port);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,
                 methodCaller,
@@ -323,6 +340,9 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
+            var aggregateRoots = new AggregateRoots(
+                _loggerFactory.CreateLogger<AggregateRoots>());
+
             return new Client(
                 eventTypes,
                 eventStoreBuilder,
@@ -338,11 +358,12 @@ namespace Dolittle.SDK
                 _embeddingsBuilder,
                 projectionStoreBuilder,
                 embeddings,
+                aggregateRoots,
                 _loggerFactory,
                 _cancellation);
         }
 
-        async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
+        static async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
         {
             var retryCount = 0;
 

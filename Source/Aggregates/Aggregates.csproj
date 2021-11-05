@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Aggregates</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Aggregates</RootNamespace>
   </PropertyGroup>
     
   <ItemGroup>
@@ -12,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Events/Events.csproj" />
+    <ProjectReference Include="../Async/Async.csproj" />
   </ItemGroup>
 
 </Project>

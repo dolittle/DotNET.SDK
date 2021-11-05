@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../default.props" />
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.SDK.Extensions.Discovery</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <PackageReference Include="BaselineTypeDiscovery" Version="$(BaselineTypeDiscoveryVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../SDK/SDK.csproj" />
+  </ItemGroup>
+
+</Project>

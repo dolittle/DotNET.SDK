@@ -58,7 +58,7 @@ namespace Dolittle.SDK.Protobuf
             var generationType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Generation)).PropertyType;
             try
             {
-                object artifactId = Activator.CreateInstance(idType);
+                var artifactId = Activator.CreateInstance(idType);
                 var artifactIdValueProperty = idType.GetProperty(nameof(ArtifactId.Value));
                 artifactIdValueProperty.SetValue(artifactId, id);
 

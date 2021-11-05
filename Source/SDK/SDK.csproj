@@ -12,7 +12,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="../**/*.csproj" Exclude="../SDK/SDK.csproj" />
+    <ProjectReference Include="../**/*.csproj" Exclude="../Extensions.*/*.csproj;../SDK/SDK.csproj" />
   </ItemGroup>
 
 </Project>

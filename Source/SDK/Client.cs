@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Embeddings.Builder;
@@ -40,6 +41,7 @@ namespace Dolittle.SDK
         readonly EventHorizons _eventHorizons;
         readonly IEventProcessors _eventProcessors;
         readonly IEventProcessingConverter _eventProcessingConverter;
+        readonly IAggregateRoots _aggregateRoots;
         readonly ILoggerFactory _loggerFactory;
         readonly CancellationToken _cancellation;
         IContainer _container;
@@ -62,6 +64,7 @@ namespace Dolittle.SDK
         /// <param name="embeddingsBuilder">The <see cref="EmbeddingsBuilder" />.</param>
         /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
         /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
+        /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -79,6 +82,7 @@ namespace Dolittle.SDK
             EmbeddingsBuilder embeddingsBuilder,
             ProjectionStoreBuilder projectionStoreBuilder,
             IEmbeddings embeddings,
+            IAggregateRoots aggregateRoots,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -96,6 +100,7 @@ namespace Dolittle.SDK
             _embeddingsBuilder = embeddingsBuilder;
             Projections = projectionStoreBuilder;
             Embeddings = embeddings;
+            _aggregateRoots = aggregateRoots;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -188,7 +193,7 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="IAggregateRootOperations{TAggregate}" />.</returns>
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<EventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
-            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _loggerFactory)
+            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _aggregateRoots, _loggerFactory)
                     .Create();
 
         /// <summary>
@@ -200,7 +205,7 @@ namespace Dolittle.SDK
         /// <returns>The <see cref="IAggregateRootOperations{TAggregate}" />.</returns>
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<EventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
-            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _loggerFactory)
+            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _aggregateRoots, _loggerFactory)
                     .Get(eventSource);
 
         /// <inheritdoc/>

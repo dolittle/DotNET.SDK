@@ -88,7 +88,7 @@ namespace Dolittle.SDK.Events.Processing
                         continue;
                     }
 
-                    _logger.LogDebug("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
+                    _logger.LogInformation("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
                     await client.Handle(eventProcessor, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception exception)

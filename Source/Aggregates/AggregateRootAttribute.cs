@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates
@@ -16,11 +17,15 @@ namespace Dolittle.SDK.Aggregates
         /// Initializes a new instance of the <see cref="AggregateRootAttribute"/> class.
         /// </summary>
         /// <param name="id">The unique identifier.</param>
-        public AggregateRootAttribute(string id) => Id = id;
+        /// <param name="alias">The alias for the aggregate root.</param>
+        public AggregateRootAttribute(string id, string alias = default)
+        {
+            Type = new AggregateRootType(id, Generation.First, alias);
+        }
 
         /// <summary>
-        /// Gets the <see cref="AggregateRootId" />.
+        /// Gets the <see cref="AggregateRootType"/>.
         /// </summary>
-        public AggregateRootId Id { get; }
+        public AggregateRootType Type { get; }
     }
 }

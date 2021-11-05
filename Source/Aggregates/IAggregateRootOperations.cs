@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Dolittle.SDK.Aggregates
@@ -18,14 +19,16 @@ namespace Dolittle.SDK.Aggregates
         /// Perform an operation on an <see cref="AggregateRoot"/>.
         /// </summary>
         /// <param name="method"><see cref="Action{T}">Method</see> to perform.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>The <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task Perform(Action<TAggregate> method);
+        Task Perform(Action<TAggregate> method, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Perform an asynchronous operation on an <see cref="AggregateRoot"/>.
         /// </summary>
         /// <param name="method"><see cref="Action{T}">Method</see> to perform.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
         /// <returns>The <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task Perform(Func<TAggregate, Task> method);
+        Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default);
     }
 }
