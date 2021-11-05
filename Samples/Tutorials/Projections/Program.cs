@@ -35,20 +35,20 @@ namespace Kitchen
             var eventStore = client.EventStore.ForTenant(TenantId.Development);
 
             await eventStore.Commit(_ =>
-                    _.CreateEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"))
-                        .FromEventSource("Dolittle Tacos"))
+                _.CreateEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
             await eventStore.Commit(_ =>
-                    _.CreateEvent(new DishPrepared("Bean Blaster Taco", "Mrs. Tex Mex"))
-                        .FromEventSource("Dolittle Tacos"))
+                _.CreateEvent(new DishPrepared("Bean Blaster Taco", "Mrs. Tex Mex"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
             await eventStore.Commit(_ =>
-                    _.CreateEvent(new DishPrepared("Avocado Artillery Tortilla", "Mr. Taco"))
-                        .FromEventSource("Dolittle Tacos"))
+                _.CreateEvent(new DishPrepared("Avocado Artillery Tortilla", "Mr. Taco"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
             await eventStore.Commit(_ =>
-                    _.CreateEvent(new DishPrepared("Chili Canon Wrap", "Mrs. Tex Mex"))
-                        .FromEventSource("Dolittle Tacos"))
+                _.CreateEvent(new DishPrepared("Chili Canon Wrap", "Mrs. Tex Mex"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
 
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
