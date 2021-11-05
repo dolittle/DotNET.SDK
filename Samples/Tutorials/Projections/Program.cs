@@ -17,8 +17,6 @@ namespace Kitchen
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
                     eventTypes.Register<DishPrepared>())
-                .WithEventHandlers(builder =>
-                    builder.RegisterEventHandler<DishHandler>())
                 .WithProjections(builder => {
                     builder.RegisterProjection<DishCounter>();
 
@@ -38,19 +36,19 @@ namespace Kitchen
 
             await eventStore.Commit(_ =>
                 _.CreateEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"))
-                .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
             await eventStore.Commit(_ =>
                 _.CreateEvent(new DishPrepared("Bean Blaster Taco", "Mrs. Tex Mex"))
-                .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
             await eventStore.Commit(_ =>
                 _.CreateEvent(new DishPrepared("Avocado Artillery Tortilla", "Mr. Taco"))
-                .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
             await eventStore.Commit(_ =>
                 _.CreateEvent(new DishPrepared("Chili Canon Wrap", "Mrs. Tex Mex"))
-                .FromEventSource("bfe6f6e4-ada2-4344-8a3b-65a3e1fe16e9"))
+                .FromEventSource("Dolittle Tacos"))
                 .ConfigureAwait(false);
 
             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);

@@ -3,6 +3,7 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/embeddings/
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
@@ -41,15 +42,17 @@ namespace Kitchen
                 .Update(updatedEmployee.Name, updatedEmployee);
             Console.WriteLine($"Updated {updatedEmployee.Name}.");
 
-            var mrTaco = client.Embeddings
+            var mrTaco = await client.Embeddings
                 .ForTenant(TenantId.Development)
-                .Get<Employee>("Mr. Taco");
-            var allEmployees = client.Embeddings
+                .Get<Employee>("Mr. Taco")
+                .ConfigureAwait(false);
+            Console.WriteLine($"Mr. Taco is now working at {mrTaco.State.Workplace}");
+
+            var allEmployeeNames = await client.Embeddings
                 .ForTenant(TenantId.Development)
-                .GetAll<Employee>();
-            var employeeKeys = client.Embeddings
-                .ForTenant(TenantId.Development)
-                .GetKeys<Employee>();
+                .GetKeys<Employee>()
+                .ConfigureAwait(false);
+            Console.WriteLine($"All current employees are {string.Join(",", allEmployeeNames)}");
 
             await client.Embeddings
                 .ForTenant(TenantId.Development)
