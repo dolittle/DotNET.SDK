@@ -1,3 +1,26 @@
+# [11.0.0] - 2021-11-5 [PR: #77](https://github.com/dolittle/DotNET.SDK/pull/77)
+## Summary
+
+Fixes a problem with aggregates so that it now can be used in an async way. Registration of event types and aggregate roots to the Runtime.
+
+
+### Added
+
+- Registration of alias for event types through the attribute or builder
+- Registration of alias fro aggregate roots through the attribute
+- Default alias registration for event type classes and aggregate root classes. Default is the name of the class
+- Extension Methods on the ClientBuilder for registering all event handlers, event types, projections, embeddings, aggregate roots by discovering them through the assemblies and DLLs in the solution 
+
+### Changed
+
+- Log Level for registered Event Processors to Information
+- The Getting Started, Aggregates, Projections and Embeddings tutorials updated to reflect new features of the SDK
+
+### Fixed
+
+- A problem where you couldn't use an aggregate root in an asynchronous manner
+
+
 # [10.1.0] - 2021-10-21 [PR: #76](https://github.com/dolittle/DotNET.SDK/pull/76)
 ## Summary
 
