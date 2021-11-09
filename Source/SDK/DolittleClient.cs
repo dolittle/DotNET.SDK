@@ -22,7 +22,6 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
-using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +30,7 @@ namespace Dolittle.SDK
     /// <summary>
     /// Represents the client for working with the Dolittle Runtime.
     /// </summary>
-    public class Client : IDisposable
+    public class DolittleClient : IDisposable, IDolittleClient
     {
         readonly ProcessingCoordinator _processingCoordinator;
         readonly EventHandlersBuilder _eventHandlersBuilder;
@@ -50,7 +49,7 @@ namespace Dolittle.SDK
         bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Client" /> class.
+        /// Initializes a new instance of the <see cref="DolittleClient" /> class.
         /// </summary>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
         /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
@@ -70,7 +69,7 @@ namespace Dolittle.SDK
         /// <param name="tenants">The <see cref="ITenants"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
-        public Client(
+        public DolittleClient(
             IEventTypes eventTypes,
             EventStoreBuilder eventStoreBuilder,
             EventHorizons eventHorizons,
@@ -145,25 +144,19 @@ namespace Dolittle.SDK
         /// Create a client builder for a Microservice.
         /// </summary>
         /// <param name="microserviceId">The unique identifier for the microservice.</param>
-        /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
-        public static ClientBuilder ForMicroservice(MicroserviceId microserviceId)
-            => new ClientBuilder(microserviceId);
+        /// <returns>The <see cref="DolittleClientBuilder"/> to build the <see cref="DolittleClient"/> from.</returns>
+        public static DolittleClientBuilder ForMicroservice(MicroserviceId microserviceId)
+            => new DolittleClientBuilder(microserviceId);
 
-        /// <summary>
-        /// /// Sets the <see cref="IContainer" /> to use for inversion of control.
-        /// </summary>
-        /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
-        /// <returns>The client builder for continuation.</returns>
-        public Client WithContainer(IContainer container)
+
+        /// <inheritdoc />
+        public IDolittleClient WithContainer(IContainer container)
         {
             _container = container;
             return this;
         }
 
-        /// <summary>
-        /// Start the client.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> that completes when the client has started. </returns>
+        /// <inheritdoc/>
         public Task Start()
         {
             _eventHandlersBuilder.BuildAndRegister(
@@ -195,24 +188,13 @@ namespace Dolittle.SDK
             return _processingCoordinator.Completion;
         }
 
-        /// <summary>
-        /// Gets the <see cref="IAggregateRootOperations{TAggregate}" /> for a new aggregate of the specificied <typeparamref name="TAggregateRoot"/>.
-        /// </summary>
-        /// <param name="buildEventStore">The <see cref="Func{T, TResult}" /> for creating the <see cref="IEventStore" />.</param>
-        /// <typeparam name="TAggregateRoot">The <see cref="Type" /> of the <see cref="AggregateRoot" />.</typeparam>
-        /// <returns>The <see cref="IAggregateRootOperations{TAggregate}" />.</returns>
+        /// <inheritdoc />
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<EventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
             => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _aggregateRoots, _loggerFactory)
                     .Create();
 
-        /// <summary>
-        /// Gets the <see cref="IAggregateRootOperations{TAggregate}" /> for a new aggregate of the specificied <typeparamref name="TAggregateRoot"/>.
-        /// </summary>
-        /// <param name="eventSource">The <see cref="EventSourceId" />.</param>
-        /// <param name="buildEventStore">The <see cref="Func{T, TResult}" /> for creating the <see cref="IEventStore" />.</param>
-        /// <typeparam name="TAggregateRoot">The <see cref="Type" /> of the <see cref="AggregateRoot" />.</typeparam>
-        /// <returns>The <see cref="IAggregateRootOperations{TAggregate}" />.</returns>
+        /// <inheritdoc />
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<EventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
             => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _aggregateRoots, _loggerFactory)
