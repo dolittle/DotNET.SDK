@@ -22,6 +22,7 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK
@@ -65,6 +66,7 @@ namespace Dolittle.SDK
         /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
         /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
         /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
+        /// <param name="tenants">The <see cref="ITenants"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public Client(
@@ -83,6 +85,7 @@ namespace Dolittle.SDK
             ProjectionStoreBuilder projectionStoreBuilder,
             IEmbeddings embeddings,
             IAggregateRoots aggregateRoots,
+            ITenants tenants,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -101,6 +104,7 @@ namespace Dolittle.SDK
             Projections = projectionStoreBuilder;
             Embeddings = embeddings;
             _aggregateRoots = aggregateRoots;
+            Tenants = tenants;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -132,7 +136,12 @@ namespace Dolittle.SDK
         public IEventHorizons EventHorizons => _eventHorizons;
 
         /// <summary>
-        /// Create a client builder for a Miroservice.
+        /// Gets the <see cref="ITenants"/>.
+        /// </summary>
+        public ITenants Tenants { get; }
+
+        /// <summary>
+        /// Create a client builder for a Microservice.
         /// </summary>
         /// <param name="microserviceId">The unique identifier for the microservice.</param>
         /// <returns>The <see cref="ClientBuilder"/> to build the <see cref="Client"/> from.</returns>
