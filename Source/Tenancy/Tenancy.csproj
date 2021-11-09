@@ -6,8 +6,13 @@
     <AssemblyName>Dolittle.SDK.Tenancy</AssemblyName>
   </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
+    </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="../Services/Services.csproj" />
   </ItemGroup>
 
 </Project>
