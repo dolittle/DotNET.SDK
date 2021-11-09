@@ -35,7 +35,7 @@ namespace Dolittle.SDK.Tenancy.Client.Internal
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Tenant>> GetAll(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Tenant>> GetAll(CancellationToken cancellationToken = default)
         {
             _logger.LogDebug("Getting all Tenants");
             try

@@ -18,6 +18,6 @@ namespace Dolittle.SDK.Tenancy.Client
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="FailedToGetAllTenants">Exception that gets thrown when the Runtime failed getting all tenants.</exception>
-        Task<IEnumerable<Tenant>> GetAll(CancellationToken cancellationToken);
+        Task<IEnumerable<Tenant>> GetAll(CancellationToken cancellationToken = default);
     }
 }
