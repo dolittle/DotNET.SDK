@@ -5,7 +5,7 @@ using System;
 using Dolittle.Protobuf.Contracts;
 using Dolittle.SDK.Protobuf;
 
-namespace Dolittle.SDK.Tenancy
+namespace Dolittle.SDK.Tenancy.Client
 {
     /// <summary>
     /// Exception that gets thrown when getting all tenants failed.

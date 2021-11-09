@@ -5,7 +5,7 @@ using Dolittle.Runtime.Tenancy.Contracts;
 using Dolittle.SDK.Services;
 using Grpc.Core;
 
-namespace Dolittle.SDK.Tenancy.Internal
+namespace Dolittle.SDK.Tenancy.Client.Internal
 {
     /// <summary>
     /// Represents a wrapper for gRPC Subscriptions.Subscribe.

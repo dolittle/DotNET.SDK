@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../default.props" />
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.SDK.Tenancy.Client</AssemblyName>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="../Services/Services.csproj" />
+    <ProjectReference Include="../Tenancy/Tenancy.csproj" />
+  </ItemGroup>
+
+</Project>

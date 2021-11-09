@@ -4,9 +4,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Tenancy.Internal;
 
-namespace Dolittle.SDK.Tenancy
+namespace Dolittle.SDK.Tenancy.Client
 {
     /// <summary>
     /// Defines a system that knows about Tenants in the Runtime.

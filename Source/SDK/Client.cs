@@ -23,6 +23,7 @@ using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
+using Dolittle.SDK.Tenancy.Client;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK

@@ -26,7 +26,7 @@ using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
-using Dolittle.SDK.Tenancy.Internal;
+using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;

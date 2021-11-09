@@ -11,9 +11,8 @@ using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
 using Contracts = Dolittle.Runtime.Tenancy.Contracts;
-using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.SDK.Tenancy.Internal
+namespace Dolittle.SDK.Tenancy.Client.Internal
 {
     /// <summary>
     /// Represents a client for <see cref="Contracts.Tenants"/> and an implementation of <see cref="ITenants"/>.
