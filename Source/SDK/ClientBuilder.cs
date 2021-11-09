@@ -26,6 +26,7 @@ using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
+using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
@@ -359,6 +360,7 @@ namespace Dolittle.SDK
                 projectionStoreBuilder,
                 embeddings,
                 aggregateRoots,
+                new TenantsClient(methodCaller, _loggerFactory.CreateLogger<TenantsClient>()),
                 _loggerFactory,
                 _cancellation);
         }
