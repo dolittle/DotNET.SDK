@@ -22,19 +22,16 @@ namespace Dolittle.SDK.Tenancy.Internal
     {
         static readonly TenantsGetAllMethod _method = new TenantsGetAllMethod();
         readonly IPerformMethodCalls _caller;
-        readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TenantsClient"/> class.
         /// </summary>
         /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
-        /// <param name="executionContext">Tha base <see cref="ExecutionContext"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/> to use.</param>
-        public TenantsClient(IPerformMethodCalls caller, ExecutionContext executionContext, ILogger logger)
+        public TenantsClient(IPerformMethodCalls caller, ILogger logger)
         {
             _caller = caller;
-            _executionContext = executionContext;
             _logger = logger;
         }
 
