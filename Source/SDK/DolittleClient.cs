@@ -52,7 +52,7 @@ namespace Dolittle.SDK
         /// Initializes a new instance of the <see cref="DolittleClient" /> class.
         /// </summary>
         /// <param name="eventTypes">The <see cref="EventTypes" />.</param>
-        /// <param name="eventStoreBuilder">The <see cref="EventStoreBuilder" />.</param>
+        /// <param name="eventStoreBuilder">The <see cref="IEventStoreBuilder" />.</param>
         /// <param name="eventHorizons">The <see cref="EventHorizons" />.</param>
         /// <param name="processingCoordinator">The <see cref="ProcessingCoordinator" />.</param>
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
@@ -63,7 +63,7 @@ namespace Dolittle.SDK
         /// <param name="eventsToProtobufConverter">The <see cref="IConvertEventsToProtobuf" />.</param>
         /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder" />.</param>
         /// <param name="embeddingsBuilder">The <see cref="EmbeddingsBuilder" />.</param>
-        /// <param name="projectionStoreBuilder">The <see cref="ProjectionStoreBuilder" />.</param>
+        /// <param name="projectionStoreBuilder">The <see cref="IProjectionStoreBuilder" />.</param>
         /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
         /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="tenants">The <see cref="ITenants"/>.</param>
@@ -71,7 +71,7 @@ namespace Dolittle.SDK
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public DolittleClient(
             IEventTypes eventTypes,
-            EventStoreBuilder eventStoreBuilder,
+            IEventStoreBuilder eventStoreBuilder,
             EventHorizons eventHorizons,
             ProcessingCoordinator processingCoordinator,
             IEventProcessors eventProcessors,
@@ -82,7 +82,7 @@ namespace Dolittle.SDK
             IConvertEventsToProtobuf eventsToProtobufConverter,
             ProjectionsBuilder projectionsBuilder,
             EmbeddingsBuilder embeddingsBuilder,
-            ProjectionStoreBuilder projectionStoreBuilder,
+            IProjectionStoreBuilder projectionStoreBuilder,
             IEmbeddings embeddings,
             IAggregateRoots aggregateRoots,
             ITenants tenants,
@@ -110,34 +110,22 @@ namespace Dolittle.SDK
             _container = new DefaultContainer();
         }
 
-        /// <summary>
-        /// Gets the <see cref="IEventTypes" />.
-        /// </summary>
+        /// <inheritdoc />
         public IEventTypes EventTypes { get; }
 
-        /// <summary>
-        /// Gets the <see cref="EventStoreBuilder" />.
-        /// </summary>
-        public EventStoreBuilder EventStore { get; }
+        /// <inheritdoc />
+        public IEventStoreBuilder EventStore { get; }
 
-        /// <summary>
-        /// Gets the <see cref="ProjectionStoreBuilder" />.
-        /// </summary>
-        public ProjectionStoreBuilder Projections { get; }
+        /// <inheritdoc />
+        public IProjectionStoreBuilder Projections { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IEmbeddings" />.
-        /// </summary>
+        /// <inheritdoc />
         public IEmbeddings Embeddings { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IEventHorizons" />.
-        /// </summary>
+        /// <inheritdoc />
         public IEventHorizons EventHorizons => _eventHorizons;
 
-        /// <summary>
-        /// Gets the <see cref="ITenants"/>.
-        /// </summary>
+        /// <inheritdoc />
         public ITenants Tenants { get; }
 
         /// <summary>
@@ -189,13 +177,13 @@ namespace Dolittle.SDK
         }
 
         /// <inheritdoc />
-        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<EventStoreBuilder, IEventStore> buildEventStore)
+        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<IEventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
             => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _aggregateRoots, _loggerFactory)
                     .Create();
 
         /// <inheritdoc />
-        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<EventStoreBuilder, IEventStore> buildEventStore)
+        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<IEventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
             => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, _aggregateRoots, _loggerFactory)
                     .Get(eventSource);

@@ -11,9 +11,9 @@ using Microsoft.Extensions.Logging;
 namespace Dolittle.SDK.Projections.Store.Builders
 {
     /// <summary>
-    /// Represents a builder for building <see cref="ProjectionStore"/>.
+    /// Represents an implementation of <see cref="IProjectionStoreBuilder"/>.
     /// </summary>
-    public class ProjectionStoreBuilder
+    public class ProjectionStoreBuilder : IProjectionStoreBuilder
     {
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
@@ -47,11 +47,7 @@ namespace Dolittle.SDK.Projections.Store.Builders
             _loggerFactory = loggerFactory;
         }
 
-        /// <summary>
-        /// Gets the projection store <see cref="IProjectionStore"/> for the given tenant.
-        /// </summary>
-        /// <param name="tenantId">The <see cref="TenantId">tenant</see> to get projections for.</param>
-        /// <returns>An <see cref="IProjectionStore"/>.</returns>
+        /// <inheritdoc />
         public IProjectionStore ForTenant(TenantId tenantId)
         {
             var executionContext = _executionContext
