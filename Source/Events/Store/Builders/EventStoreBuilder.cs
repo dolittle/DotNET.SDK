@@ -12,9 +12,9 @@ using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 namespace Dolittle.SDK.Events.Store.Builders
 {
     /// <summary>
-    /// Represents a builder for building <see cref="EventStore"/>.
+    /// Represents an implementation of <see cref="IEventStoreBuilder"/>.
     /// </summary>
-    public class EventStoreBuilder
+    public class EventStoreBuilder : IEventStoreBuilder
     {
         readonly IPerformMethodCalls _caller;
         readonly IConvertEventsToProtobuf _eventToProtobufConverter;
@@ -60,11 +60,7 @@ namespace Dolittle.SDK.Events.Store.Builders
             _loggerFactory = loggerFactory;
         }
 
-        /// <summary>
-        /// Creates an <see cref="IEventStore"/> for the given tenant.
-        /// </summary>
-        /// <param name="tenantId">The <see cref="TenantId">tenant</see> to create the event store for.</param>
-        /// <returns>An <see cref="IEventStore"/>.</returns>
+        /// <inheritdoc />
         public IEventStore ForTenant(TenantId tenantId)
         {
             var executionContext = _executionContext
