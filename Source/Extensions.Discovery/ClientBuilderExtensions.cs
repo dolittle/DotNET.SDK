@@ -66,7 +66,7 @@ namespace Dolittle.SDK
         static IEnumerable<Assembly> GetAllAssemblies()
         {
             return AssemblyFinder.FindAssemblies(
-                failedFile => throw new CouldNotLoadAssemblyFromFile(failedFile),
+                _ => { },
                 _ => true,
                 false);
         }
