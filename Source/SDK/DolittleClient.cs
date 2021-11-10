@@ -136,7 +136,6 @@ namespace Dolittle.SDK
         public static DolittleClientBuilder ForMicroservice(MicroserviceId microserviceId)
             => new DolittleClientBuilder(microserviceId);
 
-
         /// <inheritdoc />
         public IDolittleClient WithContainer(IContainer container)
         {

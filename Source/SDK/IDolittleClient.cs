@@ -33,22 +33,22 @@ namespace Dolittle.SDK
         /// <summary>
         /// Gets the <see cref="IProjectionStoreBuilder" />.
         /// </summary>
-        public IProjectionStoreBuilder Projections { get; }
+        IProjectionStoreBuilder Projections { get; }
 
         /// <summary>
         /// Gets the <see cref="IEmbeddings" />.
         /// </summary>
-        public IEmbeddings Embeddings { get; }
+        IEmbeddings Embeddings { get; }
 
         /// <summary>
         /// Gets the <see cref="IEventHorizons" />.
         /// </summary>
-        public IEventHorizons EventHorizons { get; }
+        IEventHorizons EventHorizons { get; }
 
         /// <summary>
         /// Gets the <see cref="ITenants"/>.
         /// </summary>
-        public ITenants Tenants { get; }
+        ITenants Tenants { get; }
 
         /// <summary>
         /// /// Sets the <see cref="IContainer" /> to use for inversion of control.
