@@ -4,7 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Runtime.Tenancy.Contracts;
+using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
@@ -53,7 +53,7 @@ namespace Dolittle.SDK.Resources.Internal
             _logger.LogDebug("Getting MongoDB resource for {Tenant}", tenantId.Value);
             try
             {
-                var request = new Contracts.GetRequest { CallContext = new CallRequestContext { ExecutionContext = _executionContext.ToProtobuf() } };
+                var request = new Contracts.GetRequest { CallContext = new CallRequestContext { ExecutionContext = _executionContext.ForTenant(tenantId).ToProtobuf() } };
                 var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
                 if (response.Failure == null)
                 {
