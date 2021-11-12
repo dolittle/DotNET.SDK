@@ -43,12 +43,12 @@ namespace Dolittle.SDK.Resources.Internal
         public Task<IMongoDatabase> GetMongoDB(TenantId tenantId, MongoDatabaseSettings databaseSettings = default, CancellationToken cancellationToken = default)
             => GetMongoDB(
                 tenantId,
-                connectionString => new MongoClient(MongoClientSettings.FromConnectionString(connectionString).Freeze()),
+                connectionString => MongoClientSettings.FromConnectionString(connectionString.Url),
                 databaseSettings,
                 cancellationToken);
 
         /// <inheritdoc />
-        public async Task<IMongoDatabase> GetMongoDB(TenantId tenantId, Func<string, MongoClient> createClientFromConnectionString, MongoDatabaseSettings databaseSettings = default, CancellationToken cancellationToken = default)
+        public async Task<IMongoDatabase> GetMongoDB(TenantId tenantId, Func<MongoUrl, MongoClientSettings> createSettingsFromConnectionString, MongoDatabaseSettings databaseSettings = default, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug("Getting MongoDB resource for {Tenant}", tenantId.Value);
             try
@@ -57,8 +57,10 @@ namespace Dolittle.SDK.Resources.Internal
                 var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
                 if (response.Failure == null)
                 {
-                    var client = createClientFromConnectionString(response.ConnectionString);
-                    return client.GetDatabase(response.DatabaseName, databaseSettings);
+                    var mongoUrl = MongoUrl.Create(response.ConnectionString);
+                    _logger.LogDebug("Received MongoDB resource for {Tenant} with connection string {ConnectionString}", tenantId.Value.ToString(), mongoUrl.ToString());
+                    var settings = createSettingsFromConnectionString(mongoUrl);
+                    return new MongoClient(settings.Freeze()).GetDatabase(mongoUrl.DatabaseName, databaseSettings);
                 }
 
                 _logger.LogWarning("An error occurred while getting all Tenants because {Reason}. Failure Id '{FailureId}'", response.Failure.Reason, response.Failure.Id.ToGuid().ToString());

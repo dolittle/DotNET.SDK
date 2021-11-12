@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <BaselineTypeDiscoveryVersion>1.1.2</BaselineTypeDiscoveryVersion>
-        <ContractsVersion>6.3.0-legolas.2</ContractsVersion>
+        <ContractsVersion>6.3.0-legolas.3</ContractsVersion>
         <MicrosoftExtensionsVersion>3.1.2</MicrosoftExtensionsVersion>
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.18.1</ProtobufVersion>
