@@ -14,7 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="../Concepts/Concepts.csproj" />
     <ProjectReference Include="../Services/Services.csproj" />
-    <ProjectReference Include="../Executon/Execution.csproj" />
+    <ProjectReference Include="../Execution/Execution.csproj" />
   </ItemGroup>
 
 </Project>

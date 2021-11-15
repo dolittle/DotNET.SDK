@@ -360,7 +360,7 @@ namespace Dolittle.SDK
                 projectionStoreBuilder,
                 embeddings,
                 aggregateRoots,
-                new TenantsClient(methodCaller, _loggerFactory.CreateLogger<TenantsClient>()),
+                new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>()),
                 new ResourcesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<ResourcesClient>()),
                 _loggerFactory,
                 _cancellation);

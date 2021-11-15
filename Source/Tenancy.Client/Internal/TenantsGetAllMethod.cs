@@ -8,7 +8,7 @@ using Grpc.Core;
 namespace Dolittle.SDK.Tenancy.Client.Internal
 {
     /// <summary>
-    /// Represents a wrapper for gRPC Subscriptions.Subscribe.
+    /// Represents a wrapper for gRPC Tenants.GetAll.
     /// </summary>
     public class TenantsGetAllMethod : ICanCallAUnaryMethod<GetAllRequest, GetAllResponse>
     {
