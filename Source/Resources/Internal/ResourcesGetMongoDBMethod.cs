@@ -8,15 +8,15 @@ using Grpc.Core;
 namespace Dolittle.SDK.Resources.Internal
 {
     /// <summary>
-    /// Represents a wrapper for gRPC Subscriptions.Subscribe.
+    /// Represents a wrapper for gRPC Resources.GetMongoDB.
     /// </summary>
-    public class ResourcesGetMongoDbMethod : ICanCallAUnaryMethod<GetRequest, GetMongoDbResponse>
+    public class ResourcesGetMongoDBMethod : ICanCallAUnaryMethod<GetRequest, GetMongoDBResponse>
     {
         /// <inheritdoc/>
-        public AsyncUnaryCall<GetMongoDbResponse> Call(GetRequest message, Channel channel, CallOptions callOptions)
+        public AsyncUnaryCall<GetMongoDBResponse> Call(GetRequest message, Channel channel, CallOptions callOptions)
         {
             var client = new Dolittle.Runtime.Resources.Contracts.Resources.ResourcesClient(channel);
-            return client.GetMongoDbAsync(message, callOptions);
+            return client.GetMongoDBAsync(message, callOptions);
         }
     }
 }

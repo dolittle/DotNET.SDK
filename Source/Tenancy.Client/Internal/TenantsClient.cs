@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using Dolittle.Runtime.Tenancy.Contracts;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
+using Dolittle.Services.Contracts;
 using Microsoft.Extensions.Logging;
 using Contracts = Dolittle.Runtime.Tenancy.Contracts;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Tenancy.Client.Internal
 {
@@ -21,16 +23,19 @@ namespace Dolittle.SDK.Tenancy.Client.Internal
     {
         static readonly TenantsGetAllMethod _method = new TenantsGetAllMethod();
         readonly IPerformMethodCalls _caller;
+        readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TenantsClient"/> class.
         /// </summary>
         /// <param name="caller">The method caller to use to perform calls to the Runtime.</param>
+        /// <param name="executionContext">The <see cref="ExecutionContext"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/> to use.</param>
-        public TenantsClient(IPerformMethodCalls caller, ILogger logger)
+        public TenantsClient(IPerformMethodCalls caller, ExecutionContext executionContext, ILogger logger)
         {
             _caller = caller;
+            _executionContext = executionContext;
             _logger = logger;
         }
 
@@ -40,7 +45,8 @@ namespace Dolittle.SDK.Tenancy.Client.Internal
             _logger.LogDebug("Getting all Tenants");
             try
             {
-                var response = await _caller.Call(_method, new GetAllRequest(), cancellationToken).ConfigureAwait(false);
+                var request = new GetAllRequest{ CallContext = new CallRequestContext { ExecutionContext = _executionContext.ToProtobuf() } };
+                var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
                 if (response.Failure == null)
                 {
                     return response.Tenants.Select(CreateTenant);

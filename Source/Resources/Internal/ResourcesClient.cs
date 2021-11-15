@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Resources.Internal
     /// </summary>
     public class ResourcesClient : IResources
     {
-        static readonly ResourcesGetMongoDbMethod _method = new ResourcesGetMongoDbMethod();
+        static readonly ResourcesGetMongoDBMethod _method = new ResourcesGetMongoDBMethod();
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
         readonly ILogger _logger;
