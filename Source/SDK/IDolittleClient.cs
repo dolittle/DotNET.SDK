@@ -11,6 +11,7 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Projections.Store.Builders;
+using Dolittle.SDK.Resources;
 using Dolittle.SDK.Tenancy.Client;
 
 namespace Dolittle.SDK
@@ -49,6 +50,11 @@ namespace Dolittle.SDK
         /// Gets the <see cref="ITenants"/>.
         /// </summary>
         ITenants Tenants { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IResources"/>.
+        /// </summary>
+        IResources Resources { get; }
 
         /// <summary>
         /// /// Sets the <see cref="IContainer" /> to use for inversion of control.

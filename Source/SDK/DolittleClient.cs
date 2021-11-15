@@ -21,6 +21,7 @@ using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
+using Dolittle.SDK.Resources;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy.Client;
 using Microsoft.Extensions.Logging;
@@ -67,6 +68,7 @@ namespace Dolittle.SDK
         /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
         /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="tenants">The <see cref="ITenants"/>.</param>
+        /// <param name="resources">The <see cref="IResources"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public DolittleClient(
@@ -86,6 +88,7 @@ namespace Dolittle.SDK
             IEmbeddings embeddings,
             IAggregateRoots aggregateRoots,
             ITenants tenants,
+            IResources resources,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -105,6 +108,7 @@ namespace Dolittle.SDK
             Embeddings = embeddings;
             _aggregateRoots = aggregateRoots;
             Tenants = tenants;
+            Resources = resources;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
             _container = new DefaultContainer();
@@ -127,6 +131,9 @@ namespace Dolittle.SDK
 
         /// <inheritdoc />
         public ITenants Tenants { get; }
+
+        /// <inheritdoc />
+        public IResources Resources { get; }
 
         /// <summary>
         /// Create a client builder for a Microservice.

@@ -23,6 +23,7 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
+using Dolittle.SDK.Resources.Internal;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
@@ -341,8 +342,7 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
-            var aggregateRoots = new AggregateRoots(
-                _loggerFactory.CreateLogger<AggregateRoots>());
+            var aggregateRoots = new AggregateRoots(_loggerFactory.CreateLogger<AggregateRoots>());
 
             return new DolittleClient(
                 eventTypes,
@@ -361,6 +361,7 @@ namespace Dolittle.SDK
                 embeddings,
                 aggregateRoots,
                 new TenantsClient(methodCaller, _loggerFactory.CreateLogger<TenantsClient>()),
+                new ResourcesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<ResourcesClient>()),
                 _loggerFactory,
                 _cancellation);
         }
