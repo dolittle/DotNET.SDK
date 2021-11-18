@@ -68,7 +68,7 @@ namespace Dolittle.SDK
         /// <param name="embeddings">The <see cref="IEmbeddings" />.</param>
         /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="tenants">The <see cref="ITenants"/>.</param>
-        /// <param name="resources">The <see cref="IResources"/>.</param>
+        /// <param name="resources">The <see cref="IResourcesBuilder"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public DolittleClient(
@@ -88,7 +88,7 @@ namespace Dolittle.SDK
             IEmbeddings embeddings,
             IAggregateRoots aggregateRoots,
             ITenants tenants,
-            IResources resources,
+            IResourcesBuilder resources,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -133,7 +133,7 @@ namespace Dolittle.SDK
         public ITenants Tenants { get; }
 
         /// <inheritdoc />
-        public IResources Resources { get; }
+        public IResourcesBuilder Resources { get; }
 
         /// <summary>
         /// Create a client builder for a Microservice.

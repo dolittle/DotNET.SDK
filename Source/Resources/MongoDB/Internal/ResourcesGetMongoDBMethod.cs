@@ -5,7 +5,7 @@ using Dolittle.Runtime.Resources.Contracts;
 using Dolittle.SDK.Services;
 using Grpc.Core;
 
-namespace Dolittle.SDK.Resources.Internal
+namespace Dolittle.SDK.Resources.MongoDB.Internal
 {
     /// <summary>
     /// Represents a wrapper for gRPC Resources.GetMongoDB.

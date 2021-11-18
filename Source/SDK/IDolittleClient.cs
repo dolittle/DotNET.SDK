@@ -52,9 +52,9 @@ namespace Dolittle.SDK
         ITenants Tenants { get; }
 
         /// <summary>
-        /// Gets the <see cref="IResources"/>.
+        /// Gets the <see cref="IResourcesBuilder"/>.
         /// </summary>
-        IResources Resources { get; }
+        IResourcesBuilder Resources { get; }
 
         /// <summary>
         /// /// Sets the <see cref="IContainer" /> to use for inversion of control.

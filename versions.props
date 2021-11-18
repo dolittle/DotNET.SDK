@@ -6,7 +6,7 @@
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.18.1</ProtobufVersion>
         <GrpcVersion>2.41.0</GrpcVersion>
-        <MongoDBDriverVersion>2.10.1</MongoDBDriverVersion>
+        <MongoDBDriverVersion>2.13.2</MongoDBDriverVersion>
         <NewtonsoftVersion>12.0.3</NewtonsoftVersion>
         <SystemImmutableVersion>1.7.1</SystemImmutableVersion>
     </PropertyGroup>

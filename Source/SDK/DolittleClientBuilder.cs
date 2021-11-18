@@ -23,7 +23,7 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
-using Dolittle.SDK.Resources.Internal;
+using Dolittle.SDK.Resources;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
@@ -361,7 +361,7 @@ namespace Dolittle.SDK
                 embeddings,
                 aggregateRoots,
                 new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>()),
-                new ResourcesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<ResourcesClient>()),
+                new ResourcesBuilder(methodCaller, executionContext, _loggerFactory),
                 _loggerFactory,
                 _cancellation);
         }
