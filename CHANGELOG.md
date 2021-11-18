@@ -1,3 +1,20 @@
+# [12.0.0] - 2021-11-18 [PR: #100](https://github.com/dolittle/DotNET.SDK/pull/100)
+## Summary
+
+Adds the ability to get the configured tenants, and a MongoDB database per tenant from the Runtime through the client. Also renames the Client to DolittleClient, and introduces interfaces many places to simplify creation of mocks for testing purposes.
+
+### Added
+
+- ITenants Tenants property on the client for getting all tenants from the Runtime
+- IResourcesBuilder Resources property on the client for getting resources for a specific tenant. Currently supports MongoDB. 
+- IDolittleClient interface that DolittleClient implements, and interfaces for other classes in the client structure
+
+### Changed
+
+- Client renamed to DolittleClient
+- ClientBuilder renamed to DolittleClientBuilder
+
+
 # [11.0.0] - 2021-11-5 [PR: #77](https://github.com/dolittle/DotNET.SDK/pull/77)
 ## Summary
 
