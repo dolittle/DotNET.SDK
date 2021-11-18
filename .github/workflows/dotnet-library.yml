@@ -1,7 +1,7 @@
 name: .NET Library CI/CD
 
 env:
-  PRERELEASE_BRANCHES: aragorn # Comma separated list of prerelease branch names. 'alpha,rc, ...'
+  PRERELEASE_BRANCHES: legolas # Comma separated list of prerelease branch names. 'alpha,rc, ...'
   CASCADES: "" # Comma separated list of cascading repos. 'dolittle/DotNet.SDK,...'
   NUGET_OUTPUT: Artifacts/NuGet
   COVERAGE_FOLDER: Coverage
@@ -24,12 +24,19 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "3.1.301"
+      - name: Setup .Net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
       - name: Setup dotCover
         run: dotnet tool install JetBrains.dotCover.GlobalTool -g
       - name: Setup report generator
         run: dotnet tool install dotnet-reportgenerator-globaltool -g
       - name: Build
         run: dotnet build --configuration Release
+      - name: Build Samples
+        working-directory: Samples
+        run: dotnet build
       - name: Test
         run: dotnet test --configuration Release --no-build
       - name: Create test coverage report
@@ -83,6 +90,7 @@ jobs:
         uses: dolittle/github-release-action@v2
         if: ${{ steps.context.outputs.should-publish == 'true' }}
         with:
+          token: ${{  secrets.BUILD_PAT  }}
           version: ${{ steps.increment-version.outputs.next-version }}
           body: ${{ steps.context.outputs.pr-body }}
 

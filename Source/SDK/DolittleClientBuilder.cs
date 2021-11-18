@@ -23,9 +23,11 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
+using Dolittle.SDK.Resources;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
+using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
@@ -35,9 +37,9 @@ using Version = Dolittle.SDK.Microservices.Version;
 namespace Dolittle.SDK
 {
     /// <summary>
-    /// Represents a builder for building <see cref="Client" />.
+    /// Represents a builder for building <see cref="DolittleClient" />.
     /// </summary>
-    public class ClientBuilder
+    public class DolittleClientBuilder
     {
         readonly EventTypesBuilder _eventTypesBuilder;
         readonly AggregateRootsBuilder _aggregateRootsBuilder;
@@ -65,10 +67,10 @@ namespace Dolittle.SDK
             });
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClientBuilder"/> class.
+        /// Initializes a new instance of the <see cref="DolittleClientBuilder"/> class.
         /// </summary>
         /// <param name="microserviceId">The <see cref="MicroserviceId"/> of the microservice.</param>
-        public ClientBuilder(MicroserviceId microserviceId)
+        public DolittleClientBuilder(MicroserviceId microserviceId)
         {
             _microserviceId = microserviceId;
 
@@ -94,7 +96,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="version">The version of the microservice.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithVersion(Version version)
+        public DolittleClientBuilder WithVersion(Version version)
         {
             _version = version;
             return this;
@@ -105,7 +107,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="interval">The ping interval.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithPingInterval(TimeSpan interval)
+        public DolittleClientBuilder WithPingInterval(TimeSpan interval)
         {
             _pingInterval = interval;
             return this;
@@ -120,7 +122,7 @@ namespace Dolittle.SDK
         /// <param name="build">Build number of the microservice.</param>
         /// <param name="preReleaseString">If prerelease - the prerelease string.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithVersion(int major, int minor, int patch, int build = 0, string preReleaseString = "")
+        public DolittleClientBuilder WithVersion(int major, int minor, int patch, int build = 0, string preReleaseString = "")
         {
             _version = new Version(major, minor, patch, build, preReleaseString);
             return this;
@@ -131,7 +133,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="environment">The environment in which the microservice is running.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEnvironment(Environment environment)
+        public DolittleClientBuilder WithEnvironment(Environment environment)
         {
             _environment = environment;
             return this;
@@ -144,7 +146,7 @@ namespace Dolittle.SDK
         /// <param name="port">The port to connect to.</param>
         /// <returns>The client builder for continuation.</returns>
         /// <remarks>If not specified, host 'localhost' and port 50053 will be used.</remarks>
-        public ClientBuilder WithRuntimeOn(string host, ushort port)
+        public DolittleClientBuilder WithRuntimeOn(string host, ushort port)
         {
             _host = host;
             _port = port;
@@ -156,7 +158,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="cancellation">The cancellation token for cancelling pending operations on the Runtime.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithCancellation(CancellationToken cancellation)
+        public DolittleClientBuilder WithCancellation(CancellationToken cancellation)
         {
             _cancellation = cancellation;
             return this;
@@ -167,7 +169,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventTypes(Action<EventTypesBuilder> callback)
+        public DolittleClientBuilder WithEventTypes(Action<EventTypesBuilder> callback)
         {
             callback(_eventTypesBuilder);
             return this;
@@ -178,7 +180,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithAggregateRoots(Action<AggregateRootsBuilder> callback)
+        public DolittleClientBuilder WithAggregateRoots(Action<AggregateRootsBuilder> callback)
         {
             callback(_aggregateRootsBuilder);
             return this;
@@ -189,7 +191,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithFilters(Action<EventFiltersBuilder> callback)
+        public DolittleClientBuilder WithFilters(Action<EventFiltersBuilder> callback)
         {
             callback(_eventFiltersBuilder);
             return this;
@@ -200,7 +202,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventHandlers(Action<EventHandlersBuilder> callback)
+        public DolittleClientBuilder WithEventHandlers(Action<EventHandlersBuilder> callback)
         {
             callback(_eventHandlersBuilder);
             return this;
@@ -211,7 +213,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithProjections(Action<ProjectionsBuilder> callback)
+        public DolittleClientBuilder WithProjections(Action<ProjectionsBuilder> callback)
         {
             callback(_projectionsBuilder);
             return this;
@@ -222,7 +224,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
+        public DolittleClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
         {
             callback(_embeddingsBuilder);
             return this;
@@ -233,7 +235,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="callback">The builder callback.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventHorizons(Action<SubscriptionsBuilder> callback)
+        public DolittleClientBuilder WithEventHorizons(Action<SubscriptionsBuilder> callback)
         {
             callback(_eventHorizonsBuilder);
             return this;
@@ -245,7 +247,7 @@ namespace Dolittle.SDK
         /// <param name="factory">The given <see cref="ILoggerFactory"/>.</param>
         /// <returns>The client builder for continuation.</returns>
         /// <remarks>If not used, a factory with 'Trace' level logging will be used.</remarks>
-        public ClientBuilder WithLogging(ILoggerFactory factory)
+        public DolittleClientBuilder WithLogging(ILoggerFactory factory)
         {
             _loggerFactory = factory;
             return this;
@@ -256,7 +258,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="jsonSerializerSettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="JsonSerializerSettings"/> to modify settings.</param>
         /// <returns>The client builder for continuation.</returns>
-        public ClientBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
+        public DolittleClientBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
         {
             _jsonSerializerSettingsBuilder = jsonSerializerSettingsBuilder;
             return this;
@@ -265,8 +267,8 @@ namespace Dolittle.SDK
         /// <summary>
         /// Build the Client.
         /// </summary>
-        /// <returns>The <see cref="Client"/>.</returns>
-        public Client Build()
+        /// <returns>The <see cref="DolittleClient"/>.</returns>
+        public DolittleClient Build()
         {
             var methodCaller = new MethodCaller(_host, _port);
             var executionContext = new ExecutionContext(
@@ -340,10 +342,9 @@ namespace Dolittle.SDK
                 executionContext,
                 _loggerFactory);
 
-            var aggregateRoots = new AggregateRoots(
-                _loggerFactory.CreateLogger<AggregateRoots>());
+            var aggregateRoots = new AggregateRoots(_loggerFactory.CreateLogger<AggregateRoots>());
 
-            return new Client(
+            return new DolittleClient(
                 eventTypes,
                 eventStoreBuilder,
                 eventHorizons,
@@ -359,6 +360,8 @@ namespace Dolittle.SDK
                 projectionStoreBuilder,
                 embeddings,
                 aggregateRoots,
+                new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>()),
+                new ResourcesBuilder(methodCaller, executionContext, _loggerFactory),
                 _loggerFactory,
                 _cancellation);
         }

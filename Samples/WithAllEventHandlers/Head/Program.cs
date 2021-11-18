@@ -12,7 +12,7 @@ namespace Kitchen
     {
         public static void Main()
         {
-            var client = Client
+            var client = DolittleClient
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
                     eventTypes.Register<Events.DishPrepared>())

@@ -12,15 +12,15 @@ namespace ASP.NET.Kitchen
     [Route("/api/kitchen")]
     public class KitchenController : ControllerBase
     {
-        Client _client;
+        DolittleClient _client;
 
-        public KitchenController(Client client)
+        public KitchenController(DolittleClient client)
         {
             _client = client;
         }
-            
+
         [HttpPost("prepare")]
-        public async Task<IActionResult> Prepare([FromBody]PrepareDish prepareDish)
+        public async Task<IActionResult> Prepare([FromBody] PrepareDish prepareDish)
         {
             var preparedDish = new DishPrepared(prepareDish.Dish, prepareDish.Chef);
 
