@@ -14,7 +14,7 @@ namespace EventHorizon.Producer
     {
         static void Main(string[] args)
         {
-            var client = Client.ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
+            var client = DolittleClient.ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
                     eventTypes.Register<DishPrepared>())
                 .WithEventHandlers(eventHandlersBuilder =>

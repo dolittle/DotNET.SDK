@@ -13,16 +13,18 @@ namespace Kitchen
     {
         public async static Task Main()
         {
-            var client = Client
+            var client = DolittleClient
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                 .WithEventTypes(eventTypes =>
                     eventTypes.Register<DishPrepared>())
-                .WithProjections(builder => {
+                .WithProjections(builder =>
+                {
                     builder.RegisterProjection<DishCounter>();
 
                     builder.CreateProjection("0767bc04-bc03-40b8-a0be-5f6c6130f68b")
                         .ForReadModel<Chef>()
-                        .On<DishPrepared>(_ => _.KeyFromProperty(_ => _.Chef), (chef, @event, projectionContext) => {
+                        .On<DishPrepared>(_ => _.KeyFromProperty(_ => _.Chef), (chef, @event, projectionContext) =>
+                        {
                             chef.Name = @event.Chef;
                             if (!chef.Dishes.Contains(@event.Dish)) chef.Dishes.Add(@event.Dish);
                             return chef;
@@ -57,8 +59,9 @@ namespace Kitchen
                 .ForTenant(TenantId.Development)
                 .GetAll<DishCounter>().ConfigureAwait(false);
 
-            foreach (var (dish, state) in dishes) {
-                 Console.WriteLine($"The kitchen has prepared {dish} {state.State.NumberOfTimesPrepared} times");
+            foreach (var (dish, state) in dishes)
+            {
+                Console.WriteLine($"The kitchen has prepared {dish} {state.State.NumberOfTimesPrepared} times");
             }
 
             var chef = await client.Projections
