@@ -12,7 +12,7 @@ namespace EventHorizon.Consumer
     {
         static void Main(string[] args)
         {
-            var client = Client.ForMicroservice("a14bb24e-51f3-4d83-9eba-44c4cffe6bb9")
+            var client = DolittleClient.ForMicroservice("a14bb24e-51f3-4d83-9eba-44c4cffe6bb9")
                 .WithRuntimeOn("localhost", 50055)
                 .WithEventTypes(eventTypes =>
                     eventTypes.Register<DishPrepared>())

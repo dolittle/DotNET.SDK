@@ -24,12 +24,19 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "3.1.301"
+      - name: Setup .Net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
       - name: Setup dotCover
         run: dotnet tool install JetBrains.dotCover.GlobalTool -g
       - name: Setup report generator
         run: dotnet tool install dotnet-reportgenerator-globaltool -g
       - name: Build
         run: dotnet build --configuration Release
+      - name: Build Samples
+        working-directory: Samples
+        run: dotnet build
       - name: Test
         run: dotnet test --configuration Release --no-build
       - name: Create test coverage report

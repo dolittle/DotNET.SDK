@@ -19,18 +19,18 @@ namespace ASP.NET
 
     public class Startup
     {
-        Client _client;
+        DolittleClient _client;
 
         public Startup()
         {
-            _client = Client
+            _client = DolittleClient
                 .ForMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
-                .WithEventTypes(eventTypes => 
+                .WithEventTypes(eventTypes =>
                 {
                     eventTypes.Register<DishPrepared>();
                     eventTypes.Register<DishEaten>();
                 })
-                .WithEventHandlers(builder => 
+                .WithEventHandlers(builder =>
                 {
                     builder.RegisterEventHandler<DishHandler>();
                     builder.RegisterEventHandler<DishCustomerHandler>();
