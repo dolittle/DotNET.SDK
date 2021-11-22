@@ -57,11 +57,9 @@ namespace Dolittle.SDK
         IResourcesBuilder Resources { get; }
 
         /// <summary>
-        /// /// Sets the <see cref="IContainer" /> to use for inversion of control.
+        /// Gets the <see cref="IContainer"/>.
         /// </summary>
-        /// <param name="container">The <see cref="IContainer" /> to use for inversion of control.</param>
-        /// <returns>The client builder for continuation.</returns>
-        IDolittleClient WithContainer(IContainer container);
+        IContainer Services { get; }
 
         /// <summary>
         /// Start the client.

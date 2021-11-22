@@ -80,6 +80,7 @@ namespace Dolittle.SDK.DependencyInversion
                 configure?.Invoke(tenant, tenantServices);
             }
 
+            tenantServices.AddSingleton(tenant);
             return tenantServices;
         }
     }

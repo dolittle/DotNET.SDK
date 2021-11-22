@@ -46,7 +46,6 @@ namespace Dolittle.SDK
         readonly IAggregateRoots _aggregateRoots;
         readonly ILoggerFactory _loggerFactory;
         readonly CancellationToken _cancellation;
-        IContainer _container;
         bool _disposed;
 
         /// <summary>
@@ -69,6 +68,7 @@ namespace Dolittle.SDK
         /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
         /// <param name="tenants">The <see cref="ITenants"/>.</param>
         /// <param name="resources">The <see cref="IResourcesBuilder"/>.</param>
+        /// <param name="container">The configured <see cref="IContainer"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
         public DolittleClient(
@@ -89,6 +89,7 @@ namespace Dolittle.SDK
             IAggregateRoots aggregateRoots,
             ITenants tenants,
             IResourcesBuilder resources,
+            IContainer container,
             ILoggerFactory loggerFactory,
             CancellationToken cancellationToken)
         {
@@ -109,9 +110,9 @@ namespace Dolittle.SDK
             _aggregateRoots = aggregateRoots;
             Tenants = tenants;
             Resources = resources;
+            Services = container;
             _loggerFactory = loggerFactory;
             _cancellation = cancellationToken;
-            _container = new DefaultContainer();
         }
 
         /// <inheritdoc />
@@ -135,6 +136,9 @@ namespace Dolittle.SDK
         /// <inheritdoc />
         public IResourcesBuilder Resources { get; }
 
+        /// <inheritdoc />
+        public IContainer Services { get; }
+
         /// <summary>
         /// Create a client builder for a Microservice.
         /// </summary>
@@ -143,13 +147,6 @@ namespace Dolittle.SDK
         public static DolittleClientBuilder ForMicroservice(MicroserviceId microserviceId)
             => new DolittleClientBuilder(microserviceId);
 
-        /// <inheritdoc />
-        public IDolittleClient WithContainer(IContainer container)
-        {
-            _container = container;
-            return this;
-        }
-
         /// <inheritdoc/>
         public Task Start()
         {
@@ -157,7 +154,7 @@ namespace Dolittle.SDK
                 _eventProcessors,
                 EventTypes,
                 _eventProcessingConverter,
-                _container,
+                Services,
                 _loggerFactory,
                 _cancellation);
             _filtersBuilder.BuildAndRegister(

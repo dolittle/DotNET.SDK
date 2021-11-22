@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Aggregates.Internal;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
@@ -28,6 +29,7 @@ using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
@@ -59,6 +61,9 @@ namespace Dolittle.SDK
         Environment _environment;
         CancellationToken _cancellation;
         Action<JsonSerializerSettings> _jsonSerializerSettingsBuilder;
+
+        IServiceCollection _serviceCollection = new ServiceCollection();
+        Action<TenantId, IServiceCollection> _configureServicesForTenant;
 
         ILoggerFactory _loggerFactory = LoggerFactory.Create(_ =>
             {
@@ -265,10 +270,32 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
-        /// Build the Client.
+        /// Sets the preconfigured <see cref="IServiceCollection"/> that's to be added to the <see cref="ContainerBuilder"/>.
         /// </summary>
-        /// <returns>The <see cref="DolittleClient"/>.</returns>
-        public DolittleClient Build()
+        /// <param name="services">The given <see cref="IServiceCollection"/>.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public DolittleClientBuilder WithServices(IServiceCollection services)
+        {
+            _serviceCollection = services;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Action"/> callback that configures services for tenant.
+        /// </summary>
+        /// <param name="configureServicesForTenant">The <see cref="Action"/> callback for configuring an <see cref="IServiceCollection"/> tied to a <see cref="TenantId"/>.</param>
+        /// <returns>The client builder for continuation.</returns>
+        public DolittleClientBuilder WithTenantServices(Action<TenantId, IServiceCollection> configureServicesForTenant)
+        {
+            _configureServicesForTenant = configureServicesForTenant;
+            return this;
+        }
+
+        /// <summary>
+        /// Connects the Client to the Runtime.
+        /// </summary>
+        /// <returns>The connected <see cref="DolittleClient"/>.</returns>
+        public async Task<DolittleClient> Connect()
         {
             var methodCaller = new MethodCaller(_host, _port);
             var executionContext = new ExecutionContext(
@@ -281,8 +308,8 @@ namespace Dolittle.SDK
                 CultureInfo.InvariantCulture);
             var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(eventTypes);
-            _eventTypesBuilder.BuildAndRegister(new Events.Internal.EventTypesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()), _cancellation);
-            _aggregateRootsBuilder.BuildAndRegister(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
+            await _eventTypesBuilder.BuildAndRegister(new Events.Internal.EventTypesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()), _cancellation).ConfigureAwait(false);
+            await _aggregateRootsBuilder.BuildAndRegister(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation).ConfigureAwait(false);
 
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 _pingInterval,
@@ -344,6 +371,16 @@ namespace Dolittle.SDK
 
             var aggregateRoots = new AggregateRoots(_loggerFactory.CreateLogger<AggregateRoots>());
 
+            var tenantsClient = new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>());
+
+            var containerBuilder = new ServiceProviderFactory().CreateBuilder(_serviceCollection);
+            containerBuilder.AddTenantServices(_configureServicesForTenant);
+            var tenants = await tenantsClient.GetAll(_cancellation).ConfigureAwait(false);
+            foreach (var tenant in tenants)
+            {
+                containerBuilder.AddTenant(tenant.Id);
+            }
+
             return new DolittleClient(
                 eventTypes,
                 eventStoreBuilder,
@@ -360,10 +397,114 @@ namespace Dolittle.SDK
                 projectionStoreBuilder,
                 embeddings,
                 aggregateRoots,
-                new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>()),
+                tenantsClient,
                 new ResourcesBuilder(methodCaller, executionContext, _loggerFactory),
+                containerBuilder.Build(),
                 _loggerFactory,
                 _cancellation);
+        }
+
+        /// <summary>
+        /// Build the Client.
+        /// </summary>
+        /// <returns>The <see cref="DolittleClient"/>.</returns>
+        public DolittleClient Build()
+        {
+            return null;
+            // var methodCaller = new MethodCaller(_host, _port);
+            // var executionContext = new ExecutionContext(
+            //     _microserviceId,
+            //     TenantId.System,
+            //     _version,
+            //     _environment,
+            //     CorrelationId.System,
+            //     Claims.Empty,
+            //     CultureInfo.InvariantCulture);
+            // var eventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
+            // _eventTypesBuilder.AddAssociationsInto(eventTypes);
+            // _eventTypesBuilder.BuildAndRegister(new Events.Internal.EventTypesClient(methodCaller, executionContext, _loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()), _cancellation);
+            // _aggregateRootsBuilder.BuildAndRegister(new AggregateRootsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<AggregateRoots>()), _cancellation);
+            //
+            // var reverseCallClientsCreator = new ReverseCallClientCreator(
+            //     _pingInterval,
+            //     methodCaller,
+            //     executionContext,
+            //     _loggerFactory);
+            //
+            // Func<JsonSerializerSettings> jsonSerializerSettingsProvider = () =>
+            // {
+            //     var settings = new JsonSerializerSettings();
+            //     _jsonSerializerSettingsBuilder?.Invoke(settings);
+            //     return settings;
+            // };
+            //
+            // var serializer = new EventContentSerializer(
+            //     eventTypes,
+            //     jsonSerializerSettingsProvider);
+            // var eventToProtobufConverter = new EventToProtobufConverter(serializer);
+            // var eventToSDKConverter = new EventToSDKConverter(serializer);
+            // var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
+            // var aggregateEventToSDKConverter = new AggregateEventToSDKConverter(serializer);
+            // var projectionsToSDKConverter = new ProjectionsToSDKConverter();
+            //
+            // var eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
+            // var processingCoordinator = new ProcessingCoordinator();
+            //
+            // var eventProcessors = new EventProcessors(reverseCallClientsCreator, processingCoordinator, _loggerFactory.CreateLogger<EventProcessors>());
+            //
+            // var callContextResolver = new CallContextResolver();
+            //
+            // var eventStoreBuilder = new EventStoreBuilder(
+            //     methodCaller,
+            //     eventToProtobufConverter,
+            //     eventToSDKConverter,
+            //     aggregateEventToProtobufConverter,
+            //     aggregateEventToSDKConverter,
+            //     executionContext,
+            //     callContextResolver,
+            //     eventTypes,
+            //     _loggerFactory);
+            //
+            // var eventHorizons = new EventHorizons(methodCaller, executionContext, _eventHorizonRetryPolicy, _loggerFactory.CreateLogger<EventHorizons>());
+            // _eventHorizonsBuilder.BuildAndSubscribe(eventHorizons, _cancellation);
+            //
+            // var projectionStoreBuilder = new ProjectionStoreBuilder(
+            //     methodCaller,
+            //     executionContext,
+            //     callContextResolver,
+            //     _projectionAssociations,
+            //     projectionsToSDKConverter,
+            //     _loggerFactory);
+            // var embeddings = new Embeddings.Embeddings(
+            //     methodCaller,
+            //     callContextResolver,
+            //     _embeddingAssociations,
+            //     projectionsToSDKConverter,
+            //     executionContext,
+            //     _loggerFactory);
+            //
+            // var aggregateRoots = new AggregateRoots(_loggerFactory.CreateLogger<AggregateRoots>());
+            //
+            // return new DolittleClient(
+            //     eventTypes,
+            //     eventStoreBuilder,
+            //     eventHorizons,
+            //     processingCoordinator,
+            //     eventProcessors,
+            //     eventProcessingConverter,
+            //     _eventHandlersBuilder,
+            //     _eventFiltersBuilder,
+            //     projectionsToSDKConverter,
+            //     eventToProtobufConverter,
+            //     _projectionsBuilder,
+            //     _embeddingsBuilder,
+            //     projectionStoreBuilder,
+            //     embeddings,
+            //     aggregateRoots,
+            //     new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>()),
+            //     new ResourcesBuilder(methodCaller, executionContext, _loggerFactory),
+            //     _loggerFactory,
+            //     _cancellation);
         }
 
         static async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
