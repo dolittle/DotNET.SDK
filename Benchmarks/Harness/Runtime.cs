@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
@@ -14,15 +13,16 @@ namespace Dolittle.Benchmarks.Harness;
 public class Runtime : IAsyncDisposable
 {
     const string Image = "dolittle/runtime";
+    const string MongoImage = "dolittle/mongodb";
 
-    readonly DockerClient _client;
+    readonly IDockerClient _client;
     readonly RuntimeConfig _config;
     readonly ILogger _logger;
 
     string _containerId;
     bool _started;
 
-    public Runtime(DockerClient client, RuntimeConfig config, ILogger logger)
+    public Runtime(IDockerClient client, RuntimeConfig config, ILogger logger)
     {
         _client = client;
         _config = config;
@@ -42,15 +42,6 @@ public class Runtime : IAsyncDisposable
             return;
         }
         _logger.WriteLine(LogKind.Info, $"Starting {this}");
-        // await _client.Images.CreateImageAsync(
-        //     new ImagesCreateParameters
-        //     {
-        //         FromImage = Image,
-        //         Tag = _config.Tag,
-        //         
-        //     },
-        //     null,
-        //     new Progress<JSONMessage>()).ConfigureAwait(false);
         
         _containerId = (await _client.Containers.CreateContainerAsync(new CreateContainerParameters
         {

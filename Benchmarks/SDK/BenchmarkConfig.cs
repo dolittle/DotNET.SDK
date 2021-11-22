@@ -5,6 +5,7 @@ using System.Linq;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
@@ -20,6 +21,9 @@ public static class BenchmarkConfig
         var job = Job.Default
             .WithWarmupCount(0)
             .WithIterationCount(1)
+            .WithUnrollFactor(1)
+            .WithInvocationCount(1)
+            .WithStrategy(RunStrategy.ColdStart)
             .DontEnforcePowerPlan();
         
         return ManualConfig.CreateEmpty()

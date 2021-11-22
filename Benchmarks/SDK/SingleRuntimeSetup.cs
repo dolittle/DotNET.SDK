@@ -26,21 +26,18 @@ public class SingleRuntimeSetup
     [IterationSetup]
     public virtual void IterationSetup()
     {
-        Console.WriteLine($"Starting runtime {_singleRuntime.Endpoints}");
         _singleRuntime.Start().Wait();
     }
 
     [IterationCleanup]
     public virtual void IterationCleanup()
     {
-        Console.WriteLine($"stopping runtime {_singleRuntime.Endpoints}");
         _singleRuntime.Stop().Wait();
     }
 
     [GlobalCleanup]
     public async Task GlobalCleanup()
     {
-        Console.WriteLine("Cleaning up harness");
         _harness.Dispose();
         if (_singleRuntime is not null)
         {

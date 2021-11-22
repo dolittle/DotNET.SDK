@@ -19,6 +19,7 @@ public class Harness : IDisposable
     {
         _logger = logger;
         _dockerClient = new DockerClientConfiguration().CreateClient();
+        
     }
 
     public static Harness Setup(ILogger logger)

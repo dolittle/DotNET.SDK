@@ -26,8 +26,7 @@ public class RuntimeBuilder
     public Runtime Build()
     {
         var (privatePort, publicPort, mongoPort) = (_portPool.Find(), _portPool.Find(), _portPool.Find());
-        // var tag = "latest-development";
-        var tag = "test-new";
+        var tag = "latest-development";
         return new Runtime(_dockerClient, new RuntimeConfig(tag, privatePort, publicPort, mongoPort), _logger);
     }
 }
