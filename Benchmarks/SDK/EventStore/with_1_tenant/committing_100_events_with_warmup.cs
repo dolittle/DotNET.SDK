@@ -37,7 +37,6 @@ public class committing_100_events_with_warmup : SingleRuntimeSetup
     [Benchmark]
     public async Task Commit100()
     {
-        
         var @event = new some_event();
         await _eventStore.Commit(_ =>
         {

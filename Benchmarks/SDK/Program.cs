@@ -1,14 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using Dolittle.Benchmarks.Harness;
+using Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 
 namespace Dolittle.Benchmarks.SDK;
 
@@ -20,10 +15,11 @@ class Program
     {
         var argsList = new List<string>(args);
         var config = BenchmarkConfig.Create();
-        return BenchmarkSwitcher
-            .FromAssembly(typeof(Program).Assembly)
-            .Run(argsList.ToArray(), config)
-            .ToExitCode();
+        // return BenchmarkSwitcher
+        //     .FromAssembly(typeof(Program).Assembly)
+        //     .Run(argsList.ToArray(), config)
+        //     .ToExitCode();
+        return new[] {BenchmarkRunner.Run<committing_100_events_with_warmup>(config, args)}.ToExitCode();
     }
 
 }
