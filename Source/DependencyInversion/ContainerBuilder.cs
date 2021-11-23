@@ -4,9 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dolittle.SDK.DependencyInversion
 {
@@ -15,46 +16,19 @@ namespace Dolittle.SDK.DependencyInversion
     /// </summary>
     public class ContainerBuilder
     {
-        readonly IServiceCollection _rootServices = new ServiceCollection();
         readonly HashSet<TenantId> _tenants = new HashSet<TenantId>();
         readonly List<Action<TenantId, IServiceCollection>> _configureServicesForTenantCallbacks = new List<Action<TenantId, IServiceCollection>>();
 
-        Func<IServiceCollection, IServiceProvider> _createRootProvider = services => services.BuildServiceProvider();
+        IServiceProvider _rootProvider = new ServiceCollection().BuildServiceProvider();
 
         /// <summary>
         /// Populates the root <see cref="IServiceCollection"/> with al the given <see cref="ServiceDescriptor"/> services.
         /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to populate the root <see cref="IServiceCollection"/>.</param>
-        public void PopulateRootContainer(IServiceCollection services)
+        /// <param name="provider">The root <see cref="IServiceProvider"/>.</param>
+        public void UseRootProvider(IServiceProvider provider)
         {
-            foreach (var serviceDescriptor in services)
-            {
-                PopulateRootContainer(serviceDescriptor);
-            }
+            _rootProvider = provider;
         }
-
-        /// <summary>
-        /// Populates the root <see cref="IServiceCollection"/> with al the given <see cref="ServiceDescriptor"/> services.
-        /// </summary>
-        /// <param name="serviceDescriptor">The <see cref="ServiceDescriptor"/> to populate the root <see cref="IServiceCollection"/> with.</param>
-        public void PopulateRootContainer(ServiceDescriptor serviceDescriptor)
-        {
-            _rootServices.Add(serviceDescriptor);
-        }
-
-        /// <summary>
-        /// Uses an existing <see cref="IServiceProviderFactory{TContainerBuilder}"/>.
-        /// </summary>
-        /// <param name="factory">The <see cref="IServiceProviderFactory{TContainerBuilder}"/>.</param>
-        /// <param name="configureNonDolittleContainer">The optional <see cref="Action{T}"/> callback for configuring the non-Dolittle <typeparamref name="TContainerBuilder"/>.</param>
-        /// <typeparam name="TContainerBuilder">The <see cref="Type"/> of the container builder.</typeparam>
-        public void UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory, Action<TContainerBuilder> configureNonDolittleContainer = default)
-            => _createRootProvider = services =>
-            {
-                var nonDolittleContainerBuilder = factory.CreateBuilder(services);
-                configureNonDolittleContainer?.Invoke(nonDolittleContainerBuilder);
-                return factory.CreateServiceProvider(nonDolittleContainerBuilder);
-            };
 
         /// <summary>
         /// Adds a tenant.
@@ -75,36 +49,21 @@ namespace Dolittle.SDK.DependencyInversion
         /// </summary>
         /// <returns>The built <see cref="IContainer"/>.</returns>
         public IContainer Build()
-        {
-            var rootProvider = _createRootProvider(_rootServices);
-            return new Container(
-                _tenants.ToDictionary(
-                    tenant => tenant,
-                    tenant => CreateTenantScopedServicesFromRoot(tenant, rootProvider))
-                .ToDictionary<KeyValuePair<TenantId, IServiceCollection>, TenantId, IServiceProvider>(
-                    _ => _.Key,
-                    _ => _.Value.BuildServiceProvider()), rootProvider);
-        }
+            => new Container(_tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, new UnknownServiceOnTenantContainerRegistrationSource(_rootProvider))), _rootProvider);
 
-        IServiceCollection CreateTenantScopedServicesFromRoot(TenantId tenant, IServiceProvider rootProvider)
+        IServiceProvider CreateTenantContainer(TenantId tenant, UnknownServiceOnTenantContainerRegistrationSource unknownServiceOnTenantContainerRegistrationSource)
         {
-            var tenantServices = new ServiceCollection();
-            tenantServices.Add(new ServiceDescriptor());
-            foreach (var serviceDescriptor in _rootServices)
-            {
-                tenantServices.Add(new ServiceDescriptor(
-                    serviceDescriptor.ServiceType,
-                    _ => rootProvider.GetService(serviceDescriptor.ServiceType),
-                    serviceDescriptor.Lifetime));
-            }
+            var services = new ServiceCollection();
+            var serviceProviderFactory = new AutofacServiceProviderFactory(_ => _.RegisterSource(unknownServiceOnTenantContainerRegistrationSource));
 
             foreach (var configure in _configureServicesForTenantCallbacks)
             {
-                configure?.Invoke(tenant, tenantServices);
+                configure?.Invoke(tenant, services);
             }
 
-            tenantServices.AddSingleton(tenant);
-            return tenantServices;
+            services.AddSingleton(tenant);
+            var containerBuilder = serviceProviderFactory.CreateBuilder(services);
+            return serviceProviderFactory.CreateServiceProvider(containerBuilder);
         }
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.DependencyInversion;
@@ -12,6 +13,7 @@ using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Resources;
+using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client;
 
 namespace Dolittle.SDK
@@ -47,9 +49,9 @@ namespace Dolittle.SDK
         IEventHorizons EventHorizons { get; }
 
         /// <summary>
-        /// Gets the <see cref="ITenants"/>.
+        /// Gets the <see cref="IEnumerable{T}"/> of <see cref="Tenant"/>.
         /// </summary>
-        ITenants Tenants { get; }
+        IEnumerable<Tenant> Tenants { get; }
 
         /// <summary>
         /// Gets the <see cref="IResourcesBuilder"/>.
