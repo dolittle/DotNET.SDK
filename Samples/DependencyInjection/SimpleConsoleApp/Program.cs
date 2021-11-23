@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System;
 using Dolittle.SDK;
+using Dolittle.SDK.Samples.DependencyInjection.Shared;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,41 +26,3 @@ client.Services.GetRequiredService<ITransient>().SayHello();
 client.Services.GetRequiredService<IScoped>().SayHello();
 await client.Start().ConfigureAwait(false);
 
-public interface IService
-{
-    void SayHello();
-}
-public interface ISingleton : IService {}
-public interface ITransient : IService {}
-public interface IScoped : IService {}
-
-public class Singleton : ISingleton
-{
-    public void SayHello()
-        => Console.WriteLine($"Hello from Singleton");
-}
-
-public class Transient : ITransient
-{
-    public void SayHello()
-        => Console.WriteLine($"Hello from Transient");
-}
-public class Scoped : IScoped
-{
-    public void SayHello()
-        => Console.WriteLine($"Hello from Scoped");}
-
-public interface ITenantSpecific : IService { }
-
-public class TenantSpecific : ITenantSpecific
-{
-    readonly TenantId _tenant;
-
-    public TenantSpecific(TenantId tenant)
-    {
-        _tenant = tenant;
-    }
-
-    public void SayHello()
-        => Console.WriteLine($"Hello from tenant {_tenant}");
-}
