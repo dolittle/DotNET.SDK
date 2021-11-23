@@ -14,18 +14,20 @@ public class Harness : IDisposable
 
     readonly DockerClient _dockerClient;
     readonly OpenPortPool _portPool = new();
+    readonly RuntimeWithMongoFactory _runtimeWithMongoFactory;
 
     Harness(ILogger logger)
     {
         _logger = logger;
         _dockerClient = new DockerClientConfiguration().CreateClient();
-        
+        _runtimeWithMongoFactory = new RuntimeWithMongoFactory(new OpenPortPool(), _logger);
+
     }
 
     public static Harness Setup(ILogger logger)
         => Instance ??= new Harness(logger);
 
-    public RuntimeBuilder SetupRuntime() => new(_dockerClient, _portPool, _logger);
+    public RuntimeBuilder SetupRuntime() => new(_dockerClient, _runtimeWithMongoFactory);
 
     public void Dispose() => _dockerClient?.Dispose();
 }

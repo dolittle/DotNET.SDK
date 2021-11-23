@@ -5,28 +5,24 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Loggers;
 using Docker.DotNet;
 
 namespace Dolittle.Benchmarks.Harness;
 
 public class RuntimeBuilder
 {
-    readonly DockerClient _dockerClient;
-    readonly OpenPortPool _portPool;
-    readonly ILogger _logger;
+    readonly IDockerClient _dockerClient;
+    readonly RuntimeWithMongoFactory _runtimeWithMongoFactory;
 
-    public RuntimeBuilder(DockerClient dockerClient, OpenPortPool portPool, ILogger logger)
+    public RuntimeBuilder(IDockerClient dockerClient, RuntimeWithMongoFactory runtimeWithMongoFactory)
     {
         _dockerClient = dockerClient;
-        _portPool = portPool;
-        _logger = logger;
+        _runtimeWithMongoFactory = runtimeWithMongoFactory;
     }
 
-    public Runtime Build()
-    {
-        var (privatePort, publicPort, mongoPort) = (_portPool.Find(), _portPool.Find(), _portPool.Find());
-        var tag = "latest-development";
-        return new Runtime(_dockerClient, new RuntimeConfig(tag, privatePort, publicPort, mongoPort), _logger);
-    }
+    public IRuntimeWithMongo Build(string runtimeTag = "latest", string mongoDbTag = "latest")
+        => _runtimeWithMongoFactory.Create(_dockerClient, runtimeTag, mongoDbTag);
+
+    public IRuntimeWithMongo BuildDevelopment(string tag = "latest")
+        => _runtimeWithMongoFactory.CreateDevelopment(_dockerClient, tag);
 }

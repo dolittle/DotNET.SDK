@@ -27,7 +27,10 @@ public class RuntimeContainer : Container
             new BoundPorts((privatePort, DefaultPrivatePort), (publicPort, DefaultPublicPort)),
             logger)
     {
+        Endpoints = new RuntimeEndpoints(privatePort.Port, publicPort.Port);
     }
+    
+    public RuntimeEndpoints Endpoints { get; }
 
     protected override Task WaitUntilContainerStarted()
         => Task.Delay(TimeSpan.FromSeconds(5));

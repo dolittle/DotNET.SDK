@@ -8,7 +8,7 @@ using Docker.DotNet;
 
 namespace Dolittle.Benchmarks.Harness;
 
-public class RuntimeDevelopmentContainer : Container
+public class RuntimeDevelopmentContainer : Container, IRuntimeWithMongo
 {
     public RuntimeDevelopmentContainer(
         IDockerClient client,
@@ -27,9 +27,12 @@ public class RuntimeDevelopmentContainer : Container
                 (mongoPort, MongoDbContainer.DefaultPort)),
             logger)
     {
+        Endpoints = new RuntimeEndpoints(privatePort.Port, publicPort.Port);
     }
 
     protected override Task WaitUntilContainerStarted()
         => Task.Delay(TimeSpan.FromSeconds(5));
 
+    public RuntimeEndpoints Endpoints { get; }
+    
 }

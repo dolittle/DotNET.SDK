@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using Docker.DotNet;
@@ -40,14 +41,15 @@ public abstract class Container : IContainer
             return;
         }
         _logger.WriteLine(LogKind.Info, $"Starting {this}");
-
+        var exposesPorts = Configuration.CreateExposedPorts(_boundPorts);
+        var portBindings = Configuration.CreatePortBindings(_boundPorts);
         var createContainerParameters = new CreateContainerParameters
         {
             Image = $"{Image}:{Tag}",
-            ExposedPorts = Configuration.CreateExposedPorts(_boundPorts),
-            HostConfig =
+            ExposedPorts = exposesPorts,
+            HostConfig = new HostConfig
             {
-                PortBindings = Configuration.CreatePortBindings(_boundPorts)
+                PortBindings = portBindings
             }
         };
         ModifyCreateContainerParameters(createContainerParameters);

@@ -14,7 +14,7 @@ public static class Configuration
 
     public static IDictionary<string, IList<PortBinding>> CreatePortBindings(IEnumerable<(int hostPort, int containerPort)> bindings)
         => bindings.ToDictionary<(int hostPort, int containerPort), string, IList<PortBinding>>(
-            binding => $"{binding}/tcp",
+            binding => $"{binding.containerPort}/tcp",
             binding => new List<PortBinding>
             {
                 new PortBinding
