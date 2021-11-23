@@ -22,7 +22,7 @@ public class SingleRuntimeSetup
         var logger = ConsoleLogger.Default;
         logger.WriteLine(LogKind.Info, "Setting up harness");
         _harness = Harness.Harness.Setup(logger);
-        _singleRuntime = _harness.SetupRuntime().Build();
+        _singleRuntime = _harness.SetupRuntime().BuildDevelopment();
     }
     
     [IterationSetup]

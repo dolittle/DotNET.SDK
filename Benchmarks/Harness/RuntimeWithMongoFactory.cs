@@ -28,7 +28,7 @@ public class RuntimeWithMongoFactory
             new MongoDbContainer(
                 client,
                 mongoDbTag,
-                _portPool.Find(),
+                _portPool.Claim(27017),
                 _logger));
     }
 

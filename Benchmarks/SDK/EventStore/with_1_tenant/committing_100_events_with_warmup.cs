@@ -8,7 +8,7 @@ using Dolittle.SDK.Tenancy;
 
 namespace Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 
-public class committing_100_events : SingleRuntimeSetup
+public class committing_100_events_with_warmup : SingleRuntimeSetup
 {
     IEventStore _eventStore;
 
@@ -18,6 +18,9 @@ public class committing_100_events : SingleRuntimeSetup
         var client = GetClientBuilder().Build();
         client.Start();
         _eventStore = client.EventStore.ForTenant(TenantId.Development);
+        _eventStore.Commit(_ => _.CreateEvent(new some_event())
+            .FromEventSource("source")
+            .WithEventType("3065740c-f2e3-4ef4-9738-fe2b1a104399")).Wait();
     }
 
     [Benchmark]
@@ -46,9 +49,4 @@ public class committing_100_events : SingleRuntimeSetup
             }
         });
     }
-}
-
-public class some_event
-{
-    public string Message = "Hello";
 }

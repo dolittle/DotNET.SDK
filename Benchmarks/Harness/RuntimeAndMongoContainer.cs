@@ -5,6 +5,13 @@ using System.Threading.Tasks;
 
 namespace Dolittle.Benchmarks.Harness;
 
+
+/// <summary>
+/// 
+/// </summary>
+/// <remarks>
+/// Cannot really use this until there is a way of binding up resources.json because of the need to setup custom mongodb port.
+/// </remarks>
 public class RuntimeAndMongoContainer : IRuntimeWithMongo
 {
     readonly RuntimeContainer _runtimeContainer;

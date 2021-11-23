@@ -24,6 +24,7 @@ public static class BenchmarkConfig
             .WithUnrollFactor(1)
             .WithInvocationCount(1)
             .WithStrategy(RunStrategy.ColdStart)
+            .WithLaunchCount(1)
             .DontEnforcePowerPlan();
         
         return ManualConfig.CreateEmpty()

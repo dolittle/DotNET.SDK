@@ -43,6 +43,14 @@ public abstract class Container : IContainer
         _logger.WriteLine(LogKind.Info, $"Starting {this}");
         var exposesPorts = Configuration.CreateExposedPorts(_boundPorts);
         var portBindings = Configuration.CreatePortBindings(_boundPorts);
+        await Client.Images.CreateImageAsync(
+            new ImagesCreateParameters
+            {
+                Tag = Tag,
+                FromImage = $"{Image}:{Tag}"
+            },
+            null,
+            new Progress<JSONMessage>()).ConfigureAwait(false);
         var createContainerParameters = new CreateContainerParameters
         {
             Image = $"{Image}:{Tag}",
@@ -66,7 +74,8 @@ public abstract class Container : IContainer
             return;
         }
         _logger.WriteLine(LogKind.Info, $"Stopping {this}");
-        await Client.Containers.StopContainerAsync(ContainerId, new ContainerStopParameters()).ConfigureAwait(false);
+        // await Client.Containers.StopContainerAsync(ContainerId, new ContainerStopParameters()).ConfigureAwait(false);
+        await Client.Containers.KillContainerAsync(ContainerId, new ContainerKillParameters()).ConfigureAwait(false);
         _started = false;
     }
 
