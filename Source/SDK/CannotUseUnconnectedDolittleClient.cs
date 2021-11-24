@@ -8,13 +8,13 @@ namespace Dolittle.SDK
     /// <summary>
     /// Exception that gets thrown when the trying to access properties on the <see cref="IDolittleClient"/> that requires it to be started.
     /// </summary>
-    public class DolittleClientNotStarted : Exception
+    public class CannotUseUnconnectedDolittleClient : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DolittleClientNotStarted"/> class.
+        /// Initializes a new instance of the <see cref="CannotUseUnconnectedDolittleClient"/> class.
         /// </summary>
-        public DolittleClientNotStarted()
-            : base($"{nameof(IDolittleClient)} has not been started yet. Invoke the {nameof(IDolittleClient.Start)}() method")
+        public CannotUseUnconnectedDolittleClient()
+            : base($"{nameof(DolittleClient)} has not been connected yet. Connect the Dolittle Client to the Runtime by calling the {nameof(IDolittleClient.Connect)} method")
         {
         }
     }

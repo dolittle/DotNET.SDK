@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.DependencyInversion;
@@ -14,7 +15,6 @@ using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Resources;
 using Dolittle.SDK.Tenancy;
-using Dolittle.SDK.Tenancy.Client;
 
 namespace Dolittle.SDK
 {
@@ -64,10 +64,28 @@ namespace Dolittle.SDK
         IContainer Services { get; }
 
         /// <summary>
-        /// Start the client.
+        /// Connects the <see cref="IDolittleClient"/>.
         /// </summary>
-        /// <returns>A <see cref="Task"/> that completes when the client has started. </returns>
-        Task Start();
+        /// <param name="configureClient">The optional <see cref="Action{T}"/> callback for configuring the <see cref="DolittleClientConfiguration"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task Connect(ConfigureDolittleClient configureClient, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Connects the <see cref="IDolittleClient"/>.
+        /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task Connect(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Disconnects the <see cref="IDolittleClient"/>.
+        /// </summary>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        Task Disconnect(CancellationToken cancellationToken = default);
+
+        // TODO: Replace this with something else (Like IPRojections)
 
         /// <summary>
         /// Gets the <see cref="IAggregateRootOperations{TAggregate}" /> for a new aggregate of the specified <typeparamref name="TAggregateRoot"/>.

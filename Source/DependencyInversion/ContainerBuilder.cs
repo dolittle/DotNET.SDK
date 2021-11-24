@@ -17,7 +17,7 @@ namespace Dolittle.SDK.DependencyInversion
     public class ContainerBuilder
     {
         readonly HashSet<TenantId> _tenants = new HashSet<TenantId>();
-        readonly List<Action<TenantId, IServiceCollection>> _configureServicesForTenantCallbacks = new List<Action<TenantId, IServiceCollection>>();
+        readonly List<ConfigureTenantServices> _configureServicesForTenantCallbacks = new List<ConfigureTenantServices>();
 
         IServiceProvider _rootProvider = new ServiceCollection().BuildServiceProvider();
 
@@ -40,8 +40,8 @@ namespace Dolittle.SDK.DependencyInversion
         /// <summary>
         /// Adds a callback that configures services for tenant.
         /// </summary>
-        /// <param name="configureServicesForTenant">The <see cref="Action{T}"/> callback for configuring an <see cref="IServiceCollection"/> tied to a <see cref="TenantId"/>.</param>
-        public void AddTenantServices(Action<TenantId, IServiceCollection> configureServicesForTenant)
+        /// <param name="configureServicesForTenant">The <see cref="ConfigureTenantServices"/> callback.</param>
+        public void AddTenantServices(ConfigureTenantServices configureServicesForTenant)
             => _configureServicesForTenantCallbacks.Add(configureServicesForTenant);
 
         /// <summary>
@@ -63,6 +63,7 @@ namespace Dolittle.SDK.DependencyInversion
 
             services.AddSingleton(tenant);
             var containerBuilder = serviceProviderFactory.CreateBuilder(services);
+
             return serviceProviderFactory.CreateServiceProvider(containerBuilder);
         }
     }

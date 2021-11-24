@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../default.props" />
   <PropertyGroup>
-    <AssemblyName>Dolittle.SDK.DependencyInversion</AssemblyName>
+    <AssemblyName>Dolittle.SDK.Extensions.Hosting</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

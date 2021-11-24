@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
@@ -21,17 +22,22 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Events.Store.Converters;
+using Dolittle.SDK.Execution;
+using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resources;
+using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Environment = Dolittle.SDK.Microservices.Environment;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
+using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK
 {
@@ -59,16 +65,16 @@ namespace Dolittle.SDK
         IEventProcessors _eventProcessors;
         IEventProcessingConverter _eventProcessingConverter;
         IAggregateRoots _aggregateRoots;
-        ILoggerFactory _loggerFactory;
-        CancellationToken _cancellation;
-        bool _disposed;
-        bool _connected;
-        bool _ready;
-        IServiceProvider _serviceProvider;
-        Action<TenantId, IServiceCollection> _configureTenantContainers;
         IProjectionStoreBuilder _projections;
         IEmbeddings _embeddings;
         IContainer _services;
+
+        bool _disposed;
+        bool _connected;
+        IEnumerable<Tenant> _tenants;
+        IResourcesBuilder _resources;
+        IEventStoreBuilder _eventStore;
+        IEventTypes _eventTypes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -108,169 +114,99 @@ namespace Dolittle.SDK
         }
 
         /// <inheritdoc />
-        public IEventTypes EventTypes { get; private set; }
+        public IEventTypes EventTypes
+        {
+            get => GetOrThrowIfNotConnected(_eventTypes);
+            private set => _eventTypes = value;
+        }
 
         /// <inheritdoc />
-        public IEventStoreBuilder EventStore { get; private set; }
+        public IEventStoreBuilder EventStore
+        {
+            get => GetOrThrowIfNotConnected(_eventStore);
+            private set => _eventStore = value;
+        }
 
         /// <inheritdoc />
-        public IEventHorizons EventHorizons => _eventHorizons;
+        public IEventHorizons EventHorizons
+        {
+            get => GetOrThrowIfNotConnected(_eventHorizons);
+            private set => _eventHorizons = value as EventHorizons;
+        }
 
         /// <inheritdoc />
-        public IEnumerable<Tenant> Tenants { get; private set; }
+        public IEnumerable<Tenant> Tenants
+        {
+            get => GetOrThrowIfNotConnected(_tenants);
+            private set => _tenants = value;
+        }
 
         /// <inheritdoc />
-        public IResourcesBuilder Resources { get; private set; }
+        public IResourcesBuilder Resources
+        {
+            get => GetOrThrowIfNotConnected(_resources);
+            private set => _resources = value;
+        }
 
         /// <inheritdoc />
         public IProjectionStoreBuilder Projections
         {
-            get => GetOrThrowIfNotReady(_projections);
+            get => GetOrThrowIfNotConnected(_projections);
             private set => _projections = value;
         }
 
         /// <inheritdoc />
         public IEmbeddings Embeddings
         {
-            get => GetOrThrowIfNotReady(_embeddings);
+            get => GetOrThrowIfNotConnected(_embeddings);
             private set => _embeddings = value;
-        }
-
-        TRequiresStartService GetOrThrowIfNotReady<TRequiresStartService>(TRequiresStartService service)
-        {
-            if (!_ready)
-            {
-                throw new DolittleClientNotStarted();
-            }
-
-            return service;
         }
 
         /// <inheritdoc />
         public IContainer Services
         {
-            get => _services ?? throw new DolittleClientNotStarted();
+            get => GetOrThrowIfNotConnected(_services);
             private set => _services = value;
         }
 
         /// <summary>
         /// Create a client builder for a Microservice.
         /// </summary>
+        /// <param name="setup">The <see cref="SetupDolittleClient"/> callback.</param>
         /// <returns>The <see cref="DolittleClientBuilder"/> to build the <see cref="DolittleClient"/> from.</returns>
-        public static DolittleClientBuilder Setup()
-            => new DolittleClientBuilder();
-
-        /// <summary>
-        /// Configures the root <see cref="IServiceProvider"/>.
-        /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-        /// <returns>The client for continuation.</returns>
-        public DolittleClient WithServiceProvider(IServiceProvider serviceProvider)
+        public static IDolittleClient Setup(SetupDolittleClient setup)
         {
-            _serviceProvider = serviceProvider;
-            return this;
+            var builder = new DolittleClientBuilder();
+            setup(builder);
+            return builder.Build();
         }
 
-        /// <summary>
-        /// Configures a <see cref="Action{T}"/> callback for configuring the tenant specific IoC containers.
-        /// </summary>
-        /// <param name="configureTenantContainers">The <see cref="Action{T}"/> callback for configuring the tenant specific IoC containers</param>
-        /// <returns>The client for continuation.</returns>
-        public DolittleClient WithTenantServices(Action<TenantId, IServiceCollection> configureTenantContainers) // Maybe hook in with TContainerBuilder instead? That way we can allow for using the Autofac ContainerBuilder for instance
+        /// <inheritdoc />
+        public Task Connect(ConfigureDolittleClient configureClient, CancellationToken cancellationToken = default)
         {
-            _configureTenantContainers = configureTenantContainers;
-            return this;
+            var configuration = new DolittleClientConfiguration();
+            configureClient?.Invoke(configuration);
+            return Connect(configuration, cancellationToken);
         }
 
-        /// <inheritdoc/>
-        public Task Start()
-        {
-            if (!_connected)
-            {
-                throw new CannotStartUnconnectedDolittleClient();
-            }
+        /// <inheritdoc />
+        public Task Connect(CancellationToken cancellationToken = default)
+            => Connect(new DolittleClientConfiguration(), cancellationToken);
 
-            ConfigureContainer();
-
-            // Should use container when creating aggregate roots? We at least though of that at some point
-            _aggregateRoots = new AggregateRoots(_loggerFactory.CreateLogger<AggregateRoots>());
-            _eventHandlersBuilder.BuildAndRegister(
-                _eventProcessors,
-                EventTypes,
-                _eventProcessingConverter,
-                Services,
-                _loggerFactory,
-                _cancellation);
-            _filtersBuilder.BuildAndRegister(
-                _eventProcessors,
-                _eventProcessingConverter,
-                _loggerFactory,
-                _cancellation);
-            _projectionsBuilder.BuildAndRegister(
-                _eventProcessors,
-                EventTypes,
-                _eventProcessingConverter,
-                _projectionConverter,
-                _loggerFactory,
-                _cancellation);
-            _embeddingsBuilder.BuildAndRegister(
-                _eventProcessors,
-                EventTypes,
-                _eventsToProtobufConverter,
-                _projectionConverter,
-                _loggerFactory,
-                _cancellation);
-
-            _ready = true;
-            return _processingCoordinator.Completion;
-        }
-
-        /// <summary>
-        /// Connects the <see cref="IDolittleClient"/>.
-        /// </summary>
-        /// <param name="configureClient">The optional <see cref="Action{T}"/> callback for configuring the <see cref="DolittleClientConfiguration"/>.</param>
-        /// <param name="configureConnection">The optional <see cref="Action{T}"/> callback for configuring the <see cref="DolittleClientConnectionArguments"/>.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task Connect(
-            Action<DolittleClientConfigurationBuilder> configureClient = default,
-            Action<DolittleClientConnectionArguments> configureConnection = default)
-        {
-            var connectionConfig = new DolittleClientConnectionArguments();
-            configureConnection?.Invoke(connectionConfig);
-            return Connect(configureClient, connectionConfig);
-        }
-
-        /// <summary>
-        /// Connects the <see cref="IDolittleClient"/>.
-        /// </summary>
-        /// <param name="configureClient">The optional <see cref="Action{T}"/> callback for configuring the <see cref="DolittleClientConfiguration"/>.</param>
-        /// <param name="executionContextResolver">The optional <see cref="ICanResolveExecutionContextForDolittleClient"/>.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task Connect(
-            Action<DolittleClientConfigurationBuilder> configureClient = default,
-            ICanResolveExecutionContextForDolittleClient executionContextResolver = default)
-        {
-            executionContextResolver ??= new DolittleClientConnectionArguments();
-            var clientConfigBuilder = DolittleClientConfiguration.Builder;
-            configureClient?.Invoke(clientConfigBuilder);
-            var clientConfig = clientConfigBuilder.Build();
-            var executionContext = await executionContextResolver.Resolve().ConfigureAwait(false);
-
-            await PerformHandshake(executionContext).ConfigureAwait(false);
-            await RegisterAndCreateDependencies(clientConfig, executionContext).ConfigureAwait(false);
-            _connected = true;
-        }
+        /// <inheritdoc />
+        public Task Disconnect(CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
 
         /// <inheritdoc />
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<IEventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
-            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, GetOrThrowIfNotReady(_aggregateRoots), _loggerFactory)
+            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, GetOrThrowIfNotConnected(_aggregateRoots), _loggerFactory)
                     .Create();
 
         /// <inheritdoc />
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<IEventStoreBuilder, IEventStore> buildEventStore)
             where TAggregateRoot : AggregateRoot
-            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, GetOrThrowIfNotReady(_aggregateRoots), _loggerFactory)
+            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, GetOrThrowIfNotConnected(_aggregateRoots), _loggerFactory)
                     .Get(eventSource);
 
         /// <inheritdoc/>
@@ -296,31 +232,56 @@ namespace Dolittle.SDK
             _disposed = true;
         }
 
-        async Task RegisterAndCreateDependencies(DolittleClientConfiguration clientConfig, ExecutionContext executionContext)
+        async Task Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken)
         {
-            _loggerFactory = clientConfig.LoggerFactory;
-            _cancellation = clientConfig.Cancellation;
-            var methodCaller = new MethodCaller(clientConfig.RuntimeHost, clientConfig.RuntimePort);
-            EventTypes = new EventTypes(_loggerFactory.CreateLogger<EventTypes>());
-            _eventTypesBuilder.AddAssociationsInto(EventTypes);
+            var executionContext = await PerformHandshake(configuration.RuntimeHost, configuration.RuntimePort, cancellationToken).ConfigureAwait(false);
+            await RegisterAndCreateDependencies(
+                configuration.RuntimeHost,
+                configuration.RuntimePort,
+                configuration.PingInterval,
+                configuration.EventSerializerProvider,
+                configuration.LoggerFactory,
+                executionContext,
+                cancellationToken).ConfigureAwait(false);
+            ConfigureContainer(configuration);
+
+            StartEventProcessors(configuration.LoggerFactory, cancellationToken);
+
+            _connected = true;
+            await _processingCoordinator.Completion.ConfigureAwait(false);
+        }
+
+        async Task RegisterAndCreateDependencies(
+            string runtimeHost,
+            ushort runtimePort,
+            TimeSpan pingInterval,
+            Func<JsonSerializerSettings> eventSerializerProvider,
+            ILoggerFactory loggerFactory,
+            ExecutionContext executionContext,
+            CancellationToken cancellation)
+        {
+            _aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
+            var methodCaller = new MethodCaller(runtimeHost, runtimePort);
+            EventTypes = new EventTypes(loggerFactory.CreateLogger<EventTypes>());
+            _eventTypesBuilder.AddAssociationsInto(_eventTypes);
             await _eventTypesBuilder.BuildAndRegister(
                 new Events.Internal.EventTypesClient(
                     methodCaller,
                     executionContext,
-                    _loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
-                _cancellation).ConfigureAwait(false);
+                    loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
+                cancellation).ConfigureAwait(false);
             await _aggregateRootsBuilder.BuildAndRegister(
                 new AggregateRootsClient(
                     methodCaller,
                     executionContext,
-                    _loggerFactory.CreateLogger<AggregateRoots>()),
-                _cancellation).ConfigureAwait(false);
+                    loggerFactory.CreateLogger<AggregateRoots>()),
+                cancellation).ConfigureAwait(false);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
-                clientConfig.PingInterval,
+                pingInterval,
                 methodCaller,
                 executionContext,
-                _loggerFactory);
-            var serializer = new EventContentSerializer(EventTypes, clientConfig.EventSerializerProvider);
+                loggerFactory);
+            var serializer = new EventContentSerializer(_eventTypes, eventSerializerProvider);
             _eventsToProtobufConverter = new EventToProtobufConverter(serializer);
             var eventToSDKConverter = new EventToSDKConverter(serializer);
             var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
@@ -329,7 +290,7 @@ namespace Dolittle.SDK
             _eventProcessors = new EventProcessors(
                 reverseCallClientsCreator,
                 _processingCoordinator,
-                _loggerFactory.CreateLogger<EventProcessors>());
+                loggerFactory.CreateLogger<EventProcessors>());
             EventStore = new EventStoreBuilder(
                 methodCaller,
                 _eventsToProtobufConverter,
@@ -338,15 +299,15 @@ namespace Dolittle.SDK
                 aggregateEventToSDKConverter,
                 executionContext,
                 _callContextResolver,
-                EventTypes,
-                _loggerFactory);
+                _eventTypes,
+                loggerFactory);
 
-            _eventHorizons = new EventHorizons(
+            EventHorizons = new EventHorizons(
                 methodCaller,
                 executionContext,
                 _eventHorizonRetryPolicy,
-                _loggerFactory.CreateLogger<EventHorizons>());
-            _eventHorizonsBuilder.BuildAndSubscribe(_eventHorizons, _cancellation);
+                loggerFactory.CreateLogger<EventHorizons>());
+            _eventHorizonsBuilder.BuildAndSubscribe(_eventHorizons, cancellation);
 
             Projections = new ProjectionStoreBuilder(
                 methodCaller,
@@ -354,36 +315,84 @@ namespace Dolittle.SDK
                 _callContextResolver,
                 _projectionAssociations,
                 _projectionConverter,
-                _loggerFactory);
+                loggerFactory);
             Embeddings = new Embeddings.Embeddings(
                 methodCaller,
                 _callContextResolver,
                 _embeddingAssociations,
                 _projectionConverter,
                 executionContext,
-                _loggerFactory);
+                loggerFactory);
 
-            var tenants = new TenantsClient(methodCaller, executionContext, _loggerFactory.CreateLogger<TenantsClient>());
-            Resources = new ResourcesBuilder(methodCaller, executionContext, _loggerFactory);
-            Tenants = await tenants.GetAll(_cancellation).ConfigureAwait(false);
+            var tenants = new TenantsClient(methodCaller, executionContext, loggerFactory.CreateLogger<TenantsClient>());
+            Resources = new ResourcesBuilder(methodCaller, executionContext, loggerFactory);
+            Tenants = await tenants.GetAll(cancellation).ConfigureAwait(false);
         }
 
-        void ConfigureContainer()
+        void StartEventProcessors(ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+        {
+            _eventHandlersBuilder.BuildAndRegister(
+                _eventProcessors,
+                _eventTypes,
+                _eventProcessingConverter,
+                _services,
+                loggerFactory,
+                cancellationToken);
+            _filtersBuilder.BuildAndRegister(
+                _eventProcessors,
+                _eventProcessingConverter,
+                loggerFactory,
+                cancellationToken);
+            _projectionsBuilder.BuildAndRegister(
+                _eventProcessors,
+                _eventTypes,
+                _eventProcessingConverter,
+                _projectionConverter,
+                loggerFactory,
+                cancellationToken);
+            _embeddingsBuilder.BuildAndRegister(
+                _eventProcessors,
+                _eventTypes,
+                _eventsToProtobufConverter,
+                _projectionConverter,
+                loggerFactory,
+                cancellationToken);
+        }
+
+        TRequiresStartService GetOrThrowIfNotConnected<TRequiresStartService>(TRequiresStartService service)
+        {
+            if (!_connected)
+            {
+                throw new CannotUseUnconnectedDolittleClient();
+            }
+
+            return service;
+        }
+
+        void ConfigureContainer(DolittleClientConfiguration config)
         {
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.UseRootProvider(_serviceProvider);
+            containerBuilder.UseRootProvider(config.ServiceProvider);
             foreach (var tenant in Tenants)
             {
                 containerBuilder.AddTenant(tenant.Id);
             }
 
-            containerBuilder.AddTenantServices(_configureTenantContainers);
+            containerBuilder.AddTenantServices(config.ConfigureTenantServices);
             Services = containerBuilder.Build();
         }
 
-        Task PerformHandshake(ExecutionContext executionContext)
+        Task<ExecutionContext> PerformHandshake(string runtimeHost, ushort runtimePort, CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            // TODO: Connect and get from platform.
+            return Task.FromResult(new ExecutionContext(
+                MicroserviceId.NotSet,
+                TenantId.Development,
+                Version.NotSet,
+                Environment.Undetermined,
+                CorrelationId.System,
+                Claims.Empty,
+                CultureInfo.InvariantCulture));
         }
     }
 }
