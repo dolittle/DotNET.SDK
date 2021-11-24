@@ -41,7 +41,7 @@ namespace Dolittle.SDK.Testing.Events.Store
             CultureInfo.CurrentCulture);
 
         /// <summary>
-        /// Gets the current <see cref="EventLogSequenceNumber"/>.
+        /// Gets or sets the current <see cref="EventLogSequenceNumber"/>.
         /// </summary>
         public EventLogSequenceNumber SequenceNumber { get; set; } = EventLogSequenceNumber.Initial;
 

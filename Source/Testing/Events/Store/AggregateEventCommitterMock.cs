@@ -46,7 +46,7 @@ namespace Dolittle.SDK.Testing.Events.Store
         public ExecutionContext ExecutionContext => _committerMock.ExecutionContext;
 
         /// <summary>
-        /// Gets the current <see cref="EventLogSequenceNumber"/>.
+        /// Gets or sets the current <see cref="EventLogSequenceNumber"/>.
         /// </summary>
         public EventLogSequenceNumber SequenceNumber
         {
