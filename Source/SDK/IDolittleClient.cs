@@ -66,17 +66,25 @@ namespace Dolittle.SDK
         /// <summary>
         /// Connects the <see cref="IDolittleClient"/>.
         /// </summary>
+        /// <param name="configuration">The <see cref="DolittleClientConfiguration"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="Task"/>, that when resolved, returns the client for continuation.</returns>
+        Task<IDolittleClient> Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Connects the <see cref="IDolittleClient"/>.
+        /// </summary>
         /// <param name="configureClient">The optional <see cref="Action{T}"/> callback for configuring the <see cref="DolittleClientConfiguration"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Connect(ConfigureDolittleClient configureClient, CancellationToken cancellationToken = default);
+        /// <returns>A <see cref="Task"/>, that when resolved, returns the client for continuation.</returns>
+        Task<IDolittleClient> Connect(ConfigureDolittleClient configureClient, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Connects the <see cref="IDolittleClient"/>.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Connect(CancellationToken cancellationToken = default);
+        /// <returns>A <see cref="Task"/>, that when resolved, returns the client for continuation.</returns>
+        Task<IDolittleClient> Connect(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Disconnects the <see cref="IDolittleClient"/>.

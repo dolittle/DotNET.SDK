@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,43 +15,43 @@ namespace Dolittle.SDK
     public class DolittleClientConfiguration
     {
         /// <summary>
-        /// Gets the Runtime host.
+        /// Gets or sets the Runtime host.
         /// </summary>
-        public string RuntimeHost { get; private set; } = "localhost";
+        public string RuntimeHost { get; set; } = "localhost";
 
         /// <summary>
-        /// Gets the Runtime port.
+        /// Gets or sets theRuntime port.
         /// </summary>
-        public ushort RuntimePort { get; private set; } = 50053;
+        public ushort RuntimePort { get; set; } = 50053;
 
         /// <summary>
-        /// Gets the ping-interval <see cref="TimeSpan"/>.
+        /// Gets or sets theping-interval <see cref="TimeSpan"/>.
         /// </summary>
-        public TimeSpan PingInterval { get; private set; } = TimeSpan.FromSeconds(5);
+        public TimeSpan PingInterval { get; set; } = TimeSpan.FromSeconds(5);
 
         /// <summary>
-        /// Gets the event serializer provider.
+        /// Gets or sets theevent serializer provider.
         /// </summary>
-        public Func<JsonSerializerSettings> EventSerializerProvider { get; private set; } = () => new JsonSerializerSettings();
+        public Func<JsonSerializerSettings> EventSerializerProvider { get; set; } = () => new JsonSerializerSettings();
 
         /// <summary>
-        /// Gets the <see cref="ILoggerFactory"/>.
+        /// Gets or sets the<see cref="ILoggerFactory"/>.
         /// </summary>
-        public ILoggerFactory LoggerFactory { get; private set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
+        public ILoggerFactory LoggerFactory { get; set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
         {
             _.SetMinimumLevel(LogLevel.Information);
             _.AddConsole();
         });
 
         /// <summary>
-        /// Gets the <see cref="IServiceProvider"/>.
+        /// Gets or sets the<see cref="IServiceProvider"/>.
         /// </summary>
-        public IServiceProvider ServiceProvider { get; private set; } = new DefaultServiceProviderFactory().CreateServiceProvider(new ServiceCollection());
+        public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProviderFactory().CreateServiceProvider(new ServiceCollection());
 
         /// <summary>
-        /// Gets the <see cref="ConfigureTenantServices"/> callback.
+        /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
         /// </summary>
-        public ConfigureTenantServices ConfigureTenantServices { get; private set; } = (_, __) => { };
+        public ConfigureTenantServices ConfigureTenantServices { get; set; } = (_, __) => { };
 
         /// <summary>
         /// Connect to a specific host and port for the Dolittle runtime.

@@ -75,6 +75,7 @@ namespace Dolittle.SDK
         IResourcesBuilder _resources;
         IEventStoreBuilder _eventStore;
         IEventTypes _eventTypes;
+        ILoggerFactory _loggerFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -182,7 +183,7 @@ namespace Dolittle.SDK
         }
 
         /// <inheritdoc />
-        public Task Connect(ConfigureDolittleClient configureClient, CancellationToken cancellationToken = default)
+        public Task<IDolittleClient> Connect(ConfigureDolittleClient configureClient, CancellationToken cancellationToken = default)
         {
             var configuration = new DolittleClientConfiguration();
             configureClient?.Invoke(configuration);
@@ -190,12 +191,35 @@ namespace Dolittle.SDK
         }
 
         /// <inheritdoc />
-        public Task Connect(CancellationToken cancellationToken = default)
+        public Task<IDolittleClient> Connect(CancellationToken cancellationToken = default)
             => Connect(new DolittleClientConfiguration(), cancellationToken);
 
         /// <inheritdoc />
+        public async Task<IDolittleClient> Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken = default)
+        {
+            if (_connected)
+            {
+                throw new CannotConnectDolittleClientMultipleTimes();
+            }
+
+            var executionContext = await PerformHandshake(configuration.RuntimeHost, configuration.RuntimePort, cancellationToken).ConfigureAwait(false);
+            await RegisterAndCreateDependencies(
+                configuration.RuntimeHost,
+                configuration.RuntimePort,
+                configuration.PingInterval,
+                configuration.EventSerializerProvider,
+                configuration.LoggerFactory,
+                executionContext,
+                cancellationToken).ConfigureAwait(false);
+            ConfigureContainer(configuration);
+            StartEventProcessors(configuration.LoggerFactory, cancellationToken);
+            _connected = true;
+            return this;
+        }
+
+        /// <inheritdoc />
         public Task Disconnect(CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+            => _processingCoordinator.Completion;
 
         /// <inheritdoc />
         public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<IEventStoreBuilder, IEventStore> buildEventStore)
@@ -232,25 +256,6 @@ namespace Dolittle.SDK
             _disposed = true;
         }
 
-        async Task Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken)
-        {
-            var executionContext = await PerformHandshake(configuration.RuntimeHost, configuration.RuntimePort, cancellationToken).ConfigureAwait(false);
-            await RegisterAndCreateDependencies(
-                configuration.RuntimeHost,
-                configuration.RuntimePort,
-                configuration.PingInterval,
-                configuration.EventSerializerProvider,
-                configuration.LoggerFactory,
-                executionContext,
-                cancellationToken).ConfigureAwait(false);
-            ConfigureContainer(configuration);
-
-            StartEventProcessors(configuration.LoggerFactory, cancellationToken);
-
-            _connected = true;
-            await _processingCoordinator.Completion.ConfigureAwait(false);
-        }
-
         async Task RegisterAndCreateDependencies(
             string runtimeHost,
             ushort runtimePort,
@@ -260,6 +265,7 @@ namespace Dolittle.SDK
             ExecutionContext executionContext,
             CancellationToken cancellation)
         {
+            _loggerFactory = loggerFactory;
             _aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
             var methodCaller = new MethodCaller(runtimeHost, runtimePort);
             EventTypes = new EventTypes(loggerFactory.CreateLogger<EventTypes>());
