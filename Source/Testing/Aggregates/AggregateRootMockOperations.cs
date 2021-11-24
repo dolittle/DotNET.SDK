@@ -3,10 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Testing.Events;
+using Dolittle.SDK.Testing.Events.Store;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Dolittle.SDK.Testing.Aggregates
@@ -21,7 +24,6 @@ namespace Dolittle.SDK.Testing.Aggregates
         where TAggregate : AggregateRoot
     {
         readonly EventStoreMock _eventStore;
-        readonly EventTypes _eventTypes;
         readonly List<Func<TAggregate, Task>> _queuedActions = new List<Func<TAggregate, Task>>();
 
         /// <summary>
@@ -30,13 +32,14 @@ namespace Dolittle.SDK.Testing.Aggregates
         /// <param name="eventSourceId">The event source id of the mock.</param>
         public AggregateRootMockOperations(EventSourceId eventSourceId)
         {
-            _eventStore = new EventStoreMock();
-            _eventTypes = new EventTypes(NullLogger.Instance);
+            var eventTypes = new EventTypesMock();
+
+            _eventStore = EventStoreMock.Create(eventTypes);
 
             Operations = new AggregateRootOperations<TAggregate>(
                 eventSourceId,
                 _eventStore,
-                _eventTypes,
+                eventTypes,
                 new AggregateRoots(NullLogger.Instance),
                 NullLogger.Instance);
         }
@@ -54,11 +57,7 @@ namespace Dolittle.SDK.Testing.Aggregates
         /// <returns>The <see cref="AggregateRootMockOperations{TAggregate}"/> for continuation.</returns>
         public AggregateRootMockOperations<TAggregate> WithEvents(params object[] events)
         {
-            foreach (var @event in events)
-            {
-                _eventStore.AlreadyCommittedEvents.Add(events);
-            }
-
+            _eventStore.EventsToFetch.AddRange(events);
             return this;
         }
 
@@ -99,7 +98,7 @@ namespace Dolittle.SDK.Testing.Aggregates
         public async Task<IList<object>> GetAppliedEvents()
         {
             await PerformAllQueuedActions().ConfigureAwait(false);
-            return _eventStore.CommittedEvents;
+            return _eventStore.CommittedEvents.Select(_ => _.Content).ToList();
         }
 
         async Task PerformAllQueuedActions()
