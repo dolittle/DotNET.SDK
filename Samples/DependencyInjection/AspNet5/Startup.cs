@@ -34,9 +34,16 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+        services.AddTransient<ITransient, Transient>();
+        services.AddScoped<IScoped, Scoped>();
+        services.AddSingleton<ISingleton, Singleton>();
         services.AddDolittle(
             _ => { },
-            _ => _.WithTenantServices((tenant, services) => services.AddSingleton(typeof(ITenantSpecific), typeof(TenantSpecific))));
+            _ => _.WithTenantServices((tenant, services) =>
+            {
+                services.AddSingleton<ITenantSpecific, TenantSpecific>();
+                services.AddScoped<ITenantSpecificScoped, TenantSpecificScoped>();
+            }));
         services.AddSwaggerGen();
         // services.Replace(new ServiceDescriptor(typeof(IControllerActivator), typeof(CustomControllerActivator), ServiceLifetime.Singleton));
     }
@@ -57,7 +64,10 @@ public class Startup
         app.Use(async (context, next) =>
         {
             var dolittleClient = context.RequestServices.GetRequiredService<IDolittleClient>();
-            context.RequestServices = dolittleClient.Services.GetProviderFor(TenantId.Development);
+            var tenantServices = dolittleClient.Services.ForTenant(TenantId.Development);
+            var scopeFactory = tenantServices.GetRequiredService<IServiceScopeFactory>();
+            using var scope = scopeFactory.CreateScope();
+            context.RequestServices = scope.ServiceProvider;
             await next();
         });
         app.UseHttpsRedirection();

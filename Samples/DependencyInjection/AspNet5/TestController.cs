@@ -8,18 +8,23 @@ using Microsoft.AspNetCore.Mvc;
 [Route("test")]
 public class TestController : ControllerBase
 {
+    readonly IScoped _scopedService;
     readonly ITenantSpecific _tenantSpecificService;
+    readonly ITenantSpecificScoped _tenantSpecificScopedService;
 
-    public TestController(ITenantSpecific tenantSpecificService)
+    public TestController(IScoped scopedService, ITenantSpecific tenantSpecificService, ITenantSpecificScoped tenantSpecificScopedService)
     {
+        _scopedService = scopedService;
         _tenantSpecificService = tenantSpecificService;
-        tenantSpecificService.SayHello();
+        _tenantSpecificScopedService = tenantSpecificScopedService;
     }
     
     [HttpGet]
     public IActionResult Get()
     {
+        _scopedService.SayHello();
         _tenantSpecificService.SayHello();
+        _tenantSpecificScopedService.SayHello();
         return Accepted();
     }
 }
