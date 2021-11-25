@@ -10,12 +10,24 @@ services.AddSingleton(typeof(ISingleton), typeof(Singleton));
 services.AddTransient(typeof(ITransient), typeof(Transient));
 services.AddScoped(typeof(IScoped), typeof(Scoped));
 
-var client = await DolittleClient
-    .ForMicroservice("cc0bbb90-9ead-43a5-a53d-c32a3105fd43")
-    .WithServices(services)
-    .WithTenantServices((tenant, services) => services.AddSingleton(typeof(ITenantSpecific), typeof(TenantSpecific)))
-    .Connect()
-    .ConfigureAwait(false);
+// Method 1
+services.AddDolittle(_ => { }, _ => _.WithTenantServices(((tenant, collection) => collection.AddSingleton(typeof(ITenantSpecific), typeof(TenantSpecific)))));
+var provider = services.BuildServiceProvider();
+
+var client = await provider.GetRequiredService<IDolittleClient>()
+    .Connect(provider.GetRequiredService<DolittleClientConfiguration>()).ConfigureAwait(false);
+
+// Method two
+// var client = await DolittleClient
+//     .Setup(_ => { })
+//     .Connect(_ => _
+//         .WithServiceProvider(provider)
+//         .WithTenantServices((tenant, services) =>
+//         {
+//             services.AddSingleton(typeof(ITenantSpecific), typeof(TenantSpecific));
+//         })
+//     ).ConfigureAwait(false);
+
 
 client.Services.Get<ITenantSpecific>(TenantId.Development).SayHello();
 client.Services.Get<ISingleton>(TenantId.Development).SayHello();
@@ -24,5 +36,3 @@ client.Services.Get<IScoped>(TenantId.Development).SayHello();
 client.Services.GetRequiredService<ISingleton>().SayHello();
 client.Services.GetRequiredService<ITransient>().SayHello();
 client.Services.GetRequiredService<IScoped>().SayHello();
-await client.Start().ConfigureAwait(false);
-
