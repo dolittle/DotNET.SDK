@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
 using Autofac.Core;
 using Autofac.Core.Activators.Delegate;
 using Autofac.Core.Lifetime;
 using Autofac.Core.Registration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.DependencyInversion
 {
@@ -42,9 +42,7 @@ namespace Dolittle.SDK.DependencyInversion
                 Guid.NewGuid(),
                 new DelegateActivator(
                     serviceWithType.ServiceType,
-                    (ctx, parameters) => ctx.IsRegisteredService(service)
-                        ? ctx.Resolve(serviceWithType.ServiceType, parameters)
-                        : _rootProvider.GetService(serviceWithType.ServiceType)),
+                    (_, __) => _rootProvider.GetRequiredService(serviceWithType.ServiceType)),
                 new CurrentScopeLifetime(),
                 InstanceSharing.None,
                 InstanceOwnership.OwnedByLifetimeScope,
