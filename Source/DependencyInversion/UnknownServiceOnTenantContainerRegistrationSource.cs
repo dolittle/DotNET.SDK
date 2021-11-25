@@ -36,35 +36,35 @@ namespace Dolittle.SDK.DependencyInversion
         public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
         {
             if (!(service is IServiceWithType serviceWithType)
-                || registrationAccessor(service).Any())
+                || registrationAccessor(service).Any()
+                || _rootProvider.GetService(serviceWithType.ServiceType) == null)
             {
                 return Enumerable.Empty<IComponentRegistration>();
             }
 
-            // var registration = new ComponentRegistration(
-            //     Guid.NewGuid(),
-            //     new DelegateActivator(
-            //         serviceWithType.ServiceType,
-            //         (_, __) => _.Resolve<RootProviderWrapper>()
-            //             .ServiceProvider
-            //             .GetService(serviceWithType.ServiceType)),
-            //     new CurrentScopeLifetime(),
-            //     InstanceSharing.None,
-            //     InstanceOwnership.OwnedByLifetimeScope,
-            //     new[] { service },
-            //     new Dictionary<string, object>());
             var registration = new ComponentRegistration(
                 Guid.NewGuid(),
-                new InstanceActivator(serviceWithType.ServiceType),
+                new DelegateActivator(
+                    serviceWithType.ServiceType,
+                    (_, __) => _rootProvider
+                        .GetRequiredService(serviceWithType.ServiceType)),
                 new CurrentScopeLifetime(),
                 InstanceSharing.None,
                 InstanceOwnership.OwnedByLifetimeScope,
                 new[] { service },
                 new Dictionary<string, object>());
+            // var registration = new ComponentRegistration(
+            //     Guid.NewGuid(),
+            //     new InstanceActivator(serviceWithType.ServiceType),
+            //     new CurrentScopeLifetime(),
+            //     InstanceSharing.None,
+            //     InstanceOwnership.OwnedByLifetimeScope,
+            //     new[] { service },
+            //     new Dictionary<string, object>());
             return new[] { registration };
         }
 
         /// <inheritdoc />
-        public bool IsAdapterForIndividualComponents => true;
+        public bool IsAdapterForIndividualComponents => false;
     }
 }

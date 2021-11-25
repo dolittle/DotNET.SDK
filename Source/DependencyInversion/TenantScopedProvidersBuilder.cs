@@ -63,34 +63,16 @@ namespace Dolittle.SDK.DependencyInversion
             }
 
             containerBuilder.Populate(services);
-
-            containerBuilder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(_rootProvider));
             containerBuilder.RegisterInstance(tenant);
-            containerBuilder
-                .Register(_ => new ServiceScopeFactory(_rootProvider.GetRequiredService<IServiceScopeFactory>(), _.Resolve<ILifetimeScope>()))
-                .As<IServiceScopeFactory>();
-            containerBuilder.RegisterInstance(new RootProviderWrapper(_rootProvider));
-            containerBuilder.ComponentRegistryBuilder.Registered += (sender, args) =>
+            var container = containerBuilder.Build();
+
+            var rootScope = container.BeginLifetimeScope(builder =>
             {
-                // The PipelineBuilding event fires just before the pipeline is built, and
-                // middleware can be added inside it.
-                args.ComponentRegistration.PipelineBuilding += (sender2, pipeline) =>
-                {
-                    pipeline.Use(PipelinePhase.RegistrationPipelineStart, (context, next) =>
-                    {
-                        if (context.Service is IServiceWithType swt)
-                        {
-                            Console.WriteLine($"In my middleware {swt.ServiceType}");
-                        }
+                builder.RegisterInstance(new ServiceScopeFactory(_rootProvider.GetRequiredService<IServiceScopeFactory>(), container)).As<IServiceScopeFactory>();
+                builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(_rootProvider));
+            });
 
-                        next(context);
-                    });
-                };
-            };
-            return new AutofacServiceProvider(containerBuilder.Build());
-
-            // Console.WriteLine(provider.GetRequiredService<IServiceScopeFactory>().GetType());
-            // return provider;
+            return new AutofacServiceProvider(rootScope);
         }
     }
 }

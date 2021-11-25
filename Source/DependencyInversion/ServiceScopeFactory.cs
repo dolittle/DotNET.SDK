@@ -32,7 +32,9 @@ namespace Dolittle.SDK.DependencyInversion
         {
             Console.WriteLine("Creating scope");
             var rootScope = _rootServiceScopeFactory.CreateScope();
-            var tenantProviderScope = _lifetimeScope.BeginLifetimeScope(_ => _.RegisterInstance(new RootProviderWrapper(rootScope.ServiceProvider)));
+            var tenantProviderScope = _lifetimeScope.BeginLifetimeScope(builder =>
+                builder.RegisterSource(
+                    new UnknownServiceOnTenantContainerRegistrationSource(rootScope.ServiceProvider)));
             return new TenantServiceScope(rootScope, tenantProviderScope);
         }
     }
