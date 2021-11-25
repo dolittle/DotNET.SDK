@@ -24,6 +24,8 @@ namespace Dolittle.SDK.Samples.DependencyInjection.Shared
     }
     public class Scoped : IScoped
     {
+        public Scoped()
+            => Console.WriteLine("Creating scoped service");
         public void SayHello()
             => Console.WriteLine($"Hello from Scoped");}
 

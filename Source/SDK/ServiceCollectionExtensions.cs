@@ -8,6 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK
 {
+    // public static class ApplicationBuilderExtensions
+    // {
+    //     public static IApplicationBuilder UseDolittle(this IApplicationBuilder app)
+    //     {
+    //         
+    //     }
+    // }
+    
     /// <summary>
     /// Extension methods for <see cref="IServiceCollection"/> for adding setting up the <see cref="IDolittleClient"/>.
     /// </summary>
@@ -42,7 +50,6 @@ namespace Dolittle.SDK
             var dolittleClient = DolittleClient.Setup(setupClient);
             return services
                 .AddSingleton(dolittleClient)
-                .AddTransient<IContainer>(_ => _.GetRequiredService<IDolittleClient>().Services)
                 .AddHostedService<DolittleClientService>();
         }
 

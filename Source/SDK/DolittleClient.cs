@@ -67,7 +67,7 @@ namespace Dolittle.SDK
         IAggregateRoots _aggregateRoots;
         IProjectionStoreBuilder _projections;
         IEmbeddings _embeddings;
-        IContainer _services;
+        ITenantScopedProviders _services;
 
         bool _disposed;
         IEnumerable<Tenant> _tenants;
@@ -166,7 +166,7 @@ namespace Dolittle.SDK
         }
 
         /// <inheritdoc />
-        public IContainer Services
+        public ITenantScopedProviders Services
         {
             get => GetOrThrowIfNotConnected(_services);
             private set => _services = value;
@@ -379,7 +379,7 @@ namespace Dolittle.SDK
 
         void ConfigureContainer(DolittleClientConfiguration config)
         {
-            var containerBuilder = new ContainerBuilder();
+            var containerBuilder = new TenantScopedProvidersBuilder();
             containerBuilder.UseRootProvider(config.ServiceProvider);
             foreach (var tenant in _tenants)
             {

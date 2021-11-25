@@ -33,7 +33,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            IContainer container,
+            ITenantScopedProviders tenantScopedProviders,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
             => BuildAndRegister(

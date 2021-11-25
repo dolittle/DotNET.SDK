@@ -64,9 +64,9 @@ namespace Dolittle.SDK
         IResourcesBuilder Resources { get; }
 
         /// <summary>
-        /// Gets the <see cref="IContainer"/>.
+        /// Gets the <see cref="ITenantScopedProviders"/>.
         /// </summary>
-        IContainer Services { get; }
+        ITenantScopedProviders Services { get; }
 
         /// <summary>
         /// Connects the <see cref="IDolittleClient"/>.

@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.DependencyInversion;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -15,28 +16,28 @@ namespace Dolittle.SDK.Events.Handling.Builder
     public class ClassEventHandlerMethod<TEventHandler> : IEventHandlerMethod
         where TEventHandler : class
     {
-        readonly IContainer _container;
+        readonly ITenantScopedProviders _tenantScopedProviders;
         readonly TaskEventHandlerMethodSignature<TEventHandler> _method;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassEventHandlerMethod{TEventHandler}"/> class.
         /// </summary>
-        /// <param name="container">The <see cref="IContainer"/> to use for creating instances of the event handler.</param>
+        /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="TaskEventHandlerMethodSignature{TEvent}"/> method to invoke.</param>
-        public ClassEventHandlerMethod(IContainer container, TaskEventHandlerMethodSignature<TEventHandler> method)
+        public ClassEventHandlerMethod(ITenantScopedProviders tenantScopedProviders, TaskEventHandlerMethodSignature<TEventHandler> method)
         {
-            _container = container;
+            _tenantScopedProviders = tenantScopedProviders;
             _method = method;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassEventHandlerMethod{TEventHandler}"/> class.
         /// </summary>
-        /// <param name="container">The <see cref="IContainer"/> to use for creating instances of the event handler.</param>
+        /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="VoidEventHandlerMethodSignature{TEvent}" /> method to invoke.</param>
-        public ClassEventHandlerMethod(IContainer container, VoidEventHandlerMethodSignature<TEventHandler> method)
+        public ClassEventHandlerMethod(ITenantScopedProviders tenantScopedProviders, VoidEventHandlerMethodSignature<TEventHandler> method)
             : this(
-                container,
+                tenantScopedProviders,
                 (TEventHandler instance, object @event, EventContext context) =>
                 {
                     method(instance, @event, context);
@@ -48,7 +49,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <inheritdoc/>
         public Task<Try> TryHandle(object @event, EventContext context)
         {
-            var eventHandlerInstance = _container.Get<TEventHandler>(context.CurrentExecutionContext);
+            var eventHandlerInstance = _tenantScopedProviders.ForTenant(context.CurrentExecutionContext.Tenant).GetService<TEventHandler>();
             if (eventHandlerInstance == null) throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
             return _method(eventHandlerInstance, @event, context).TryTask();
         }

@@ -7,7 +7,7 @@ using Dolittle.SDK.DependencyInversion;
 namespace Dolittle.SDK.Events.Handling.Builder
 {
     /// <summary>
-    /// Exception that gets thrown when <see cref="IContainer" /> could not instantitate event handler.
+    /// Exception that gets thrown when <see cref="ITenantScopedProviders" /> could not instantitate event handler.
     /// </summary>
     public class CouldNotInstantiateEventHandler : Exception
     {

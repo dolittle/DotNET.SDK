@@ -85,20 +85,20 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="container">The <see cref="IContainer" />.</param>
+        /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            IContainer container,
+            ITenantScopedProviders tenantScopedProviders,
             ILoggerFactory loggerFactory,
             CancellationToken cancellation)
         {
             foreach (var builder in _builders)
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, container, loggerFactory, cancellation);
+                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, tenantScopedProviders, loggerFactory, cancellation);
             }
         }
 

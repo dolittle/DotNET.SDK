@@ -38,7 +38,7 @@ public class Startup
             _ => { },
             _ => _.WithTenantServices((tenant, services) => services.AddSingleton(typeof(ITenantSpecific), typeof(TenantSpecific))));
         services.AddSwaggerGen();
-        services.Replace(new ServiceDescriptor(typeof(IControllerActivator), typeof(CustomControllerActivator), ServiceLifetime.Singleton));
+        // services.Replace(new ServiceDescriptor(typeof(IControllerActivator), typeof(CustomControllerActivator), ServiceLifetime.Singleton));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -54,6 +54,12 @@ public class Startup
             options.RoutePrefix = string.Empty;
         });
 
+        app.Use(async (context, next) =>
+        {
+            var dolittleClient = context.RequestServices.GetRequiredService<IDolittleClient>();
+            context.RequestServices = dolittleClient.Services.GetProviderFor(TenantId.Development);
+            await next();
+        });
         app.UseHttpsRedirection();
         app.UseRouting();
 
@@ -64,11 +70,5 @@ public class Startup
             endpoints.MapControllers();
         });
         // app.UseMiddleware<>()
-        app.Use(async (context, next) =>
-        {
-            Console.WriteLine("In middleware");
-            await next();
-        });
     }
 }
-

@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
+using Autofac;
 using Autofac.Core;
 using Autofac.Core.Activators.Delegate;
 using Autofac.Core.Lifetime;
@@ -18,31 +20,42 @@ namespace Dolittle.SDK.DependencyInversion
     public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSource
     {
         readonly IServiceProvider _rootProvider;
+        readonly ObjectIDGenerator _idGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnknownServiceOnTenantContainerRegistrationSource"/> class.
         /// </summary>
-        /// <param name="rootProvider">The root <see cref="IServiceProvider"/>.</param>
+        /// <param name="rootProvider"></param>
         public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider)
         {
             _rootProvider = rootProvider;
+            _idGenerator = new ObjectIDGenerator();
         }
 
         /// <inheritdoc />
         public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
         {
             if (!(service is IServiceWithType serviceWithType)
-                || registrationAccessor(service).Any()
-                || _rootProvider.GetService(serviceWithType.ServiceType) == null)
+                || registrationAccessor(service).Any())
             {
                 return Enumerable.Empty<IComponentRegistration>();
             }
 
+            // var registration = new ComponentRegistration(
+            //     Guid.NewGuid(),
+            //     new DelegateActivator(
+            //         serviceWithType.ServiceType,
+            //         (_, __) => _.Resolve<RootProviderWrapper>()
+            //             .ServiceProvider
+            //             .GetService(serviceWithType.ServiceType)),
+            //     new CurrentScopeLifetime(),
+            //     InstanceSharing.None,
+            //     InstanceOwnership.OwnedByLifetimeScope,
+            //     new[] { service },
+            //     new Dictionary<string, object>());
             var registration = new ComponentRegistration(
                 Guid.NewGuid(),
-                new DelegateActivator(
-                    serviceWithType.ServiceType,
-                    (_, __) => _rootProvider.GetRequiredService(serviceWithType.ServiceType)),
+                new InstanceActivator(serviceWithType.ServiceType),
                 new CurrentScopeLifetime(),
                 InstanceSharing.None,
                 InstanceOwnership.OwnedByLifetimeScope,
@@ -52,6 +65,6 @@ namespace Dolittle.SDK.DependencyInversion
         }
 
         /// <inheritdoc />
-        public bool IsAdapterForIndividualComponents => false;
+        public bool IsAdapterForIndividualComponents => true;
     }
 }
