@@ -24,6 +24,11 @@ namespace Dolittle.SDK
     public interface IDolittleClient
     {
         /// <summary>
+        /// Gets a value indicating whether the Dolittle Client is connected.
+        /// </summary>
+        bool Connected { get; }
+
+        /// <summary>
         /// Gets the <see cref="IEventTypes" />.
         /// </summary>
         IEventTypes EventTypes { get; }

@@ -55,7 +55,6 @@ namespace Dolittle.SDK.DependencyInversion
         {
             var services = new ServiceCollection();
             var serviceProviderFactory = new AutofacServiceProviderFactory(_ => _.RegisterSource(unknownServiceOnTenantContainerRegistrationSource));
-
             foreach (var configure in _configureServicesForTenantCallbacks)
             {
                 configure?.Invoke(tenant, services);
@@ -63,7 +62,6 @@ namespace Dolittle.SDK.DependencyInversion
 
             services.AddSingleton(tenant);
             var containerBuilder = serviceProviderFactory.CreateBuilder(services);
-
             return serviceProviderFactory.CreateServiceProvider(containerBuilder);
         }
     }

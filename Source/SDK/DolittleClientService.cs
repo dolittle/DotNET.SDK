@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Dolittle.SDK
 {
@@ -14,26 +15,26 @@ namespace Dolittle.SDK
     public class DolittleClientService : IHostedService
     {
         readonly IDolittleClient _dolittleClient;
-        readonly DolittleClientConfiguration _dolittleConfiguration;
+        readonly DolittleClientConfiguration _dolittleConfigurationAccessor;
         ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DolittleClientService"/> class.
         /// </summary>
         /// <param name="dolittleClient">The <see cref="IDolittleClient"/>.</param>
-        /// <param name="dolittleConfiguration">The <see cref="DolittleClientConfiguration"/>.</param>
-        public DolittleClientService(IDolittleClient dolittleClient, DolittleClientConfiguration dolittleConfiguration)
+        /// <param name="dolittleConfigurationAccessor">The <see cref="IOptions{TOptions}"/> of <see cref="DolittleClientConfiguration"/>.</param>
+        public DolittleClientService(IDolittleClient dolittleClient, IOptions<DolittleClientConfiguration> dolittleConfigurationAccessor)
         {
             _dolittleClient = dolittleClient;
-            _dolittleConfiguration = dolittleConfiguration;
+            _dolittleConfigurationAccessor = dolittleConfigurationAccessor.Value;
         }
 
         /// <inheritdoc />
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger = _dolittleConfiguration.LoggerFactory.CreateLogger<DolittleClientService>();
+            _logger = _dolittleConfigurationAccessor.LoggerFactory.CreateLogger<DolittleClientService>();
             _logger.LogInformation("Connecting Dolittle Client");
-            await _dolittleClient.Connect(_dolittleConfiguration, cancellationToken).ConfigureAwait(false);
+            await _dolittleClient.Connect(_dolittleConfigurationAccessor, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />

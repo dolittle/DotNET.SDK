@@ -70,7 +70,6 @@ namespace Dolittle.SDK
         IContainer _services;
 
         bool _disposed;
-        bool _connected;
         IEnumerable<Tenant> _tenants;
         IResourcesBuilder _resources;
         IEventStoreBuilder _eventStore;
@@ -113,6 +112,9 @@ namespace Dolittle.SDK
             _eventHorizonsBuilder = eventHorizonsBuilder;
             _eventHorizonRetryPolicy = eventHorizonRetryPolicy;
         }
+
+        /// <inheritdoc />
+        public bool Connected { get; private set; }
 
         /// <inheritdoc />
         public IEventTypes EventTypes
@@ -197,7 +199,7 @@ namespace Dolittle.SDK
         /// <inheritdoc />
         public async Task<IDolittleClient> Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken = default)
         {
-            if (_connected)
+            if (Connected)
             {
                 throw new CannotConnectDolittleClientMultipleTimes();
             }
@@ -213,7 +215,7 @@ namespace Dolittle.SDK
                 cancellationToken).ConfigureAwait(false);
             ConfigureContainer(configuration);
             StartEventProcessors(configuration.LoggerFactory, cancellationToken);
-            _connected = true;
+            Connected = true;
             return this;
         }
 
@@ -367,7 +369,7 @@ namespace Dolittle.SDK
 
         TRequiresStartService GetOrThrowIfNotConnected<TRequiresStartService>(TRequiresStartService service)
         {
-            if (!_connected)
+            if (!Connected)
             {
                 throw new CannotUseUnconnectedDolittleClient();
             }
@@ -379,7 +381,7 @@ namespace Dolittle.SDK
         {
             var containerBuilder = new ContainerBuilder();
             containerBuilder.UseRootProvider(config.ServiceProvider);
-            foreach (var tenant in Tenants)
+            foreach (var tenant in _tenants)
             {
                 containerBuilder.AddTenant(tenant.Id);
             }

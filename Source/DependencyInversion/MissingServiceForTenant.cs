@@ -17,7 +17,7 @@ namespace Dolittle.SDK.DependencyInversion
         /// <param name="service">The service that could not be resolved.</param>
         /// <param name="tenant">The tenant the service is resolved for.</param>
         public MissingServiceForTenant(Type service, TenantId tenant)
-            : base($"Could not resolved {service} for tenant {tenant}")
+            : base($"Could not resolve {service} for tenant {tenant}")
         {
         }
     }
