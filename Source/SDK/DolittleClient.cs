@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
@@ -379,15 +380,11 @@ namespace Dolittle.SDK
 
         void ConfigureContainer(DolittleClientConfiguration config)
         {
-            var containerBuilder = new TenantScopedProvidersBuilder();
-            containerBuilder.UseRootProvider(config.ServiceProvider);
-            foreach (var tenant in _tenants)
-            {
-                containerBuilder.AddTenant(tenant.Id);
-            }
-
-            containerBuilder.AddTenantServices(config.ConfigureTenantServices);
-            Services = containerBuilder.Build();
+            Services = new TenantScopedProvidersBuilder()
+                .WithRoot(config.ServiceProvider)
+                .WithTenants(_tenants.Select(_ => _.Id))
+                .AddTenantServices(config.ConfigureTenantServices)
+                .Build();
         }
 
         Task<ExecutionContext> PerformHandshake(string runtimeHost, ushort runtimePort, CancellationToken cancellationToken)

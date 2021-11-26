@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using Autofac;
 using Autofac.Core;
 using Autofac.Core.Activators.Delegate;
 using Autofac.Core.Lifetime;
@@ -20,16 +18,14 @@ namespace Dolittle.SDK.DependencyInversion
     public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSource
     {
         readonly IServiceProvider _rootProvider;
-        readonly ObjectIDGenerator _idGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnknownServiceOnTenantContainerRegistrationSource"/> class.
         /// </summary>
-        /// <param name="rootProvider"></param>
+        /// <param name="rootProvider">The root <see cref="IServiceProvider"/>.s</param>
         public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider)
         {
             _rootProvider = rootProvider;
-            _idGenerator = new ObjectIDGenerator();
         }
 
         /// <inheritdoc />
@@ -41,26 +37,19 @@ namespace Dolittle.SDK.DependencyInversion
             {
                 return Enumerable.Empty<IComponentRegistration>();
             }
+            var serviceType = serviceWithType.ServiceType;
 
             var registration = new ComponentRegistration(
                 Guid.NewGuid(),
                 new DelegateActivator(
-                    serviceWithType.ServiceType,
+                    serviceType,
                     (_, __) => _rootProvider
-                        .GetRequiredService(serviceWithType.ServiceType)),
+                        .GetRequiredService(serviceType)),
                 new CurrentScopeLifetime(),
                 InstanceSharing.None,
                 InstanceOwnership.OwnedByLifetimeScope,
                 new[] { service },
                 new Dictionary<string, object>());
-            // var registration = new ComponentRegistration(
-            //     Guid.NewGuid(),
-            //     new InstanceActivator(serviceWithType.ServiceType),
-            //     new CurrentScopeLifetime(),
-            //     InstanceSharing.None,
-            //     InstanceOwnership.OwnedByLifetimeScope,
-            //     new[] { service },
-            //     new Dictionary<string, object>());
             return new[] { registration };
         }
 
