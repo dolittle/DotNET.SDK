@@ -47,7 +47,7 @@ namespace Dolittle.SDK.DependencyInversion
                         .GetRequiredService(serviceType)),
                 new CurrentScopeLifetime(),
                 InstanceSharing.None,
-                InstanceOwnership.OwnedByLifetimeScope,
+                InstanceOwnership.ExternallyOwned,
                 new[] { service },
                 new Dictionary<string, object>());
             return new[] { registration };

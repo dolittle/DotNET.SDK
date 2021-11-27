@@ -34,6 +34,7 @@ using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
@@ -65,7 +66,6 @@ namespace Dolittle.SDK
         EventHorizons _eventHorizons;
         IEventProcessors _eventProcessors;
         IEventProcessingConverter _eventProcessingConverter;
-        IAggregateRoots _aggregateRoots;
         IProjectionStoreBuilder _projections;
         IEmbeddings _embeddings;
         ITenantScopedProviders _services;
@@ -75,7 +75,7 @@ namespace Dolittle.SDK
         IResourcesBuilder _resources;
         IEventStoreBuilder _eventStore;
         IEventTypes _eventTypes;
-        ILoggerFactory _loggerFactory;
+        IAggregatesBuilder _aggregates;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -129,6 +129,13 @@ namespace Dolittle.SDK
         {
             get => GetOrThrowIfNotConnected(_eventStore);
             private set => _eventStore = value;
+        }
+
+        /// <inheritdoc />
+        public IAggregatesBuilder Aggregates
+        {
+            get => GetOrThrowIfNotConnected(_aggregates);
+            private set => _aggregates = value;
         }
 
         /// <inheritdoc />
@@ -224,18 +231,6 @@ namespace Dolittle.SDK
         public Task Disconnect(CancellationToken cancellationToken = default)
             => _processingCoordinator.Completion;
 
-        /// <inheritdoc />
-        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(Func<IEventStoreBuilder, IEventStore> buildEventStore)
-            where TAggregateRoot : AggregateRoot
-            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, GetOrThrowIfNotConnected(_aggregateRoots), _loggerFactory)
-                    .Create();
-
-        /// <inheritdoc />
-        public IAggregateRootOperations<TAggregateRoot> AggregateOf<TAggregateRoot>(EventSourceId eventSource, Func<IEventStoreBuilder, IEventStore> buildEventStore)
-            where TAggregateRoot : AggregateRoot
-            => new AggregateOf<TAggregateRoot>(buildEventStore(EventStore), EventTypes, GetOrThrowIfNotConnected(_aggregateRoots), _loggerFactory)
-                    .Get(eventSource);
-
         /// <inheritdoc/>
         public void Dispose()
         {
@@ -268,8 +263,7 @@ namespace Dolittle.SDK
             ExecutionContext executionContext,
             CancellationToken cancellation)
         {
-            _loggerFactory = loggerFactory;
-            _aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
+            var aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
             var methodCaller = new MethodCaller(runtimeHost, runtimePort);
             EventTypes = new EventTypes(loggerFactory.CreateLogger<EventTypes>());
             _eventTypesBuilder.AddAssociationsInto(_eventTypes);
@@ -310,7 +304,11 @@ namespace Dolittle.SDK
                 _callContextResolver,
                 _eventTypes,
                 loggerFactory);
-
+            Aggregates = new AggregatesBuilder(
+                _eventStore,
+                _eventTypes,
+                aggregateRoots,
+                loggerFactory);
             EventHorizons = new EventHorizons(
                 methodCaller,
                 executionContext,
@@ -383,9 +381,18 @@ namespace Dolittle.SDK
             Services = new TenantScopedProvidersBuilder()
                 .WithRoot(config.ServiceProvider)
                 .WithTenants(_tenants.Select(_ => _.Id))
+                .AddTenantServices(AddDefaultTenantServices)
                 .AddTenantServices(config.ConfigureTenantServices)
                 .Build();
         }
+
+        void AddDefaultTenantServices(TenantId tenant, IServiceCollection services)
+            => services
+                .AddScoped(_ => EventStore.ForTenant(tenant))
+                .AddScoped(_ => Aggregates.ForTenant(tenant))
+                .AddScoped(_ => Projections.ForTenant(tenant))
+                .AddScoped(_ => Embeddings.ForTenant(tenant))
+                .AddScoped(_ => Resources.ForTenant(tenant));
 
         Task<ExecutionContext> PerformHandshake(string runtimeHost, ushort runtimePort, CancellationToken cancellationToken)
         {

@@ -19,7 +19,7 @@ namespace Dolittle.SDK.DependencyInversion
         readonly List<ConfigureTenantServices> _configureServicesForTenantCallbacks = new List<ConfigureTenantServices>();
 
         HashSet<TenantId> _tenants = new HashSet<TenantId>();
-        IServiceProvider _rootProvider = new ServiceCollection().BuildServiceProvider();
+        IServiceProvider _rootProvider;
 
         /// <summary>
         /// Populates the root <see cref="IServiceCollection"/> with al the given <see cref="ServiceDescriptor"/> services.
@@ -63,6 +63,7 @@ namespace Dolittle.SDK.DependencyInversion
 
         IServiceProvider CreateTenantContainer(TenantId tenant)
         {
+            _rootProvider ??= new ServiceCollection().BuildServiceProvider();
             var containerBuilder = new ContainerBuilder();
             var services = new ServiceCollection();
             foreach (var configure in _configureServicesForTenantCallbacks)
