@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
