@@ -46,12 +46,12 @@ namespace Dolittle.SDK
         /// <summary>
         /// Gets or sets the<see cref="IServiceProvider"/>.
         /// </summary>
-        public IServiceProvider ServiceProvider { get; set; } = new DefaultServiceProviderFactory().CreateServiceProvider(new ServiceCollection());
+        public IServiceProvider ServiceProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
         /// </summary>
-        public ConfigureTenantServices ConfigureTenantServices { get; set; } = (_, __) => { };
+        public ConfigureTenantServices ConfigureTenantServices { get; set; }
 
         /// <summary>
         /// Connect to a specific host and port for the Dolittle runtime.
