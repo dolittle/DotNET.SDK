@@ -3,16 +3,13 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Kitchen;
+namespace Customers;
 
-public class PrepareDish
+public class EatDish
 {
     [Required]
-    public string Chef { get; set; } = "";
-    
-    [Required]
     public string Dish { get; set; } = "";
-    
+
     [Required]
-    public string Kitchen { get; set; } = "";
+    public string Customer { get; set; } = "";
 }

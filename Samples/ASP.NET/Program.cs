@@ -1,29 +1,48 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Dolittle.SDK;
+using Dolittle.SDK.Extensions.AspNet;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace ASP.NET
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDolittle(SetupDolittleClient, ConfigureDolittleClient);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+app.UseDolittle();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+});
+
+app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+app.Run();
+
+static void SetupDolittleClient(DolittleClientBuilder builder)
+{
+    builder
+        .WithAllAggregateRoots()
+        .WithAllEmbeddings()
+        .WithAllProjections()
+        .WithAllEventHandlers()
+        .WithAllEventTypes();
+}
+static void ConfigureDolittleClient(DolittleClientConfiguration config)
+{
 }
