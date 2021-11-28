@@ -17,8 +17,6 @@ namespace Dolittle.SDK.Extensions.AspNet
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
         /// <returns>The builder for continuation.</returns>
         public static IApplicationBuilder UseDolittle(this IApplicationBuilder app)
-        {
-            return app.UseMiddleware<MyMIddleware>();
-        }
+            => app.UseMiddleware<TenantScopedServiceProviderMiddleware>();
     }
 }
