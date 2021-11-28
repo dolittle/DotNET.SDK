@@ -29,7 +29,8 @@ namespace Dolittle.SDK.Embeddings.Builder
             IConvertEventsToProtobuf eventsToProtobufConverter,
             IConvertProjectionsToSDK projectionsConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             var logger = loggerFactory.CreateLogger(GetType());
             logger.LogDebug("Building embedding from type {EmbeddingType}", _embeddingType);
@@ -94,7 +95,8 @@ namespace Dolittle.SDK.Embeddings.Builder
             eventProcessors.Register(
                 embeddingsProcessor,
                 new EmbeddingsProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
         }
 
         bool TryGetEmbeddingId(out EmbeddingId embeddingId)

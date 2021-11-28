@@ -69,15 +69,17 @@ namespace Dolittle.SDK.Events.Filters
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             if (_innerBuilder == default) throw new FilterDefinitionIncomplete(FilterId, ScopeId, "Call Partitioned() or Handle(...) before building private filter");
-            _innerBuilder.BuildAndRegister(FilterId, ScopeId, eventProcessors, converter, loggerFactory, cancellation);
+            _innerBuilder.BuildAndRegister(FilterId, ScopeId, eventProcessors, converter, loggerFactory, cancelConnectToken, stopProcessingToken);
         }
     }
 }

@@ -40,7 +40,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessingConverter processingConverter,
             ITenantScopedProviders tenantScopedProviders,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation);
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken);
 
         /// <summary>
         /// Builds and registers event handler.
@@ -52,7 +53,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="createTypedHandlerMethod">The <see cref="CreateTypedHandleMethod" /> callback.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken"/> for stopping processing.</param>
         protected void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
@@ -61,7 +63,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             CreateTypedHandleMethod createTypedHandlerMethod,
             ILoggerFactory loggerFactory,
             ILogger logger,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             logger.LogDebug("Building event handler from type {EventHandler}", EventHandlerType);
             if (!TryGetEventHandlerInformation(out var eventHandlerId, out var partitioned, out var scopeId, out var alias, out var hasAlias))
@@ -100,7 +103,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             eventProcessors.Register(
                 eventHandlerProcessor,
                 new EventHandlerProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
         }
 
         bool TryBuildHandlerMethods(

@@ -90,22 +90,24 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
             IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             foreach (var builder in _builders)
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, projectionConverter, loggerFactory, cancellation);
+                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, projectionConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
         }
 
-        bool IsProjection(Type type)
+        static bool IsProjection(Type type)
             => type.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() as ProjectionAttribute != default;
     }
 }

@@ -20,7 +20,8 @@ namespace Dolittle.SDK.Events.Processing
         /// </summary>
         /// <param name="eventProcessor">The <see cref="IEventProcessor{TIdentifier, TRegisterResponse, TRequest, TResponse}" /> to register.</param>
         /// <param name="protocol">The <see cref="IAmAReverseCallProtocol{TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse}"/>.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancelConnectToken">The cancellation token.</param>
+        /// <param name="stopProcessorsToken">The cancellation token used to stop the event processor.</param>
         /// <typeparam name="TIdentifier">The <see cref="Type" /> of the <see cref="ConceptAs{T}" /> <see cref="Guid" />.>.</typeparam>
         /// <typeparam name="TClientMessage">The <see cref="Type" /> of the reverse call client message.</typeparam>
         /// <typeparam name="TServerMessage">The <see cref="Type" /> of the reverse call client server message.</typeparam>
@@ -31,7 +32,8 @@ namespace Dolittle.SDK.Events.Processing
         void Register<TIdentifier, TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse>(
             IEventProcessor<TIdentifier, TRegisterArguments, TRequest,  TResponse> eventProcessor,
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse> protocol,
-            CancellationToken cancellationToken)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessorsToken)
             where TIdentifier : ConceptAs<Guid>
             where TClientMessage : class, IMessage
             where TServerMessage : class, IMessage

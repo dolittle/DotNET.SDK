@@ -31,11 +31,12 @@ namespace Dolittle.SDK.Events.Filters
             IEventProcessors eventProcessors,
             IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             ThrowIfCallbackIsMissing(filterId, scopeId);
             var filter = new PartitionedEventFilterProcessor(filterId, scopeId, _callback, converter, loggerFactory);
-            eventProcessors.Register(filter, _protocol, cancellation);
+            eventProcessors.Register(filter, _protocol, cancelConnectToken, stopProcessingToken);
         }
 
         void ThrowIfCallbackIsMissing(FilterId filterId, ScopeId scopeId)

@@ -74,6 +74,7 @@ namespace Dolittle.SDK
         IEventStoreBuilder _eventStore;
         IEventTypes _eventTypes;
         IAggregatesBuilder _aggregates;
+        CancellationTokenSource _eventProcessorCancellationTokenSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -227,7 +228,10 @@ namespace Dolittle.SDK
 
         /// <inheritdoc />
         public Task Disconnect(CancellationToken cancellationToken = default)
-            => _processingCoordinator.Completion;
+        {
+            _eventProcessorCancellationTokenSource.Cancel();
+            return _processingCoordinator.Completion;
+        }
 
         /// <inheritdoc/>
         public void Dispose()
@@ -246,6 +250,7 @@ namespace Dolittle.SDK
 
             if (disposeManagedResources)
             {
+                _eventProcessorCancellationTokenSource?.Dispose();
                 _eventHorizons?.Dispose();
             }
 
@@ -336,32 +341,37 @@ namespace Dolittle.SDK
 
         void StartEventProcessors(ILoggerFactory loggerFactory, CancellationToken cancellationToken)
         {
+            _eventProcessorCancellationTokenSource = new CancellationTokenSource();
             _eventHandlersBuilder.BuildAndRegister(
                 _eventProcessors,
                 _eventTypes,
                 _eventProcessingConverter,
                 _services,
                 loggerFactory,
-                cancellationToken);
+                cancellationToken,
+                GetStopProcessingToken());
             _filtersBuilder.BuildAndRegister(
                 _eventProcessors,
                 _eventProcessingConverter,
                 loggerFactory,
-                cancellationToken);
+                cancellationToken,
+                GetStopProcessingToken());
             _projectionsBuilder.BuildAndRegister(
                 _eventProcessors,
                 _eventTypes,
                 _eventProcessingConverter,
                 _projectionConverter,
                 loggerFactory,
-                cancellationToken);
+                cancellationToken,
+                GetStopProcessingToken());
             _embeddingsBuilder.BuildAndRegister(
                 _eventProcessors,
                 _eventTypes,
                 _eventsToProtobufConverter,
                 _projectionConverter,
                 loggerFactory,
-                cancellationToken);
+                cancellationToken,
+                GetStopProcessingToken());
         }
 
         TRequiresStartService GetOrThrowIfNotConnected<TRequiresStartService>(TRequiresStartService service)
@@ -404,5 +414,7 @@ namespace Dolittle.SDK
                 Claims.Empty,
                 CultureInfo.InvariantCulture));
         }
+
+        CancellationToken GetStopProcessingToken() => _eventProcessorCancellationTokenSource.Token;
     }
 }

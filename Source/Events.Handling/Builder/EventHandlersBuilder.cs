@@ -87,18 +87,20 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
             ITenantScopedProviders tenantScopedProviders,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             foreach (var builder in _builders)
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, tenantScopedProviders, loggerFactory, cancellation);
+                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, tenantScopedProviders, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
         }
 

@@ -20,13 +20,15 @@ namespace Dolittle.SDK.Events.Filters
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> used to stop the processor.</param>
         void BuildAndRegister(
             FilterId filterId,
             ScopeId scopeId,
             IEventProcessors eventProcessors,
             IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation);
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken);
     }
 }

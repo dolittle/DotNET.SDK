@@ -22,13 +22,15 @@ namespace Dolittle.SDK.Projections.Builder
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessorToken">The <see cref="CancellationToken" /> for stopping the processor.</param>
         void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
             IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation);
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessorToken);
     }
 }

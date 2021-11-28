@@ -35,7 +35,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessingConverter processingConverter,
             ITenantScopedProviders tenantScopedProviders,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
             => BuildAndRegister(
                 eventProcessors,
                 eventTypes,
@@ -44,7 +45,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 CreateTypedHandleMethod,
                 loggerFactory,
                 loggerFactory.CreateLogger(GetType()),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
 
         IEventHandlerMethod CreateUntypedHandleMethod(MethodInfo method)
         {

@@ -84,7 +84,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessingConverter processingConverter,
             ITenantScopedProviders tenantScopedProviders,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
             if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
@@ -114,7 +115,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             eventProcessors.Register(
                 eventHandlerProcessor,
                 new EventHandlerProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
         }
     }
 }

@@ -175,7 +175,8 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessingConverter processingConverter,
             IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessorToken)
         {
             var logger = loggerFactory.CreateLogger<ProjectionBuilderForReadModel<TReadModel>>();
             var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TReadModel>>();
@@ -205,7 +206,8 @@ namespace Dolittle.SDK.Projections.Builder
             eventProcessors.Register(
                 projectionProcessor,
                 new ProjectionsProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessorToken);
         }
     }
 }
