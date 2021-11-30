@@ -7,8 +7,7 @@ using Dolittle.SDK.Events;
 namespace Dolittle.SDK.Aggregates.Builders
 {
     /// <summary>
-    /// Defines a system that knows how to get the <see cref="IAggregateRootOperations{TAggregate}"/> for a specific <see cref="AggregateRoot"/>
-    /// scoped to a tenant.
+    /// Defines a system that knows how to get <see cref="IAggregateRootOperations{TAggregate}"/> for aggregates scoped to a tenant.
     /// </summary>
     public interface IAggregates
     {
@@ -19,6 +18,14 @@ namespace Dolittle.SDK.Aggregates.Builders
         /// <typeparam name="TAggregateRoot">The <see cref="Type"/> of the <see cref="AggregateRoot"/> class.</typeparam>
         /// <returns>The <see cref="IAggregateRootOperations{TAggregate}"/> for the <typeparamref name="TAggregateRoot"/> <see cref="AggregateRoot"/> class.</returns>
         IAggregateRootOperations<TAggregateRoot> Get<TAggregateRoot>(EventSourceId eventSourceId)
+            where TAggregateRoot : AggregateRoot;
+
+        /// <summary>
+        /// Gets the <see cref="IAggregateOf{TAggregate}"/> for the <typeparamref name="TAggregateRoot"/> <see cref="AggregateRoot"/> class.
+        /// </summary>
+        /// <typeparam name="TAggregateRoot">The <see cref="Type"/> of the <see cref="AggregateRoot"/> class.</typeparam>
+        /// <returns>The <see cref="IAggregateOf{TAggregate}"/> for the <typeparamref name="TAggregateRoot"/> <see cref="AggregateRoot"/> class.</returns>
+        IAggregateOf<TAggregateRoot> Of<TAggregateRoot>()
             where TAggregateRoot : AggregateRoot;
     }
 }

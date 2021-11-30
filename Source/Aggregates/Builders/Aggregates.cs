@@ -42,5 +42,10 @@ namespace Dolittle.SDK.Aggregates.Builders
                 _eventTypes,
                 _aggregateRoots,
                 _loggerFactory.CreateLogger<AggregateRootOperations<TAggregateRoot>>());
+
+        /// <inheritdoc />
+        public IAggregateOf<TAggregateRoot> Of<TAggregateRoot>()
+            where TAggregateRoot : AggregateRoot
+            => new AggregateOf<TAggregateRoot>(this);
     }
 }
