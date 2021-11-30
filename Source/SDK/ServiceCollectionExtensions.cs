@@ -16,10 +16,10 @@ namespace Dolittle.SDK
         /// Adds the <see cref="IDolittleClient"/> and <see cref="DolittleClientConfiguration"/> to the <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="setupClient">The <see cref="SetupDolittleClient"/> callback.</param>
-        /// <param name="configureClient">The <see cref="ConfigureDolittleClient"/> callback.</param>
+        /// <param name="setupClient">The optional <see cref="SetupDolittleClient"/> callback.</param>
+        /// <param name="configureClient">The optinal <see cref="ConfigureDolittleClient"/> callback.</param>
         /// <returns>The <see cref="IServiceCollection"/> for continuation.</returns>
-        public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient, ConfigureDolittleClient configureClient)
+        public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient = default, ConfigureDolittleClient configureClient = default)
         {
             return services
                 .AddDolittleOptions(configureClient)
@@ -28,12 +28,12 @@ namespace Dolittle.SDK
 
         static IServiceCollection AddDolittleOptions(this IServiceCollection services, ConfigureDolittleClient configureClient)
         {
-            return services
+            services
                 .AddOptions<DolittleClientConfiguration>()
                 .BindConfiguration(nameof(DolittleClientConfiguration))
                 .Configure<IServiceProvider>(ConfigureWithDefaultsFromServiceProvider)
-                .PostConfigure(clientConfig => configureClient?.Invoke(clientConfig))
-                .Services;
+                .PostConfigure(clientConfig => configureClient?.Invoke(clientConfig));
+            return services;
         }
 
         static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient)

@@ -187,7 +187,7 @@ namespace Dolittle.SDK
         public static IDolittleClient Setup(SetupDolittleClient setup)
         {
             var builder = new DolittleClientBuilder();
-            setup(builder);
+            setup?.Invoke(builder);
             return builder.Build();
         }
 
