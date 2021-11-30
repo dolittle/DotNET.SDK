@@ -15,6 +15,7 @@ namespace Dolittle.SDK.Extensions.AspNet
     /// </summary>
     public class TenantScopedServiceProviderMiddleware
     {
+        const string TenantIdHeader = "Tenant-ID";
         readonly RequestDelegate _next;
         readonly IDolittleClient _client;
 
@@ -45,7 +46,7 @@ namespace Dolittle.SDK.Extensions.AspNet
 
         IServiceProvider GetTenantSpecificServiceProvider(HttpContext ctx)
         {
-            var tenantId = Guid.TryParse(ctx.Request.Headers["Tenant-Id"], out var tenantGuid)
+            var tenantId = Guid.TryParse(ctx.Request.Headers[TenantIdHeader], out var tenantGuid)
                 ? new TenantId { Value = tenantGuid }
                 : TenantId.Development;
             return _client.Services.ForTenant(tenantId);
