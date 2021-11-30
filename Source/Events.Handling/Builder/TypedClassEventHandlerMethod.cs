@@ -49,13 +49,21 @@ namespace Dolittle.SDK.Events.Handling.Builder
         }
 
         /// <inheritdoc/>
-        public Task<Try> TryHandle(object @event, EventContext context)
+        public async Task<Try> TryHandle(object @event, EventContext context)
         {
-            var eventHandlerInstance = ActivatorUtilities.GetServiceOrCreateInstance<TEventHandler>(_tenantScopedProviders.ForTenant(context.CurrentExecutionContext.Tenant));
-            if (eventHandlerInstance == null) throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
-            if (@event is TEvent typedEvent) return _method(eventHandlerInstance, typedEvent, context).TryTask();
+            if (!(@event is TEvent typedEvent))
+            {
+                return new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
+            }
 
-            return Task.FromResult<Try>(new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType()));
+            using var scope = _tenantScopedProviders.ForTenant(context.CurrentExecutionContext.Tenant).CreateScope();
+            var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
+            if (eventHandler == null)
+            {
+                throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
+            }
+
+            return await _method(eventHandler, typedEvent, context).TryTask().ConfigureAwait(false);
         }
     }
 }
