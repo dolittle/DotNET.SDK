@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Builders;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,21 +11,20 @@ namespace Kitchen;
 [Route("/api/kitchen")]
 public class KitchenController : ControllerBase
 {
-    readonly IAggregates _aggregates;
+    readonly IAggregateOf<Kitchen> _kitchen;
 
     public KitchenController(IAggregates aggregates)
     {
-        _aggregates = aggregates;
+        _kitchen = aggregates.Of<Kitchen>();
     }
 
     [HttpPost("prepare")]
     public async Task<IActionResult> Prepare([FromBody] PrepareDish cmd)
     {
-        await _aggregates
-            .Get<Kitchen>(cmd.Kitchen)
+        await _kitchen
+            .Get(cmd.Kitchen)
             .Perform(_ => _.PrepareDish(cmd.Chef, cmd.Dish))
             .ConfigureAwait(false);
-
         return Ok();
     }
 }
