@@ -5,47 +5,43 @@ using System;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Projections;
 
-namespace Kitchen
+[Embedding("e5577d2c-0de7-481c-b5be-6ef613c2fcd6")]
+public class Employee
 {
+    public string Name { get; set; } = "";
+    public string Workplace { get; set; } = "Unassigned";
 
-    [Embedding("e5577d2c-0de7-481c-b5be-6ef613c2fcd6")]
-    public class Employee
+    public object ResolveUpdateToEvents(Employee updatedEmployee, EmbeddingContext context)
     {
-        public string Name { get; set; } = "";
-        public string Workplace { get; set; } = "Unassigned";
-
-        public object ResolveUpdateToEvents(Employee updatedEmployee, EmbeddingContext context)
+        if (Name != updatedEmployee.Name)
         {
-            if (Name != updatedEmployee.Name)
-            {
-                return new EmployeeHired(updatedEmployee.Name);
-            }
-            else if (Workplace != updatedEmployee.Workplace)
-            {
-                return new EmployeeTransferred(Name, Workplace, updatedEmployee.Workplace);
-            }
-
-            throw new NotImplementedException();
+            return new EmployeeHired(updatedEmployee.Name);
+        }
+        else if (Workplace != updatedEmployee.Workplace)
+        {
+            return new EmployeeTransferred(Name, Workplace, updatedEmployee.Workplace);
         }
 
-        public object ResolveDeletionToEvents(EmbeddingContext context)
-        {
-            return new EmployeeRetired(Name);
-        }
+        throw new NotImplementedException();
+    }
 
-        public void On(EmployeeHired @event, EmbeddingProjectContext context)
-        {
-            Name = @event.Name;
-        }
+    public object ResolveDeletionToEvents(EmbeddingContext context)
+    {
+        return new EmployeeRetired(Name);
+    }
 
-        public void On(EmployeeTransferred @event, EmbeddingProjectContext context)
-        {
-            Workplace = @event.To;
-        }
+    public void On(EmployeeHired @event, EmbeddingProjectContext context)
+    {
+        Name = @event.Name;
+    }
 
-        public ProjectionResultType On(EmployeeRetired @event, EmbeddingProjectContext context)
-        {
-            return ProjectionResultType.Delete;
-        }
+    public void On(EmployeeTransferred @event, EmbeddingProjectContext context)
+    {
+        Workplace = @event.To;
+    }
+
+    public ProjectionResultType On(EmployeeRetired @event, EmbeddingProjectContext context)
+    {
+        return ProjectionResultType.Delete;
     }
 }
