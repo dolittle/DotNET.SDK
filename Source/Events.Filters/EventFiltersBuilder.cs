@@ -51,21 +51,23 @@ namespace Dolittle.SDK.Events.Filters
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
         public void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventProcessingConverter converter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             foreach (var filterBuilder in _privateFilterBuilders)
             {
-                filterBuilder.BuildAndRegister(eventProcessors, converter, loggerFactory, cancellation);
+                filterBuilder.BuildAndRegister(eventProcessors, converter, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
 
             foreach (var filterBuilder in _publicFilterBuilders)
             {
-                filterBuilder.BuildAndRegister(eventProcessors, converter, loggerFactory, cancellation);
+                filterBuilder.BuildAndRegister(eventProcessors, converter, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
         }
     }

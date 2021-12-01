@@ -312,9 +312,12 @@ namespace Dolittle.SDK.Services
             return Task.CompletedTask;
         }
 
-        void ThrowIfInvalidPingInterval(TimeSpan pingInterval)
+        static void ThrowIfInvalidPingInterval(TimeSpan pingInterval)
         {
-            if (pingInterval.TotalMilliseconds <= 0) throw new PingIntervalNotGreaterThanZero();
+            if (pingInterval.TotalMilliseconds <= 0)
+            {
+                throw new PingIntervalNotGreaterThanZero();
+            }
         }
 
         void ThrowIfConnecting()

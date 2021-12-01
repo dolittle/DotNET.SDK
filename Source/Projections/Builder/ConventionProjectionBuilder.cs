@@ -33,7 +33,8 @@ namespace Dolittle.SDK.Projections.Builder
             IEventProcessingConverter processingConverter,
             IConvertProjectionsToSDK projectionConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             var logger = loggerFactory.CreateLogger(GetType());
             logger.LogDebug("Building projection from type {ProjectionType}", _projectionType);
@@ -79,7 +80,8 @@ namespace Dolittle.SDK.Projections.Builder
             eventProcessors.Register(
                 projectionProcessor,
                 new ProjectionsProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
         }
 
         bool HasMoreThanOneConstructor()

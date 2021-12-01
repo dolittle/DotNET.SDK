@@ -182,7 +182,8 @@ namespace Dolittle.SDK.Embeddings.Builder
             IConvertEventsToProtobuf eventsToProtobufConverter,
             IConvertProjectionsToSDK projectionsConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             var logger = loggerFactory.CreateLogger<EmbeddingBuilderForReadModel<TReadModel>>();
             var eventTypesToMethods = new Dictionary<EventType, IOnMethod<TReadModel>>();
@@ -218,7 +219,8 @@ namespace Dolittle.SDK.Embeddings.Builder
             eventProcessors.Register(
                 embeddingsProcessor,
                 new EmbeddingsProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
         }
 
         bool TryAddOnMethods(IEventTypes eventTypes, IDictionary<EventType, IOnMethod<TReadModel>> eventTypesToMethods, ILogger logger)

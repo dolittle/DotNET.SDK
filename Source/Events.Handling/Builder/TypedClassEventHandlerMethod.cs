@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.DependencyInversion;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Events.Handling.Builder
 {
@@ -17,44 +18,51 @@ namespace Dolittle.SDK.Events.Handling.Builder
         where TEventHandler : class
         where TEvent : class
     {
-        readonly IContainer _container;
+        readonly Func<ITenantScopedProviders> _tenantScopedProvidersFactory;
         readonly TaskEventHandlerMethodSignature<TEventHandler, TEvent> _method;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypedClassEventHandlerMethod{TEventHandler, TEvent}"/> class.
         /// </summary>
-        /// <param name="container">The <see cref="IContainer"/> to use for creating instances of the event handler.</param>
+        /// <param name="tenantScopedProvidersFactory">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="TaskEventHandlerMethodSignature{TEvent}"/> method to invoke.</param>
-        public TypedClassEventHandlerMethod(IContainer container, TaskEventHandlerMethodSignature<TEventHandler, TEvent> method)
+        public TypedClassEventHandlerMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, TaskEventHandlerMethodSignature<TEventHandler, TEvent> method)
         {
-            _container = container;
+            _tenantScopedProvidersFactory = tenantScopedProvidersFactory;
             _method = method;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypedClassEventHandlerMethod{TEventHandler, TEvent}"/> class.
         /// </summary>
-        /// <param name="container">The <see cref="IContainer"/> to use for creating instances of the event handler.</param>
+        /// <param name="tenantScopedProvidersFactory">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="VoidEventHandlerMethodSignature{TEvent}" /> method to invoke.</param>
-        public TypedClassEventHandlerMethod(IContainer container, VoidEventHandlerMethodSignature<TEventHandler, TEvent> method)
+        public TypedClassEventHandlerMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, VoidEventHandlerMethodSignature<TEventHandler, TEvent> method)
             : this(
-                container,
+                tenantScopedProvidersFactory,
                 (TEventHandler instance, TEvent @event, EventContext context) =>
                 {
                     method(instance, @event, context);
                     return Task.CompletedTask;
                 })
-        {
-        }
+        { }
 
         /// <inheritdoc/>
-        public Task<Try> TryHandle(object @event, EventContext context)
+        public async Task<Try> TryHandle(object @event, EventContext context)
         {
-            var eventHandlerInstance = _container.Get<TEventHandler>(context.CurrentExecutionContext);
-            if (eventHandlerInstance == null) throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
-            if (@event is TEvent typedEvent) return _method(eventHandlerInstance, typedEvent, context).TryTask();
+            if (!(@event is TEvent typedEvent))
+            {
+                return new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
+            }
 
-            return Task.FromResult<Try>(new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType()));
+            using var scope = _tenantScopedProvidersFactory().ForTenant(context.CurrentExecutionContext.Tenant).CreateScope();
+            var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
+            if (eventHandler == null)
+            {
+                throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
+            }
+
+            return await _method(eventHandler, typedEvent, context).TryTask().ConfigureAwait(false);
         }
     }
 }

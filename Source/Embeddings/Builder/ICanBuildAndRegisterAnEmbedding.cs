@@ -23,13 +23,15 @@ namespace Dolittle.SDK.Embeddings.Builder
         /// <param name="eventsToProtobufConverter">The <see cref="IConvertEventsToProtobuf" />.</param>
         /// <param name="projectionsConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
         void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IConvertEventsToProtobuf eventsToProtobufConverter,
             IConvertProjectionsToSDK projectionsConverter,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation);
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken);
     }
 }

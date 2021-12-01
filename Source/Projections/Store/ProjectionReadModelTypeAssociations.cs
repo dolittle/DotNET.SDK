@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Projections.Store
         public void Associate(ProjectionId projection, Type projectionType, ScopeId scope)
         {
             ThrowIfMultipleProjectionsAssociatedWithType(projectionType, projection);
-            _typeToAssociations.Add(projectionType, new ScopedProjectionIdentifier(projection, scope));
+            _typeToAssociations[projectionType] = new ScopedProjectionIdentifier(projection, scope);
         }
 
         /// <inheritdoc/>

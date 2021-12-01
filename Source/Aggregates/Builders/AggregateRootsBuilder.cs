@@ -2,14 +2,15 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Store;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Aggregates.Builders
 {
@@ -18,7 +19,7 @@ namespace Dolittle.SDK.Aggregates.Builders
     /// </summary>
     public class AggregateRootsBuilder
     {
-        readonly List<(Type, AggregateRootType)> _associations = new List<(Type, AggregateRootType)>();
+        readonly Dictionary<Type, AggregateRootType> _associations = new Dictionary<Type, AggregateRootType>();
 
         /// <summary>
         /// Associate a <see cref="Type" /> with the <see cref="AggregateRootType" /> given by an attribute.
@@ -67,10 +68,27 @@ namespace Dolittle.SDK.Aggregates.Builders
         /// Builds the aggregate roots by registering them with the Runtime.
         /// </summary>
         /// <param name="aggregateRoots">The <see cref="Internal.AggregateRootsClient"/>.</param>
+        /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
+        /// <param name="aggregatesBuilder">The <see cref="IAggregatesBuilder"/>.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task BuildAndRegister(Internal.AggregateRootsClient aggregateRoots, CancellationToken cancellationToken)
-            => aggregateRoots.Register(_associations.Select(_ => _.Item2), cancellationToken);
+        public async Task BuildAndRegister(
+            Internal.AggregateRootsClient aggregateRoots,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
+            IAggregatesBuilder aggregatesBuilder,
+            CancellationToken cancellationToken)
+        {
+            await aggregateRoots.Register(_associations.Values, cancellationToken).ConfigureAwait(false);
+            foreach (var type in _associations.Keys)
+            {
+                tenantScopedProvidersBuilder.AddTenantServices((tenant, services) =>
+                {
+                    var aggregates = aggregatesBuilder.ForTenant(tenant);
+                    var aggregateOfInstance = Activator.CreateInstance(typeof(AggregateOf<>).MakeGenericType(type), aggregates) ?? throw new CouldNotCreateAggregateOf(type, tenant);
+                    services.AddSingleton(typeof(IAggregateOf<>).MakeGenericType(type), aggregateOfInstance);
+                });
+            }
+        }
 
         static bool IsAggregateRoot(Type type)
             => type.GetCustomAttributes(typeof(AggregateRootAttribute), true).FirstOrDefault() is AggregateRootAttribute;
@@ -95,7 +113,7 @@ namespace Dolittle.SDK.Aggregates.Builders
 
         void AddAssociation(Type type, AggregateRootType aggregateRootType)
         {
-            _associations.Add((type, aggregateRootType));
+            _associations[type] = aggregateRootType;
         }
 
         void ThrowIfTypeIsMissingAggregateRootAttribute(Type type)

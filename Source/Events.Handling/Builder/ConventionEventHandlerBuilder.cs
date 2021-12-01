@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Internal;
 using Dolittle.SDK.Events.Processing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Handling.Builder
@@ -38,9 +39,11 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            IContainer container,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
+            Func<ITenantScopedProviders> tenantScopedProvidersFactory,
             ILoggerFactory loggerFactory,
-            CancellationToken cancellation);
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken);
 
         /// <summary>
         /// Builds and registers event handler.
@@ -50,18 +53,22 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
         /// <param name="createUntypedHandlerMethod">The <see cref="CreateUntypedHandleMethod" /> callback.</param>
         /// <param name="createTypedHandlerMethod">The <see cref="CreateTypedHandleMethod" /> callback.</param>
+        /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="logger">The <see cref="ILogger" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
+        /// <param name="stopProcessingToken">The <see cref="CancellationToken"/> for stopping processing.</param>
         protected void BuildAndRegister(
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
             CreateUntypedHandleMethod createUntypedHandlerMethod,
             CreateTypedHandleMethod createTypedHandlerMethod,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
             ILoggerFactory loggerFactory,
             ILogger logger,
-            CancellationToken cancellation)
+            CancellationToken cancelConnectToken,
+            CancellationToken stopProcessingToken)
         {
             logger.LogDebug("Building event handler from type {EventHandler}", EventHandlerType);
             if (!TryGetEventHandlerInformation(out var eventHandlerId, out var partitioned, out var scopeId, out var alias, out var hasAlias))
@@ -89,18 +96,19 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 return;
             }
 
-            var eventHandler = hasAlias 
+            var eventHandler = hasAlias
                 ? new EventHandler(eventHandlerId, alias, scopeId, partitioned, eventTypesToMethods)
                 : new EventHandler(eventHandlerId, EventHandlerType.Name, scopeId, partitioned, eventTypesToMethods);
             var eventHandlerProcessor = new EventHandlerProcessor(
                 eventHandler,
                 processingConverter,
                 loggerFactory.CreateLogger<EventHandlerProcessor>());
-
             eventProcessors.Register(
                 eventHandlerProcessor,
                 new EventHandlerProtocol(),
-                cancellation);
+                cancelConnectToken,
+                stopProcessingToken);
+            tenantScopedProvidersBuilder.AddTenantServices((_, services) => services.AddScoped(EventHandlerType));
         }
 
         bool TryBuildHandlerMethods(
@@ -339,7 +347,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
             return true;
         }
 
-        bool TryGetFirstMethodParameterType(MethodInfo method, out Type type)
+        static bool TryGetFirstMethodParameterType(MethodInfo method, out Type type)
         {
             type = default;
             if (method.GetParameters().Length == 0) return false;
@@ -348,22 +356,22 @@ namespace Dolittle.SDK.Events.Handling.Builder
             return true;
         }
 
-        bool IsDecoratedHandlerMethod(MethodInfo method)
+        static bool IsDecoratedHandlerMethod(MethodInfo method)
             => method.GetCustomAttributes(typeof(HandlesAttribute), true).FirstOrDefault() != default;
 
-        bool SecondMethodParameterIsEventContext(MethodInfo method)
+        static bool SecondMethodParameterIsEventContext(MethodInfo method)
             => method.GetParameters().Length > 1 && method.GetParameters()[1].ParameterType == typeof(EventContext);
 
-        bool MethodHasNoExtraParameters(MethodInfo method)
+        static bool MethodHasNoExtraParameters(MethodInfo method)
             => method.GetParameters().Length == 2;
 
-        bool MethodReturnsTask(MethodInfo method)
+        static bool MethodReturnsTask(MethodInfo method)
             => method.ReturnType == typeof(Task);
 
-        bool MethodReturnsVoid(MethodInfo method)
+        static bool MethodReturnsVoid(MethodInfo method)
             => method.ReturnType == typeof(void);
 
-        bool MethodReturnsAsyncVoid(MethodInfo method)
+        static bool MethodReturnsAsyncVoid(MethodInfo method)
         {
             var asyncAttribute = typeof(AsyncStateMachineAttribute);
             var isAsyncMethod = (AsyncStateMachineAttribute)method.GetCustomAttribute(asyncAttribute) != null;

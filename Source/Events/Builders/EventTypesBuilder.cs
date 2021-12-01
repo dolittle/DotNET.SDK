@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.DependencyInversion;
 
 namespace Dolittle.SDK.Events.Builders
 {
@@ -16,7 +17,7 @@ namespace Dolittle.SDK.Events.Builders
     /// </summary>
     public class EventTypesBuilder
     {
-        readonly List<(Type, EventType)> _associations = new List<(Type, EventType)>();
+        readonly Dictionary<Type, EventType> _associations = new Dictionary<Type, EventType>();
 
         /// <summary>
         /// Associate a <see cref="Type" /> with an <see cref="EventType" />.
@@ -119,9 +120,12 @@ namespace Dolittle.SDK.Events.Builders
         /// <returns>The <see cref="EventTypesBuilder" /> for continuation.</returns>
         public EventTypesBuilder RegisterAllFrom(Assembly assembly)
         {
-            foreach (var type in assembly.ExportedTypes.Where(IsEventType))
+            foreach (var type in assembly.ExportedTypes)
             {
-                Register(type);
+                if (IsEventType(type))
+                {
+                    Register(type);
+                }
             }
 
             return this;
@@ -134,7 +138,7 @@ namespace Dolittle.SDK.Events.Builders
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task BuildAndRegister(Internal.EventTypesClient eventTypes, CancellationToken cancellationToken)
-            => eventTypes.Register(_associations.Select(_ => _.Item2), cancellationToken);
+            => eventTypes.Register(_associations.Values, cancellationToken);
 
         /// <summary>
         /// Adds all the <see cref="Type" /> to <see cref="EventType" /> associations to the provided <see cref="IEventTypes" />.
@@ -180,7 +184,7 @@ namespace Dolittle.SDK.Events.Builders
         void AddAssociation(Type type, EventType eventType)
         {
             ThrowIfAttributeSpecifiesADifferentEventType(type, eventType);
-            _associations.Add((type, eventType));
+            _associations[type] = eventType;
         }
 
         void ThrowIfTypeIsMissingEventTypeAttribute(Type type)
