@@ -55,7 +55,7 @@ jobs:
       - name: Create test coverage report
         run: dotnet dotcover test --dcXML=coverage.xml
       - name: Create Cobertura test coverage report
-        run: reportgenerator -reports:CoverageReport.xml -targetdir:./ -reporttypes:Cobertura
+        run: reportgenerator -reports:CoverageReport.xml -targetdir:./ -reporttypes:Cobertura -filefilters:'-*.g.cs'
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v2.7.5
         env:
