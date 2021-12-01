@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
+using BaselineTypeDiscovery;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.Embeddings.Store;
@@ -32,6 +35,14 @@ namespace Dolittle.SDK
         readonly ProjectionsBuilder _projectionsBuilder;
         readonly EmbeddingsBuilder _embeddingsBuilder;
 
+        bool _withoutDiscovery;
+        Action<EventTypesBuilder> _eventTypesCallback;
+        Action<AggregateRootsBuilder> _aggregateRootsCallback;
+        Action<EventFiltersBuilder> _eventFiltersCallback;
+        Action<EventHandlersBuilder> _eventHandlersCallback;
+        Action<EmbeddingsBuilder> _embeddingsBuilderCallback;
+        Action<ProjectionsBuilder> _projectionsCallback;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DolittleClientBuilder"/> class.
         /// </summary>
@@ -48,7 +59,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public DolittleClientBuilder WithEventTypes(Action<EventTypesBuilder> callback)
         {
-            callback(_eventTypesBuilder);
+            _eventTypesCallback = callback;
             return this;
         }
 
@@ -59,7 +70,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public DolittleClientBuilder WithAggregateRoots(Action<AggregateRootsBuilder> callback)
         {
-            callback(_aggregateRootsBuilder);
+            _aggregateRootsCallback = callback;
             return this;
         }
 
@@ -70,7 +81,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public DolittleClientBuilder WithFilters(Action<EventFiltersBuilder> callback)
         {
-            callback(_eventFiltersBuilder);
+            _eventFiltersCallback = callback;
             return this;
         }
 
@@ -81,7 +92,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public DolittleClientBuilder WithEventHandlers(Action<EventHandlersBuilder> callback)
         {
-            callback(_eventHandlersBuilder);
+            _eventHandlersCallback = callback;
             return this;
         }
 
@@ -92,7 +103,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public DolittleClientBuilder WithProjections(Action<ProjectionsBuilder> callback)
         {
-            callback(_projectionsBuilder);
+            _projectionsCallback = callback;
             return this;
         }
 
@@ -103,7 +114,7 @@ namespace Dolittle.SDK
         /// <returns>The client builder for continuation.</returns>
         public DolittleClientBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
         {
-            callback(_embeddingsBuilder);
+            _embeddingsBuilderCallback = callback;
             return this;
         }
 
@@ -119,11 +130,28 @@ namespace Dolittle.SDK
         }
 
         /// <summary>
+        /// Turns off automatic discovery and registration.
+        /// </summary>
+        /// <returns>The client builder for continuation.</returns>
+        public DolittleClientBuilder WithoutDiscovery()
+        {
+            _withoutDiscovery = true;
+            return this;
+        }
+
+        /// <summary>
         /// Builds an unconnected <see cref="DolittleClient"/>.
         /// </summary>
         /// <returns>The <see cref="DolittleClient"/>.</returns>
         public IDolittleClient Build()
-            => new DolittleClient(
+        {
+            if (!_withoutDiscovery)
+            {
+                DiscoverAndRegisterAll();
+            }
+
+            ApplyAllCallbacks();
+            return new DolittleClient(
                 _eventTypesBuilder,
                 _projectionAssociations,
                 _embeddingAssociations,
@@ -134,6 +162,17 @@ namespace Dolittle.SDK
                 _eventFiltersBuilder,
                 _eventHorizonsBuilder,
                 _eventHorizonRetryPolicy);
+        }
+
+        void ApplyAllCallbacks()
+        {
+            _projectionsCallback?.Invoke(_projectionsBuilder);
+            _aggregateRootsCallback?.Invoke(_aggregateRootsBuilder);
+            _embeddingsBuilderCallback?.Invoke(_embeddingsBuilder);
+            _eventFiltersCallback?.Invoke(_eventFiltersBuilder);
+            _eventHandlersCallback?.Invoke(_eventHandlersBuilder);
+            _eventTypesCallback?.Invoke(_eventTypesBuilder);
+        }
 
         static async Task EventHorizonRetryPolicy(Subscription subscription, ILogger logger, Func<Task<bool>> methodToPerform)
         {
@@ -157,5 +196,40 @@ namespace Dolittle.SDK
                 await Task.Delay(timeout).ConfigureAwait(false);
             }
         }
+
+        static void ForAllAllScannedAssemblies(Action<Assembly> registerAllFromAssembly)
+        {
+            foreach (var assembly in GetAllAssemblies())
+            {
+                registerAllFromAssembly(assembly);
+            }
+        }
+
+        static IEnumerable<Assembly> GetAllAssemblies()
+        {
+            return AssemblyFinder.FindAssemblies(
+                _ => { },
+                _ => true,
+                false);
+        }
+
+        void DiscoverAndRegisterAll()
+        {
+            RegisterAllEmbeddings();
+            RegisterAllProjections();
+            RegisterAllAggregateRoots();
+            RegisterAllEventHandlers();
+            RegisterAllEventTypes();
+        }
+
+        void RegisterAllEventTypes() => ForAllAllScannedAssemblies(assembly => _eventTypesBuilder.RegisterAllFrom(assembly));
+
+        void RegisterAllAggregateRoots() => ForAllAllScannedAssemblies(assembly => _aggregateRootsBuilder.RegisterAllFrom(assembly));
+
+        void RegisterAllEventHandlers() => ForAllAllScannedAssemblies(assembly => _eventHandlersBuilder.RegisterAllFrom(assembly));
+
+        void RegisterAllProjections() => ForAllAllScannedAssemblies(assembly => _projectionsBuilder.RegisterAllFrom(assembly));
+
+        void RegisterAllEmbeddings() => ForAllAllScannedAssemblies(assembly => _embeddingsBuilder.RegisterAllFrom(assembly));
     }
 }

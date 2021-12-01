@@ -17,7 +17,7 @@ namespace Dolittle.SDK
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="setupClient">The optional <see cref="SetupDolittleClient"/> callback.</param>
-        /// <param name="configureClient">The optinal <see cref="ConfigureDolittleClient"/> callback.</param>
+        /// <param name="configureClient">The optional <see cref="ConfigureDolittleClient"/> callback.</param>
         /// <returns>The <see cref="IServiceCollection"/> for continuation.</returns>
         public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient = default, ConfigureDolittleClient configureClient = default)
         {
@@ -26,7 +26,7 @@ namespace Dolittle.SDK
                 .AddDolittleClient(setupClient);
         }
 
-        static IServiceCollection AddDolittleOptions(this IServiceCollection services, ConfigureDolittleClient configureClient)
+        static IServiceCollection AddDolittleOptions(this IServiceCollection services, ConfigureDolittleClient configureClient = default)
         {
             services
                 .AddOptions<DolittleClientConfiguration>()
@@ -36,7 +36,7 @@ namespace Dolittle.SDK
             return services;
         }
 
-        static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient)
+        static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default)
         {
             var dolittleClient = DolittleClient.Setup(setupClient);
             return services

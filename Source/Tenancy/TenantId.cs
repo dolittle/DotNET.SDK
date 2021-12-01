@@ -22,7 +22,7 @@ namespace Dolittle.SDK.Tenancy
         public static readonly TenantId System = "08831584-e016-42f6-bc5e-c4f098fed42b";
 
         /// <summary>
-        /// A <see cref="TenantId"/> that can be used for convience during development.
+        /// A <see cref="TenantId"/> that can be used for convenience during development.
         /// </summary>
         public static readonly TenantId Development = "445f8ea8-1a6f-40d7-b2fc-796dba92dc44";
 

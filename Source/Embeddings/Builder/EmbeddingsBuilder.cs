@@ -20,7 +20,8 @@ namespace Dolittle.SDK.Embeddings.Builder
     /// </summary>
     public class EmbeddingsBuilder
     {
-        readonly IList<ICanBuildAndRegisterAnEmbedding> _builders = new List<ICanBuildAndRegisterAnEmbedding>();
+        readonly List<ICanBuildAndRegisterAnEmbedding> _builders = new List<ICanBuildAndRegisterAnEmbedding>();
+        readonly Dictionary<Type, ICanBuildAndRegisterAnEmbedding> _typedBuilders = new Dictionary<Type, ICanBuildAndRegisterAnEmbedding>();
         readonly IEmbeddingReadModelTypeAssociations _embeddingAssociations;
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace Dolittle.SDK.Embeddings.Builder
             var builder = Activator.CreateInstance(
                     typeof(ConventionEmbeddingBuilder<>).MakeGenericType(type))
                     as ICanBuildAndRegisterAnEmbedding;
-            _builders.Add(builder);
+            _typedBuilders[type] = builder;
             _embeddingAssociations.Associate(type);
             return this;
         }
@@ -102,13 +103,13 @@ namespace Dolittle.SDK.Embeddings.Builder
             CancellationToken cancelConnectToken,
             CancellationToken stopProcessingToken)
         {
-            foreach (var builder in _builders)
+            foreach (var builder in _builders.Concat(_typedBuilders.Values))
             {
                 builder.BuildAndRegister(eventProcessors, eventTypes, eventsToProtobufConverter, projectionConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
         }
 
-        bool IsEmbedding(Type type)
-            => (type.GetCustomAttributes(typeof(EmbeddingAttribute), true).FirstOrDefault() as EmbeddingAttribute) != default;
+        static bool IsEmbedding(Type type)
+            => type.GetCustomAttributes(typeof(EmbeddingAttribute), true).FirstOrDefault() is EmbeddingAttribute;
     }
 }

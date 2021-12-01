@@ -19,7 +19,8 @@ namespace Dolittle.SDK.Projections.Builder
     /// </summary>
     public class ProjectionsBuilder
     {
-        readonly IList<ICanBuildAndRegisterAProjection> _builders = new List<ICanBuildAndRegisterAProjection>();
+        readonly List<ICanBuildAndRegisterAProjection> _builders = new List<ICanBuildAndRegisterAProjection>();
+        readonly Dictionary<Type, ICanBuildAndRegisterAProjection> _typedBuilders = new Dictionary<Type, ICanBuildAndRegisterAProjection>();
         readonly IProjectionReadModelTypeAssociations _projectionAssociations;
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Dolittle.SDK.Projections.Builder
             var builder = Activator.CreateInstance(
                     typeof(ConventionProjectionBuilder<>).MakeGenericType(type))
                     as ICanBuildAndRegisterAProjection;
-            _builders.Add(builder);
+            _typedBuilders[type] = builder;
             _projectionAssociations.Associate(type);
             return this;
         }
@@ -74,9 +75,12 @@ namespace Dolittle.SDK.Projections.Builder
         /// <returns>The <see cref="ProjectionsBuilder" /> for continuation.</returns>
         public ProjectionsBuilder RegisterAllFrom(Assembly assembly)
         {
-            foreach (var type in assembly.ExportedTypes.Where(IsProjection))
+            foreach (var type in assembly.ExportedTypes)
             {
-                RegisterProjection(type);
+                if (IsProjection(type))
+                {
+                    RegisterProjection(type);
+                }
             }
 
             return this;
@@ -101,13 +105,13 @@ namespace Dolittle.SDK.Projections.Builder
             CancellationToken cancelConnectToken,
             CancellationToken stopProcessingToken)
         {
-            foreach (var builder in _builders)
+            foreach (var builder in _builders.Concat(_typedBuilders.Values))
             {
                 builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, projectionConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
         }
 
         static bool IsProjection(Type type)
-            => type.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() as ProjectionAttribute != default;
+            => type.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() is ProjectionAttribute;
     }
 }

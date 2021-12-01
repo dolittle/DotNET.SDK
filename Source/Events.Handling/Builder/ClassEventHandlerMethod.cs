@@ -16,28 +16,28 @@ namespace Dolittle.SDK.Events.Handling.Builder
     public class ClassEventHandlerMethod<TEventHandler> : IEventHandlerMethod
         where TEventHandler : class
     {
-        readonly ITenantScopedProviders _tenantScopedProviders;
+        readonly Func<ITenantScopedProviders> _tenantScopedProvidersFactory;
         readonly TaskEventHandlerMethodSignature<TEventHandler> _method;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassEventHandlerMethod{TEventHandler}"/> class.
         /// </summary>
-        /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
+        /// <param name="tenantScopedProvidersFactory">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="TaskEventHandlerMethodSignature{TEvent}"/> method to invoke.</param>
-        public ClassEventHandlerMethod(ITenantScopedProviders tenantScopedProviders, TaskEventHandlerMethodSignature<TEventHandler> method)
+        public ClassEventHandlerMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, TaskEventHandlerMethodSignature<TEventHandler> method)
         {
-            _tenantScopedProviders = tenantScopedProviders;
+            _tenantScopedProvidersFactory = tenantScopedProvidersFactory;
             _method = method;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassEventHandlerMethod{TEventHandler}"/> class.
         /// </summary>
-        /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
+        /// <param name="tenantScopedProvidersFactory">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
         /// <param name="method">The <see cref="VoidEventHandlerMethodSignature{TEvent}" /> method to invoke.</param>
-        public ClassEventHandlerMethod(ITenantScopedProviders tenantScopedProviders, VoidEventHandlerMethodSignature<TEventHandler> method)
+        public ClassEventHandlerMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, VoidEventHandlerMethodSignature<TEventHandler> method)
             : this(
-                tenantScopedProviders,
+                tenantScopedProvidersFactory,
                 (TEventHandler instance, object @event, EventContext context) =>
                 {
                     method(instance, @event, context);
@@ -49,7 +49,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <inheritdoc/>
         public async Task<Try> TryHandle(object @event, EventContext context)
         {
-            using var scope = _tenantScopedProviders.ForTenant(context.CurrentExecutionContext.Tenant).CreateScope();
+            using var scope = _tenantScopedProvidersFactory().ForTenant(context.CurrentExecutionContext.Tenant).CreateScope();
             var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
             if (eventHandler == null)
             {

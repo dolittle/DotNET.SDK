@@ -33,7 +33,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            ITenantScopedProviders tenantScopedProviders,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
+            Func<ITenantScopedProviders> tenantScopedProvidersFactory,
             ILoggerFactory loggerFactory,
             CancellationToken cancelConnectToken,
             CancellationToken stopProcessingToken)
@@ -43,6 +44,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 processingConverter,
                 CreateUntypedHandleMethod,
                 CreateTypedHandleMethod,
+                tenantScopedProvidersBuilder,
                 loggerFactory,
                 loggerFactory.CreateLogger(GetType()),
                 cancelConnectToken,

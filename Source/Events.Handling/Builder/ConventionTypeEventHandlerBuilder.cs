@@ -30,7 +30,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            ITenantScopedProviders tenantScopedProviders,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
+            Func<ITenantScopedProviders> tenantScopedProvidersFactory,
             ILoggerFactory loggerFactory,
             CancellationToken cancelConnectToken,
             CancellationToken stopProcessingToken)
@@ -38,14 +39,15 @@ namespace Dolittle.SDK.Events.Handling.Builder
                 eventProcessors,
                 eventTypes,
                 processingConverter,
-                method => CreateUntypedHandleMethod(tenantScopedProviders, method),
-                (eventParameterType, method) => CreateTypedHandleMethod(tenantScopedProviders, eventParameterType, method),
+                method => CreateUntypedHandleMethod(tenantScopedProvidersFactory, method),
+                (eventParameterType, method) => CreateTypedHandleMethod(tenantScopedProvidersFactory, eventParameterType, method),
+                tenantScopedProvidersBuilder,
                 loggerFactory,
                 loggerFactory.CreateLogger(GetType()),
                 cancelConnectToken,
                 stopProcessingToken);
 
-        IEventHandlerMethod CreateUntypedHandleMethod(ITenantScopedProviders tenantScopedProviders, MethodInfo method)
+        IEventHandlerMethod CreateUntypedHandleMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, MethodInfo method)
         {
             var eventHandlerSignatureType = method.ReturnType == typeof(Task) ?
                                     typeof(TaskEventHandlerMethodSignature<>)
@@ -54,11 +56,11 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
             return Activator.CreateInstance(
                 typeof(ClassEventHandlerMethod<>).MakeGenericType(EventHandlerType),
-                tenantScopedProviders,
+                tenantScopedProvidersFactory,
                 eventHandlerSignature) as IEventHandlerMethod;
         }
 
-        IEventHandlerMethod CreateTypedHandleMethod(ITenantScopedProviders tenantScopedProviders, Type eventParameterType, MethodInfo method)
+        IEventHandlerMethod CreateTypedHandleMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, Type eventParameterType, MethodInfo method)
         {
             var eventHandlerSignatureGenericTypeDefinition = method.ReturnType == typeof(Task) ?
                                                 typeof(TaskEventHandlerMethodSignature<,>)
@@ -68,7 +70,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
 
             return Activator.CreateInstance(
                 typeof(TypedClassEventHandlerMethod<,>).MakeGenericType(EventHandlerType, eventParameterType),
-                tenantScopedProviders,
+                tenantScopedProvidersFactory,
                 eventHandlerSignature) as IEventHandlerMethod;
         }
     }

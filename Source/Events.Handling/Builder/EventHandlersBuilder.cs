@@ -17,7 +17,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
     /// </summary>
     public class EventHandlersBuilder
     {
-        readonly IList<ICanBuildAndRegisterAnEventHandler> _builders = new List<ICanBuildAndRegisterAnEventHandler>();
+        readonly List<ICanBuildAndRegisterAnEventHandler> _builders = new List<ICanBuildAndRegisterAnEventHandler>();
+        readonly Dictionary<Type, ICanBuildAndRegisterAnEventHandler> _typedBuilder = new Dictionary<Type, ICanBuildAndRegisterAnEventHandler>();
 
         /// <summary>
         /// Start building an event handler.
@@ -47,7 +48,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
         public EventHandlersBuilder RegisterEventHandler(Type type)
         {
-            _builders.Add(new ConventionTypeEventHandlerBuilder(type));
+            _typedBuilder[type] = new ConventionTypeEventHandlerBuilder(type);
             return this;
         }
 
@@ -60,7 +61,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         public EventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
             where TEventHandler : class
         {
-            _builders.Add(new ConventionInstanceEventHandlerBuilder(eventHandlerInstance));
+            _typedBuilder[typeof(TEventHandler)] = new ConventionInstanceEventHandlerBuilder(eventHandlerInstance);
             return this;
         }
 
@@ -71,9 +72,12 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
         public EventHandlersBuilder RegisterAllFrom(Assembly assembly)
         {
-            foreach (var type in assembly.ExportedTypes.Where(IsEventHandler))
+            foreach (var type in assembly.ExportedTypes)
             {
-                RegisterEventHandler(type);
+                if (IsEventHandler(type))
+                {
+                    RegisterEventHandler(type);
+                }
             }
 
             return this;
@@ -85,7 +89,8 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
         /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
         /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="tenantScopedProviders">The <see cref="ITenantScopedProviders" />.</param>
+        /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
+        /// <param name="tenantScopedProvidersFactory">The <see cref="Func{TResult}"/> for getting <see cref="ITenantScopedProviders" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
         /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
@@ -93,18 +98,19 @@ namespace Dolittle.SDK.Events.Handling.Builder
             IEventProcessors eventProcessors,
             IEventTypes eventTypes,
             IEventProcessingConverter processingConverter,
-            ITenantScopedProviders tenantScopedProviders,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
+            Func<ITenantScopedProviders> tenantScopedProvidersFactory,
             ILoggerFactory loggerFactory,
             CancellationToken cancelConnectToken,
             CancellationToken stopProcessingToken)
         {
-            foreach (var builder in _builders)
+            foreach (var builder in _builders.Concat(_typedBuilder.Values))
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, tenantScopedProviders, loggerFactory, cancelConnectToken, stopProcessingToken);
+                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, tenantScopedProvidersBuilder, tenantScopedProvidersFactory, loggerFactory, cancelConnectToken, stopProcessingToken);
             }
         }
 
-        bool IsEventHandler(Type type)
-            => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() as EventHandlerAttribute != default;
+        static bool IsEventHandler(Type type)
+            => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() is EventHandlerAttribute;
     }
 }

@@ -34,6 +34,7 @@ using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Environment = Dolittle.SDK.Microservices.Environment;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
@@ -182,9 +183,9 @@ namespace Dolittle.SDK
         /// <summary>
         /// Create a client builder for a Microservice.
         /// </summary>
-        /// <param name="setup">The <see cref="SetupDolittleClient"/> callback.</param>
+        /// <param name="setup">The optional <see cref="SetupDolittleClient"/> callback.</param>
         /// <returns>The <see cref="DolittleClientBuilder"/> to build the <see cref="DolittleClient"/> from.</returns>
-        public static IDolittleClient Setup(SetupDolittleClient setup)
+        public static IDolittleClient Setup(SetupDolittleClient setup = default)
         {
             var builder = new DolittleClientBuilder();
             setup?.Invoke(builder);
@@ -212,6 +213,7 @@ namespace Dolittle.SDK
             }
 
             var executionContext = await PerformHandshake(configuration.RuntimeHost, configuration.RuntimePort, cancellationToken).ConfigureAwait(false);
+            var tenantScopedProvidersBuilder = new TenantScopedProvidersBuilder();
             await RegisterAndCreateDependencies(
                 configuration.RuntimeHost,
                 configuration.RuntimePort,
@@ -219,10 +221,11 @@ namespace Dolittle.SDK
                 configuration.EventSerializerProvider,
                 configuration.LoggerFactory,
                 executionContext,
+                tenantScopedProvidersBuilder,
                 cancellationToken).ConfigureAwait(false);
-            ConfigureContainer(configuration);
-            StartEventProcessors(configuration.LoggerFactory, cancellationToken);
+            StartEventProcessors(tenantScopedProvidersBuilder, configuration.LoggerFactory, cancellationToken);
             Connected = true;
+            ConfigureContainer(tenantScopedProvidersBuilder, configuration);
             return this;
         }
 
@@ -264,6 +267,7 @@ namespace Dolittle.SDK
             Func<JsonSerializerSettings> eventSerializerProvider,
             ILoggerFactory loggerFactory,
             ExecutionContext executionContext,
+            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
             CancellationToken cancellation)
         {
             var aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
@@ -275,12 +279,6 @@ namespace Dolittle.SDK
                     methodCaller,
                     executionContext,
                     loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
-                cancellation).ConfigureAwait(false);
-            await _aggregateRootsBuilder.BuildAndRegister(
-                new AggregateRootsClient(
-                    methodCaller,
-                    executionContext,
-                    loggerFactory.CreateLogger<AggregateRoots>()),
                 cancellation).ConfigureAwait(false);
             var reverseCallClientsCreator = new ReverseCallClientCreator(
                 pingInterval,
@@ -312,6 +310,15 @@ namespace Dolittle.SDK
                 _eventTypes,
                 aggregateRoots,
                 loggerFactory);
+
+            await _aggregateRootsBuilder.BuildAndRegister(
+                new AggregateRootsClient(
+                    methodCaller,
+                    executionContext,
+                    loggerFactory.CreateLogger<AggregateRoots>()),
+                tenantScopedProvidersBuilder,
+                _aggregates,
+                cancellation).ConfigureAwait(false);
             EventHorizons = new EventHorizons(
                 methodCaller,
                 executionContext,
@@ -339,14 +346,15 @@ namespace Dolittle.SDK
             Tenants = await tenants.GetAll(cancellation).ConfigureAwait(false);
         }
 
-        void StartEventProcessors(ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+        void StartEventProcessors(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
         {
             _eventProcessorCancellationTokenSource = new CancellationTokenSource();
             _eventHandlersBuilder.BuildAndRegister(
                 _eventProcessors,
                 _eventTypes,
                 _eventProcessingConverter,
-                _services,
+                tenantScopedProvidersBuilder,
+                () => _services,
                 loggerFactory,
                 cancellationToken,
                 GetStopProcessingToken());
@@ -384,17 +392,18 @@ namespace Dolittle.SDK
             return service;
         }
 
-        void ConfigureContainer(DolittleClientConfiguration config)
+        void ConfigureContainer(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, DolittleClientConfiguration config)
         {
-            Services = new TenantScopedProvidersBuilder()
+            Services = tenantScopedProvidersBuilder
                 .WithRoot(config.ServiceProvider)
                 .WithTenants(_tenants.Select(_ => _.Id))
-                .AddTenantServices(AddDefaultTenantServices)
+                .AddTenantServices(AddBuilderServices)
+                .AddTenantServices((tenant, services) => services.AddScoped(_ => Resources.ForTenant(tenant).MongoDB.GetDatabase().Result))
                 .AddTenantServices(config.ConfigureTenantServices)
                 .Build();
         }
 
-        void AddDefaultTenantServices(TenantId tenant, IServiceCollection services)
+        void AddBuilderServices(TenantId tenant, IServiceCollection services)
             => services
                 .AddScoped(_ => EventStore.ForTenant(tenant))
                 .AddScoped(_ => Aggregates.ForTenant(tenant))
