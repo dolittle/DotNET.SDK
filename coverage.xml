@@ -10,6 +10,9 @@
         <FilterEntry>
         <ModuleMask>*.for_*</ModuleMask>
         </FilterEntry>
+        <FilterEntry>
+        <ModuleMask>*.g.cs</ModuleMask>
+        </FilterEntry>
     </ExcludeFilters>
     </Filters>
     <Scope>
