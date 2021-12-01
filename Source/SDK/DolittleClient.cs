@@ -225,6 +225,8 @@ namespace Dolittle.SDK
                 cancellationToken).ConfigureAwait(false);
             StartEventProcessors(tenantScopedProvidersBuilder, configuration.LoggerFactory, cancellationToken);
             Connected = true;
+
+            // It's currently important that the container gets built after registering and starting the event processors, because they add tenant scoped services themselves.
             ConfigureContainer(tenantScopedProvidersBuilder, configuration);
             return this;
         }
@@ -354,7 +356,7 @@ namespace Dolittle.SDK
                 _eventTypes,
                 _eventProcessingConverter,
                 tenantScopedProvidersBuilder,
-                () => _services,
+                () => Services,
                 loggerFactory,
                 cancellationToken,
                 GetStopProcessingToken());
@@ -398,7 +400,6 @@ namespace Dolittle.SDK
                 .WithRoot(config.ServiceProvider)
                 .WithTenants(_tenants.Select(_ => _.Id))
                 .AddTenantServices(AddBuilderServices)
-                .AddTenantServices((tenant, services) => services.AddScoped(_ => Resources.ForTenant(tenant).MongoDB.GetDatabase().Result))
                 .AddTenantServices(config.ConfigureTenantServices)
                 .Build();
         }
