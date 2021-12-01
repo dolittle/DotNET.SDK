@@ -13,9 +13,9 @@ public class KitchenController : ControllerBase
 {
     readonly IAggregateOf<Kitchen> _kitchen;
 
-    public KitchenController(IAggregates aggregates)
+    public KitchenController(IAggregateOf<Kitchen> kitchen)
     {
-        _kitchen = aggregates.Of<Kitchen>();
+        _kitchen = kitchen;
     }
 
     [HttpPost("prepare")]

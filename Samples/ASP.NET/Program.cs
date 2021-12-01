@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDolittle(SetupDolittleClient);
+builder.Services.AddDolittle();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -30,13 +30,3 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
-
-static void SetupDolittleClient(DolittleClientBuilder builder)
-{
-    builder
-        .WithAllAggregateRoots()
-        .WithAllEmbeddings()
-        .WithAllProjections()
-        .WithAllEventHandlers()
-        .WithAllEventTypes();
-}

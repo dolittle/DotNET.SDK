@@ -15,9 +15,9 @@ public class DishServer
 {
     readonly IAggregateOf<Customer> _customers;
 
-    public DishServer(IAggregates aggregates)
+    public DishServer(IAggregateOf<Customer> customers)
     {
-        _customers = aggregates.Of<Customer>();
+        _customers = customers;
     }
 
     public async Task Handle(DishPrepared @event, EventContext ctx)
@@ -29,4 +29,3 @@ public class DishServer
             .ConfigureAwait(false);
     }
 }
-
