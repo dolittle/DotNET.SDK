@@ -43,7 +43,7 @@ jobs:
       - name: Update VersionInfo
         uses: dolittle/update-version-info-action@v1
         with:
-          version: ${{ steps.increment-version.outputs.next-version || "0.0.0-prerelease" }}
+          version: ${{ steps.increment-version.outputs.next-version || '0.0.0-prerelease' }}
           files-to-update: Source/SDK/VersionInfo.cs
       - name: Build
         run: dotnet build --configuration Release
