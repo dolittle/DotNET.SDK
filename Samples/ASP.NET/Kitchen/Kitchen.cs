@@ -12,6 +12,7 @@ using Dolittle.SDK.Events;
 public class Kitchen : AggregateRoot
 {
     readonly Dictionary<string, int> _ingredients = new();
+    readonly HashSet<string> _chefs = new();
 
     public Kitchen(EventSourceId eventSource)
         : base(eventSource)
@@ -22,22 +23,55 @@ public class Kitchen : AggregateRoot
 
     public void RestockIngredient(string ingredient, int amount)
     {
-        var oldAmount = 0;
+        var newStock = amount;
         if (_ingredients.ContainsKey(ingredient))
         {
-            oldAmount = _ingredients[ingredient];
+            newStock += _ingredients[ingredient];
         }
-        _ingredients[ingredient] = oldAmount + amount; 
-        Apply(new );
+        
+        Apply(new IngredientRestocked(ingredient, amount, newStock));
     }
 
-    public void PrepareDish(string chef, string dish)
+    public void CheckInChef(string chef)
     {
-        if (_ingredients <= 0) throw new Exception($"Kitchen {Name} has run out of ingredients, sorry!");
+        if (_chefs.Contains(chef))
+        {
+            throw new Exception($"Chef {chef} has already checked in to kitchen {Name}");
+        }
+        Apply(new ChefCheckedIn(chef));
+    }
+    public void CheckOutChef(string chef)
+    {
+        if (!_chefs.Contains(chef))
+        {
+            throw new Exception($"Chef {chef} has not checked in to kitchen {Name}");
+        }
+        Apply(new ChefCheckedOut(chef));
+    }
+
+    public void PrepareDish(string chef, string dish, IDictionary<string, int> requiredIngredients)
+    {
+        foreach (var (ingredient, amount) in requiredIngredients)
+        {
+            
+        }
+        if ( <= 0)
+        {
+            throw new Exception($"Kitchen {Name} has run out of ingredients, sorry!");
+        }
         Apply(new DishPrepared(dish, chef));
         Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
     }
 
-    void On(DishPrepared @event)
-        => _ingredients--;
+    void On(ChefCheckedIn @event)
+        => _chefs.Add(@event.Chef);
+    
+    void On(ChefCheckedOut @event)
+        => _chefs.Remove(@event.Chef);
+
+    void On(IngredientUsed @event)
+        => _ingredients[@event.Ingredient] = @event.Stock;
+    
+    void On(IngredientRestocked @event)
+        => _ingredients[@event.Ingredient] = @event.Stock; 
 }

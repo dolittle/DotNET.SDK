@@ -13,9 +13,9 @@ using Kitchen;
 [EventHandler("f2d366cf-c00a-4479-acc4-851e04b6fbba")]
 public class DishServer
 {
-    readonly IAggregateOf<Customer> _customers;
+    readonly IAggregateOf<Menu> _customers;
 
-    public DishServer(IAggregateOf<Customer> customers)
+    public DishServer(IAggregateOf<Menu> customers)
     {
         _customers = customers;
     }
