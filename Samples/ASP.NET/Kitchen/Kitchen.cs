@@ -1,17 +1,17 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-// Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/csharp/
 
 using System;
+using System.Collections.Generic;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
-namespace Kitchen;
+// namespace Kitchen;
 
 [AggregateRoot("01ad9a9f-711f-47a8-8549-43320f782a1e")]
 public class Kitchen : AggregateRoot
 {
-    int _ingredients = 2;
+    readonly Dictionary<string, int> _ingredients = new();
 
     public Kitchen(EventSourceId eventSource)
         : base(eventSource)
@@ -19,6 +19,17 @@ public class Kitchen : AggregateRoot
     }
 
     string Name => EventSourceId;
+
+    public void RestockIngredient(string ingredient, int amount)
+    {
+        var oldAmount = 0;
+        if (_ingredients.ContainsKey(ingredient))
+        {
+            oldAmount = _ingredients[ingredient];
+        }
+        _ingredients[ingredient] = oldAmount + amount; 
+        Apply(new );
+    }
 
     public void PrepareDish(string chef, string dish)
     {

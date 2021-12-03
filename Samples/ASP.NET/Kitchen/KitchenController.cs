@@ -6,7 +6,7 @@ using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Builders;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Kitchen;
+// namespace Kitchen;
 
 [Route("/api/kitchen")]
 public class KitchenController : ControllerBase
