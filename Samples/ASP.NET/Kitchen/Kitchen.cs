@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
@@ -36,7 +37,7 @@ public class Kitchen : AggregateRoot
     {
         if (_chefs.Contains(chef))
         {
-            throw new Exception($"Chef {chef} has already checked in to kitchen {Name}");
+            throw new ArgumentException($"Chef {chef} has already checked in to kitchen {Name}", nameof(chef));
         }
         Apply(new ChefCheckedIn(chef));
     }
@@ -44,23 +45,38 @@ public class Kitchen : AggregateRoot
     {
         if (!_chefs.Contains(chef))
         {
-            throw new Exception($"Chef {chef} has not checked in to kitchen {Name}");
+            throw new ArgumentException($"Chef {chef} has not checked in to kitchen {Name}", nameof(chef));
         }
         Apply(new ChefCheckedOut(chef));
     }
 
     public void PrepareDish(string chef, string dish, IDictionary<string, int> requiredIngredients)
     {
-        // foreach (var (ingredient, amount) in requiredIngredients)
-        // {
-            
-        // }
-        // if ( <= 0)
-        // {
-        //     throw new Exception($"Kitchen {Name} has run out of ingredients, sorry!");
-        // }
+        if (HasInsufficientIngredients(requiredIngredients, out var insufficientIngredients))
+        {
+            throw new ArgumentException(
+                $"Kitchen {EventSourceId} has insufficient ingredients\n{string.Join("\n", insufficientIngredients.Select(_ => $"\t{_.Key}: {_.Value}") )}",
+                nameof(requiredIngredients));
+        }
         Apply(new DishPrepared(dish, chef));
-        Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
+        foreach (var (ingredient, amount) in requiredIngredients)
+        {
+            Apply(new IngredientUsed(ingredient, amount, _ingredients[ingredient] - amount));
+        }
+    }
+
+    bool HasInsufficientIngredients(IDictionary<string, int> requiredIngredients, out IDictionary<string, int> insufficientIngredients)
+    {
+        insufficientIngredients = new Dictionary<string, int>();
+        foreach (var (ingredient, amount) in requiredIngredients)
+        {
+            _ingredients.TryGetValue(ingredient, out var stock);
+            if (stock < amount)
+            {
+                insufficientIngredients[ingredient] = amount - stock;
+            }
+        }
+        return insufficientIngredients.Any();
     }
 
     void On(ChefCheckedIn @event)
