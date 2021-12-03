@@ -34,20 +34,18 @@ public class RestaurantMenu
                 Builders<Menu>.Filter.Eq(_ => _.Restaurant, ctx.EventSourceId.ToString()),
                 Builders<Menu>.Update.PullFilter(_ => _.Dishes, Builders<Menu.Dish>.Filter.Eq(_ => _.Name, @event.Dish)),
                 new UpdateOptions {IsUpsert = true}));
-    
+
     public Task Handle(RecipeDescripionAdded @event, EventContext ctx)
         => UpdateCollection(menus =>
-            menus.UpdateOneAsync(
-                Builders<Menu>.Filter.Eq(_ => _.Restaurant, ctx.EventSourceId.ToString()) & Builders<Menu>.Filter.ElemMatch(_ => _.Dishes, Builders<Menu.Dish>.Filter.Eq(_ => _.Name, ctx.EventSourceId.ToString())),
-                Builders<Menu>.Update.Set(_ => _.Dishes[-1].Description, @event.Description),
-                new UpdateOptions {IsUpsert = true}));
-    
+            menus.UpdateManyAsync(
+                Builders<Menu>.Filter.ElemMatch(_ => _.Dishes, Builders<Menu.Dish>.Filter.Eq(_ => _.Name, ctx.EventSourceId.ToString())),
+                Builders<Menu>.Update.Set(_ => _.Dishes[-1].Description, @event.Description)));
+
     public Task Handle(RecipeDescriptionChanged @event, EventContext ctx)
         => UpdateCollection(menus =>
-            menus.UpdateOneAsync(
-                Builders<Menu>.Filter.Eq(_ => _.Restaurant, ctx.EventSourceId.ToString()) & Builders<Menu>.Filter.ElemMatch(_ => _.Dishes, Builders<Menu.Dish>.Filter.Eq(_ => _.Name, ctx.EventSourceId.ToString())),
-                Builders<Menu>.Update.Set(_ => _.Dishes[-1].Description, @event.Description),
-                new UpdateOptions {IsUpsert = true}));
+            menus.UpdateManyAsync(
+                Builders<Menu>.Filter.ElemMatch(_ => _.Dishes, Builders<Menu.Dish>.Filter.Eq(_ => _.Name, ctx.EventSourceId.ToString())),
+                Builders<Menu>.Update.Set(_ => _.Dishes[-1].Description, @event.Description)));
 
     async Task UpdateCollection(Func<IMongoCollection<Menu>, Task> action)
     {
