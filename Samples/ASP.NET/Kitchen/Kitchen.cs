@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
@@ -13,14 +15,13 @@ using Dolittle.SDK.Events;
 public class Kitchen : AggregateRoot
 {
     readonly Dictionary<string, int> _ingredients = new();
-    readonly HashSet<string> _chefs = new();
+    readonly Dictionary<string, DateTimeOffset> _chefs = new();
 
-    public Kitchen(EventSourceId eventSource)
-        : base(eventSource)
+    public Kitchen(EventSourceId restaurant) : base(restaurant)
     {
     }
 
-    string Name => EventSourceId;
+    string Restaurant => EventSourceId;
 
     public void RestockIngredient(string ingredient, int amount)
     {
@@ -35,22 +36,26 @@ public class Kitchen : AggregateRoot
 
     public void CheckInChef(string chef)
     {
-        if (_chefs.Contains(chef))
+        if (_chefs.ContainsKey(chef))
         {
-            throw new ArgumentException($"Chef {chef} has already checked in to kitchen {Name}", nameof(chef));
+            throw new ArgumentException($"Chef {chef} has already checked in to kitchen {Restaurant}", nameof(chef));
         }
-        Apply(new ChefCheckedIn(chef));
+        Apply(new ChefCheckedIn(chef, DateTimeOffset.Now));
     }
+    
     public void CheckOutChef(string chef)
     {
-        if (!_chefs.Contains(chef))
+        if (!_chefs.ContainsKey(chef))
         {
-            throw new ArgumentException($"Chef {chef} has not checked in to kitchen {Name}", nameof(chef));
+            throw new ArgumentException($"Chef {chef} has not checked in to kitchen {Restaurant}", nameof(chef));
         }
-        Apply(new ChefCheckedOut(chef));
+
+        var checkedInTime = _chefs[chef];
+        var timeAtWork = DateTimeOffset.Now - checkedInTime;
+        Apply(new ChefCheckedOut(chef, (int)Math.Round(timeAtWork.TotalHours + 0.5)));
     }
 
-    public void PrepareDish(string chef, string dish, IDictionary<string, int> requiredIngredients)
+    public void PrepareDish(string dish, IDictionary<string, int> requiredIngredients)
     {
         if (HasInsufficientIngredients(requiredIngredients, out var insufficientIngredients))
         {
@@ -58,7 +63,14 @@ public class Kitchen : AggregateRoot
                 $"Kitchen {EventSourceId} has insufficient ingredients\n{string.Join("\n", insufficientIngredients.Select(_ => $"\t{_.Key}: {_.Value}") )}",
                 nameof(requiredIngredients));
         }
-        Apply(new DishPrepared(dish, chef));
+
+        if (_chefs.Count < 1)
+        {
+            throw new EntryPointNotFoundException(
+                $"There are no chefs available to prepare {dish} at the {Restaurant} restaurant.");
+        }
+        
+        Apply(new DishPrepared(dish, PickChefToPrepareNextDish()));
         foreach (var (ingredient, amount) in requiredIngredients)
         {
             Apply(new IngredientUsed(ingredient, amount, _ingredients[ingredient] - amount));
@@ -79,8 +91,15 @@ public class Kitchen : AggregateRoot
         return insufficientIngredients.Any();
     }
 
+    string PickChefToPrepareNextDish()
+    {
+        var availableChefs = _chefs.Keys.ToArray(); 
+        var index = RandomNumberGenerator.GetInt32(0, availableChefs.Length);
+        return availableChefs[index];
+    }
+
     void On(ChefCheckedIn @event)
-        => _chefs.Add(@event.Chef);
+        => _chefs[@event.Chef] = @event.CheckInTime;
     
     void On(ChefCheckedOut @event)
         => _chefs.Remove(@event.Chef);

@@ -13,7 +13,7 @@ public class Recipe : AggregateRoot
     bool _descriptionIsSet;
     readonly Dictionary<string, int> _ingredientsNeeded = new();
 
-    public Recipe(EventSourceId eventSource) : base(eventSource)
+    public Recipe(EventSourceId recipe) : base(recipe)
     {}
 
     public void SetDescription(string description)
