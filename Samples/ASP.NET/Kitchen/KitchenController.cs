@@ -21,10 +21,10 @@ public class KitchenController : ControllerBase
     [HttpPost("prepare")]
     public async Task<IActionResult> Prepare([FromBody] PrepareDish cmd)
     {
-        await _kitchen
-            .Get(cmd.Kitchen)
-            .Perform(_ => _.PrepareDish(cmd.Chef, cmd.Dish))
-            .ConfigureAwait(false);
+        // await _kitchen
+        //     .Get(cmd.Kitchen)
+        //     .Perform(_ => _.PrepareDish(cmd.Chef, cmd.Dish))
+        //     .ConfigureAwait(false);
         return Ok();
     }
 }

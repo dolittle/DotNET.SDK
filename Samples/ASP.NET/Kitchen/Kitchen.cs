@@ -51,14 +51,14 @@ public class Kitchen : AggregateRoot
 
     public void PrepareDish(string chef, string dish, IDictionary<string, int> requiredIngredients)
     {
-        foreach (var (ingredient, amount) in requiredIngredients)
-        {
+        // foreach (var (ingredient, amount) in requiredIngredients)
+        // {
             
-        }
-        if ( <= 0)
-        {
-            throw new Exception($"Kitchen {Name} has run out of ingredients, sorry!");
-        }
+        // }
+        // if ( <= 0)
+        // {
+        //     throw new Exception($"Kitchen {Name} has run out of ingredients, sorry!");
+        // }
         Apply(new DishPrepared(dish, chef));
         Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
     }

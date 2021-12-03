@@ -1,16 +1,16 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-// namespace Recipes;
-
 using System.Collections.Generic;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
+namespace Recipes;
+ 
+[AggregateRoot("b0dcbfef-9e49-4c44-a286-45ff968b5086")]
 public class Recipe : AggregateRoot
 {
     bool _descriptionIsSet;
-    string _description;
     readonly Dictionary<string, int> _ingredientsNeeded = new();
 
     public Recipe(EventSourceId eventSource) : base(eventSource)
@@ -30,22 +30,25 @@ public class Recipe : AggregateRoot
 
     public void UpdateIngredientNeeded(string ingredient, int amount)
     {
-        var newAmount = amount;
         if (!_ingredientsNeeded.TryGetValue(ingredient, out var oldAmount))
         {
             Apply(new IngredientAddedToRecipe(ingredient, amount));
         }
+        else if (amount == 0)
+        {
+            Apply(new IngredientRemovedFromRecipe(ingredient));
+        }
         else
         {
-            Apply(amount == 0 ? new IngredientRemovedFromRecipe(ingredient) : new IngredientAmountChangedForRecipe(ingredient, amount, oldAmount));
+            Apply(new IngredientAmountChangedForRecipe(ingredient, amount, oldAmount));
         }
     }
 
     void On(RecipeDescripionAdded @event)
-        => SetInternalDescription(@event.Description);
+        => _descriptionIsSet = true;
 
     void On(RecipeDescriptionChanged @event)
-        => SetInternalDescription(@event.Description);
+        => _descriptionIsSet = true;
 
     void On(IngredientAddedToRecipe @event)
         => _ingredientsNeeded[@event.Ingredient] = @event.AmountNeeded;
@@ -56,9 +59,4 @@ public class Recipe : AggregateRoot
     void On(IngredientRemovedFromRecipe @event)
         => _ingredientsNeeded.Remove(@event.Ingredient); 
 
-    void SetInternalDescription(string description)
-    {
-        _descriptionIsSet = true;
-        _description = description;
-    }
 }
