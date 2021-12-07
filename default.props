@@ -8,9 +8,17 @@
         <PackageReleaseNotes>https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md</PackageReleaseNotes>
         <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
         <NoWarn>$(NoWarn);SYSLIB1002;SYSLIB1006;SYSLIB1007</NoWarn>
+
+        <PackageIcon>logo.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Dolittle.Common" Version="2.*" PrivateAssets="All"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)/Assets/logo.png" Pack="true" PackagePath="/logo.png" />
+        <None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="/README.md" />
     </ItemGroup>
 </Project>
