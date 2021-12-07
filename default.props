@@ -19,6 +19,6 @@
     
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)/Assets/logo.png" Pack="true" PackagePath="/logo.png" />
-        <None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="/README.md" />
+        <None Include="$(MSBuildThisFileDirectory)/Assets/PACKAGE-README.md" Pack="true" PackagePath="/README.md" />
     </ItemGroup>
 </Project>
