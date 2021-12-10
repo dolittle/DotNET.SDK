@@ -53,13 +53,8 @@ namespace Dolittle.SDK.Failures
         /// <param name="failure">The failure to map to an exception.</param>
         /// <returns>A known kind of <see cref="Exception"/>, or <see cref="UnknownRuntimeFailure"/> if the failure is not known.</returns>
         public static Exception CreateFromFailure(Failure failure)
-        {
-            if (_exceptionMappings.TryGetValue(failure.Id, out var constructor))
-            {
-                return constructor(failure.Reason);
-            }
-
-            return new UnknownRuntimeFailure(failure);
-        }
+            => _exceptionMappings.TryGetValue(failure.Id, out var constructor)
+                ? constructor(failure.Reason)
+                : new UnknownRuntimeFailure(failure);
     }
 }

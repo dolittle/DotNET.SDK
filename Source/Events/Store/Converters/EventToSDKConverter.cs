@@ -4,124 +4,124 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Protobuf;
-using Contracts = Dolittle.Runtime.Events.Contracts;
 
-namespace Dolittle.SDK.Events.Store.Converters
+namespace Dolittle.SDK.Events.Store.Converters;
+
+/// <summary>
+/// Represents an implementation of <see cref="IConvertEventsToSDK"/>.
+/// </summary>
+public class EventToSDKConverter : IConvertEventsToSDK
 {
-    /// <summary>
-    /// Represents an implementation of <see cref="IConvertEventsToSDK"/>.
-    /// </summary>
-    public class EventToSDKConverter : IConvertEventsToSDK
-    {
-        readonly ISerializeEventContent _serializer;
+    readonly ISerializeEventContent _serializer;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventToSDKConverter"/> class.
-        /// </summary>
-        /// <param name="serializer"><see cref="ISerializeEventContent"/> for deserializing event contents.</param>
-        public EventToSDKConverter(ISerializeEventContent serializer)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventToSDKConverter"/> class.
+    /// </summary>
+    /// <param name="serializer"><see cref="ISerializeEventContent"/> for deserializing event contents.</param>
+    public EventToSDKConverter(ISerializeEventContent serializer)
+    {
+        _serializer = serializer;
+    }
+
+    /// <inheritdoc/>
+    public bool TryConvert(Runtime.Events.Contracts.CommittedEvent source, out CommittedEvent @event, out Exception error)
+    {
+        @event = null;
+
+        if (source == null)
         {
-            _serializer = serializer;
+            error = new ArgumentNullException(nameof(source));
+            return false;
         }
 
-        /// <inheritdoc/>
-        public bool TryConvert(Contracts.CommittedEvent source, out CommittedEvent @event, out Exception error)
+        if (source.Occurred == null)
         {
-            @event = null;
+            error = new MissingCommittedEventInformation(nameof(source.Occurred));
+            return false;
+        }
 
-            if (source == null)
+        if (!source.ExecutionContext.TryToExecutionContext(out var executionContext, out var executionContextError))
+        {
+            error = new InvalidCommittedEventInformation(nameof(source.ExecutionContext), executionContextError);
+            return false;
+        }
+
+        if (!source.EventType.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
+        {
+            error = new InvalidCommittedEventInformation(nameof(source.EventType), eventTypeError);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(source.Content))
+        {
+            error = new MissingCommittedEventInformation(nameof(source.Content));
+            return false;
+        }
+
+        if (!_serializer.TryDeserialize(eventType, source.EventLogSequenceNumber, source.Content, out var content, out var deserializationError))
+        {
+            error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);
+            return false;
+        }
+
+        if (source.External)
+        {
+            if (source.ExternalEventReceived == null)
             {
-                error = new ArgumentNullException(nameof(source));
+                error = new MissingCommittedEventInformation(nameof(source.ExternalEventReceived));
                 return false;
-            }
-
-            if (source.Occurred == null)
-            {
-                error = new MissingCommittedEventInformation(nameof(source.Occurred));
-                return false;
-            }
-
-            if (!source.ExecutionContext.TryToExecutionContext(out var executionContext, out var executionContextError))
-            {
-                error = new InvalidCommittedEventInformation(nameof(source.ExecutionContext), executionContextError);
-                return false;
-            }
-
-            if (!source.EventType.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
-            {
-                error = new InvalidCommittedEventInformation(nameof(source.EventType), eventTypeError);
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(source.Content))
-            {
-                error = new MissingCommittedEventInformation(nameof(source.Content));
-                return false;
-            }
-
-            if (!_serializer.TryDeserialize(eventType, source.EventLogSequenceNumber, source.Content, out var content, out var deserializationError))
-            {
-                error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);
-                return false;
-            }
-
-            if (source.External)
-            {
-                if (source.ExternalEventReceived == null)
-                {
-                    error = new MissingCommittedEventInformation(nameof(source.ExternalEventReceived));
-                    return false;
-                }
-
-                error = null;
-                @event = new CommittedExternalEvent(
-                    source.EventLogSequenceNumber,
-                    source.Occurred.ToDateTimeOffset(),
-                    source.EventSourceId,
-                    executionContext,
-                    eventType,
-                    content,
-                    source.Public,
-                    source.ExternalEventLogSequenceNumber,
-                    source.ExternalEventReceived.ToDateTimeOffset());
-                return true;
             }
 
             error = null;
-            @event = new CommittedEvent(
+            @event = new CommittedExternalEvent(
                 source.EventLogSequenceNumber,
                 source.Occurred.ToDateTimeOffset(),
                 source.EventSourceId,
                 executionContext,
                 eventType,
                 content,
-                source.Public);
+                source.Public,
+                source.ExternalEventLogSequenceNumber,
+                source.ExternalEventReceived.ToDateTimeOffset());
             return true;
         }
 
-        /// <inheritdoc/>
-        public bool TryConvert(IReadOnlyList<Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
-        {
-            events = default;
+        error = null;
+        @event = new CommittedEvent(
+            source.EventLogSequenceNumber,
+            source.Occurred.ToDateTimeOffset(),
+            source.EventSourceId,
+            executionContext,
+            eventType,
+            content,
+            source.Public);
+        return true;
+    }
 
-            if (source == null)
+    /// <inheritdoc/>
+    public bool TryConvert(IReadOnlyList<Runtime.Events.Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
+    {
+        events = default;
+
+        if (source == null)
+        {
+            error = new ArgumentNullException(nameof(source));
+            return false;
+        }
+
+        var list = new List<CommittedEvent>();
+        foreach (var sourceEvent in source)
+        {
+            if (!TryConvert(sourceEvent, out var @event, out error))
             {
-                error = new ArgumentNullException(nameof(source));
                 return false;
             }
 
-            var list = new List<CommittedEvent>();
-            foreach (var sourceEvent in source)
-            {
-                if (!TryConvert(sourceEvent, out var @event, out error))
-                    return false;
-
-                list.Add(@event);
-            }
-
-            events = new CommittedEvents(list);
-            error = null;
-            return true;
+            list.Add(@event);
         }
+
+        events = new CommittedEvents(list);
+        error = null;
+        return true;
     }
 }

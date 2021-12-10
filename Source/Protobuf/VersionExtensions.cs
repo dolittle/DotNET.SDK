@@ -17,14 +17,14 @@ namespace Dolittle.SDK.Protobuf
         /// <param name="version"><see cref="Version"/> to convert.</param>
         /// <returns>The converted <see cref="PbVersion"/>.</returns>
         public static PbVersion ToProtobuf(this Version version)
-            => new PbVersion
-                {
+            => new()
+            {
                     Major = version.Major,
                     Minor = version.Minor,
                     Patch = version.Patch,
                     Build = version.Build,
                     PreReleaseString = version.PreReleaseString
-                };
+            };
 
         /// <summary>
         /// Convert a <see cref="PbVersion"/> to a <see cref="Version"/>.
@@ -32,7 +32,7 @@ namespace Dolittle.SDK.Protobuf
         /// <param name="version"><see cref="PbVersion"/> to convert.</param>
         /// <returns>The converted <see cref="Version"/>.</returns>
         public static Version ToVersion(this PbVersion version)
-            => new Version(
+            => new(
                 version.Major,
                 version.Minor,
                 version.Patch,
