@@ -10,8 +10,8 @@ namespace Dolittle.SDK.Handshake.Internal;
 
 static partial class Log
 {
-    [LoggerMessage(0, LogLevel.Debug, "Performing handshake between Dolittle DotNET SDK v{SDKVersion} using version {ContractsVersion} Contracts and Dolittle Runtime")]
-    internal static partial void PerformHandshake(ILogger logger, Version sdkVersion, Version contractsVersion);
+    [LoggerMessage(0, LogLevel.Debug, "Performing handshake between Head v{HeadVersion} using Dolittle DotNET SDK v{SDKVersion} using version {ContractsVersion} Contracts and Dolittle Runtime")]
+    internal static partial void PerformHandshake(ILogger logger, Version headVersion, Version sdkVersion, Version contractsVersion);
 
     [LoggerMessage(0, LogLevel.Warning, "Error performing handshake with Dolittle Runtime")]
     internal static partial void ErrorPerformingHandshake(ILogger logger, Exception ex);
@@ -19,6 +19,6 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Warning, "Dolittle Runtime failed performing handshake. ({FailureId}){FailureReason}")]
     internal static partial void HandshakeFailedResponse(ILogger logger, FailureReason failureReason, FailureId failureId);
 
-    [LoggerMessage(0, LogLevel.Debug, "Successfully performed handshake between Dolittle DotNET SDK v{SDKVersion} using version {SDKContractsVersion} Contracts and Dolittle Runtime v{RuntimeVersion} using version {RuntimeContractsVersion} Contracts")]
-    internal static partial void SuccessfullyPerformedHandshake(ILogger logger, Version sdkVersion, Version sdkContractsVersion, Version runtimeVersion, Version runtimeContractsVersion);
+    [LoggerMessage(0, LogLevel.Debug, "Successfully performed handshake between Head v{HeadVersion} using Dolittle DotNET SDK v{SDKVersion} using version {SDKContractsVersion} Contracts and Dolittle Runtime v{RuntimeVersion} using version {RuntimeContractsVersion} Contracts")]
+    internal static partial void SuccessfullyPerformedHandshake(ILogger logger, Version headVersion, Version sdkVersion, Version sdkContractsVersion, Version runtimeVersion, Version runtimeContractsVersion);
 }
