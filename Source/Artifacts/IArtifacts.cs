@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Dolittle.SDK.Artifacts;
 
 /// <summary>
-/// Defines a system that knows about <see cref="Artifact{TId}"/>.
+/// Defines a system that knows about <see cref="Artifact{TId}"/> associated to a <see cref="Type"/>.
 /// </summary>
 /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
@@ -68,11 +68,4 @@ public interface IArtifacts<TArtifact, TId>
     /// <param name="artifact"><see cref="Artifact{TId}"/> to get for.</param>
     /// <returns><see cref="Type"/>.</returns>
     Type GetTypeFor(TArtifact artifact);
-
-    /// <summary>
-    /// Register an relationship between an <see cref="Artifact{TId}"/> and a <see cref="Type"/>.
-    /// </summary>
-    /// <param name="type"><see cref="Type"/> associated with the artifact.</param>
-    /// <param name="artifact"><see cref="Artifact{TId}"/> to register.</param>
-    void Associate(Type type, TArtifact artifact);
 }

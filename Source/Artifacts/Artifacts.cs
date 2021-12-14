@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dolittle.SDK.Artifacts;
 
@@ -15,23 +16,24 @@ public abstract class Artifacts<TArtifact, TId> : IArtifacts<TArtifact, TId>
     where TArtifact : Artifact<TId>
     where TId : ArtifactId
 {
-    readonly Dictionary<TArtifact, Type> _artifactToTypeMap = new();
-    readonly Dictionary<Type, TArtifact> _typeToArtifactMap = new();
+    readonly IDictionary<TArtifact, Type> _artifactToTypeMap;
+    readonly IDictionary<Type, TArtifact> _typeToArtifactMap;
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="Artifacts{TArtifact,TId}"/> class.
+    /// </summary>
+    /// <param name="associations">The artifact associations.</param>
+    protected Artifacts(IDictionary<Type, TArtifact> associations)
+    {
+        _typeToArtifactMap = associations;
+        _artifactToTypeMap = associations.ToDictionary(_ => _.Value, _ => _.Key);
+    }
 
     /// <inheritdoc/>
     public IEnumerable<TArtifact> All => _artifactToTypeMap.Keys;
     
     /// <inheritdoc/>
     public IEnumerable<Type> Types => _typeToArtifactMap.Keys;
-
-    /// <inheritdoc />
-    public void Associate(Type type, TArtifact artifact)
-    {
-        ThrowIfMultipleTypesAssociatedWithArtifact(artifact, type);
-        ThrowIfMultipleArtifactsAssociatedWithType(type, artifact);
-        _typeToArtifactMap[type] = artifact;
-        _artifactToTypeMap[artifact] = type;
-    }
 
     /// <inheritdoc />
     public TArtifact GetFor<T>()
@@ -41,14 +43,20 @@ public abstract class Artifacts<TArtifact, TId> : IArtifacts<TArtifact, TId>
     /// <inheritdoc />
     public TArtifact GetFor(Type type)
     {
-        if (!_typeToArtifactMap.TryGetValue(type, out var artifact)) throw CreateNoArtifactAssociatedWithType(type);
+        if (!_typeToArtifactMap.TryGetValue(type, out var artifact))
+        {
+            throw CreateNoArtifactAssociatedWithType(type);
+        }
         return artifact;
     }
 
     /// <inheritdoc />
     public Type GetTypeFor(TArtifact artifact)
     {
-        if (!_artifactToTypeMap.TryGetValue(artifact, out var type)) throw CreateNoTypeAssociatedWithArtifact(artifact);
+        if (!_artifactToTypeMap.TryGetValue(artifact, out var type))
+        {
+            throw CreateNoTypeAssociatedWithArtifact(artifact);
+        }
         return type;
     }
 
@@ -76,38 +84,4 @@ public abstract class Artifacts<TArtifact, TId> : IArtifacts<TArtifact, TId>
     /// <param name="artifact">The <typeparamref name="TArtifact"/> that has no association.</param>
     /// <returns>The <see cref="Exception"/> to throw.</returns>
     protected abstract Exception CreateNoTypeAssociatedWithArtifact(TArtifact artifact);
-
-    /// <summary>
-    /// Create <see cref="Exception"/> to throw when trying to associate multiple instances of <typeparamref name="TArtifact"/> to a single <see cref="Type"/>.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> that was attempted to associate with a <typeparamref name="TArtifact"/>.</param>
-    /// <param name="artifact">The <typeparamref name="TArtifact"/> that was attempted to associate with.</param>
-    /// <param name="existing">The <typeparamref name="TArtifact"/> that the <see cref="Type"/> was already associated with.</param>
-    /// <returns>The <see cref="Exception"/> to throw.</returns>
-    protected abstract Exception CreateCannotAssociateMultipleArtifactsWithType(Type type, TArtifact artifact, TArtifact existing);
-
-    /// <summary>
-    /// Create <see cref="Exception"/> to throw when trying to associate multiple instances of <see cref="Type"/> to a single <typeparamref name="TArtifact"/>.
-    /// </summary>
-    /// <param name="artifact">The <typeparamref name="TArtifact"/> that was attempted to associate with a <see cref="Type"/>.</param>
-    /// <param name="type">The <see cref="Type"/> that was attempted to associate with.</param>
-    /// <param name="existing">The <see cref="Type"/> that the <typeparamref name="TArtifact"/> was already associated with.</param>
-    /// <returns>The <see cref="Exception"/> to throw.</returns>
-    protected abstract Exception CreateCannotAssociateMultipleTypesWithArtifact(TArtifact artifact, Type type, Type existing);
-
-    void ThrowIfMultipleTypesAssociatedWithArtifact(TArtifact artifact, Type type)
-    {
-        if (_artifactToTypeMap.TryGetValue(artifact, out var existing))
-        {
-            throw CreateCannotAssociateMultipleTypesWithArtifact(artifact, type, existing);
-        }
-    }
-
-    void ThrowIfMultipleArtifactsAssociatedWithType(Type type, TArtifact artifact)
-    {
-        if (_typeToArtifactMap.TryGetValue(type, out var existing))
-        {
-            throw CreateCannotAssociateMultipleArtifactsWithType(type, artifact, existing);
-        }
-    }
 }

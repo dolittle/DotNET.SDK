@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../Common/Common.csproj" />
     <ProjectReference Include="../Concepts/Concepts.csproj" />
   </ItemGroup>
 
