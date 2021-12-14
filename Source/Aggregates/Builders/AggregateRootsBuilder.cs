@@ -5,123 +5,92 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.DependencyInversion;
-using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Dolittle.SDK.Aggregates.Builders
+namespace Dolittle.SDK.Aggregates.Builders;
+
+/// <summary>
+/// Represents an implementation of <see cref="IAggregateRootsBuilder"/>.
+/// </summary>
+public class AggregateRootsBuilder : IAggregateRootsBuilder
 {
-    /// <summary>
-    /// Represents a system that registers <see cref="Type" /> to <see cref="EventType" /> associations to an <see cref="IEventTypes" /> instance.
-    /// </summary>
-    public class AggregateRootsBuilder
+    readonly Dictionary<Type, AggregateRootType> _associations = new();
+    
+    /// <inheritdoc />
+    public IAggregateRootsBuilder Register<T>()
+        where T : class
+        => Register(typeof(T));
+    
+    /// <inheritdoc />
+    public IAggregateRootsBuilder Register(Type type)
     {
-        readonly Dictionary<Type, AggregateRootType> _associations = new Dictionary<Type, AggregateRootType>();
-
-        /// <summary>
-        /// Associate a <see cref="Type" /> with the <see cref="AggregateRootType" /> given by an attribute.
-        /// </summary>
-        /// <typeparam name="T">The <see cref="Type" /> to associate with an <see cref="AggregateRootType" />.</typeparam>
-        /// <returns>The <see cref="AggregateRootsBuilder"/> for continuation.</returns>
-        /// <remarks>
-        /// The type must have a AggregateRoot attribute.
-        /// </remarks>
-        public AggregateRootsBuilder Register<T>()
-            where T : class
-            => Register(typeof(T));
-
-        /// <summary>
-        /// Associate the <see cref="Type" /> with the <see cref="AggregateRootType" /> given by an attribute.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> to associate with an <see cref="AggregateRootType" />.</param>
-        /// <returns>The <see cref="AggregateRootsBuilder"/> for continuation.</returns>
-        /// <remarks>
-        /// The type must have a AggregateRoot attribute.
-        /// </remarks>
-        public AggregateRootsBuilder Register(Type type)
+        ThrowIfTypeIsMissingAggregateRootAttribute(type);
+        TryGetAggregateRootTypeFromAttribute(type, out var eventType);
+        AddAssociation(type, eventType);
+        return this;
+    }
+    
+    /// <inheritdoc />
+    public IAggregateRootsBuilder RegisterAllFrom(Assembly assembly)
+    {
+        foreach (var type in assembly.ExportedTypes.Where(IsAggregateRoot))
         {
-            ThrowIfTypeIsMissingAggregateRootAttribute(type);
-            TryGetAggregateRootTypeFromAttribute(type, out var eventType);
-            AddAssociation(type, eventType);
-            return this;
+            Register(type);
         }
 
-        /// <summary>
-        /// Registers all aggregate root classes from an <see cref="Assembly" />.
-        /// </summary>
-        /// <param name="assembly">The <see cref="Assembly" /> to register the aggregate root classes from.</param>
-        /// <returns>The <see cref="AggregateRootsBuilder" /> for continuation.</returns>
-        public AggregateRootsBuilder RegisterAllFrom(Assembly assembly)
-        {
-            foreach (var type in assembly.ExportedTypes.Where(IsAggregateRoot))
-            {
-                Register(type);
-            }
+        return this;
+    }
 
-            return this;
+    /// <summary>
+    /// Builds the aggregate roots by registering them with the Runtime.
+    /// </summary>
+    /// <param name="aggregateRoots">The <see cref="Internal.AggregateRootsClient"/>.</param>
+    /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
+    /// <param name="aggregatesBuilder">The <see cref="IAggregatesBuilder"/>.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    public IUnregisteredAggregateRoots Build()
+    {
+        var result = new UnregisteredAggregateRoots();
+        foreach (var (type, aggregateRootType) in _associations)
+        {
+            result.Associate(type, aggregateRootType);
         }
+        return result;
+    }
 
-        /// <summary>
-        /// Builds the aggregate roots by registering them with the Runtime.
-        /// </summary>
-        /// <param name="aggregateRoots">The <see cref="Internal.AggregateRootsClient"/>.</param>
-        /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
-        /// <param name="aggregatesBuilder">The <see cref="IAggregatesBuilder"/>.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task BuildAndRegister(
-            Internal.AggregateRootsClient aggregateRoots,
-            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
-            IAggregatesBuilder aggregatesBuilder,
-            CancellationToken cancellationToken)
+    static bool IsAggregateRoot(Type type)
+        => type.GetCustomAttributes(typeof(AggregateRootAttribute), true).FirstOrDefault() is AggregateRootAttribute;
+
+    static bool TryGetAggregateRootTypeFromAttribute(Type type, out AggregateRootType aggregateRootType)
+    {
+        if (Attribute.GetCustomAttribute(type, typeof(AggregateRootAttribute)) is AggregateRootAttribute attribute)
         {
-            await aggregateRoots.Register(_associations.Values, cancellationToken).ConfigureAwait(false);
-            foreach (var type in _associations.Keys)
+            if (!attribute.Type.HasAlias)
             {
-                tenantScopedProvidersBuilder.AddTenantServices((tenant, services) =>
-                {
-                    var aggregates = aggregatesBuilder.ForTenant(tenant);
-                    var aggregateOfInstance = Activator.CreateInstance(typeof(AggregateOf<>).MakeGenericType(type), aggregates) ?? throw new CouldNotCreateAggregateOf(type, tenant);
-                    services.AddSingleton(typeof(IAggregateOf<>).MakeGenericType(type), aggregateOfInstance);
-                });
-            }
-        }
-
-        static bool IsAggregateRoot(Type type)
-            => type.GetCustomAttributes(typeof(AggregateRootAttribute), true).FirstOrDefault() is AggregateRootAttribute;
-
-        static bool TryGetAggregateRootTypeFromAttribute(Type type, out AggregateRootType aggregateRootType)
-        {
-            if (Attribute.GetCustomAttribute(type, typeof(AggregateRootAttribute)) is AggregateRootAttribute attribute)
-            {
-                if (!attribute.Type.HasAlias)
-                {
-                    aggregateRootType = new AggregateRootType(attribute.Type.Id, attribute.Type.Generation, type.Name);
-                    return true;
-                }
-
-                aggregateRootType = attribute.Type;
+                aggregateRootType = new AggregateRootType(attribute.Type.Id, attribute.Type.Generation, type.Name);
                 return true;
             }
 
-            aggregateRootType = default;
-            return false;
+            aggregateRootType = attribute.Type;
+            return true;
         }
 
-        void AddAssociation(Type type, AggregateRootType aggregateRootType)
-        {
-            _associations[type] = aggregateRootType;
-        }
+        aggregateRootType = default;
+        return false;
+    }
 
-        void ThrowIfTypeIsMissingAggregateRootAttribute(Type type)
+    void AddAssociation(Type type, AggregateRootType aggregateRootType)
+    {
+        _associations[type] = aggregateRootType;
+    }
+
+    void ThrowIfTypeIsMissingAggregateRootAttribute(Type type)
+    {
+        if (!TryGetAggregateRootTypeFromAttribute(type, out _))
         {
-            if (!TryGetAggregateRootTypeFromAttribute(type, out _))
-            {
-                throw new TypeIsMissingAggregateRootAttribute(type);
-            }
+            throw new TypeIsMissingAggregateRootAttribute(type);
         }
     }
 }
