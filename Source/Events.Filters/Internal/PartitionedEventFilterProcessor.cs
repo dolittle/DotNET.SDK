@@ -8,55 +8,54 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Events.Filters.Internal
+namespace Dolittle.SDK.Events.Filters.Internal;
+
+/// <summary>
+/// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter partitioned private events.
+/// </summary>
+public class PartitionedEventFilterProcessor : FilterEventProcessor<PartitionedFilterRegistrationRequest, PartitionedFilterResponse>
 {
+    readonly PartitionedFilterEventCallback _filterEventCallback;
+    readonly FilterId _filterId;
+    readonly ScopeId _scopeId;
+
     /// <summary>
-    /// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter partitioned private events.
+    /// Initializes a new instance of the <see cref="PartitionedEventFilterProcessor"/> class.
     /// </summary>
-    public class PartitionedEventFilterProcessor : FilterEventProcessor<PartitionedFilterRegistrationRequest, PartitionedFilterResponse>
+    /// <param name="filterId">The <see cref="FilterId" />.</param>
+    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
+    /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
+    /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+    /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
+    public PartitionedEventFilterProcessor(
+        FilterId filterId,
+        ScopeId scopeId,
+        PartitionedFilterEventCallback filterEventCallback,
+        IEventProcessingConverter converter,
+        ILoggerFactory loggerFactory)
+        : base("Partitioned Filter", filterId, converter, loggerFactory)
     {
-        readonly PartitionedFilterEventCallback _filterEventCallback;
-        readonly FilterId _filterId;
-        readonly ScopeId _scopeId;
+        _filterEventCallback = filterEventCallback;
+        _filterId = filterId;
+        _scopeId = scopeId;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PartitionedEventFilterProcessor"/> class.
-        /// </summary>
-        /// <param name="filterId">The <see cref="FilterId" />.</param>
-        /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-        /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
-        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        public PartitionedEventFilterProcessor(
-            FilterId filterId,
-            ScopeId scopeId,
-            PartitionedFilterEventCallback filterEventCallback,
-            IEventProcessingConverter converter,
-            ILoggerFactory loggerFactory)
-            : base("Partitioned Filter", filterId, converter, loggerFactory)
+    /// <inheritdoc/>
+    public override PartitionedFilterRegistrationRequest RegistrationRequest
+        => new()
         {
-            _filterEventCallback = filterEventCallback;
-            _filterId = filterId;
-            _scopeId = scopeId;
-        }
+            FilterId = _filterId.ToProtobuf(),
+            ScopeId = _scopeId.ToProtobuf(),
+        };
 
-        /// <inheritdoc/>
-        public override PartitionedFilterRegistrationRequest RegistrationRequest
-            => new PartitionedFilterRegistrationRequest
-            {
-                FilterId = _filterId.ToProtobuf(),
-                ScopeId = _scopeId.ToProtobuf(),
-            };
+    /// <inheritdoc/>
+    protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)
+        => new() { Failure = failure };
 
-        /// <inheritdoc/>
-        protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)
-            => new PartitionedFilterResponse { Failure = failure };
-
-        /// <inheritdoc/>
-        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
-        {
-            var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
-            return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.Value };
-        }
+    /// <inheritdoc/>
+    protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
+    {
+        var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
+        return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.Value };
     }
 }

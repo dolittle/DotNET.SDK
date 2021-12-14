@@ -4,6 +4,7 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events.Filters</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Events.Filters</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
