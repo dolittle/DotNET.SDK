@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Internal;
@@ -15,6 +16,14 @@ namespace Dolittle.SDK.Aggregates.Builders;
 /// </summary>
 public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggregateRoots
 {
+    /// <summary>
+    /// Initializes an instance of the <see cref="UnregisteredAggregateRoots"/> class.
+    /// </summary>
+    /// <param name="associations"></param>
+    public UnregisteredAggregateRoots(IDictionary<Type, AggregateRootType> associations) : base(associations)
+    {
+    }
+
     /// <inheritdoc />
     public async Task Register(
         AggregateRootsClient aggregateRoots,

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Events;
@@ -11,6 +12,14 @@ namespace Dolittle.SDK.Events;
 /// </summary>
 public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
 {
+    /// <summary>
+    /// Initializes an instance of the <see cref="EventTypes"/> class.
+    /// </summary>
+    /// <param name="associations">The <see cref="EventType"/> associations.</param>
+    public EventTypes(IDictionary<Type, EventType> associations) : base(associations)
+    {
+    }
+
     /// <inheritdoc/>
     protected override Exception CreateNoArtifactAssociatedWithType(Type type)
         => new NoEventTypeAssociatedWithType(type);
@@ -18,12 +27,4 @@ public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
     /// <inheritdoc/>
     protected override Exception CreateNoTypeAssociatedWithArtifact(EventType artifact)
         => new NoTypeAssociatedWithEventType(artifact);
-
-    /// <inheritdoc/>
-    protected override Exception CreateCannotAssociateMultipleArtifactsWithType(Type type, EventType artifact, EventType existing)
-        => new CannotAssociateMultipleEventTypesWithType(type, artifact, existing);
-
-    /// <inheritdoc/>
-    protected override Exception CreateCannotAssociateMultipleTypesWithArtifact(EventType artifact, Type type, Type existing)
-        => new CannotAssociateMultipleTypesWithEventType(artifact, type, existing);
 }
