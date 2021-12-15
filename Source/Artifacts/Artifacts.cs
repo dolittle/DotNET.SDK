@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Artifacts;
 
@@ -12,28 +12,25 @@ namespace Dolittle.SDK.Artifacts;
 /// </summary>
 /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-public abstract class Artifacts<TArtifact, TId> : IArtifacts<TArtifact, TId>
-    where TArtifact : Artifact<TId>
+public abstract class Artifacts<TArtifact, TId> : UniqueBindings<TArtifact, Type>, IArtifacts<TArtifact, TId>
+    where TArtifact : Artifact<TId>, IEquatable<TArtifact>
     where TId : ArtifactId
 {
-    readonly IDictionary<TArtifact, Type> _artifactToTypeMap;
-    readonly IDictionary<Type, TArtifact> _typeToArtifactMap;
 
     /// <summary>
     /// Initializes an instance of the <see cref="Artifacts{TArtifact,TId}"/> class.
     /// </summary>
     /// <param name="associations">The artifact associations.</param>
-    protected Artifacts(IDictionary<Type, TArtifact> associations)
+    protected Artifacts(IDictionary<TArtifact, Type> associations)
+        : base(associations)
     {
-        _typeToArtifactMap = associations;
-        _artifactToTypeMap = associations.ToDictionary(_ => _.Value, _ => _.Key);
     }
 
     /// <inheritdoc/>
-    public IEnumerable<TArtifact> All => _artifactToTypeMap.Keys;
+    public IEnumerable<TArtifact> All => Identifiers;
     
     /// <inheritdoc/>
-    public IEnumerable<Type> Types => _typeToArtifactMap.Keys;
+    public IEnumerable<Type> Types => Values;
 
     /// <inheritdoc />
     public TArtifact GetFor<T>()
@@ -41,47 +38,14 @@ public abstract class Artifacts<TArtifact, TId> : IArtifacts<TArtifact, TId>
         => GetFor(typeof(T));
 
     /// <inheritdoc />
-    public TArtifact GetFor(Type type)
-    {
-        if (!_typeToArtifactMap.TryGetValue(type, out var artifact))
-        {
-            throw CreateNoArtifactAssociatedWithType(type);
-        }
-        return artifact;
-    }
-
-    /// <inheritdoc />
-    public Type GetTypeFor(TArtifact artifact)
-    {
-        if (!_artifactToTypeMap.TryGetValue(artifact, out var type))
-        {
-            throw CreateNoTypeAssociatedWithArtifact(artifact);
-        }
-        return type;
-    }
+    public Type GetTypeFor(TArtifact artifact) => base.GetFor(artifact);
 
     /// <inheritdoc />
     public bool HasFor<T>()
         where T : class
         => HasFor(typeof(T));
 
-    /// <inheritdoc />
-    public bool HasFor(Type type) => _typeToArtifactMap.ContainsKey(type);
 
     /// <inheritdoc />
-    public bool HasTypeFor(TArtifact artifact) => _artifactToTypeMap.ContainsKey(artifact);
-
-    /// <summary>
-    /// Create <see cref="Exception"/> to throw when no <typeparamref name="TArtifact"/> is associated with the given <see cref="Type"/>.
-    /// </summary>
-    /// <param name="type">The <see cref="Type"/> that has no association.</param>
-    /// <returns>The <see cref="Exception"/> to throw.</returns>
-    protected abstract Exception CreateNoArtifactAssociatedWithType(Type type);
-
-    /// <summary>
-    /// Create <see cref="Exception"/> to throw when no <see cref="Type"/> is associated with the given <typeparamref name="TArtifact"/>.
-    /// </summary>
-    /// <param name="artifact">The <typeparamref name="TArtifact"/> that has no association.</param>
-    /// <returns>The <see cref="Exception"/> to throw.</returns>
-    protected abstract Exception CreateNoTypeAssociatedWithArtifact(TArtifact artifact);
+    public bool HasTypeFor(TArtifact artifact) => base.HasFor(artifact);
 }

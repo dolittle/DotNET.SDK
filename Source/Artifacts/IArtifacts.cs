@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Artifacts;
 
@@ -11,10 +12,11 @@ namespace Dolittle.SDK.Artifacts;
 /// </summary>
 /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-public interface IArtifacts<TArtifact, TId>
-    where TArtifact : Artifact<TId>
+public interface IArtifacts<TArtifact, TId> : IUniqueBindings<TArtifact, Type>
+    where TArtifact : Artifact<TId>, IEquatable<TArtifact>
     where TId : ArtifactId
 {
+    
     /// <summary>
     /// Gets all artifacts.
     /// </summary>
@@ -24,36 +26,22 @@ public interface IArtifacts<TArtifact, TId>
     /// Gets all the <see cref="Type"/> types.
     /// </summary>
     IEnumerable<Type> Types { get; }
-
+    
     /// <summary>
-    /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
+    /// Check if there an <see cref="Artifact{TId}"/> binding for a <see cref="Type"/>.
     /// </summary>
-    /// <typeparam name="T">CLR type of the artifact.</typeparam>
+    /// <typeparam name="T"><see cref="Type"/> of the artifact.</typeparam>
     /// <returns><see cref="bool"/>.</returns>
     bool HasFor<T>()
         where T : class;
 
     /// <summary>
-    /// Check if there is a type associated with an <see cref="Artifact{TId}" />.
+    /// Get an <see cref="Artifact{TId}"/> bound to the given <see cref="Type"/>.
     /// </summary>
-    /// <param name="type">CLR type of the artifact.</param>
-    /// <returns><see cref="bool"/>.</returns>
-    bool HasFor(Type type);
-
-    /// <summary>
-    /// Get an <see cref="Artifact{TId}"/> from a given type.
-    /// </summary>
-    /// <typeparam name="T">CLR type of the artifact.</typeparam>
+    /// <typeparam name="T"><see cref="Type"/> of the artifact.</typeparam>
     /// <returns><see cref="Artifact{TId}"/>.</returns>
     TArtifact GetFor<T>()
         where T : class;
-
-    /// <summary>
-    /// Get an <see cref="Artifact{TId}"/> from a given type.
-    /// </summary>
-    /// <param name="type">CLR type of the artifact.</param>
-    /// <returns><see cref="Artifact{TId}"/>.</returns>
-    TArtifact GetFor(Type type);
 
     /// <summary>
     /// Check if there is an <typeparamref name="TArtifact"/> associated with a <see cref="Type" />.
@@ -63,7 +51,7 @@ public interface IArtifacts<TArtifact, TId>
     bool HasTypeFor(TArtifact artifact);
 
     /// <summary>
-    /// Get a CLR <see cref="Type"/> for a specific <see cref="Artifact{TId}"/>.
+    /// Gets the <see cref="Type"/> bound t a specific <see cref="Artifact{TId}"/>.
     /// </summary>
     /// <param name="artifact"><see cref="Artifact{TId}"/> to get for.</param>
     /// <returns><see cref="Type"/>.</returns>
