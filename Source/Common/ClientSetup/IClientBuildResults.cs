@@ -12,6 +12,12 @@ namespace Dolittle.SDK.Common.ClientSetup;
 public interface IClientBuildResults
 {
     /// <summary>
+    /// Adds the <see cref="ClientBuildResult"/>.
+    /// </summary>
+    /// <param name="result">The <see cref="ClientBuildResult"/>.</param>
+    void Add(ClientBuildResult result);
+    
+    /// <summary>
     /// Adds an information build result.
     /// </summary>
     /// <param name="message">The information message</param>

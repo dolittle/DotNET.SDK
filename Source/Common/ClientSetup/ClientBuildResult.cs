@@ -9,32 +9,63 @@ namespace Dolittle.SDK.Common.ClientSetup;
 /// <summary>
 /// Represents a client build result.
 /// </summary>
-public class ClientBuildResult
+public abstract class ClientBuildResult
 {
     readonly string _message;
     readonly Exception _error;
     readonly LogLevel _logLevel;
 
-    ClientBuildResult(LogLevel logLevel, string message, Exception error = default)
+    /// <summary>
+    /// Initializes an instance of the <see cref="ClientBuildResult"/> class.
+    /// </summary>
+    /// <param name="logLevel">The <see cref="LogLevel"/>.</param>
+    /// <param name="message">The build message.</param>
+    /// <param name="failed">The value indicating whether this is a failed result.</param>
+    /// <param name="error">The optional error <see cref="Exception"/>.</param>
+    protected ClientBuildResult(LogLevel logLevel, string message, bool failed, Exception error = default)
     {
         _logLevel = logLevel;
         _message = message;
         _error = error;
+        IsFailed = failed;
     }
-
-    public static ClientBuildResult Information(string message)
-        => new(LogLevel.Debug, message);
-
-    public static ClientBuildResult Failure(string message, string fix = default)
-        => new(LogLevel.Warning, string.IsNullOrEmpty(fix) ? message : $"{message}. {fix}");
     
-    public static ClientBuildResult Error(Exception error)
-        => new(LogLevel.Error, error.Message, error);
+
+    /// <summary>
+    /// Creates an <see cref="InformationBuildResult"/>.
+    /// </summary>
+    /// <param name="message">The build message.</param>
+    /// <returns>The <see cref="InformationBuildResult"/>.</returns>
+    public static InformationBuildResult Information(string message) => new(message);
+
+
+    /// <summary>
+    /// Creates an <see cref="FailureBuildResult"/>.
+    /// </summary>
+    /// <param name="message">The build message.</param>
+    /// <param name="fix">The fix message.</param>
+    /// <returns>The <see cref="FailureBuildResult"/>.</returns>
+    public static FailureBuildResult Failure(string message, string fix = default) => new(message, fix);
+    
+    /// <summary>
+    /// Creates an <see cref="ErrorBuildResult"/>.
+    /// </summary>
+    /// <param name="error">The error <see cref="Exception"/>.</param>
+    /// <returns>The <see cref="ErrorBuildResult"/>.</returns>
+    public static ErrorBuildResult Error(Exception error) => new(error);
+    
+    /// <summary>
+    /// Gets a value indicating whether this is a failed result.
+    /// </summary>
+    public bool IsFailed { get; }
 
 
 #pragma warning disable CA1848
 #pragma warning disable CA2254
-    /// <inheritdoc />
+    /// <summary>
+    /// Logs the build message.
+    /// </summary>
+    /// <param name="logger">The provided <see cref="ILogger"/>to log the message to.</param>
     public void Log(ILogger logger)
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
         => logger.Log(_logLevel, 0, _error, _message);

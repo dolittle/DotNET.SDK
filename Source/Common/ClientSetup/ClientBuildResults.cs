@@ -14,23 +14,26 @@ public class ClientBuildResults : IClientBuildResults
 {
     readonly List<ClientBuildResult> _results = new();
 
+    public void Add(ClientBuildResult result)
+    {
+        if (result.IsFailed)
+        {
+            Failed = true;
+        }
+        _results.Add(result);
+    }
+
     /// <inheritdoc />
     public void AddInformation(string message)
-        => _results.Add(ClientBuildResult.Information(message));
+        => Add(ClientBuildResult.Information(message));
 
     /// <inheritdoc />
     public void AddFailure(string message, string fix = "")
-    {
-        Failed = true;
-        _results.Add(ClientBuildResult.Failure(message, fix));
-    }
+        => Add(ClientBuildResult.Failure(message, fix));
 
     /// <inheritdoc />
     public void AddError(Exception error)
-    {
-        Failed = true;
-        _results.Add(ClientBuildResult.Error(error));
-    }
+        => Add(ClientBuildResult.Error(error));
 
     /// <inheritdoc />
     public bool Failed { get; private set; }
