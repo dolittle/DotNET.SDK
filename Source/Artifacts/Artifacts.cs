@@ -16,13 +16,12 @@ public abstract class Artifacts<TArtifact, TId> : UniqueBindings<TArtifact, Type
     where TArtifact : Artifact<TId>, IEquatable<TArtifact>
     where TId : ArtifactId
 {
-
     /// <summary>
     /// Initializes an instance of the <see cref="Artifacts{TArtifact,TId}"/> class.
     /// </summary>
-    /// <param name="associations">The artifact associations.</param>
-    protected Artifacts(IDictionary<TArtifact, Type> associations)
-        : base(associations)
+    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/>.</param>
+    protected Artifacts(IUniqueBindings<TArtifact, Type> bindings)
+        : base(bindings)
     {
     }
 

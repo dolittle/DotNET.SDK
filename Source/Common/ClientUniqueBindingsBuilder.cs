@@ -59,7 +59,7 @@ public abstract class ClientUniqueBindingsBuilder<TIdentifier, TValue, TUniqueBi
     /// <param name="buildResult">The <see cref="ClientBuildResult"/> to add.</param>
     protected void AddBuildResult(ClientBuildResult buildResult) => _buildResults.Add(buildResult);
 
-void AddIdentifierToValueMapping(TIdentifier identifier, TValue value)
+    void AddIdentifierToValueMapping(TIdentifier identifier, TValue value)
     {
         if (_identifierToValueMap.TryGetValue(identifier, out var associatedTypes))
         {

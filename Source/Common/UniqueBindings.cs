@@ -16,8 +16,7 @@ public class UniqueBindings<TIdentifier, TValue> : IUniqueBindings<TIdentifier, 
     where TIdentifier : IEquatable<TIdentifier>
     where TValue : class
 {
-    readonly Dictionary<TIdentifier, TValue> _identifierToValueMap;
-    readonly Dictionary<TValue, TIdentifier> _valueToIdentifier;
+    readonly IDictionary<TValue, TIdentifier> _valueToIdentifier;
 
     /// <summary>
     /// Initializes an instance of the <see cref="UniqueBindings{TIdentifier,TValue}"/> class.
@@ -25,22 +24,31 @@ public class UniqueBindings<TIdentifier, TValue> : IUniqueBindings<TIdentifier, 
     /// <param name="bindings"></param>
     public UniqueBindings(IDictionary<TIdentifier, TValue> bindings)
     {
-        _identifierToValueMap = bindings.ToDictionary(_ => _.Key, _ => _.Value);
+        Bindings = bindings.ToDictionary(_ => _.Key, _ => _.Value);
         _valueToIdentifier = bindings.ToDictionary(_ => _.Value, _ => _.Key);
     }
 
-    /// <inheritdoc />
-    public IDictionary<TIdentifier, TValue> Bindings => _identifierToValueMap;
+    /// <summary>
+    /// Initializes an instance of the <see cref="UniqueBindings{TIdentifier,TValue}"/> class.
+    /// </summary>
+    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/>.</param>
+    public UniqueBindings(IUniqueBindings<TIdentifier, TValue> bindings)
+    {
+        Bindings = bindings.Bindings;
+    }
 
     /// <inheritdoc />
-    public IEnumerable<TIdentifier> Identifiers => _identifierToValueMap.Keys;
+    public IDictionary<TIdentifier, TValue> Bindings { get; }
+
+    /// <inheritdoc />
+    public IEnumerable<TIdentifier> Identifiers => Bindings.Keys;
 
     /// <inheritdoc />
     public IEnumerable<TValue> Values => _valueToIdentifier.Keys;
 
     /// <inheritdoc />
     public bool HasFor(TIdentifier identifier)
-        => _identifierToValueMap.ContainsKey(identifier);
+        => Bindings.ContainsKey(identifier);
 
     /// <inheritdoc />
     public bool HasFor(TValue value)
@@ -48,7 +56,7 @@ public class UniqueBindings<TIdentifier, TValue> : IUniqueBindings<TIdentifier, 
 
     /// <inheritdoc />
     public TValue GetFor(TIdentifier identifier)
-        => _identifierToValueMap.TryGetValue(identifier, out var value)
+        => Bindings.TryGetValue(identifier, out var value)
             ? value
             : throw new MissingUniqueBindingForIdentifier<TIdentifier, TValue>(identifier);
 
