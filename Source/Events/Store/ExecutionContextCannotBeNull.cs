@@ -4,19 +4,18 @@
 using System;
 using Dolittle.SDK.Execution;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Exception that gets thrown when trying to construct a <see cref="CommittedEvent"/> without an <see cref="ExecutionContext"/>.
+/// </summary>
+public class ExecutionContextCannotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct a <see cref="CommittedEvent"/> without an <see cref="ExecutionContext"/>.
+    /// Initializes a new instance of the <see cref="ExecutionContextCannotBeNull"/> class.
     /// </summary>
-    public class ExecutionContextCannotBeNull : Exception
+    public ExecutionContextCannotBeNull()
+        : base($"The {nameof(ExecutionContext)} of an {nameof(CommittedEvent)} cannot be null")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExecutionContextCannotBeNull"/> class.
-        /// </summary>
-        public ExecutionContextCannotBeNull()
-            : base($"The {nameof(ExecutionContext)} of an {nameof(CommittedEvent)} cannot be null")
-        {
-        }
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates;
@@ -16,17 +17,9 @@ public class AggregateRootTypes : Artifacts<AggregateRootType, AggregateRootId>,
     /// <summary>
     /// Initializes an instance of the <see cref="AggregateRootTypes"/> class.
     /// </summary>
-    /// <param name="associations">The <see cref="AggregateRootType"/> associations.</param>
-    public AggregateRootTypes(IDictionary<Type, AggregateRootType> associations)
-        : base(associations)
+    /// <param name="bindings">The <see cref="AggregateRootType"/> associations.</param>
+    public AggregateRootTypes(IUniqueBindings<AggregateRootType, Type> bindings)
+        : base(bindings)
     {
     }
-
-    /// <inheritdoc/>
-    protected override Exception CreateNoArtifactAssociatedWithType(Type type)
-        => new AggregateRootTypeAssociatedWithType(type);
-
-    /// <inheritdoc/>
-    protected override Exception CreateNoTypeAssociatedWithArtifact(AggregateRootType artifact)
-        => new NoTypeAssociatedWithAggregateRootType(artifact);
 }

@@ -7,7 +7,7 @@ namespace Dolittle.SDK.Concepts.given
     {
         public static implicit operator InheritingFromLongConcept(long value)
         {
-            return new InheritingFromLongConcept { Value = value };
+            return new(value);
         }
     }
 }

@@ -5,11 +5,11 @@ using System;
 
 namespace Dolittle.SDK.Concepts.given
 {
-    public class GuidConcept : ConceptAs<Guid>
+    public record GuidConcept(Guid Value) : ConceptAs<Guid>(Value)
     {
         public static implicit operator GuidConcept(Guid value)
         {
-            return new GuidConcept { Value = value };
+            return new(value);
         }
     }
 }

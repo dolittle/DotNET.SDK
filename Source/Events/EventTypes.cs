@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Events;
 
@@ -15,16 +16,8 @@ public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
     /// <summary>
     /// Initializes an instance of the <see cref="EventTypes"/> class.
     /// </summary>
-    /// <param name="associations">The <see cref="EventType"/> associations.</param>
-    public EventTypes(IDictionary<Type, EventType> associations) : base(associations)
+    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for "/><see cref="EventType"/> to <see cref="Type"/>.</param>
+    public EventTypes(IUniqueBindings<EventType, Type> bindings) : base(bindings)
     {
     }
-
-    /// <inheritdoc/>
-    protected override Exception CreateNoArtifactAssociatedWithType(Type type)
-        => new NoEventTypeAssociatedWithType(type);
-
-    /// <inheritdoc/>
-    protected override Exception CreateNoTypeAssociatedWithArtifact(EventType artifact)
-        => new NoTypeAssociatedWithEventType(artifact);
 }

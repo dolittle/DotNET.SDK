@@ -4,21 +4,20 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dolittle.SDK.Events.Store.Internal
+namespace Dolittle.SDK.Events.Store.Internal;
+
+/// <summary>
+/// Defines a system that can commit <see cref="UncommittedEvents" /> for internal use.
+/// </summary>
+public interface ICommitEvents
 {
     /// <summary>
-    /// Defines a system that can commit <see cref="UncommittedEvents" /> for internal use.
+    /// Commits uncommitted events.
     /// </summary>
-    public interface ICommitEvents
-    {
-        /// <summary>
-        /// Commits uncommitted events.
-        /// </summary>
-        /// <param name="uncommittedEvents">The <see cref="UncommittedEvents" /> to commit.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvents" />.</returns>
-        Task<CommittedEvents> Commit(
-            UncommittedEvents uncommittedEvents,
-            CancellationToken cancellationToken = default);
-    }
+    /// <param name="uncommittedEvents">The <see cref="UncommittedEvents" /> to commit.</param>
+    /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+    /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedEvents" />.</returns>
+    Task<CommittedEvents> Commit(
+        UncommittedEvents uncommittedEvents,
+        CancellationToken cancellationToken = default);
 }

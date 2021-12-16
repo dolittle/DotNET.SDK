@@ -3,18 +3,17 @@
 
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.Aggregates.Builders
+namespace Dolittle.SDK.Aggregates.Builders;
+
+/// <summary>
+/// Defines a build for <see cref="IAggregates"/> for tenants.
+/// </summary>
+public interface IAggregatesBuilder
 {
     /// <summary>
-    /// Defines a build for <see cref="IAggregates"/> for tenants.
+    /// Gets an <see cref="IAggregates"/> for a specific <see cref="TenantId"/>.
     /// </summary>
-    public interface IAggregatesBuilder
-    {
-        /// <summary>
-        /// Gets an <see cref="IAggregates"/> for a specific <see cref="TenantId"/>.
-        /// </summary>
-        /// <param name="tenant">The <see cref="TenantId"/>.</param>
-        /// <returns>The <see cref="IAggregates"/> for the specified <see cref="TenantId"/>.</returns>
-        IAggregates ForTenant(TenantId tenant);
-    }
+    /// <param name="tenant">The <see cref="TenantId"/>.</param>
+    /// <returns>The <see cref="IAggregates"/> for the specified <see cref="TenantId"/>.</returns>
+    IAggregates ForTenant(TenantId tenant);
 }

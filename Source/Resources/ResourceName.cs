@@ -8,12 +8,12 @@ namespace Dolittle.SDK.Resources
     /// <summary>
     /// Represents the name of an <see cref="IResource" />.
     /// </summary>
-    public class ResourceName : ConceptAs<string>
+    public record ResourceName(string Value) : ConceptAs<string>(Value)
     {
         /// <summary>
         /// Implicitly convert from a <see cref="string"/> to a <see cref="ResourceName"/>.
         /// </summary>
         /// <param name="name">ResourceName as <see cref="string"/>.</param>
-        public static implicit operator ResourceName(string name) => new ResourceName { Value = name };
+        public static implicit operator ResourceName(string name) => new(name);
     }
 }

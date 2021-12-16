@@ -8,7 +8,7 @@ namespace Dolittle.SDK.Microservices;
 /// <summary>
 /// Represents the concept of a runtime environment - e.g. Testing, Development, Staging, Production.
 /// </summary>
-public class Environment : ConceptAs<string>
+public record Environment(string Value) : ConceptAs<string>(Value)
 {
     /// <summary>
     /// Represents an undetermined environment.
@@ -29,6 +29,5 @@ public class Environment : ConceptAs<string>
     /// Implicitly convert from <see cref="string"/> to <see cref="Environment"/>.
     /// </summary>
     /// <param name="environment">The environment string.</param>
-    public static implicit operator Environment(string environment)
-        => new() { Value = environment };
+    public static implicit operator Environment(string environment) => new(environment);
 }

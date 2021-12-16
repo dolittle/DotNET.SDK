@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Artifacts.for_Artifacts.given
 {
-    public class artifact_types : Artifacts<artifact_type, ArtifactId>
+    public class artifact_types : StrictArtifacts<artifact_type, ArtifactId>
     {
         public static Exception CannotAssociateMultipleArtifactsWithTypeException = new Exception("CannotAssociateMultipleArtifactsWithType");
         public static Exception CannotAssociateMultipleTypesWithArtifactException = new Exception("CannotAssociateMultipleTypesWithArtifact");
@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts.given
         public static Exception NoTypeAssociatedWithArtifactException = new Exception("NoTypeAssociatedWithArtifact");
 
         public artifact_types()
-            : base(Moq.Mock.Of<ILogger<Artifacts<artifact_type, ArtifactId>>>())
+            : base(Moq.Mock.Of<ILogger<StrictArtifacts<artifact_type, ArtifactId>>>())
         {
         }
 

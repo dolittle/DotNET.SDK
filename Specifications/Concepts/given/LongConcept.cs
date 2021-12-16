@@ -3,11 +3,11 @@
 
 namespace Dolittle.SDK.Concepts.given
 {
-    public class LongConcept : ConceptAs<long>
+    public record LongConcept(long Value) : ConceptAs<long>(Value)
     {
         public static implicit operator LongConcept(long value)
         {
-            return new LongConcept { Value = value };
+            return new(value);
         }
     }
 }

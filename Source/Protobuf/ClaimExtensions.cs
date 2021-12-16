@@ -20,7 +20,7 @@ public static class ClaimExtensions
     /// <param name="claim"><see cref="Claim"/> to convert.</param>
     /// <returns>The converted <see cref="PbClaim"/>.</returns>
     public static PbClaim ToProtobuf(this Claim claim)
-        => new() { Key = claim.Name, Value = claim.Value, ValueType = claim.ValueType };
+        => new() { Key = claim.Name, Value = claim.Value, ValueType = claim.ValueType };
 
     /// <summary>
     /// Convert a <see cref="PbClaim"/> to a <see cref="Claim"/>.

@@ -3,7 +3,7 @@
 
 namespace Dolittle.SDK.Concepts.given
 {
-    public class IntConcept : ConceptAs<int>
+    public record IntConcept(int Value) : ConceptAs<int>(Value)
     {
         public IntConcept()
         {
@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Concepts.given
 
         public static implicit operator IntConcept(int value)
         {
-            return new IntConcept { Value = value };
+            return new(value);
         }
     }
 }

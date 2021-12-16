@@ -5,6 +5,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
 
@@ -13,33 +14,24 @@ namespace Dolittle.SDK.Aggregates.Builders;
 /// <summary>
 /// Represents an implementation of <see cref="IAggregateRootsBuilder"/>.
 /// </summary>
-public class AggregateRootsBuilder : ClientArtifactsBuilder<AggregateRootType, AggregateRootId, AggregateRootAttribute>, IAggregateRootsBuilder
+public class AggregateRootsBuilder : ClientArtifactsBuilder<AggregateRootType, AggregateRootId, IUnregisteredAggregateRoots, AggregateRootAttribute>, IAggregateRootsBuilder
 {
-    /// <summary>
-    /// Initializes an instance of the <see cref="AggregateRootsBuilder"/> class.
-    /// </summary>
-    /// <param name="clientBuildResults">The <see cref="IClientBuildResults"/>.</param>
-    public AggregateRootsBuilder(IClientBuildResults clientBuildResults)
-        : base(clientBuildResults) 
-    {
-    }
-
     /// <inheritdoc />
     public IAggregateRootsBuilder Register<T>()
         where T : class
         => Register(typeof(T));
     
     /// <inheritdoc />
-    public new IAggregateRootsBuilder Register(Type type)
+    public IAggregateRootsBuilder Register(Type type)
     {
-        base.Register(type);
+        Add(type);
         return this;
     }
     
     /// <inheritdoc />
-    public new IAggregateRootsBuilder RegisterAllFrom(Assembly assembly)
+    public IAggregateRootsBuilder RegisterAllFrom(Assembly assembly)
     {
-        base.RegisterAllFrom(assembly);
+        AddAllFrom(assembly);
         return this;
     }
 
@@ -47,11 +39,14 @@ public class AggregateRootsBuilder : ClientArtifactsBuilder<AggregateRootType, A
     /// Builds the aggregate roots by registering them with the Runtime.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public new IUnregisteredAggregateRoots Build()
-        => new UnregisteredAggregateRoots(base.Build());
-    
+    public IUnregisteredAggregateRoots Build(IClientBuildResults buildResults) => base.Build(buildResults);
+
     /// <inheritdoc />
-    protected override bool TryGetArtifactFromAttribute(Type type, AggregateRootAttribute attribute, out AggregateRootType artifact)
+    protected override IUnregisteredAggregateRoots CreateUniqueBindings(IClientBuildResults aggregatedBuildResults, IUniqueBindings<AggregateRootType, Type> bindings)
+        => new UnregisteredAggregateRoots(bindings);
+
+    /// <inheritdoc />
+    protected override bool TryGetIdentifierFromDecorator(Type type, AggregateRootAttribute attribute, out AggregateRootType artifact)
     {
         if (!attribute.Type.HasAlias)
         {

@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.when_converting_to_protob
         static Artifact result;
 
         Establish context = () => artifact = new given.artifact_type_with_custom_artifact_id(
-            new given.custom_artifact_id { Value = Guid.Parse("24faf6b5-3d64-4314-b1e4-97f0ff8bf942") },
+            new given.custom_artifact_id(Guid.Parse("24faf6b5-3d64-4314-b1e4-97f0ff8bf942")),
             1);
 
         Because of = () => result = artifact.ToProtobuf();

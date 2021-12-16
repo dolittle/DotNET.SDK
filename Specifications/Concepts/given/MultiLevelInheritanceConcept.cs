@@ -7,7 +7,7 @@ namespace Dolittle.SDK.Concepts.given
     {
         public static implicit operator MultiLevelInheritanceConcept(long value)
         {
-            return new MultiLevelInheritanceConcept { Value = value };
+            return new(value);
         }
     }
 }

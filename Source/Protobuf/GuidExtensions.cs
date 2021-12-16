@@ -79,11 +79,11 @@ public static class GuidExtensions
     /// <typeparam name="T">Type to convert to.</typeparam>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
     public static bool TryTo<T>(this Uuid source, out T id, out Exception error)
-        where T : ConceptAs<Guid>, new()
+        where T : ConceptAs<Guid>
     {
         if (TryToGuid(source, out var value, out error))
         {
-            id = new T { Value = value };
+            id = typeof(T).GetConstructor(new []{ typeof(Guid) })?.Invoke(new object[]{ value }) as T;
             return true;
         }
 
@@ -98,6 +98,6 @@ public static class GuidExtensions
     /// <typeparam name="T">Type to convert to.</typeparam>
     /// <returns>The converted <see cref="ConceptAs{T}"/>.</returns>
     public static T To<T>(this Uuid source)
-        where T : ConceptAs<Guid>, new()
+        where T : ConceptAs<Guid>
         => TryTo<T>(source, out var id, out var error) ? id : throw error;
 }

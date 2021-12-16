@@ -6,78 +6,77 @@ using Dolittle.SDK.Protobuf;
 using PbUncommittedAggregateEvent = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent;
 using PbUncommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents;
 
-namespace Dolittle.SDK.Events.Store.Converters
+namespace Dolittle.SDK.Events.Store.Converters;
+
+/// <summary>
+/// Reperesents an implementation of <see cref="IConvertAggregateEventsToProtobuf"/>.
+/// </summary>
+public class AggregateEventToProtobufConverter : IConvertAggregateEventsToProtobuf
 {
+    readonly ISerializeEventContent _serializer;
+
     /// <summary>
-    /// Reperesents an implementation of <see cref="IConvertAggregateEventsToProtobuf"/>.
+    /// Initializes a new instance of the <see cref="AggregateEventToProtobufConverter"/> class.
     /// </summary>
-    public class AggregateEventToProtobufConverter : IConvertAggregateEventsToProtobuf
+    /// <param name="serializer">The <see cref="ISerializeEventContent"/> serializer.</param>
+    public AggregateEventToProtobufConverter(ISerializeEventContent serializer)
     {
-        readonly ISerializeEventContent _serializer;
+        _serializer = serializer;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateEventToProtobufConverter"/> class.
-        /// </summary>
-        /// <param name="serializer">The <see cref="ISerializeEventContent"/> serializer.</param>
-        public AggregateEventToProtobufConverter(ISerializeEventContent serializer)
+    /// <inheritdoc/>
+    public bool TryConvert(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error)
+    {
+        events = default;
+
+        if (source == null)
         {
-            _serializer = serializer;
+            error = new ArgumentNullException(nameof(source));
+            return false;
         }
 
-        /// <inheritdoc/>
-        public bool TryConvert(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error)
+        events = new PbUncommittedAggregateEvents
         {
-            events = default;
+            EventSourceId = source.EventSource.Value,
+            AggregateRootId = source.AggregateRoot.ToProtobuf(),
+            ExpectedAggregateRootVersion = source.ExpectedAggregateRootVersion,
+        };
 
-            if (source == null)
+        foreach (var sourceEvent in source)
+        {
+            if (!TryConvert(sourceEvent, out var @event, out error))
             {
-                error = new ArgumentNullException(nameof(source));
+                events = default;
                 return false;
             }
 
-            events = new PbUncommittedAggregateEvents
-            {
-                EventSourceId = source.EventSource.Value,
-                AggregateRootId = source.AggregateRoot.ToProtobuf(),
-                ExpectedAggregateRootVersion = source.ExpectedAggregateRootVersion,
-            };
-
-            foreach (var sourceEvent in source)
-            {
-                if (!TryConvert(sourceEvent, out var @event, out error))
-                {
-                    events = default;
-                    return false;
-                }
-
-                events.Events.Add(@event);
-            }
-
-            error = null;
-            return true;
+            events.Events.Add(@event);
         }
 
-        bool TryConvert(UncommittedAggregateEvent source, out PbUncommittedAggregateEvent @event, out Exception error)
+        error = null;
+        return true;
+    }
+
+    bool TryConvert(UncommittedAggregateEvent source, out PbUncommittedAggregateEvent @event, out Exception error)
+    {
+        @event = default;
+
+        if (source == null)
         {
-            @event = default;
-
-            if (source == null)
-            {
-                error = new ArgumentNullException(nameof(source));
-                return false;
-            }
-
-            if (!_serializer.TrySerialize(source.Content, out var content, out error))
-                return false;
-
-            error = null;
-            @event = new PbUncommittedAggregateEvent
-            {
-                EventType = source.EventType.ToProtobuf(),
-                Content = content,
-                Public = source.IsPublic,
-            };
-            return true;
+            error = new ArgumentNullException(nameof(source));
+            return false;
         }
+
+        if (!_serializer.TrySerialize(source.Content, out var content, out error))
+            return false;
+
+        error = null;
+        @event = new PbUncommittedAggregateEvent
+        {
+            EventType = source.EventType.ToProtobuf(),
+            Content = content,
+            Public = source.IsPublic,
+        };
+        return true;
     }
 }

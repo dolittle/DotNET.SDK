@@ -9,7 +9,7 @@ namespace Dolittle.SDK.Failures;
 /// <summary>
 /// Represents the failure id.
 /// </summary>
-public class FailureId : ConceptAs<Guid>
+public record FailureId(Guid Value) : ConceptAs<Guid>(Value)
 {
     /// <summary>
     /// The <see cref="FailureId"/> that refers to a failure that is not documented.
@@ -20,11 +20,11 @@ public class FailureId : ConceptAs<Guid>
     /// Implicitly converts the <see cref="Guid" /> to <see cref="FailureId" />.
     /// </summary>
     /// <param name="id"><see cref="Guid" /> to convert.</param>
-    public static implicit operator FailureId(Guid id) => new() { Value = id };
+    public static implicit operator FailureId(Guid id) => new(id);
 
     /// <summary>
     /// Implicitly converts the <see cref="Guid" /> to <see cref="FailureId" />.
     /// </summary>
     /// <param name="id"><see cref="Guid" /> to convert.</param>
-    public static implicit operator FailureId(string id) => new() { Value = Guid.Parse(id) };
+    public static implicit operator FailureId(string id) => new(Guid.Parse(id));
 }

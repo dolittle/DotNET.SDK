@@ -4,6 +4,7 @@
 using System;
 using System.Reflection;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 
 namespace Dolittle.SDK.Events.Builders;
@@ -11,26 +12,17 @@ namespace Dolittle.SDK.Events.Builders;
 /// <summary>
 /// Represents a system that registers <see cref="Type" /> to <see cref="EventType" /> associations to an <see cref="IEventTypes" /> instance.
 /// </summary>
-public class EventTypesBuilder : ClientArtifactsBuilder<EventType, EventTypeId, EventTypeAttribute>, IEventTypesBuilder
+public class EventTypesBuilder : ClientArtifactsBuilder<EventType, EventTypeId, IUnregisteredEventTypes, EventTypeAttribute>, IEventTypesBuilder
 {
-    /// <summary>
-    /// Initializes an instance of the <see cref="EventTypesBuilder"/> class.
-    /// </summary>
-    /// <param name="clientBuildResults"></param>
-    public EventTypesBuilder(IClientBuildResults clientBuildResults)
-        : base(clientBuildResults)
-    {
-    }
-
     /// <inheritdoc />
     public IEventTypesBuilder Associate<T>(EventType eventType)
         where T : class
         => Associate(typeof(T), eventType);
 
     /// <inheritdoc />
-    public new IEventTypesBuilder Associate(Type type, EventType eventType)
+    public IEventTypesBuilder Associate(Type type, EventType eventType)
     {
-        base.Associate(type, eventType);
+        Add(eventType, type);
         return this;
     }
 
@@ -58,27 +50,30 @@ public class EventTypesBuilder : ClientArtifactsBuilder<EventType, EventTypeId, 
         => Register(typeof(T));
 
     /// <inheritdoc />
-    public new IEventTypesBuilder Register(Type type)
+    public IEventTypesBuilder Register(Type type)
     {
-        base.Register(type);
+        Add(type);
         return this;
     }
 
     /// <inheritdoc />
-    public new IEventTypesBuilder RegisterAllFrom(Assembly assembly)
+    public IEventTypesBuilder RegisterAllFrom(Assembly assembly)
     {
-        base.RegisterAllFrom(assembly);
+        AddAllFrom(assembly);
         return this;
     }
 
     /// <summary>
     /// Builds the <see cref="IEventTypes"/>.
     /// </summary>
-    public new IUnregisteredEventTypes Build()
-        => new UnregisteredEventTypes(base.Build());
+    public new IUnregisteredEventTypes Build(IClientBuildResults buildResults)
+        => base.Build(buildResults);
+
+    protected override IUnregisteredEventTypes CreateUniqueBindings(IClientBuildResults aggregatedBuildResults, IUniqueBindings<EventType, Type> bindings)
+        => new UnregisteredEventTypes(bindings);
 
     /// <inheritdoc />
-    protected override bool TryGetArtifactFromAttribute(Type type, EventTypeAttribute attribute, out EventType artifact)
+    protected override bool TryGetIdentifierFromDecorator(Type type, EventTypeAttribute attribute, out EventType artifact)
     {
         if (!attribute.HasAlias)
         {

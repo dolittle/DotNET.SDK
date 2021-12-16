@@ -3,11 +3,11 @@
 
 namespace Dolittle.SDK.Concepts.given
 {
-    public class StringConcept : ConceptAs<string>
+    public record StringConcept(string Value) : ConceptAs<string>(Value)
     {
         public static implicit operator StringConcept(string value)
         {
-            return new StringConcept { Value = value };
+            return new(value);
         }
     }
 }

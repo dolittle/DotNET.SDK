@@ -5,7 +5,7 @@ using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.given
 {
-    public class artifact_type_with_custom_artifact_id : Artifact<custom_artifact_id>
+    public record artifact_type_with_custom_artifact_id : Artifact<custom_artifact_id>
     {
         public artifact_type_with_custom_artifact_id(custom_artifact_id id, Generation generation)
             : base(id, generation)

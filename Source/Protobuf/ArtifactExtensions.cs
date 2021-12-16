@@ -40,6 +40,7 @@ public static class ArtifactExtensions
         where TArtifact : Artifact<TId>
         where TId : ArtifactId
     {
+        Console.WriteLine($"Try to");
         artifact = default;
 
         if (source == default)
@@ -48,20 +49,19 @@ public static class ArtifactExtensions
             return false;
         }
 
-        if (!source.Id.TryToGuid(out var id, out var idError))
+        if (!source.Id.TryTo<TId>(out var artifactId, out var idError))
         {
             error = new CouldNotConvertProtobufArtifact(typeof(TArtifact), source, idError.Message);
             return false;
         }
+        Console.WriteLine($"Got Id {artifactId}");
+        
 
         var idType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Id)).PropertyType;
         var generationType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Generation)).PropertyType;
         try
         {
-            var artifactId = Activator.CreateInstance(idType);
-            var artifactIdValueProperty = idType.GetProperty(nameof(ArtifactId.Value));
-            artifactIdValueProperty.SetValue(artifactId, id);
-
+            
             var constructor = typeof(TArtifact).GetConstructor(new[] { idType, generationType });
             if (constructor == default)
             {
@@ -78,11 +78,6 @@ public static class ArtifactExtensions
 
             error = null;
             return true;
-        }
-        catch (MissingMethodException)
-        {
-            error = new ArtifactIdTypeDoesNotHaveDefaultParameterlessConstructor(typeof(TArtifact), source, idType);
-            return false;
         }
         catch (Exception ex)
         {
@@ -119,6 +114,8 @@ public static class ArtifactExtensions
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
     public static bool TryToArtifact(this PbArtifact source, out (ArtifactId Id, Generation Generation) artifact, out Exception error)
     {
+        
+        Console.WriteLine($"Try to artifact");
         artifact = default;
         if (!source.Id.TryTo<ArtifactId>(out var id, out error))
         {

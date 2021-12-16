@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Events.Internal;
 
 namespace Dolittle.SDK.Events.Builders;
@@ -17,8 +18,8 @@ public class UnregisteredEventTypes : EventTypes, IUnregisteredEventTypes
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredEventTypes"/> class.
     /// </summary>
-    /// <param name="associations">The <see cref="EventType"/> associations.</param>
-    public UnregisteredEventTypes(IDictionary<Type, EventType> associations) : base(associations)
+    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for <see cref="EventType"/> to <see cref="Type"/>.</param>
+    public UnregisteredEventTypes(IUniqueBindings<EventType, Type> bindings) : base(bindings)
     {
     }
 

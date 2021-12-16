@@ -3,18 +3,17 @@
 
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.Events.Store.Builders
+namespace Dolittle.SDK.Events.Store.Builders;
+
+/// <summary>
+/// Defines a builder for <see cref="IEventStore"/>.
+/// </summary>
+public interface IEventStoreBuilder
 {
     /// <summary>
-    /// Defines a builder for <see cref="IEventStore"/>.
+    /// Creates an <see cref="IEventStore"/> for the given tenant.
     /// </summary>
-    public interface IEventStoreBuilder
-    {
-        /// <summary>
-        /// Creates an <see cref="IEventStore"/> for the given tenant.
-        /// </summary>
-        /// <param name="tenantId">The <see cref="TenantId">tenant</see> to create the event store for.</param>
-        /// <returns>An <see cref="IEventStore"/>.</returns>
-        IEventStore ForTenant(TenantId tenantId);
-    }
+    /// <param name="tenantId">The <see cref="TenantId">tenant</see> to create the event store for.</param>
+    /// <returns>An <see cref="IEventStore"/>.</returns>
+    IEventStore ForTenant(TenantId tenantId);
 }

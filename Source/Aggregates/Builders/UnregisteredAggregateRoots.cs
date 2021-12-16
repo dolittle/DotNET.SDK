@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Internal;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.DependencyInversion;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,8 +20,8 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredAggregateRoots"/> class.
     /// </summary>
-    /// <param name="associations"></param>
-    public UnregisteredAggregateRoots(IDictionary<Type, AggregateRootType> associations) : base(associations)
+    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> binding <see cref="AggregateRootType"/> to <see cref="Type"/>.</param>
+    public UnregisteredAggregateRoots(IUniqueBindings<AggregateRootType, Type> bindings) : base(bindings)
     {
     }
 

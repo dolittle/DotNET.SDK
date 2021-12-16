@@ -8,13 +8,13 @@ namespace Dolittle.SDK.Projections
     /// <summary>
     /// Represents the key selector expression.
     /// </summary>
-    public class KeySelectorExpression : ConceptAs<string>
+    public record KeySelectorExpression(string Value) : ConceptAs<string>(Value)
     {
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="KeySelectorExpression"/>.
         /// </summary>
         /// <param name="expression">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="KeySelectorExpression"/>.</returns>
-        public static implicit operator KeySelectorExpression(string expression) => new KeySelectorExpression { Value = expression };
+        public static implicit operator KeySelectorExpression(string expression) => new(expression);
     }
 }
