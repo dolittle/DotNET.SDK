@@ -7,7 +7,7 @@ using Dolittle.SDK.Async;
 using Dolittle.SDK.DependencyInversion;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// An implementation of <see cref="IEventHandlerMethod" /> that invokes a method on an event handler instance for an event of a specific type.
@@ -50,7 +50,7 @@ namespace Dolittle.SDK.Events.Handling.Builder
         /// <inheritdoc/>
         public async Task<Try> TryHandle(object @event, EventContext context)
         {
-            if (!(@event is TEvent typedEvent))
+            if (@event is not TEvent typedEvent)
             {
                 return new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
             }

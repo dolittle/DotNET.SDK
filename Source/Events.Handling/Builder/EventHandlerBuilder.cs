@@ -1,124 +1,91 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Threading;
-using Dolittle.SDK.DependencyInversion;
-using Dolittle.SDK.Events.Handling.Internal;
-using Dolittle.SDK.Events.Processing;
-using Microsoft.Extensions.Logging;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Events.Handling.Builder.Methods;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder;
+
+/// <summary>
+/// Represents a building event handlers.
+/// </summary>
+public class EventHandlerBuilder : IEventHandlerBuilder
 {
+    readonly EventHandlerId _eventHandlerId;
+    readonly EventHandlerMethodsBuilder _methodsBuilder;
+
+    ScopeId _scopeId = ScopeId.Default;
+
+    EventHandlerAlias _alias;
+    bool _hasAlias;
+    bool _partitioned = true;
+
     /// <summary>
-    /// Represents a building event handlers.
+    /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
     /// </summary>
-    public class EventHandlerBuilder : ICanBuildAndRegisterAnEventHandler
+    /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
+    public EventHandlerBuilder(EventHandlerId eventHandlerId)
     {
-        readonly EventHandlerId _eventHandlerId;
-        readonly EventHandlerMethodsBuilder _methodsBuilder;
+        _eventHandlerId = eventHandlerId;
+        _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
+    }
 
-        ScopeId _scopeId = ScopeId.Default;
+    /// <inheritdoc />
+    public IEventHandlerMethodsBuilder Partitioned()
+    {
+        _partitioned = true;
+        return _methodsBuilder;
+    }
 
-        EventHandlerAlias _alias;
-        bool _hasAlias;
-        bool _partitioned = true;
+    /// <inheritdoc />
+    public IEventHandlerMethodsBuilder Unpartitioned()
+    {
+        _partitioned = false;
+        return _methodsBuilder;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
-        /// </summary>
-        /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
-        public EventHandlerBuilder(EventHandlerId eventHandlerId)
+    /// <inheritdoc />
+    public IEventHandlerBuilder InScope(ScopeId scopeId)
+    {
+        _scopeId = scopeId;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IEventHandlerBuilder WithAlias(EventHandlerAlias alias)
+    {
+        _alias = alias;
+        _hasAlias = true;
+        return this;
+    }
+
+    /// <summary>
+    /// Try build the <see cref="IEventHandler"/>.
+    /// </summary>
+    /// <param name="eventTypes">The <see cref="IEventHandler"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    /// <param name="eventHandler">The built <see cref="IEventHandler"/>.</param>
+    /// <returns>A value indicating whether the <see cref="IEventHandler"/> could be built.</returns>
+    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
+    {
+        eventHandler = default;
+        var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
+        if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, buildResults))
         {
-            _eventHandlerId = eventHandlerId;
-            _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
+            buildResults.AddFailure($"Failed to build event handler {_eventHandlerId}. One or more event handler methods could not be built");
+            return false;
         }
 
-        /// <summary>
-        /// Defines the event handler to be partitioned - this is default for an event handler.
-        /// </summary>
-        /// <returns>The builder for continuation.</returns>
-        public EventHandlerMethodsBuilder Partitioned()
+        if (eventTypesToMethods.Count < 1)
         {
-            _partitioned = true;
-            return _methodsBuilder;
+            buildResults.AddFailure($"Failed to build event handler {_eventHandlerId}. No event handler methods are configured for event handler");
+            return false;
         }
 
-        /// <summary>
-        /// Defines the event handler to be unpartitioned. By default it will be partitioned.
-        /// </summary>
-        /// <returns>The builder for continuation.</returns>
-        public EventHandlerMethodsBuilder Unpartitioned()
-        {
-            _partitioned = false;
-            return _methodsBuilder;
-        }
-
-        /// <summary>
-        /// Defines the event handler to operate on a specific <see cref="_scopeId" />.
-        /// </summary>
-        /// <param name="scopeId">The <see cref="_scopeId" />.</param>
-        /// <returns>The builder for continuation.</returns>
-        public EventHandlerBuilder InScope(ScopeId scopeId)
-        {
-            _scopeId = scopeId;
-            return this;
-        }
-
-        /// <summary>
-        /// Defines the event handler to have a specific <see cref="EventHandlerAlias" />.
-        /// </summary>
-        /// <param name="alias">The <see cref="EventHandlerAlias" />.</param>
-        /// <returns>The builder for continuation.</returns>
-        public EventHandlerBuilder WithAlias(EventHandlerAlias alias)
-        {
-            _alias = alias;
-            _hasAlias = true;
-            return this;
-        }
-
-        /// <inheritdoc/>
-        public void BuildAndRegister(
-            IEventProcessors eventProcessors,
-            IEventTypes eventTypes,
-            IEventProcessingConverter processingConverter,
-            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
-            Func<ITenantScopedProviders> tenantScopedProvidersFactory,
-            ILoggerFactory loggerFactory,
-            CancellationToken cancelConnectToken,
-            CancellationToken stopProcessingToken)
-        {
-            var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
-            if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, loggerFactory.CreateLogger<EventHandlerMethodsBuilder>()))
-            {
-                loggerFactory
-                    .CreateLogger<EventHandlerBuilder>()
-                    .LogWarning(
-                        "Failed to build event handler {EventHandlerId}. One or more event handler methods could not be built",
-                        _eventHandlerId);
-                return;
-            }
-
-            if (eventTypesToMethods.Count < 1)
-            {
-                loggerFactory
-                    .CreateLogger<EventHandlerBuilder>()
-                    .LogWarning(
-                        "Failed to build event handler {EventHandlerId}. No event handler methods are configured for event handler",
-                        _eventHandlerId);
-                return;
-            }
-
-            var eventHandler = _hasAlias
-                ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
-                : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
-            var eventHandlerProcessor = new EventHandlerProcessor(eventHandler, processingConverter, loggerFactory.CreateLogger<EventHandlerProcessor>());
-            eventProcessors.Register(
-                eventHandlerProcessor,
-                new EventHandlerProtocol(),
-                cancelConnectToken,
-                stopProcessingToken);
-        }
+        eventHandler = _hasAlias
+            ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
+            : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
+        return true;
     }
 }

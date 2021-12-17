@@ -9,20 +9,20 @@ namespace Dolittle.SDK.Events.Handling
     /// <summary>
     /// Represents the concept of a unique identifier for an event handler.
     /// </summary>
-    public class EventHandlerId : ConceptAs<Guid>
+    public record EventHandlerId(Guid Value) : ConceptAs<Guid>(Value)
     {
         /// <summary>
         /// Implicitly converts from a <see cref="Guid"/> to an <see cref="EventHandlerId"/>.
         /// </summary>
         /// <param name="eventHandlerId">The <see cref="Guid"/> representation.</param>
         /// <returns>The converted <see cref="EventHandlerId"/>.</returns>
-        public static implicit operator EventHandlerId(Guid eventHandlerId) => new EventHandlerId { Value = eventHandlerId };
+        public static implicit operator EventHandlerId(Guid eventHandlerId) => new(eventHandlerId);
 
         /// <summary>
         /// Implicitly converts from a <see cref="string"/> to an <see cref="EventHandlerId"/>.
         /// </summary>
         /// <param name="eventHandlerId">The <see cref="string"/> representation.</param>
         /// <returns>The converted <see cref="EventHandlerId"/>.</returns>
-        public static implicit operator EventHandlerId(string eventHandlerId) => new EventHandlerId { Value = Guid.Parse(eventHandlerId) };
+        public static implicit operator EventHandlerId(string eventHandlerId) => new(Guid.Parse(eventHandlerId));
     }
 }

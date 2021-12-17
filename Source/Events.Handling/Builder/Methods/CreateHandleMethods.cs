@@ -4,7 +4,7 @@
 using System;
 using System.Reflection;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// Create an untyped event handler method.

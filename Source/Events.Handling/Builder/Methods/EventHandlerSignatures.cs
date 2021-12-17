@@ -4,7 +4,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// Represents the signature for an event handler.

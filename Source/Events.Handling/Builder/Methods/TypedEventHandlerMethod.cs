@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// An implementation of <see cref="IEventHandlerMethod" /> for an event handler method on an event of a specific type.

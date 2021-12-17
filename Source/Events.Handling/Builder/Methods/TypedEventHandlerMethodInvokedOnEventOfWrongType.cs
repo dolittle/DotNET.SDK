@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// Exception that gets thrown when a <see cref="TypedEventHandlerMethod{T}" /> is invoked on an event of the wrong type.

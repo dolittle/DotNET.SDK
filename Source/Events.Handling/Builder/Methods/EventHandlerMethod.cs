@@ -4,7 +4,7 @@
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// An implementation of <see cref="IEventHandlerMethod" />.

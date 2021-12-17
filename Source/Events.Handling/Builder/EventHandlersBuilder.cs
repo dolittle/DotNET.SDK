@@ -6,111 +6,109 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
+using Dolittle.SDK.Events.Handling.Builder.Convention.Type;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder;
+
+/// <summary>
+/// Represents an implementation of <see cref="IEventHandlersBuilder"/>.
+/// </summary>
+public class EventHandlersBuilder : ClientUniqueBindingsBuilder<EventHandlerId, IEventHandler, IEventHandlerBindings>, IEventHandlersBuilder
 {
-    /// <summary>
-    /// Represents the builder for configuring event handlers.
-    /// </summary>
-    public class EventHandlersBuilder
+    readonly ConventionTypeEventHandlerBindingsBuilder _conventionTypeEventHandlers = new();
+    readonly ConventionInstanceEventHandlerBindingsBuilder _conventionInstanceEventHandlers = new();
+    readonly EventHandlerBuilderBindingsBuilder _evenHandlerBuilders = new();
+
+    IConventionTypeEventHandlers _builtConventionTypeEventHandlers;
+    IConventionInstanceEventHandlers _builtConventionInstanceEventHandlers;
+
+    /// <inheritdoc />
+    public IEventHandlerBuilder CreateEventHandler(EventHandlerId eventHandlerId)
     {
-        readonly List<ICanBuildAndRegisterAnEventHandler> _builders = new List<ICanBuildAndRegisterAnEventHandler>();
-        readonly Dictionary<Type, ICanBuildAndRegisterAnEventHandler> _typedBuilder = new Dictionary<Type, ICanBuildAndRegisterAnEventHandler>();
+        var builder = new EventHandlerBuilder(eventHandlerId);
+        _evenHandlerBuilders.Add(eventHandlerId, builder);
+        return builder;
+    }
 
-        /// <summary>
-        /// Start building an event handler.
-        /// </summary>
-        /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
-        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlerBuilder CreateEventHandler(EventHandlerId eventHandlerId)
+    /// <inheritdoc />
+    public IEventHandlersBuilder RegisterEventHandler<TEventHandler>()
+        where TEventHandler : class
+        => RegisterEventHandler(typeof(TEventHandler));
+
+    /// <inheritdoc />
+    public IEventHandlersBuilder RegisterEventHandler(Type type)
+    {
+        _conventionTypeEventHandlers.Add(type);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IEventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
+        where TEventHandler : class
+    {
+        _conventionInstanceEventHandlers.Add(eventHandlerInstance);
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IEventHandlersBuilder RegisterAllFrom(Assembly assembly)
+    {
+        foreach (var type in assembly.ExportedTypes)
         {
-            var builder = new EventHandlerBuilder(eventHandlerId);
-            _builders.Add(builder);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as an event handler class.
-        /// </summary>
-        /// <typeparam name="TEventHandler">The <see cref="Type" /> that is the event handler class.</typeparam>
-        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlersBuilder RegisterEventHandler<TEventHandler>()
-            where TEventHandler : class
-            => RegisterEventHandler(typeof(TEventHandler));
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as an event handler class.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> of the event handler.</param>
-        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlersBuilder RegisterEventHandler(Type type)
-        {
-            _typedBuilder[type] = new ConventionTypeEventHandlerBuilder(type);
-            return this;
-        }
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as an event handler class.
-        /// </summary>
-        /// <typeparam name="TEventHandler">The <see cref="Type" /> that is the event handler class.</typeparam>
-        /// <param name="eventHandlerInstance">The <typeparamref name="TEventHandler"/>.</param>
-        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
-            where TEventHandler : class
-        {
-            _typedBuilder[typeof(TEventHandler)] = new ConventionInstanceEventHandlerBuilder(eventHandlerInstance);
-            return this;
-        }
-
-        /// <summary>
-        /// Registers all event handler classes from an <see cref="Assembly" />.
-        /// </summary>
-        /// <param name="assembly">The <see cref="Assembly" /> to register the event handler classes from.</param>
-        /// <returns>The <see cref="EventHandlersBuilder" /> for continuation.</returns>
-        public EventHandlersBuilder RegisterAllFrom(Assembly assembly)
-        {
-            foreach (var type in assembly.ExportedTypes)
+            if (IsEventHandler(type))
             {
-                if (IsEventHandler(type))
-                {
-                    RegisterEventHandler(type);
-                }
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Build and registers event handlers.
-        /// </summary>
-        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
-        /// <param name="tenantScopedProvidersFactory">The <see cref="Func{TResult}"/> for getting <see cref="ITenantScopedProviders" />.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
-        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
-        public void BuildAndRegister(
-            IEventProcessors eventProcessors,
-            IEventTypes eventTypes,
-            IEventProcessingConverter processingConverter,
-            TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
-            Func<ITenantScopedProviders> tenantScopedProvidersFactory,
-            ILoggerFactory loggerFactory,
-            CancellationToken cancelConnectToken,
-            CancellationToken stopProcessingToken)
-        {
-            foreach (var builder in _builders.Concat(_typedBuilder.Values))
-            {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, tenantScopedProvidersBuilder, tenantScopedProvidersFactory, loggerFactory, cancelConnectToken, stopProcessingToken);
+                RegisterEventHandler(type);
             }
         }
 
-        static bool IsEventHandler(Type type)
-            => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() is EventHandlerAttribute;
+        return this;
+    }
+
+    /// <summary>
+    /// Build all event handlers.
+    /// </summary>
+    /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+    /// <param name="tenantScopedProvidersFactory">The <see cref="Func{TResult}"/> for getting <see cref="ITenantScopedProviders" />.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    public IUnregisteredEventHandlers Build(IEventTypes eventTypes, Func<ITenantScopedProviders> tenantScopedProvidersFactory, IClientBuildResults buildResults)
+    {
+        foreach (var eventHandler in BuildAllEventHandlers(eventTypes, tenantScopedProvidersFactory, buildResults))
+        {
+            Add(eventHandler.Identifier, eventHandler);
+        }
+
+        return new UnregisteredEventHandlers(base.Build(buildResults));
+    }
+
+    /// <inheritdoc />
+    protected override IEventHandlerBindings CreateUniqueBindings(IClientBuildResults aggregatedBuildResults, IUniqueBindings<EventHandlerId, IEventHandler> bindings)
+        => new EventHandlerBindings(_builtConventionTypeEventHandlers, _builtConventionInstanceEventHandlers, bindings);
+
+    static bool IsEventHandler(Type type)
+        => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() is EventHandlerAttribute;
+    
+    IEnumerable<IEventHandler> BuildAllEventHandlers(
+        IEventTypes eventTypes,
+        Func<ITenantScopedProviders> tenantScopedProvidersFactory,
+        IClientBuildResults buildResults)
+    {
+        _builtConventionTypeEventHandlers = _conventionTypeEventHandlers.Build(buildResults);
+        _builtConventionInstanceEventHandlers = _conventionInstanceEventHandlers.Build(buildResults);
+        var builtEventHandlerBuilders = _evenHandlerBuilders.Build(buildResults);
+        var eventHandlerBuilders = new ICanBuildEventHandlerBindings[]
+        {
+            _builtConventionInstanceEventHandlers,
+            _builtConventionTypeEventHandlers,
+            builtEventHandlerBuilders
+        };
+        return eventHandlerBuilders
+            .Select(_ => _.Build(eventTypes, buildResults, tenantScopedProvidersFactory))
+            .SelectMany(_ => _.Values);
     }
 }

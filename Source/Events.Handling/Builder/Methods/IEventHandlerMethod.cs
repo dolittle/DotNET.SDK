@@ -4,7 +4,7 @@
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder.Methods
 {
     /// <summary>
     /// Defines an event handler method.
