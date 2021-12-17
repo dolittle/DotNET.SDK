@@ -21,8 +21,8 @@ public interface ICanBuildUniqueBindings<in TIdentifier, in TValue, out TUniqueB
     /// Adds a binding between a value and an unique identifier.
     /// </summary>
     /// <param name="identifier">The <typeparamref name="TIdentifier"/> associated with the <typeparamref name="TValue"/>.</param>
-    /// <param name="type">The <typeparamref name="TValue"/> to associate with the <typeparamref name="TIdentifier"/>.</param>
-    void Add(TIdentifier identifier, TValue type);
+    /// <param name="value">The <typeparamref name="TValue"/> to associate with the <typeparamref name="TIdentifier"/>.</param>
+    void Add(TIdentifier identifier, TValue value);
 
     /// <summary>
     /// Builds the <typeparamref name="TUniqueBindings"/>.

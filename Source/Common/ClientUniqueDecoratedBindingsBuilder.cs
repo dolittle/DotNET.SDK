@@ -2,89 +2,95 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 
 namespace Dolittle.SDK.Common;
 
 /// <summary>
-/// Represents an implementation of <see cref="ICanBuildUniqueDecoratedBindings{TIdentifier,TUniqueBindings}"/>.
+/// Represents an implementation of <see cref="ICanBuildUniqueDecoratedBindings{TIdentifier,TValue,TUniqueBindings}"/>.
 /// </summary>
 /// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
+/// <typeparam name="TValue">The <see cref="Type" /> of the value to associate with the unique identifier.</typeparam>
 /// <typeparam name="TUniqueBindings">The <see cref="Type"/> of the <see cref="IUniqueBindings{TIdentifier,TValue}"/> to be built</typeparam>
 /// <typeparam name="TDecorator">The <see cref="Type"/> of the <see cref="Attribute"/> used to decorate the <see cref="Type"/> with the <typeparamref name="TIdentifier"/>.</typeparam>
-public abstract class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TUniqueBindings, TDecorator> : ClientUniqueBindingsBuilder<TIdentifier, Type, TUniqueBindings>, ICanBuildUniqueDecoratedBindings<TIdentifier, TUniqueBindings>
+public abstract class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TValue, TUniqueBindings, TDecorator> : ClientUniqueBindingsBuilder<TIdentifier, TValue, TUniqueBindings>, ICanBuildUniqueDecoratedBindings<TIdentifier, TValue, TUniqueBindings>
     where TIdentifier : IEquatable<TIdentifier>
-    where TUniqueBindings : IUniqueBindings<TIdentifier, Type>
+    where TValue : class
+    where TUniqueBindings : IUniqueBindings<TIdentifier, TValue>
     where TDecorator : Attribute
 {
     const string AttributeString = $"[{nameof(TDecorator)}(...)]";
 
     /// <inheritdoc />
-    public override void Add(TIdentifier identifier, Type type)
+    public override void Add(TIdentifier identifier, TValue value)
     {
-        if (TryGetIdentifierFromDecoratedType(type, out var decoratedIdentifier)
+        if (TryGetIdentifierFromDecoratedType(value, out var decoratedIdentifier)
             && !identifier.Equals(decoratedIdentifier))
         {
             AddBuildResult(ClientBuildResult.Failure(
-                $"Trying to associate {type} with {identifier}, but it is already associated to {decoratedIdentifier}",
-                $"Either the {AttributeString} on {type} is wrong and remove that or the manual association of {type} to {identifier} is wrong and remove that"));
+                $"Trying to associate {value} with {identifier}, but it is already associated to {decoratedIdentifier}",
+                $"Either the {AttributeString} from {value} is wrong and remove that or the manual association of {value} to {identifier} is wrong and remove that"));
             return;
         }
-        base.Add(identifier, type);
+        base.Add(identifier, value);
     }
 
     /// <inheritdoc />
-    public void Add(Type type)
+    public void Add(TValue value)
     {
-        if (TryGetIdentifierFromDecoratedType(type, out var identifier))
+        if (TryGetIdentifierFromDecoratedType(value, out var identifier))
         {
-            Add(identifier, type);
+            Add(identifier, value);
         }
         else
         {
             AddBuildResult(ClientBuildResult.Failure(
-                $"{type} is missing the {AttributeString} attribute",
-                $"Put the {AttributeString} attribute on the ${type} class"));
-        }
-
-    }
-
-    /// <inheritdoc />
-    public void AddAllFrom(Assembly assembly)
-    {
-        foreach (var type in assembly.ExportedTypes)
-        {
-            if (TryGetDecorator(type, out _))
-            {
-                Add(type);
-            }
+                $"{value} is missing the {AttributeString} attribute",
+                $"Put the {AttributeString} attribute on the {value}"));
         }
     }
-    
+
     /// <summary>
-    /// Tries to get the <typeparamref name="TIdentifier"/> from the <typeparamref name="TDecorator"/> on the decorated <see cref="Type"/>.
+    /// Try to get the <typeparamref name="TIdentifier"/> from the <typeparamref name="TDecorator"/> on the decorated <see cref="Type"/>.
     /// </summary>
-    /// <param name="decoratedType">The <see cref="Type"/> that the <typeparamref name="TDecorator"/> is on.</param>
+    /// <param name="value">The <typeparamref name="TValue"/> that the <typeparamref name="TDecorator"/> is derived from.</param>
     /// <param name="attribute">The <typeparamref name="TDecorator"/>.</param>
     /// <param name="identifier">The extracted <typeparamref name="TIdentifier"/>.</param>
-    /// <returns>The value indicating whether the <see cref="Type"/> is missing a valid <typeparamref name="TDecorator"/>.</returns>
-    protected abstract bool TryGetIdentifierFromDecorator(Type decoratedType, TDecorator attribute, out TIdentifier identifier);
+    /// <returns>The value indicating whether the <typeparamref name="TIdentifier"/> could be extracted from the <typeparamref name="TDecorator"/>.</returns>
+    protected abstract bool TryGetIdentifierFromDecorator(TValue value, TDecorator attribute, out TIdentifier identifier);
 
-    bool TryGetIdentifierFromDecoratedType(Type type, out TIdentifier identifier)
+    /// <summary>
+    /// Try to get the <typeparamref name="TDecorator"/> from the <typeparamref name="TValue"/>. 
+    /// </summary>
+    /// <param name="value">The <typeparamref name="TValue"/> to get the <typeparamref name="TDecorator"/> from.</param>
+    /// <param name="decorator">The outputted <typeparamref name="TDecorator"/>.</param>
+    /// <returns>The value indicating whether the <typeparamref name="TDecorator"/> could be extracted from the <typeparamref name="TValue"/>.</returns>
+    protected virtual bool TryGetDecorator(TValue value, out TDecorator decorator)
     {
-        identifier = default;
-        return TryGetDecorator(type, out var attribute) && TryGetIdentifierFromDecorator(type, attribute, out identifier);
+        decorator = default;
+        if (value is Type valueAsType)
+        {
+            if (Attribute.GetCustomAttribute(valueAsType, typeof(TDecorator)) is not TDecorator decoratorOnType)
+            {
+                return false;
+            }
+            decorator = decoratorOnType;       
+        }
+        else
+        {
+            var type = value.GetType();
+            if (Attribute.GetCustomAttribute(type, typeof(TDecorator)) is not TDecorator decoratorOnType)
+            {
+                return false;
+            }
+            decorator = decoratorOnType; 
+        }
+        return false;
     }
 
-    static bool TryGetDecorator(Type type, out TDecorator attribute)
+    bool TryGetIdentifierFromDecoratedType(TValue value, out TIdentifier identifier)
     {
-        attribute = default;
-        if (Attribute.GetCustomAttribute(type, typeof(TDecorator)) is not TDecorator attributeOnType)
-        {
-            return false;
-        }
-        attribute = attributeOnType;
-        return true;
+        identifier = default;
+        return TryGetDecorator(value, out var attribute) && TryGetIdentifierFromDecorator(value, attribute, out identifier);
     }
 }

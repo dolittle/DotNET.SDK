@@ -25,10 +25,10 @@ public abstract class ClientUniqueBindingsBuilder<TIdentifier, TValue, TUniqueBi
     readonly List<ClientBuildResult> _buildResults = new();
 
     /// <inheritdoc />
-    public virtual void Add(TIdentifier identifier, TValue type)
+    public virtual void Add(TIdentifier identifier, TValue value)
     {
-        AddIdentifierToValueMapping(identifier, type);
-        AddValueToIdentifierMapping(type, identifier);
+        AddIdentifierToValueMapping(identifier, value);
+        AddValueToIdentifierMapping(value, identifier);
     }
 
     /// <inheritdoc />
