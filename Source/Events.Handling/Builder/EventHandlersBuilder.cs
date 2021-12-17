@@ -5,14 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Type;
-using Dolittle.SDK.Events.Processing;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Handling.Builder;
 
