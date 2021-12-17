@@ -46,11 +46,11 @@ public class AggregateRootsBuilder : ClientArtifactsBuilder<AggregateRootType, A
         => new UnregisteredAggregateRoots(bindings);
 
     /// <inheritdoc />
-    protected override bool TryGetIdentifierFromDecorator(Type type, AggregateRootAttribute attribute, out AggregateRootType artifact)
+    protected override bool TryGetIdentifierFromDecorator(Type value, AggregateRootAttribute attribute, out AggregateRootType artifact)
     {
         if (!attribute.Type.HasAlias)
         {
-            artifact = new AggregateRootType(attribute.Type.Id, attribute.Type.Generation, type.Name);
+            artifact = new AggregateRootType(attribute.Type.Id, attribute.Type.Generation, value.Name);
             return true;
         }
 

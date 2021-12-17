@@ -73,11 +73,11 @@ public class EventTypesBuilder : ClientArtifactsBuilder<EventType, EventTypeId, 
         => new UnregisteredEventTypes(bindings);
 
     /// <inheritdoc />
-    protected override bool TryGetIdentifierFromDecorator(Type type, EventTypeAttribute attribute, out EventType artifact)
+    protected override bool TryGetIdentifierFromDecorator(Type value, EventTypeAttribute attribute, out EventType artifact)
     {
         if (!attribute.HasAlias)
         {
-            artifact = new EventType(attribute.Identifier, attribute.Generation, type.Name);
+            artifact = new EventType(attribute.Identifier, attribute.Generation, value.Name);
             return true;
         }
 
