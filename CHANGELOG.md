@@ -1,3 +1,24 @@
+# [9.1.1] - 2021-12-21
+
+## Summary
+
+Updates the Contracts packages to version 5.4.1
+
+### Changed
+
+- Updated the Contracts packages to version 5.4.1
+
+
+# [9.1.0] - 2021-7-14 [PR: #65](https://github.com/dolittle/DotNET.SDK/pull/65)
+## Summary
+
+Adds a new feature, Embeddings! They are similar to Projections, but they are meant to be used to event source changes coming from an external system. Check the [sample](https://github.com/dolittle/DotNET.SDK/tree/master/Samples/Tutorials/Embeddings) for an example.
+
+### Added
+
+- Embeddings! You can use them inline with the `WithEmbeddings()` builder, or by specifying the `ResolveUpdateToEvents`, `ResolveDeletionToEvents` and `On` methods or attributes for a class. The embeddings can be updated, deleted and fetched from the `client.Embeddings` property.
+
+
 # [9.0.0] - 2021-6-16 [PR: #61](https://github.com/dolittle/DotNET.SDK/pull/61)
 ## Summary
 
@@ -197,4 +218,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [7.0.0] - 2020-10-28
 ### Changed
 - Change EventHandlerBuilder API so that you can't accidentally overwrite your previous handlers
-
