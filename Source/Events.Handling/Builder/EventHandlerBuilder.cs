@@ -1,8 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
 namespace Dolittle.SDK.Events.Handling.Builder;
@@ -10,7 +12,7 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Represents a building event handlers.
 /// </summary>
-public class EventHandlerBuilder : IEventHandlerBuilder
+public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandler
 {
     readonly EventHandlerId _eventHandlerId;
     readonly EventHandlerMethodsBuilder _methodsBuilder;
@@ -29,6 +31,13 @@ public class EventHandlerBuilder : IEventHandlerBuilder
     {
         _eventHandlerId = eventHandlerId;
         _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
+    }
+    
+    /// <inheritdoc />
+    public bool TryGetIdentifier(out EventHandlerId identifier)
+    {
+        identifier = _eventHandlerId;
+        return true;
     }
 
     /// <inheritdoc />
@@ -60,14 +69,8 @@ public class EventHandlerBuilder : IEventHandlerBuilder
         return this;
     }
 
-    /// <summary>
-    /// Try build the <see cref="IEventHandler"/>.
-    /// </summary>
-    /// <param name="eventTypes">The <see cref="IEventHandler"/>.</param>
-    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="eventHandler">The built <see cref="IEventHandler"/>.</param>
-    /// <returns>A value indicating whether the <see cref="IEventHandler"/> could be built.</returns>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
+    /// <inheritdoc />
+    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, Func<ITenantScopedProviders> tenantScopedProvidersFactory, out IEventHandler eventHandler)
     {
         eventHandler = default;
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();

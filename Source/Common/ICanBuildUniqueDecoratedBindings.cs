@@ -10,11 +10,9 @@ namespace Dolittle.SDK.Common;
 /// </summary>
 /// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
 /// <typeparam name="TValue">The <see cref="Type" /> of the value to associate with the unique identifier.</typeparam>
-/// <typeparam name="TUniqueBindings">The <see cref="Type"/> of the <see cref="IUniqueBindings{TIdentifier,TValue}"/> to be built</typeparam>
-public interface ICanBuildUniqueDecoratedBindings<in TIdentifier, in TValue, out TUniqueBindings> : ICanBuildUniqueBindings<TIdentifier, TValue, TUniqueBindings>
+public interface ICanBuildUniqueDecoratedBindings<TIdentifier, TValue> : ICanBuildUniqueBindings<TIdentifier, TValue>
     where TIdentifier : IEquatable<TIdentifier>
     where TValue : class
-    where TUniqueBindings : IUniqueBindings<TIdentifier, TValue>
 {
     /// <summary>
     /// Adds a binding between the <typeparamref name="TValue"/> and the <typeparamref name="TIdentifier"/> where the <typeparamref name="TIdentifier"/> is derived from the decorator.

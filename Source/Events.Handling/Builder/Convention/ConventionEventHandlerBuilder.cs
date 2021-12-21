@@ -15,28 +15,39 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention;
 /// <summary>
 /// Methods for building <see cref="IEventHandler"/> instances by convention from an instantiated event handler class.
 /// </summary>
-public abstract class ConventionEventHandlerBuilder
+public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
 {
     const string MethodName = "Handle";
+
+    readonly EventHandlerId _identifier;
+    readonly EventHandlerAttribute _attribute;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConventionEventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerType">The event handler <see cref="Type" />.</param>
-    protected ConventionEventHandlerBuilder(System.Type eventHandlerType) => EventHandlerType = eventHandlerType;
+    protected ConventionEventHandlerBuilder(System.Type eventHandlerType)
+    {
+        EventHandlerType = eventHandlerType;
+        if (TryGetAttribute(out _attribute))
+        {
+            _identifier = _attribute.Identifier;
+        }
+    }
 
     /// <summary>
     /// Gets the <see cref="Type" /> of the event handler.
     /// </summary>
-    protected System.Type EventHandlerType { get; }
+    public System.Type EventHandlerType { get; }
 
-    /// <summary>
-    /// Builds event handler.
-    /// </summary>
-    /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="tenantScopedProvidersFactory">The <see cref="System.Func{TResult}"/> for getting the <see cref="ITenantScopedProviders"/>.</param>
-    /// <param name="eventHandler">The built <see cref="IEventHandler"/>.</param>
+    /// <inheritdoc />
+    public bool TryGetIdentifier(out EventHandlerId identifier)
+    {
+        identifier = _identifier;
+        return identifier != default;
+    }
+
+    /// <inheritdoc />
     public abstract bool TryBuild(
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
@@ -60,14 +71,17 @@ public abstract class ConventionEventHandlerBuilder
     {
         eventHandler = default;
         buildResults.AddInformation($"Building event handler from type {EventHandlerType}");
-        var attribute = GetAttribute();
-        
-        buildResults.AddInformation($"Building {(attribute.Partitioned ? "partitioned" : "unpartitioned")} event handler {attribute.Identifier} processing events in scope {attribute.Scope} from type {EventHandlerType}");
+        if (_attribute == default)
+        {
+            buildResults.AddFailure($"The event handler class {EventHandlerType} needs to be decorated with an [{nameof(EventHandlerAttribute)}(...)] attribute");
+            return false;
+        }
+        buildResults.AddInformation($"Building {(_attribute.Partitioned ? "partitioned" : "unpartitioned")} event handler {_identifier} processing events in scope {_attribute.Scope} from type {EventHandlerType}");
 
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
 
         if (!TryBuildHandlerMethods(
-                attribute.Identifier,
+                _identifier,
                 eventTypes,
                 createUntypedHandlerMethod,
                 createTypedHandlerMethod,
@@ -77,9 +91,9 @@ public abstract class ConventionEventHandlerBuilder
             return false;
         }
 
-        eventHandler = attribute.HasAlias
-            ? new EventHandler(attribute.Identifier, attribute.Alias, attribute.Scope, attribute.Partitioned, eventTypesToMethods)
-            : new EventHandler(attribute.Identifier, EventHandlerType.Name, attribute.Scope, attribute.Partitioned, eventTypesToMethods);
+        eventHandler = _attribute.HasAlias
+            ? new EventHandler(_identifier, _attribute.Alias, _attribute.Scope, _attribute.Partitioned, eventTypesToMethods)
+            : new EventHandler(_identifier, EventHandlerType.Name, _attribute.Scope, _attribute.Partitioned, eventTypesToMethods);
 
         return true;
     }
@@ -244,8 +258,16 @@ public abstract class ConventionEventHandlerBuilder
         return false;
     }
 
-    EventHandlerAttribute GetAttribute()
-        => EventHandlerType.GetCustomAttributes(typeof(EventHandlerAttribute), true).First() as EventHandlerAttribute;
+    bool TryGetAttribute(out EventHandlerAttribute attribute)
+    {
+        attribute = default;
+        if (EventHandlerType.GetCustomAttributes(typeof(EventHandlerAttribute), true).First() is not EventHandlerAttribute eventHandlerAttribute)
+        {
+            return false;
+        }
+        attribute = eventHandlerAttribute;
+        return true;
+    }
 
     static bool TryGetFirstMethodParameterType(MethodInfo method, out System.Type type)
     {

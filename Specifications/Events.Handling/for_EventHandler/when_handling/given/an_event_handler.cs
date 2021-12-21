@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Dolittle.SDK.Events.Handling.Builder;
+using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Machine.Specifications;
 using Moq;
 

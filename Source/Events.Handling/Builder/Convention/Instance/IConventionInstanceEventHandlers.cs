@@ -8,6 +8,6 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 /// <summary>
 /// Defines the unique convention instance event handler bindings.
 /// </summary>
-public interface IConventionInstanceEventHandlers : IUniqueBindings<EventHandlerId, object>, ICanBuildEventHandlerBindings
+public interface IConventionInstanceEventHandlers : IUniqueBindings<EventHandlerId, object>
 {
 }

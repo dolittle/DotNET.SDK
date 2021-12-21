@@ -237,7 +237,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     public Task Disconnect(CancellationToken cancellationToken = default)
     {
         _eventProcessorCancellationTokenSource.Cancel();
-        return _processingCoordinator.Completion;
+        return Task.WhenAny(_processingCoordinator.Completion, Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken));
     }
 
     /// <inheritdoc/>

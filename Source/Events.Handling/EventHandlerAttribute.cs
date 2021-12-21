@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Events.Handling;
 
@@ -9,7 +10,7 @@ namespace Dolittle.SDK.Events.Handling;
 /// Decorates a class to indicate the Event Handler Id of the Event Handler class.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class EventHandlerAttribute : Attribute
+public class EventHandlerAttribute : Attribute, IUniqueBindingDecorator<EventHandlerId>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerAttribute"/> class.
@@ -55,4 +56,7 @@ public class EventHandlerAttribute : Attribute
     /// Gets a value indicating whether this event handler has an alias.
     /// </summary>
     public bool HasAlias { get; }
+
+    /// <inheritdoc />
+    public EventHandlerId GetIdentifier() => Identifier;
 }

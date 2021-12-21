@@ -15,8 +15,6 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 /// </summary>
 public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuilder
 {
-    readonly object _eventHandlerInstance;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ConventionInstanceEventHandlerBuilder"/> class.
     /// </summary>
@@ -24,9 +22,14 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
     public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance)
         : base(eventHandlerInstance.GetType())
     {
-        _eventHandlerInstance = eventHandlerInstance;
+        EventHandlerInstance = eventHandlerInstance;
     }
 
+    /// <summary>
+    /// Gets the event handler instance.
+    /// </summary>
+    public object EventHandlerInstance { get; }
+    
     /// <inheritdoc/>
     public override bool TryBuild(
         IEventTypes eventTypes,
@@ -49,7 +52,7 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
 
         return Activator.CreateInstance(
             typeof(InstanceEventHandlerMethod<>).MakeGenericType(EventHandlerType),
-            _eventHandlerInstance,
+            EventHandlerInstance,
             eventHandlerSignature) as IEventHandlerMethod;
     }
 
@@ -63,7 +66,7 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
 
         return Activator.CreateInstance(
             typeof(TypedInstanceEventHandlerMethod<,>).MakeGenericType(EventHandlerType, eventParameterType),
-            _eventHandlerInstance,
+            EventHandlerInstance,
             eventHandlerSignature) as IEventHandlerMethod;
     }
 }

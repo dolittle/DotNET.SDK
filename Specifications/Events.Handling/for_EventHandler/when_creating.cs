@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Handling.Builder;
+using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Machine.Specifications;
 
 namespace Dolittle.SDK.Events.Handling.for_EventHandler

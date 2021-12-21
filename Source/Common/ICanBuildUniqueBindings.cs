@@ -11,11 +11,9 @@ namespace Dolittle.SDK.Common;
 /// </summary>
 /// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
 /// <typeparam name="TValue">The <see cref="Type" /> of the value to associate with the unique identifier.</typeparam>
-/// <typeparam name="TUniqueBindings">The <see cref="Type"/> of the <see cref="IUniqueBindings{TIdentifier,TValue}"/> to be built</typeparam>
-public interface ICanBuildUniqueBindings<in TIdentifier, in TValue, out TUniqueBindings>
+public interface ICanBuildUniqueBindings<TIdentifier, TValue>
     where TIdentifier : IEquatable<TIdentifier>
     where TValue : class
-    where TUniqueBindings : IUniqueBindings<TIdentifier, TValue>
 {
     /// <summary>
     /// Adds a binding between a value and an unique identifier.
@@ -25,9 +23,9 @@ public interface ICanBuildUniqueBindings<in TIdentifier, in TValue, out TUniqueB
     void Add(TIdentifier identifier, TValue value);
 
     /// <summary>
-    /// Builds the <typeparamref name="TUniqueBindings"/>.
+    /// Builds the <see cref="IUniqueBindings{TIdentifier,TValue}"/>.
     /// </summary>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <returns>The <typeparamref name="TUniqueBindings"/>.</returns>
-    TUniqueBindings Build(IClientBuildResults buildResults);
+    /// <returns>The <see cref="IUniqueBindings{TIdentifier,TValue}"/>.</returns>
+    IUniqueBindings<TIdentifier, TValue> Build(IClientBuildResults buildResults);
 }

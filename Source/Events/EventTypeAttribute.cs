@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Events;
 
@@ -10,7 +11,7 @@ namespace Dolittle.SDK.Events;
 /// Decorates a class to indicate the <see cref="EventType" /> of an event class.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class EventTypeAttribute : Attribute
+public class EventTypeAttribute : Attribute, IUniqueBindingDecorator<EventType>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EventTypeAttribute"/> class.
@@ -49,4 +50,10 @@ public class EventTypeAttribute : Attribute
     /// Gets a value indicating whether this event type has an alias.
     /// </summary>
     public bool HasAlias { get; }
+
+
+    /// <inheritdoc />
+    public EventType GetIdentifier() => HasAlias
+        ? new EventType(Identifier, Generation, Alias)
+        : new EventType(Identifier, Generation);
 }

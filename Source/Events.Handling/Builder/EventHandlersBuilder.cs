@@ -16,20 +16,25 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Represents an implementation of <see cref="IEventHandlersBuilder"/>.
 /// </summary>
-public class EventHandlersBuilder : ClientUniqueBindingsBuilder<EventHandlerId, IEventHandler, IEventHandlerBindings>, IEventHandlersBuilder
+public class EventHandlersBuilder : IEventHandlersBuilder
 {
-    readonly ConventionTypeEventHandlerBindingsBuilder _conventionTypeEventHandlers = new();
-    readonly ConventionInstanceEventHandlerBindingsBuilder _conventionInstanceEventHandlers = new();
-    readonly EventHandlerBuilderBindingsBuilder _evenHandlerBuilders = new();
-
-    IConventionTypeEventHandlers _builtConventionTypeEventHandlers;
+    readonly ClientUniqueBindingsBuilder<EventHandlerId, IEventHandler> _eventHandlerBindingsBuilder = new(valueLabel: "Event Handler");
+    readonly ClientUniqueDecoratedBindingsBuilder<EventHandlerId, Type, EventHandlerAttribute> _conventionTypeBindingsBuilder = new(valueLabel: "Event Handler Convention Type");
+    readonly ClientUniqueDecoratedBindingsBuilder<EventHandlerId, object, EventHandlerAttribute> _conventionInstanceBindingsBuilder = new(valueLabel: "Event Handler Convention Instance");
+    readonly ClientUniqueBindingsBuilder<EventHandlerId, EventHandlerBuilder> _builderBindingsBuilder = new(valueLabel: "Event Handler Builder");
+    
     IConventionInstanceEventHandlers _builtConventionInstanceEventHandlers;
+
+    readonly List<ConventionInstanceEventHandlerBuilder> _conventionInstanceBuilders = new();
+    readonly List<ConventionTypeEventHandlerBuilder> _conventionTypeBuilders = new();
+    readonly List<EventHandlerBuilder> _builders = new();
 
     /// <inheritdoc />
     public IEventHandlerBuilder CreateEventHandler(EventHandlerId eventHandlerId)
     {
         var builder = new EventHandlerBuilder(eventHandlerId);
-        _evenHandlerBuilders.Add(eventHandlerId, builder);
+        _builders.Add(builder);
+        _builderBindingsBuilder.Add(eventHandlerId, builder);
         return builder;
     }
 
@@ -41,7 +46,8 @@ public class EventHandlersBuilder : ClientUniqueBindingsBuilder<EventHandlerId, 
     /// <inheritdoc />
     public IEventHandlersBuilder RegisterEventHandler(Type type)
     {
-        _conventionTypeEventHandlers.Add(type);
+        _conventionTypeBuilders.Add(new ConventionTypeEventHandlerBuilder(type));
+        _conventionTypeBindingsBuilder.Add(type);
         return this;
     }
 
@@ -49,7 +55,8 @@ public class EventHandlersBuilder : ClientUniqueBindingsBuilder<EventHandlerId, 
     public IEventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
         where TEventHandler : class
     {
-        _conventionInstanceEventHandlers.Add(eventHandlerInstance);
+        _conventionInstanceBuilders.Add(new ConventionInstanceEventHandlerBuilder(eventHandlerInstance));
+        _conventionInstanceBindingsBuilder.Add(eventHandlerInstance);
         return this;
     }
 
@@ -75,37 +82,44 @@ public class EventHandlersBuilder : ClientUniqueBindingsBuilder<EventHandlerId, 
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     public IUnregisteredEventHandlers Build(IEventTypes eventTypes, Func<ITenantScopedProviders> tenantScopedProvidersFactory, IClientBuildResults buildResults)
     {
-        foreach (var eventHandler in BuildAllEventHandlers(eventTypes, tenantScopedProvidersFactory, buildResults))
-        {
-            Add(eventHandler.Identifier, eventHandler);
-        }
+        var eventHandlerBuilderResults = BuildEventHandlers(_builderBindingsBuilder.Build(buildResults), _builders, eventTypes, tenantScopedProvidersFactory, buildResults);
+        var conventionTypeBuilderResults = BuildEventHandlers(_conventionTypeBindingsBuilder.Build(buildResults), _conventionTypeBuilders, eventTypes, tenantScopedProvidersFactory, buildResults);
+        var conventionInstanceBuilderResults = BuildEventHandlers(_conventionInstanceBindingsBuilder.Build(buildResults), _conventionInstanceBuilders, eventTypes, tenantScopedProvidersFactory, buildResults);
 
-        return new UnregisteredEventHandlers(base.Build(buildResults));
+        var excludedIds = new HashSet<EventHandlerId>();
+        var allIds = eventHandlerBuilderResults
+            .Select(_ => _.Identifier)
+            .Concat(conventionInstanceBuilderResults.Select(_ => _.Identifier))
+            .Concat(conventionTypeBuilderResults.Select(_ => _.Identifier))
+            .ToHashSet();
+        
+        
+        foreach ()
+        {
+        }
     }
 
-    /// <inheritdoc />
-    protected override IEventHandlerBindings CreateUniqueBindings(IClientBuildResults aggregatedBuildResults, IUniqueBindings<EventHandlerId, IEventHandler> bindings)
-        => new EventHandlerBindings(_builtConventionTypeEventHandlers, _builtConventionInstanceEventHandlers, bindings);
-
-    static bool IsEventHandler(Type type)
-        => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() is EventHandlerAttribute;
-    
-    IEnumerable<IEventHandler> BuildAllEventHandlers(
+    static IEnumerable<EventHandlerBuildInformation<TBuilder>> BuildEventHandlers<TBuilder, TValue>(
+        IUniqueBindings<EventHandlerId, TValue> uniqueBindings,
+        IEnumerable<TBuilder> builders,
         IEventTypes eventTypes,
         Func<ITenantScopedProviders> tenantScopedProvidersFactory,
         IClientBuildResults buildResults)
-    {
-        _builtConventionTypeEventHandlers = _conventionTypeEventHandlers.Build(buildResults);
-        _builtConventionInstanceEventHandlers = _conventionInstanceEventHandlers.Build(buildResults);
-        var builtEventHandlerBuilders = _evenHandlerBuilders.Build(buildResults);
-        var eventHandlerBuilders = new ICanBuildEventHandlerBindings[]
-        {
-            _builtConventionInstanceEventHandlers,
-            _builtConventionTypeEventHandlers,
-            builtEventHandlerBuilders
-        };
-        return eventHandlerBuilders
-            .Select(_ => _.Build(eventTypes, buildResults, tenantScopedProvidersFactory))
-            .SelectMany(_ => _.Values);
-    }
+        where TBuilder : ICanTryBuildEventHandler
+        where TValue : class
+        => builders
+            .Where(_ => _.TryGetIdentifier(out var _))
+            .Select(builder =>
+            {
+                IEventHandler eventHandler = default;
+                builder.TryGetIdentifier(out var eventHandlerId);
+                var eventHandlerBuilt = uniqueBindings.HasFor(eventHandlerId) && builder.TryBuild(eventTypes, buildResults, tenantScopedProvidersFactory, out eventHandler);
+                return new EventHandlerBuildInformation<TBuilder>(eventHandlerBuilt, eventHandlerId, eventHandler, builder);
+            });
+    
+    static bool IsEventHandler(Type type)
+        => type.GetCustomAttributes(typeof(EventHandlerAttribute), true).FirstOrDefault() is EventHandlerAttribute;
+
+    record EventHandlerBuildInformation<TBuilder>(bool Success, EventHandlerId Identifier, IEventHandler EventHandler, TBuilder Builder)
+        where TBuilder : ICanTryBuildEventHandler;
 }

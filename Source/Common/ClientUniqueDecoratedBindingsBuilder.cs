@@ -7,20 +7,28 @@ using Dolittle.SDK.Common.ClientSetup;
 namespace Dolittle.SDK.Common;
 
 /// <summary>
-/// Represents an implementation of <see cref="ICanBuildUniqueDecoratedBindings{TIdentifier,TValue,TUniqueBindings}"/>.
+/// Represents an implementation of <see cref="ICanBuildUniqueDecoratedBindings{TIdentifier,TValue}"/>.
 /// </summary>
 /// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
 /// <typeparam name="TValue">The <see cref="Type" /> of the value to associate with the unique identifier.</typeparam>
-/// <typeparam name="TUniqueBindings">The <see cref="Type"/> of the <see cref="IUniqueBindings{TIdentifier,TValue}"/> to be built</typeparam>
 /// <typeparam name="TDecorator">The <see cref="Type"/> of the <see cref="Attribute"/> used to decorate the <see cref="Type"/> with the <typeparamref name="TIdentifier"/>.</typeparam>
-public abstract class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TValue, TUniqueBindings, TDecorator> : ClientUniqueBindingsBuilder<TIdentifier, TValue, TUniqueBindings>, ICanBuildUniqueDecoratedBindings<TIdentifier, TValue, TUniqueBindings>
+public class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TValue, TDecorator> : ClientUniqueBindingsBuilder<TIdentifier, TValue>, ICanBuildUniqueDecoratedBindings<TIdentifier, TValue>
     where TIdentifier : IEquatable<TIdentifier>
     where TValue : class
-    where TUniqueBindings : IUniqueBindings<TIdentifier, TValue>
-    where TDecorator : Attribute
+    where TDecorator : Attribute, IUniqueBindingDecorator<TIdentifier>
 {
     const string AttributeString = $"[{nameof(TDecorator)}(...)]";
-
+    
+    /// <summary>
+    /// Initializes an instance of the <see cref="ClientUniqueDecoratedBindingsBuilder{TIdentifier,TValue,TDecorator}"/> class.
+    /// </summary>
+    /// <param name="identifierLabel">The label of the identifier. Used for <see cref="IClientBuildResults"/>.</param>
+    /// <param name="valueLabel">The label of the value. Used for <see cref="IClientBuildResults"/>.</param>
+    public ClientUniqueDecoratedBindingsBuilder(string identifierLabel = nameof(TIdentifier), string valueLabel = nameof(TValue))
+        : base(identifierLabel, valueLabel)
+    {
+    }
+    
     /// <inheritdoc />
     public override void Add(TIdentifier identifier, TValue value)
     {
@@ -28,7 +36,7 @@ public abstract class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TValue, 
             && !identifier.Equals(decoratedIdentifier))
         {
             AddBuildResult(ClientBuildResult.Failure(
-                $"Trying to associate {value} with {identifier}, but it is already associated to {decoratedIdentifier}",
+                $"Trying to associate {ValueLabel} {value} with {IdentifierLabel} {identifier}, but it is already associated to {decoratedIdentifier}",
                 $"Either the {AttributeString} from {value} is wrong and remove that or the manual association of {value} to {identifier} is wrong and remove that"));
             return;
         }
@@ -51,21 +59,12 @@ public abstract class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TValue, 
     }
 
     /// <summary>
-    /// Try to get the <typeparamref name="TIdentifier"/> from the <typeparamref name="TDecorator"/> on the decorated <see cref="Type"/>.
-    /// </summary>
-    /// <param name="value">The <typeparamref name="TValue"/> that the <typeparamref name="TDecorator"/> is derived from.</param>
-    /// <param name="attribute">The <typeparamref name="TDecorator"/>.</param>
-    /// <param name="identifier">The extracted <typeparamref name="TIdentifier"/>.</param>
-    /// <returns>The value indicating whether the <typeparamref name="TIdentifier"/> could be extracted from the <typeparamref name="TDecorator"/>.</returns>
-    protected abstract bool TryGetIdentifierFromDecorator(TValue value, TDecorator attribute, out TIdentifier identifier);
-
-    /// <summary>
     /// Try to get the <typeparamref name="TDecorator"/> from the <typeparamref name="TValue"/>. 
     /// </summary>
     /// <param name="value">The <typeparamref name="TValue"/> to get the <typeparamref name="TDecorator"/> from.</param>
     /// <param name="decorator">The outputted <typeparamref name="TDecorator"/>.</param>
     /// <returns>The value indicating whether the <typeparamref name="TDecorator"/> could be extracted from the <typeparamref name="TValue"/>.</returns>
-    protected virtual bool TryGetDecorator(TValue value, out TDecorator decorator)
+    protected bool TryGetDecorator(TValue value, out TDecorator decorator)
     {
         decorator = default;
         if (value is Type valueAsType)
@@ -91,6 +90,11 @@ public abstract class ClientUniqueDecoratedBindingsBuilder<TIdentifier, TValue, 
     bool TryGetIdentifierFromDecoratedType(TValue value, out TIdentifier identifier)
     {
         identifier = default;
-        return TryGetDecorator(value, out var attribute) && TryGetIdentifierFromDecorator(value, attribute, out identifier);
+        if (!TryGetDecorator(value, out var attribute))
+        {
+            return false;
+        }
+        identifier = attribute.GetIdentifier();
+        return true;
     }
 }
