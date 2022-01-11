@@ -11,4 +11,8 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Concepts\Concepts.csproj" />
+    </ItemGroup>
+
 </Project>

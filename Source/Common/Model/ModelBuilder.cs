@@ -1,0 +1,160 @@
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Concepts;
+
+namespace Dolittle.SDK.Common.Model;
+
+/// <summary>
+/// Represents an implementation of <see cref="IModelBuilder"/>.
+/// </summary>
+public class ModelBuilder : IModelBuilder
+{
+    readonly IdentifierMap<Type> _typesByIdentifier = new();
+    readonly IdentifierMap<object> _processorBuildersByIdentifier = new();
+
+    /// <inheritdoc />
+    public void BindIdentifierToType<TIdentifier, TId>(TIdentifier identifier, Type type)
+        where TIdentifier : IIdentifier<TId>
+        where TId : ConceptAs<Guid>
+        => _typesByIdentifier.AddBinding(new TypeBinding<TIdentifier, TId>(identifier, type), type);
+
+    /// <inheritdoc />
+    public void UnbindIdentifierToType<TIdentifier, TId>(TIdentifier identifier, Type type)
+        where TIdentifier : IIdentifier<TId>
+        where TId : ConceptAs<Guid>
+    {
+        if (!Unbind(_typesByIdentifier, identifier, type))
+        {
+            throw new CannotUnbindIdentifierFromTypeThatIsNotBound(identifier, type);
+        }
+    }
+
+    /// <inheritdoc />
+    public void BindIdentifierToProcessorBuilder<TBuilder>(IIdentifier identifier, TBuilder builder)
+        where TBuilder : class, IEquatable<TBuilder>
+        => _processorBuildersByIdentifier.AddBinding(new ProcessorBuilderBinding<TBuilder>(identifier, builder), builder);
+
+    /// <inheritdoc />
+    public void UnbindIdentifierToProcessorBuilder<TBuilder>(IIdentifier identifier, TBuilder builder)
+        where TBuilder : class, IEquatable<TBuilder>
+    {
+        if (!Unbind(_processorBuildersByIdentifier, identifier, builder))
+        {
+            throw new CannotUnbindIdentifierFromProcessorBuilderThatIsNotBound(identifier, builder);
+        }
+    }
+
+    /// <inheritdoc />
+    public IModel Build(IClientBuildResults buildResults)
+    {
+        var validBindings = new List<IBinding>();
+        var deDuplicatedTypes = new DeDuplicatedIdentifierMap<Type>(
+            _typesByIdentifier,
+            (binding, type, numDuplicates) =>
+            {
+                buildResults.AddInformation($"{binding} appeared {numDuplicates} times");
+            });
+        var deDuplicatedProcessorBuilders = new DeDuplicatedIdentifierMap<object>(
+            _processorBuildersByIdentifier,
+            (binding, processorBuilder, numDuplicates) =>
+            {
+                buildResults.AddInformation($"{binding} appeared {numDuplicates} times");
+            });
+        var ids = deDuplicatedTypes.Select(_ => _.Key).Concat(deDuplicatedProcessorBuilders.Select(_ => _.Key)).ToHashSet();
+
+        foreach (var id in ids)
+        {
+            var (coexistentTypes, conflictingTypes) = SplitCoexistingAndConflictingBindings(deDuplicatedTypes, id);
+            var (coexistentProcessorBuilders, conflictingProcessorBuilders) = SplitCoexistingAndConflictingBindings(deDuplicatedProcessorBuilders, id);
+
+            if (!conflictingTypes.Any() && !conflictingProcessorBuilders.Any())
+            {
+                validBindings.AddRange(coexistentTypes.Select(_ => _.Binding).Concat(coexistentProcessorBuilders.Select(_ => _.Binding)));
+                continue;
+            }
+            AddFailedBuildResultsForConflictingBindings(id, conflictingTypes, conflictingProcessorBuilders, buildResults);
+            if (coexistentTypes.Any() || coexistentProcessorBuilders.Any())
+            {
+                AddFailedBuildResultsForCoexistentBindings(id, coexistentTypes, coexistentProcessorBuilders, buildResults);
+            }
+        }
+
+        foreach (var binding in validBindings)
+        {
+            buildResults.AddInformation($"{binding} will be bound");
+        }
+        return new Model(validBindings);
+    }
+
+    static void AddFailedBuildResultsForConflictingBindings(Guid id, IdentifierMapBinding<Type>[] conflictingTypes, IdentifierMapBinding<object>[] conflictingProcessorBuilders, IClientBuildResults buildResults)
+    {
+        
+        var conflicts = new List<string>();
+        if (conflictingTypes.Any())
+        {
+            conflicts.Add("types");
+        }
+        if (conflictingProcessorBuilders.Any())
+        {
+            conflicts.Add("processors");
+        }
+        buildResults.AddFailure($"The identifier {id} was bound to conflicting {string.Join(" and ", conflicts)}:");
+        foreach (var (binding, type)  in conflictingTypes)
+        {
+            buildResults.AddFailure($"\t {binding.Identifier} was bound to type {type.Name}. This binding will be ignored");
+        }
+        foreach (var (binding, processorBuilder) in conflictingProcessorBuilders)
+        {
+            buildResults.AddFailure($"\t {binding.Identifier} was bound to processor builder {processorBuilder}. This binding will be ignored");
+        }
+    }
+    static void AddFailedBuildResultsForCoexistentBindings(Guid id, IEnumerable<IdentifierMapBinding<Type>> coexistentTypes, IEnumerable<IdentifierMapBinding<object>> coexistentProcessorBuilders, IClientBuildResults buildResults)
+    {
+        buildResults.AddFailure($"The identifier {id} was also bound to:");
+        foreach (var (binding, type) in coexistentTypes)
+        {
+            buildResults.AddFailure($"\t {binding.Identifier} binding to type {type.Name}. This binding will be ignored");
+        }
+        foreach (var (binding, processorBuilder) in coexistentProcessorBuilders)
+        {
+            buildResults.AddFailure($"\t {binding.Identifier} binding to processor builder {processorBuilder}. This binding will be ignored");
+        }
+    }
+
+
+    static (IdentifierMapBinding<TValue>[] coexisting, IdentifierMapBinding<TValue>[] conflicting) SplitCoexistingAndConflictingBindings<TValue>(DeDuplicatedIdentifierMap<TValue> map, Guid key)
+    {
+        if (!map.TryGetValue(key, out var bindings))
+        {
+            return (Enumerable.Empty<IdentifierMapBinding<TValue>>().ToArray(), Enumerable.Empty<IdentifierMapBinding<TValue>>().ToArray());
+        }
+        var conflicts = new HashSet<IIdentifier>();
+
+        foreach (var (binding, bindingValue) in bindings)
+        {
+            foreach (var (otherBinding, _) in from otherBinding in bindings
+                                           let canCoexist = (binding.Identifier.Equals(otherBinding.Binding.Identifier) && bindingValue.Equals(otherBinding.BindingValue))
+                                            || (binding.Identifier.CanCoexistWith(otherBinding.Binding.Identifier) && !bindingValue.Equals(otherBinding.BindingValue))
+                                           where !canCoexist select otherBinding)
+            {
+                conflicts.Add(binding.Identifier);
+                conflicts.Add(otherBinding.Identifier);
+            }
+        }
+        var coexisting = bindings.Where(_ => !conflicts.Contains(_.Binding.Identifier));
+        var conflicting = bindings.Where(_ => conflicts.Contains(_.Binding.Identifier));
+        return (coexisting.ToArray(), conflicting.ToArray());
+    }
+
+    static bool Unbind<TValue>(IdentifierMap<TValue> map, IIdentifier identifier, TValue value)
+        => map.TryGetValue(identifier.Id, out var bindings) && bindings.RemoveAll(identifierAndType =>
+        {
+            var (existingIdentifier, existingValue) = identifierAndType;
+            return identifier.Equals(existingIdentifier) && value.Equals(existingValue);
+        }) > 0;
+}
