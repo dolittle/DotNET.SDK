@@ -68,7 +68,7 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <inheritdoc />
     public IEventTypesBuilder Register(Type type)
     {
-        _decoratedTypeBindings.TryAdd(type, out _, out _);
+        _decoratedTypeBindings.TryAdd(type, out _);
         return this;
     }
 

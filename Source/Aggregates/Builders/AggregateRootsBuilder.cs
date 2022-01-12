@@ -40,7 +40,7 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     /// <inheritdoc />
     public IAggregateRootsBuilder Register(Type type)
     {
-        _decoratedTypeBindings.TryAdd(type, out _, out _);
+        _decoratedTypeBindings.TryAdd(type, out _);
         return this;
     }
     

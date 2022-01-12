@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
@@ -43,16 +44,14 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     /// <param name="decorator">The <typeparamref name="TDecorator"/> that has the <typeparamref name="TIdentifier"/>.</param>
     /// <param name="identifier">The unique <typeparamref name="TIdentifier"/> that is bound to the given <see cref="Type"/>.</param>
     /// <returns>A value indicating whether the given <see cref="Type"/> is decorated with <typeparamref name="TDecorator"/>.</returns>
-    public bool TryAdd(Type type, out TDecorator decorator, out TIdentifier identifier)
+    public bool TryAdd(Type type, out TDecorator decorator)
     {
-        identifier = default;
         if (!type.TryGetDecorator(out decorator))
         {
             _buildResults.AddFailure($"The {_decoratedTypeTag} class {type.Name} is is not decorated as an {_decoratedTypeTag}", $"Add the [{nameof(TDecorator)}] decorator to the class");
             return false;
         }
-        identifier = decorator.GetIdentifier();
-        _modelBuilder.BindIdentifierToType<TIdentifier, TId>(identifier, type);
+        AddBinding(decorator.GetIdentifier(), type);
         return true;
     }
 
@@ -60,14 +59,23 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     /// Adds all the <typeparamref name="TIdentifier"/> bindings found in the <see cref="Assembly"/> <see cref="Assembly.ExportedTypes"/>;
     /// </summary>
     /// <param name="assembly"></param>
-    public void AddFromAssembly(Assembly assembly)
+    public IEnumerable<(Type, TDecorator)> AddFromAssembly(Assembly assembly)
     {
+        var result = new List<(Type, TDecorator)>();
         foreach (var type in assembly.ExportedTypes)
         {
-            if (type.TryGetDecorator<TDecorator>(out var decorator))
+            if (!type.TryGetDecorator<TDecorator>(out var decorator))
             {
-                _modelBuilder.BindIdentifierToType<TIdentifier, TId>(decorator.GetIdentifier(), type);
+                continue;
             }
+            AddBinding(decorator.GetIdentifier(), type);
+            result.Add((type, decorator));
         }
+        return result;
+    }
+
+    void AddBinding(TIdentifier identifier, Type type)
+    {
+        _modelBuilder.BindIdentifierToType<TIdentifier, TId>(identifier, type);
     }
 }
