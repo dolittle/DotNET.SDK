@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.DependencyInversion;
 
@@ -9,15 +10,8 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Defines a builder than can build <see cref="IEventHandler"/>.
 /// </summary>
-public interface ICanTryBuildEventHandler
+public interface ICanTryBuildEventHandler : IEquatable<ICanTryBuildEventHandler>
 {
-    /// <summary>
-    /// Try to get the <see cref="EventHandlerId"/>. If it does not exist then the <see cref="IEventHandler"/> could not be made.
-    /// </summary>
-    /// <param name="identifier">The <see cref="EventHandlerId"/>.</param>
-    /// <returns>A value indicating whether the <see cref="EventHandlerId"/> is available.</returns>
-    bool TryGetIdentifier(out EventHandlerId identifier);
-    
     /// <summary>
     /// Builds event handler.
     /// </summary>

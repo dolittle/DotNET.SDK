@@ -1,8 +1,14 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
+using Dolittle.SDK.Events.Handling.Builder.Convention.Type;
 using Dolittle.SDK.Events.Handling.Internal;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,17 +19,25 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Represents an implementation of <see cref="IUnregisteredEventHandlers"/>.
 /// </summary>
-public class UnregisteredEventHandlers : IUnregisteredEventHandlers
+public class UnregisteredEventHandlers : UniqueBindings<EventHandlerId, IEventHandler>, IUnregisteredEventHandlers
 {
-    readonly IEventHandlerBindings _allBindings;
-    
+    readonly IEnumerable<ProcessorBuilderBinding<ConventionInstanceEventHandlerBuilder>> _instanceBuilders;
+    readonly IEnumerable<ProcessorBuilderBinding<ConventionTypeEventHandlerBuilder>> _typedBuilders;
+
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredEventHandlers"/> class.
     /// </summary>
-    /// <param name="allBindings"></param>
-    public UnregisteredEventHandlers(IEventHandlerBindings allBindings)
+    /// <param name="eventHandlers">The unique <see cref="IEventHandler"/> event handlers.</param>
+    /// <param name="instanceBuilders"></param>
+    /// <param name="typedBuilders"></param>
+    public UnregisteredEventHandlers(
+        IUniqueBindings<EventHandlerId, IEventHandler> eventHandlers,
+        IEnumerable<ProcessorBuilderBinding<ConventionInstanceEventHandlerBuilder>> instanceBuilders,
+        IEnumerable<ProcessorBuilderBinding<ConventionTypeEventHandlerBuilder>> typedBuilders)
+        : base(eventHandlers)
     {
-        _allBindings = allBindings;
+        _instanceBuilders = instanceBuilders;
+        _typedBuilders = typedBuilders;
     }
 
     /// <inheritdoc />
@@ -35,7 +49,7 @@ public class UnregisteredEventHandlers : IUnregisteredEventHandlers
         CancellationToken cancelConnectToken,
         CancellationToken stopProcessingToken)
     {
-        foreach (var eventHandler in _allBindings.Values)
+        foreach (var eventHandler in Values)
         {
             eventProcessors.Register(
                 new EventHandlerProcessor(
@@ -51,13 +65,17 @@ public class UnregisteredEventHandlers : IUnregisteredEventHandlers
 
     void AddToContainer(EventHandlerId eventHandlerId, TenantScopedProvidersBuilder tenantScopedProvidersBuilder)
     {
-        if (_allBindings.Instances.HasFor(eventHandlerId))
+        var typedBuilderBinding = _typedBuilders.FirstOrDefault(_ => _.Identifier.Id.Equals(eventHandlerId.Value));
+        if (typedBuilderBinding != null)
         {
-            tenantScopedProvidersBuilder.AddTenantServices((_, collection) => collection.AddScoped(_allBindings.Typed.GetFor(eventHandlerId)));
+            tenantScopedProvidersBuilder.AddTenantServices((_, collection) => collection.AddScoped(typedBuilderBinding.ProcessorBuilder.EventHandlerType));
+            return;
         }
-        else if (_allBindings.Typed.HasFor(eventHandlerId))
+        
+        var instanceBuilderBinding = _instanceBuilders.FirstOrDefault(_ => _.Identifier.Id.Equals(eventHandlerId.Value));
+        if (instanceBuilderBinding != null)
         {
-            tenantScopedProvidersBuilder.AddTenantServices((_, collection) => collection.AddSingleton(_allBindings.Instances.GetFor(eventHandlerId)));
+            tenantScopedProvidersBuilder.AddTenantServices((_, collection) => collection.AddSingleton(instanceBuilderBinding.ProcessorBuilder.EventHandlerType, instanceBuilderBinding.ProcessorBuilder.EventHandlerInstance));
         }
     }
 }

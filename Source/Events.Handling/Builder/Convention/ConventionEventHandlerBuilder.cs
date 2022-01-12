@@ -18,21 +18,21 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention;
 public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
 {
     const string MethodName = "Handle";
-
-    readonly EventHandlerId _identifier;
-    readonly EventHandlerAttribute _attribute;
+    
+    readonly EventHandlerAttribute _decorator;
+    readonly object _eventHandlerInstance;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConventionEventHandlerBuilder"/> class.
     /// </summary>
+    /// <param name="decorator">The <see cref="EventHandlerAttribute"/> decorator.</param>
     /// <param name="eventHandlerType">The event handler <see cref="Type" />.</param>
-    protected ConventionEventHandlerBuilder(System.Type eventHandlerType)
+    /// <param name="eventHandlerInstance">The optional instance of the event handler class.</param>
+    protected ConventionEventHandlerBuilder(EventHandlerAttribute decorator, System.Type eventHandlerType, object eventHandlerInstance = default)
     {
         EventHandlerType = eventHandlerType;
-        if (TryGetAttribute(out _attribute))
-        {
-            _identifier = _attribute.Identifier;
-        }
+        _decorator = decorator;
+        _eventHandlerInstance = eventHandlerInstance;
     }
 
     /// <summary>
@@ -41,18 +41,23 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
     public System.Type EventHandlerType { get; }
 
     /// <inheritdoc />
-    public bool TryGetIdentifier(out EventHandlerId identifier)
-    {
-        identifier = _identifier;
-        return identifier != default;
-    }
-
-    /// <inheritdoc />
     public abstract bool TryBuild(
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
         System.Func<ITenantScopedProviders> tenantScopedProvidersFactory,
         out IEventHandler eventHandler);
+
+    /// <inheritdoc />
+    public bool Equals(ICanTryBuildEventHandler other)
+    {
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return other is ConventionEventHandlerBuilder otherBuilder
+            && (EventHandlerType == otherBuilder.EventHandlerType || _eventHandlerInstance.Equals(otherBuilder._eventHandlerInstance));
+    }
     
     /// <summary>
     /// Builds event handler.
@@ -71,17 +76,17 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
     {
         eventHandler = default;
         buildResults.AddInformation($"Building event handler from type {EventHandlerType}");
-        if (_attribute == default)
+        if (_decorator == default)
         {
             buildResults.AddFailure($"The event handler class {EventHandlerType} needs to be decorated with an [{nameof(EventHandlerAttribute)}(...)] attribute");
             return false;
         }
-        buildResults.AddInformation($"Building {(_attribute.Partitioned ? "partitioned" : "unpartitioned")} event handler {_identifier} processing events in scope {_attribute.Scope} from type {EventHandlerType}");
+        buildResults.AddInformation($"Building {(_decorator.Partitioned ? "partitioned" : "unpartitioned")} event handler {_decorator.Identifier} processing events in scope {_decorator.Scope} from type {EventHandlerType}");
 
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
 
         if (!TryBuildHandlerMethods(
-                _identifier,
+                _decorator.Identifier,
                 eventTypes,
                 createUntypedHandlerMethod,
                 createTypedHandlerMethod,
@@ -91,9 +96,9 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
             return false;
         }
 
-        eventHandler = _attribute.HasAlias
-            ? new EventHandler(_identifier, _attribute.Alias, _attribute.Scope, _attribute.Partitioned, eventTypesToMethods)
-            : new EventHandler(_identifier, EventHandlerType.Name, _attribute.Scope, _attribute.Partitioned, eventTypesToMethods);
+        eventHandler = _decorator.HasAlias
+            ? new EventHandler(_decorator.Identifier, _decorator.Alias, _decorator.Scope, _decorator.Partitioned, eventTypesToMethods)
+            : new EventHandler(_decorator.Identifier, EventHandlerType.Name, _decorator.Scope, _decorator.Partitioned, eventTypesToMethods);
 
         return true;
     }

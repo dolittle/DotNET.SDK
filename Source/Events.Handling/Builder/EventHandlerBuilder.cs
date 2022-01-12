@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
@@ -15,29 +16,26 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandler
 {
     readonly EventHandlerId _eventHandlerId;
+    readonly IModelBuilder _modelBuilder;
     readonly EventHandlerMethodsBuilder _methodsBuilder;
-
-    ScopeId _scopeId = ScopeId.Default;
 
     EventHandlerAlias _alias;
     bool _hasAlias;
     bool _partitioned = true;
+    ScopeId _scopeId = ScopeId.Default;
+    EventHandlerModelId ModelId => new(_eventHandlerId, _scopeId);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
-    public EventHandlerBuilder(EventHandlerId eventHandlerId)
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    public EventHandlerBuilder(EventHandlerId eventHandlerId, IModelBuilder modelBuilder)
     {
         _eventHandlerId = eventHandlerId;
+        _modelBuilder = modelBuilder;
         _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
-    }
-    
-    /// <inheritdoc />
-    public bool TryGetIdentifier(out EventHandlerId identifier)
-    {
-        identifier = _eventHandlerId;
-        return true;
+        Bind();
     }
 
     /// <inheritdoc />
@@ -57,7 +55,9 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <inheritdoc />
     public IEventHandlerBuilder InScope(ScopeId scopeId)
     {
+        Unbind();
         _scopeId = scopeId;
+        Bind();
         return this;
     }
 
@@ -90,5 +90,18 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
             ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
             : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
         return true;
+    }
+
+    /// <inheritdoc />
+    public bool Equals(ICanTryBuildEventHandler other)
+        => other is EventHandlerBuilder otherBuilder && _eventHandlerId.Equals(otherBuilder._eventHandlerId) && _scopeId.Equals(otherBuilder._scopeId);
+
+    void Bind()
+    {
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(ModelId, this);
+    }
+    void Unbind()
+    {
+        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(ModelId, this);
     }
 }

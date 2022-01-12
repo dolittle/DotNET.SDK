@@ -13,14 +13,15 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 /// <summary>
 /// Methods for building <see cref="IEventHandler"/> instances by convention from an instantiated event handler class.
 /// </summary>
-public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuilder
+public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuilder, IEquatable<ConventionInstanceEventHandlerBuilder>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ConventionInstanceEventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerInstance">The event handler instance.</param>
-    public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance)
-        : base(eventHandlerInstance.GetType())
+    /// <param name="decorator">The <see cref="EventHandlerAttribute"/>.</param>
+    public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance, EventHandlerAttribute decorator)
+        : base(decorator, eventHandlerInstance.GetType(), eventHandlerInstance)
     {
         EventHandlerInstance = eventHandlerInstance;
     }
@@ -30,6 +31,10 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
     /// </summary>
     public object EventHandlerInstance { get; }
     
+    /// <inheritdoc />
+    public bool Equals(ConventionInstanceEventHandlerBuilder other)
+        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other as ICanTryBuildEventHandler);
+
     /// <inheritdoc/>
     public override bool TryBuild(
         IEventTypes eventTypes,

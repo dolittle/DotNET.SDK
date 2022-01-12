@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.Model;
 
 namespace Dolittle.SDK.Events.Handling;
 
@@ -10,7 +11,7 @@ namespace Dolittle.SDK.Events.Handling;
 /// Decorates a class to indicate the Event Handler Id of the Event Handler class.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class EventHandlerAttribute : Attribute, IUniqueBindingDecorator<EventHandlerId>
+public class EventHandlerAttribute : Attribute, IDecoratedTypeDecorator<EventHandlerModelId>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerAttribute"/> class.
@@ -58,5 +59,5 @@ public class EventHandlerAttribute : Attribute, IUniqueBindingDecorator<EventHan
     public bool HasAlias { get; }
 
     /// <inheritdoc />
-    public EventHandlerId GetIdentifier() => Identifier;
+    public EventHandlerModelId GetIdentifier() => new(Identifier, Scope);
 }

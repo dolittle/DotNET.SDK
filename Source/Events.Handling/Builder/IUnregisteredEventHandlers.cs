@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Defines a collection of unregistered event handlers.
 /// </summary>
-public interface IUnregisteredEventHandlers
+public interface IUnregisteredEventHandlers : IUniqueBindings<EventHandlerId, IEventHandler>
 {
     /// <summary>
     /// Registers event handlers.
