@@ -56,7 +56,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
         }
 
         return other is ConventionEventHandlerBuilder otherBuilder
-            && (EventHandlerType == otherBuilder.EventHandlerType || _eventHandlerInstance.Equals(otherBuilder._eventHandlerInstance));
+            && EventHandlerType == otherBuilder.EventHandlerType && _eventHandlerInstance.Equals(otherBuilder._eventHandlerInstance);
     }
     
     /// <summary>

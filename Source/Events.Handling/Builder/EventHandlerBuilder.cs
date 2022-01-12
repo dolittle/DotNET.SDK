@@ -93,8 +93,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildEventHandler other)
-        => other is EventHandlerBuilder otherBuilder && _eventHandlerId.Equals(otherBuilder._eventHandlerId) && _scopeId.Equals(otherBuilder._scopeId);
+    public bool Equals(ICanTryBuildEventHandler other) => ReferenceEquals(this, other);
 
     void Bind()
     {
