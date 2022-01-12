@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Artifacts;
 
@@ -12,11 +11,10 @@ namespace Dolittle.SDK.Artifacts;
 /// </summary>
 /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-public interface IArtifacts<TArtifact, TId> : IUniqueBindings<TArtifact, Type>
+public interface IArtifacts<TArtifact, TId>
     where TArtifact : Artifact<TId>, IEquatable<TArtifact>
     where TId : ArtifactId
 {
-    
     /// <summary>
     /// Gets all artifacts.
     /// </summary>

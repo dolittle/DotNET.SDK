@@ -25,8 +25,15 @@ public abstract class Artifacts<TArtifact, TId> : UniqueBindings<TArtifact, Type
     {
     }
 
+    /// <summary>
+    /// Initializes an instance of the <see cref="Artifacts{TArtifact,TId}"/> class.
+    /// </summary>
+    protected Artifacts()
+    {
+    }
+
     /// <inheritdoc/>
-    public IEnumerable<TArtifact> All => Identifiers;
+    public IEnumerable<TArtifact> All => Keys;
     
     /// <inheritdoc/>
     public IEnumerable<Type> Types => Values;
@@ -43,7 +50,6 @@ public abstract class Artifacts<TArtifact, TId> : UniqueBindings<TArtifact, Type
     public bool HasFor<T>()
         where T : class
         => HasFor(typeof(T));
-
 
     /// <inheritdoc />
     public bool HasTypeFor(TArtifact artifact) => base.HasFor(artifact);
