@@ -18,7 +18,7 @@ namespace Dolittle.SDK.Projections.Store.Builders
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
         readonly IResolveCallContext _callContextResolver;
-        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
+        readonly IProjectionReadModelTypes _projectionAssociations;
         readonly IConvertProjectionsToSDK _projectionsToSDKConverter;
         readonly ILoggerFactory _loggerFactory;
 
@@ -28,14 +28,14 @@ namespace Dolittle.SDK.Projections.Store.Builders
         /// <param name="caller">The caller for unary calls.</param>
         /// <param name="executionContext">The base <see cref="ExecutionContext"/> to use.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
-        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations" />.</param>
+        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypes" />.</param>
         /// <param name="projectionsToSDKConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public ProjectionStoreBuilder(
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
             IResolveCallContext callContextResolver,
-            IProjectionReadModelTypeAssociations projectionAssociations,
+            IProjectionReadModelTypes projectionAssociations,
             IConvertProjectionsToSDK projectionsToSDKConverter,
             ILoggerFactory loggerFactory)
         {

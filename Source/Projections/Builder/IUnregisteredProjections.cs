@@ -4,6 +4,7 @@
 using System.Threading;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 
@@ -30,4 +31,9 @@ public interface IUnregisteredProjections : IUniqueBindings<ProjectionId, IProje
         ILoggerFactory loggerFactory,
         CancellationToken cancelConnectToken,
         CancellationToken stopProcessingToken);
+    
+    /// <summary>
+    /// Gets the <see cref="IProjectionReadModelTypes"/>.
+    /// </summary>
+    IProjectionReadModelTypes ReadModelTypes { get; }
 }

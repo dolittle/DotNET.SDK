@@ -8,6 +8,7 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Projections.Internal;
+using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 
@@ -18,14 +19,15 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 public class UnregisteredProjections : UniqueBindings<ProjectionId, IProjection>, IUnregisteredProjections
 {
-
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredProjections"/> class.
     /// </summary>
     /// <param name="eventHandlers">The unique <see cref="IProjection"/> projections.</param>
-    public UnregisteredProjections(IUniqueBindings<ProjectionId, IProjection> eventHandlers)
+    /// <param name="readModelTypes">The <see cref="IProjectionReadModelTypes"/>.</param>
+    public UnregisteredProjections(IUniqueBindings<ProjectionId, IProjection> eventHandlers, IProjectionReadModelTypes readModelTypes)
         : base(eventHandlers)
     {
+        ReadModelTypes = readModelTypes;
     }
 
     /// <inheritdoc />
@@ -50,6 +52,9 @@ public class UnregisteredProjections : UniqueBindings<ProjectionId, IProjection>
                 stopProcessingToken);
         }
     }
+
+    /// <inheritdoc />
+    public IProjectionReadModelTypes ReadModelTypes { get; }
 
     static EventProcessor<ProjectionId, ProjectionRegistrationRequest, ProjectionRequest, ProjectionResponse> CreateProjectionsProcessor(
         IProjection projection,

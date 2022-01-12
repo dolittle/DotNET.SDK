@@ -10,4 +10,4 @@ namespace Dolittle.SDK.Projections.Store;
 /// </summary>
 /// <param name="Identifier">The unique identifier for projection - <see cref="ProjectionId" />.</param>
 /// <param name="ScopeId">The scope the projection is in.</param>
-public record ScopedProjectionIdentifier(ProjectionId Identifier, ScopeId ScopeId);
+public record ScopedProjectionId(ProjectionId Identifier, ScopeId ScopeId);

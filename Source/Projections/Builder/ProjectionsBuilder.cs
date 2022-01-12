@@ -9,8 +9,7 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-
-
+using Dolittle.SDK.Projections.Store;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -103,6 +102,14 @@ public class ProjectionsBuilder : IProjectionsBuilder
                 projections.Add(projection);
             }
         }
-        return new UnregisteredProjections(new UniqueBindings<ProjectionId, IProjection>(projections.ToDictionary(_ => _.Identifier, _ => _)));
+        var identifiers = model.GetTypeBindings<ProjectionModelId, ProjectionId>();
+        var readModelTypes = new ProjectionReadModelTypes();
+        foreach (var (identifier, type) in identifiers)
+        {
+            readModelTypes.Add(new ScopedProjectionId(identifier.Id, identifier.Scope), type);
+        }
+        return new UnregisteredProjections(
+            new UniqueBindings<ProjectionId, IProjection>(projections.ToDictionary(_ => _.Identifier, _ => _)),
+            readModelTypes);
     }
 }
