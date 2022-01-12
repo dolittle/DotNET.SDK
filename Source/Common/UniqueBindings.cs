@@ -8,61 +8,118 @@ using System.Linq;
 namespace Dolittle.SDK.Common;
 
 /// <summary>
-/// Represents an implementation of <see cref="UniqueBindings{TIdentifier,TValue}"/>.
+/// Represents an implementation of <see cref="IUniqueBindings{TKey,TValue}"/>.
 /// </summary>
-/// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
-/// <typeparam name="TValue">The <see cref="Type" /> of the value to associate with the unique identifier.</typeparam>
-public class UniqueBindings<TIdentifier, TValue> : IUniqueBindings<TIdentifier, TValue>
-    where TIdentifier : IEquatable<TIdentifier>
-    where TValue : class
+/// <typeparam name="TKey">The <see cref="Type" /> of the unique key.</typeparam>
+/// <typeparam name="TValue">The <see cref="Type" /> of the unique value to associate with the unique key.</typeparam>
+public class UniqueBindings<TKey, TValue> : IUniqueBindings<TKey, TValue>
 {
-    readonly IDictionary<TValue, TIdentifier> _valueToIdentifier;
+    readonly Dictionary<TValue, TKey> _valueToKey = new();
+    readonly Dictionary<TKey, TValue> _keyToValue = new();
 
     /// <summary>
     /// Initializes an instance of the <see cref="UniqueBindings{TIdentifier,TValue}"/> class.
     /// </summary>
     /// <param name="bindings"></param>
-    public UniqueBindings(IDictionary<TIdentifier, TValue> bindings)
+    public UniqueBindings(IDictionary<TKey, TValue> bindings)
     {
-        Bindings = bindings.ToDictionary(_ => _.Key, _ => _.Value);
-        _valueToIdentifier = bindings.ToDictionary(_ => _.Value, _ => _.Key);
+        foreach (var binding in bindings)
+        {
+            Add(binding);
+        }
     }
 
     /// <summary>
     /// Initializes an instance of the <see cref="UniqueBindings{TIdentifier,TValue}"/> class.
     /// </summary>
     /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/>.</param>
-    public UniqueBindings(IUniqueBindings<TIdentifier, TValue> bindings)
+    public UniqueBindings(IUniqueBindings<TKey, TValue> bindings)
     {
-        Bindings = bindings.Bindings;
+        foreach (var (key, value) in bindings.Bindings)
+        {
+            AddBinding(key, value);
+        }
+    }
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="UniqueBindings{TKey,TValue}"/> class.
+    /// </summary>
+    public UniqueBindings()
+    {
     }
 
     /// <inheritdoc />
-    public IDictionary<TIdentifier, TValue> Bindings { get; }
+    public IEnumerable<(TKey, TValue)> Bindings => _keyToValue.Select(_ => (_.Key, _.Value));
 
     /// <inheritdoc />
-    public IEnumerable<TIdentifier> Identifiers => Bindings.Keys;
+    public IEnumerable<TKey> Keys => _keyToValue.Keys;
 
     /// <inheritdoc />
-    public IEnumerable<TValue> Values => _valueToIdentifier.Keys;
+    public IEnumerable<TValue> Values => _valueToKey.Keys;
 
     /// <inheritdoc />
-    public bool HasFor(TIdentifier identifier)
-        => Bindings.ContainsKey(identifier);
+    public bool HasFor(TKey key)
+        => _keyToValue.ContainsKey(key);
 
     /// <inheritdoc />
     public bool HasFor(TValue value)
-        => _valueToIdentifier.ContainsKey(value);
+        => _valueToKey.ContainsKey(value);
 
     /// <inheritdoc />
-    public TValue GetFor(TIdentifier identifier)
-        => Bindings.TryGetValue(identifier, out var value)
+    public TValue GetFor(TKey key)
+        => _keyToValue.TryGetValue(key, out var value)
             ? value
-            : throw new MissingUniqueBindingForIdentifier<TIdentifier, TValue>(identifier);
+            : throw new MissingUniqueBindingForKey<TKey, TValue>(key);
 
     /// <inheritdoc />
-    public TIdentifier GetFor(TValue value)
-        => _valueToIdentifier.TryGetValue(value, out var identifier)
+    public TKey GetFor(TValue value)
+        => _valueToKey.TryGetValue(value, out var identifier)
             ? identifier
-            : throw new MissingUniqueBindingForValue<TIdentifier, TValue>(value);
+            : throw new MissingUniqueBindingForValue<TKey, TValue>(value);
+
+    /// <summary>
+    /// Adds a <typeparamref name="TKey"/> to <typeparamref name="TValue"/> binding.
+    /// </summary>
+    /// <param name="key">The unique key.</param>
+    /// <param name="value">The unique value.</param>
+    public void Add(TKey key, TValue value)
+    {
+        ThrowIfValueAlreadyAssociatedWithKey(value, key);
+        ThrowIfKeyAlreadyAssociatedWithValue(key, value);
+
+        AddBinding(key, value);
+    }
+
+    /// <summary>
+    /// Adds a <typeparamref name="TKey"/> to <typeparamref name="TValue"/> binding.
+    /// </summary>
+    /// <param name="binding">The unique <typeparamref name="TKey"/> to <typeparamref name="TValue"/> binding.</param>
+    public void Add((TKey, TValue) binding) => Add(binding.Item1, binding.Item2);
+    
+    /// <summary>
+    /// Adds a <typeparamref name="TKey"/> to <typeparamref name="TValue"/> binding.
+    /// </summary>
+    /// <param name="binding">The unique <typeparamref name="TKey"/> to <typeparamref name="TValue"/> binding.</param>
+    public void Add(KeyValuePair<TKey, TValue> binding) => Add(binding.Key, binding.Value);
+
+    void AddBinding(TKey key, TValue value)
+    {
+        _valueToKey.Add(value, key);
+        _keyToValue.Add(key, value);
+    }
+    void ThrowIfKeyAlreadyAssociatedWithValue(TKey key, TValue value)
+    {
+        if (_keyToValue.TryGetValue(key, out var existingValue))
+        {
+            throw new CannotHaveMultipleValuesAssociatedWithKey<TKey, TValue>(key, value, existingValue);
+        }
+    }
+
+    void ThrowIfValueAlreadyAssociatedWithKey(TValue value, TKey key)
+    {
+        if (_valueToKey.TryGetValue(value, out var existingKey))
+        {
+            throw new CannotHaveMultipleKeysAssociatedWithValue<TKey, TValue>(value, key, existingKey);
+        }
+    }
 }

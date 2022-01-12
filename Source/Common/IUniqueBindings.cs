@@ -7,23 +7,21 @@ using System.Collections.Generic;
 namespace Dolittle.SDK.Common;
 
 /// <summary>
-/// Defines a collection of unique bindings
+/// Defines a read-only collection of unique bindings where each <typeparamref name="TKey"/> and <typeparamref name="TValue"/> is unique.
 /// </summary>
-/// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
-/// <typeparam name="TValue">The <see cref="Type" /> of the value to associate with the unique identifier.</typeparam>
-public interface IUniqueBindings<TIdentifier, TValue>
-    where TIdentifier : IEquatable<TIdentifier>
-    where TValue : class
+/// <typeparam name="TKey">The <see cref="Type" /> of the unique key.</typeparam>
+/// <typeparam name="TValue">The <see cref="Type" /> of the unique value to associate with the unique key.</typeparam>
+public interface IUniqueBindings<TKey, TValue>
 {
     /// <summary>
-    /// Gets all the <typeparamref name="TIdentifier"/> to <typeparamref name="TValue"/> bindings.
+    /// Gets all the <typeparamref name="TKey"/> and <typeparamref name="TValue"/> bindings.
     /// </summary>
-    IDictionary<TIdentifier, TValue> Bindings { get; }
+    IEnumerable<(TKey, TValue)> Bindings { get; }
 
     /// <summary>
-    /// Gets all the <typeparamref name="TIdentifier"/>.
+    /// Gets all the <typeparamref name="TKey"/>.
     /// </summary>
-    IEnumerable<TIdentifier> Identifiers { get; }
+    IEnumerable<TKey> Keys { get; }
         
     /// <summary>
     /// Gets all the <typeparamref name="TValue"/>.
@@ -31,11 +29,11 @@ public interface IUniqueBindings<TIdentifier, TValue>
     IEnumerable<TValue> Values { get; }
 
     /// <summary>
-    /// Check if there is binding for <typeparamref name="TIdentifier"/>.
+    /// Check if there is binding for <typeparamref name="TKey"/>.
     /// </summary>
-    /// <param name="identifier">The <typeparamref name="TIdentifier"/>.</param>
+    /// <param name="key">The <typeparamref name="TKey"/>.</param>
     /// <returns><see cref="bool"/>.</returns>
-    bool HasFor(TIdentifier identifier);
+    bool HasFor(TKey key);
     
     /// <summary>
     /// Check if there is binding for <typeparamref name="TValue"/>.
@@ -45,16 +43,16 @@ public interface IUniqueBindings<TIdentifier, TValue>
     bool HasFor(TValue value);
 
     /// <summary>
-    /// Gets the <typeparamref name="TValue"/> bound to the <typeparamref name="TIdentifier"/>.
+    /// Gets the <typeparamref name="TValue"/> bound to the <typeparamref name="TKey"/>.
     /// </summary>
-    /// <param name="identifier">The <typeparamref name="TIdentifier"/>.</param>
+    /// <param name="key">The <typeparamref name="TKey"/>.</param>
     /// <returns><see cref="TValue"/>.</returns>
-    TValue GetFor(TIdentifier identifier);
+    TValue GetFor(TKey key);
     
     /// <summary>
-    /// Gets the <typeparamref name="TIdentifier"/> bound to the <typeparamref name="TValue"/>.
+    /// Gets the <typeparamref name="TKey"/> bound to the <typeparamref name="TValue"/>.
     /// </summary>
     /// <param name="value">The <typeparamref name="TValue"/>.</param>
-    /// <returns><see cref="TIdentifier"/>.</returns>
-    TIdentifier GetFor(TValue value);
+    /// <returns><see cref="TKey"/>.</returns>
+    TKey GetFor(TValue value);
 }
