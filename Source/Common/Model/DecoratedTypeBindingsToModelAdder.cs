@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
 
@@ -34,7 +35,6 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
         _modelBuilder = modelBuilder;
         _buildResults = buildResults;
     }
-
     
     /// <summary>
     /// Try add the <typeparamref name="TIdentifier"/> derived from the <typeparamref name="TDecorator"/> on the given <see cref="Type"/>.
@@ -54,5 +54,20 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
         identifier = decorator.GetIdentifier();
         _modelBuilder.BindIdentifierToType<TIdentifier, TId>(identifier, type);
         return true;
+    }
+
+    /// <summary>
+    /// Adds all the <typeparamref name="TIdentifier"/> bindings found in the <see cref="Assembly"/> <see cref="Assembly.ExportedTypes"/>;
+    /// </summary>
+    /// <param name="assembly"></param>
+    public void AddFromAssembly(Assembly assembly)
+    {
+        foreach (var type in assembly.ExportedTypes)
+        {
+            if (type.TryGetDecorator<TDecorator>(out var decorator))
+            {
+                _modelBuilder.BindIdentifierToType<TIdentifier, TId>(decorator.GetIdentifier(), type);
+            }
+        }
     }
 }
