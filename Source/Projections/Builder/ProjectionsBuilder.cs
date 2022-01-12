@@ -5,113 +5,104 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
+using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Projections.Store;
-using Dolittle.SDK.Projections.Store.Converters;
-using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Projections.Builder
+
+
+namespace Dolittle.SDK.Projections.Builder;
+
+/// <summary>
+/// Represents the builder for configuring event handlers.
+/// </summary>
+public class ProjectionsBuilder : IProjectionsBuilder
 {
+    readonly IModelBuilder _modelBuilder;
+    readonly IClientBuildResults _buildResults;
+    readonly DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId> _decoratedTypeBindings;
+
     /// <summary>
-    /// Represents the builder for configuring event handlers.
+    /// Initializes a new instance of the <see cref="ProjectionsBuilder"/> class.
     /// </summary>
-    public class ProjectionsBuilder
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
     {
-        readonly List<ICanBuildAndRegisterAProjection> _builders = new List<ICanBuildAndRegisterAProjection>();
-        readonly Dictionary<Type, ICanBuildAndRegisterAProjection> _typedBuilders = new Dictionary<Type, ICanBuildAndRegisterAProjection>();
-        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
+        _modelBuilder = modelBuilder;
+        _buildResults = buildResults;
+        _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId>("projection", modelBuilder, buildResults);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectionsBuilder"/> class.
-        /// </summary>
-        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations"/>.</param>
-        public ProjectionsBuilder(IProjectionReadModelTypeAssociations projectionAssociations)
+
+    /// <inheritdoc />
+    public IProjectionBuilder CreateProjection(ProjectionId projectionId)
+    {
+        var builder = new ProjectionBuilder(projectionId, _modelBuilder);
+        return builder;
+    }
+
+    /// <inheritdoc />
+    public IProjectionsBuilder RegisterProjection<TProjection>()
+        where TProjection : class, new()
+        => RegisterProjection(typeof(TProjection));
+
+
+    /// <inheritdoc />
+    public IProjectionsBuilder RegisterProjection(Type type)
+    {
+        if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
         {
-            _projectionAssociations = projectionAssociations;
-        }
-
-        /// <summary>
-        /// Start building an projection.
-        /// </summary>
-        /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
-        /// <returns>The <see cref="ProjectionBuilder" /> for continuation.</returns>
-        public ProjectionBuilder CreateProjection(ProjectionId projectionId)
-        {
-            var builder = new ProjectionBuilder(projectionId, _projectionAssociations);
-            _builders.Add(builder);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as a projection class.
-        /// </summary>
-        /// <typeparam name="TProjection">The <see cref="Type" /> that is the projection class.</typeparam>
-        /// <returns>The <see cref="ProjectionsBuilder" /> for continuation.</returns>
-        public ProjectionsBuilder RegisterProjection<TProjection>()
-            where TProjection : class, new()
-            => RegisterProjection(typeof(TProjection));
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as a projection class.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> of the projection.</param>
-        /// <returns>The <see cref="ProjectionsBuilder" /> for continuation.</returns>
-        public ProjectionsBuilder RegisterProjection(Type type)
-        {
-            var builder = Activator.CreateInstance(
-                    typeof(ConventionProjectionBuilder<>).MakeGenericType(type))
-                    as ICanBuildAndRegisterAProjection;
-            _typedBuilders[type] = builder;
-            _projectionAssociations.Associate(type);
             return this;
         }
+        BindBuilder(type, decorator);
+        return this;
+    }
 
-        /// <summary>
-        /// Registers all projection classes from an <see cref="Assembly" />.
-        /// </summary>
-        /// <param name="assembly">The <see cref="Assembly" /> to register the projection classes from.</param>
-        /// <returns>The <see cref="ProjectionsBuilder" /> for continuation.</returns>
-        public ProjectionsBuilder RegisterAllFrom(Assembly assembly)
+    /// <inheritdoc />
+    public IProjectionsBuilder RegisterAllFrom(Assembly assembly)
+    {
+        var addedEventHandlerBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
+        foreach (var (type, decorator) in addedEventHandlerBindings)
         {
-            foreach (var type in assembly.ExportedTypes)
-            {
-                if (IsProjection(type))
-                {
-                    RegisterProjection(type);
-                }
-            }
-
-            return this;
+            BindBuilder(type, decorator);
         }
 
-        /// <summary>
-        /// Build and registers projections.
-        /// </summary>
-        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
-        /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
-        public void BuildAndRegister(
-            IEventProcessors eventProcessors,
-            IEventTypes eventTypes,
-            IEventProcessingConverter processingConverter,
-            IConvertProjectionsToSDK projectionConverter,
-            ILoggerFactory loggerFactory,
-            CancellationToken cancelConnectToken,
-            CancellationToken stopProcessingToken)
+        return this;
+    }
+
+    void BindBuilder(Type type, ProjectionAttribute decorator)
+        =>  _modelBuilder.BindIdentifierToProcessorBuilder(
+            decorator.GetIdentifier(),
+            CreateConventionProjectionBuilderFor(type, decorator));
+    
+    static ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type type, ProjectionAttribute decorator)
+        => Activator.CreateInstance(
+                typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
+                decorator)
+            as ICanTryBuildProjection;
+
+    /// <summary>
+    /// Build projections.
+    /// </summary>
+    /// <param name="model">The <see cref="IModel"/>.</param>
+    /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
+    public IUnregisteredProjections Build(
+        IModel model,
+        IEventTypes eventTypes,
+        IClientBuildResults buildResults)
+    {
+        var builders = model.GetProcessorBuilderBindings<ICanTryBuildProjection>();
+        var projections = new List<IProjection>();
+        foreach (var builder in builders.Select(_ => _.ProcessorBuilder))
         {
-            foreach (var builder in _builders.Concat(_typedBuilders.Values))
+            if (builder.TryBuild(eventTypes, buildResults, out var projection))
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, projectionConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
+                projections.Add(projection);
             }
         }
-
-        static bool IsProjection(Type type)
-            => type.GetCustomAttributes(typeof(ProjectionAttribute), true).FirstOrDefault() is ProjectionAttribute;
+        return new UnregisteredProjections(new UniqueBindings<ProjectionId, IProjection>(projections.ToDictionary(_ => _.Identifier, _ => _)));
     }
 }
