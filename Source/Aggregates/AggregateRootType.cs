@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates;

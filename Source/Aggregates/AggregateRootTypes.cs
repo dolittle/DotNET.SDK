@@ -22,4 +22,11 @@ public class AggregateRootTypes : Artifacts<AggregateRootType, AggregateRootId>,
         : base(bindings)
     {
     }
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="AggregateRootTypes"/> class.
+    /// </summary>
+    public AggregateRootTypes()
+    {
+    }
 }

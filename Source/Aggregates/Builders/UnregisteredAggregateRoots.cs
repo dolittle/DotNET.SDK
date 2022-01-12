@@ -21,7 +21,8 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
     /// Initializes an instance of the <see cref="UnregisteredAggregateRoots"/> class.
     /// </summary>
     /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> binding <see cref="AggregateRootType"/> to <see cref="Type"/>.</param>
-    public UnregisteredAggregateRoots(IUniqueBindings<AggregateRootType, Type> bindings) : base(bindings)
+    public UnregisteredAggregateRoots(IUniqueBindings<AggregateRootType, Type> bindings)
+        : base(bindings)
     {
     }
 

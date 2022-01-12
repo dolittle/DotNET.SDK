@@ -2,10 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates.Builders;
@@ -15,7 +17,21 @@ namespace Dolittle.SDK.Aggregates.Builders;
 /// </summary>
 public class AggregateRootsBuilder : IAggregateRootsBuilder
 {
-    readonly ClientArtifactsBuilder<AggregateRootType, AggregateRootId, AggregateRootAttribute> _artifactsBuilder = new();
+    readonly DecoratedTypeBindingsToModelAdder<AggregateRootAttribute, AggregateRootType, AggregateRootId> _decoratedTypeBindings;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="modelBuilder"></param>
+    /// <param name="buildResults"></param>
+    public AggregateRootsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
+    {
+        _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<AggregateRootAttribute, AggregateRootType, AggregateRootId>(
+            "aggregate root",
+            modelBuilder,
+            buildResults);
+    }
+
     /// <inheritdoc />
     public IAggregateRootsBuilder Register<T>()
         where T : class
@@ -24,14 +40,14 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     /// <inheritdoc />
     public IAggregateRootsBuilder Register(Type type)
     {
-        _artifactsBuilder.Add(type);
+        _decoratedTypeBindings.TryAdd(type, out _, out _);
         return this;
     }
     
     /// <inheritdoc />
     public IAggregateRootsBuilder RegisterAllFrom(Assembly assembly)
     {
-        _artifactsBuilder.AddAllFrom(assembly);
+        _decoratedTypeBindings.AddFromAssembly(assembly);
         return this;
     }
 
@@ -39,5 +55,9 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     /// Builds the aggregate roots by registering them with the Runtime.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public IUnregisteredAggregateRoots Build(IClientBuildResults buildResults) => new UnregisteredAggregateRoots(_artifactsBuilder.Build(buildResults));
+    public IUnregisteredAggregateRoots Build(IModel model)
+    {
+        var bindings = model.GetTypeBindings<AggregateRootType, AggregateRootId>();
+        return new UnregisteredAggregateRoots(new UniqueBindings<AggregateRootType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));
+    }
 }

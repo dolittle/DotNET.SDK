@@ -4,6 +4,7 @@
 using System;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates;
@@ -12,7 +13,7 @@ namespace Dolittle.SDK.Aggregates;
 /// The attribute for deciding the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class AggregateRootAttribute : Attribute, IUniqueBindingDecorator<AggregateRootType>
+public class AggregateRootAttribute : Attribute, IDecoratedTypeDecorator<AggregateRootType>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootAttribute"/> class.
