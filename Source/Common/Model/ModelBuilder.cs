@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
 
@@ -49,7 +50,11 @@ public class ModelBuilder : IModelBuilder
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Builds a valid Dolittle application model from the bindings.
+    /// </summary>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/> for keeping track of build results.</param>
+    /// <returns>The valid <see cref="IModel"/> representing the Dolittle application model.</returns>
     public IModel Build(IClientBuildResults buildResults)
     {
         var validBindings = new List<IBinding>();

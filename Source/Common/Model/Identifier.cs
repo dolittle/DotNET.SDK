@@ -29,7 +29,6 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
         _extras = extras;
     }
 
-    
     /// <inheritdoc />
     public override bool Equals(object obj)
     {

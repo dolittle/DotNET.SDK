@@ -3,14 +3,14 @@
 
 using System;
 
-namespace Dolittle.SDK.Common;
+namespace Dolittle.SDK.Common.Model;
 
 /// <summary>
 /// Defines the decorator for a unique binding.
 /// </summary>
 /// <typeparam name="TIdentifier">The <see cref="Type" /> of the unique identifier.</typeparam>
-public interface IUniqueBindingDecorator<out TIdentifier>
-    where TIdentifier : IEquatable<TIdentifier>
+public interface IDecoratedTypeDecorator<out TIdentifier>
+    where TIdentifier : IIdentifier
 {
     /// <summary>
     /// Gets the <typeparamref name="TIdentifier"/>.
