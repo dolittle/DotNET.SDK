@@ -3,7 +3,7 @@
 
 using System;
 using Dolittle.SDK.Artifacts;
-using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.Model;
 
 namespace Dolittle.SDK.Events;
 
@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Events;
 /// Decorates a class to indicate the <see cref="EventType" /> of an event class.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class EventTypeAttribute : Attribute, IUniqueBindingDecorator<EventType>
+public class EventTypeAttribute : Attribute, IDecoratedTypeDecorator<EventType>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EventTypeAttribute"/> class.

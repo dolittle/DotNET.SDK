@@ -17,7 +17,8 @@ public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
     /// Initializes an instance of the <see cref="EventTypes"/> class.
     /// </summary>
     /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for "/><see cref="EventType"/> to <see cref="Type"/>.</param>
-    public EventTypes(IUniqueBindings<EventType, Type> bindings) : base(bindings)
+    public EventTypes(IUniqueBindings<EventType, Type> bindings)
+        : base(bindings)
     {
     }
 }

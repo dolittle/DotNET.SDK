@@ -2,9 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 
 namespace Dolittle.SDK.Events.Builders;
 
@@ -13,7 +16,19 @@ namespace Dolittle.SDK.Events.Builders;
 /// </summary>
 public class EventTypesBuilder : IEventTypesBuilder
 {
-    readonly ClientArtifactsBuilder<EventType, EventTypeId, EventTypeAttribute> _artifactsBuilder = new();
+    readonly IModelBuilder _modelBuilder;
+    readonly DecoratedTypeBindingsToModelAdder<EventTypeAttribute, EventType, EventTypeId> _decoratedTypeBindings;
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="EventTypesBuilder"/> class.
+    /// </summary>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    public EventTypesBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
+    {
+        _modelBuilder = modelBuilder;
+        _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<EventTypeAttribute, EventType, EventTypeId>("event type", modelBuilder, buildResults);
+    }
 
     /// <inheritdoc />
     public IEventTypesBuilder Associate<T>(EventType eventType)
@@ -23,7 +38,7 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <inheritdoc />
     public IEventTypesBuilder Associate(Type type, EventType eventType)
     {
-        _artifactsBuilder.Add(eventType, type);
+        _modelBuilder.BindIdentifierToType<EventType, EventTypeId>(eventType, type);
         return this;
     }
 
@@ -53,20 +68,23 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <inheritdoc />
     public IEventTypesBuilder Register(Type type)
     {
-        _artifactsBuilder.Add(type);
+        _decoratedTypeBindings.TryAdd(type, out _, out _);
         return this;
     }
 
     /// <inheritdoc />
     public IEventTypesBuilder RegisterAllFrom(Assembly assembly)
     {
-        _artifactsBuilder.AddAllFrom(assembly);
+        _decoratedTypeBindings.AddFromAssembly(assembly);
         return this;
     }
 
     /// <summary>
     /// Builds the <see cref="IEventTypes"/>.
     /// </summary>
-    public IUnregisteredEventTypes Build(IClientBuildResults buildResults)
-        => new UnregisteredEventTypes(_artifactsBuilder.Build(buildResults));
+    public IUnregisteredEventTypes Build(IModel model)
+    {
+        var bindings = model.GetTypeBindings<EventType, EventTypeId>();
+        return new UnregisteredEventTypes(new UniqueBindings<EventType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));
+    }
 }

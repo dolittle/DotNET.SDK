@@ -72,11 +72,17 @@ public record EventType : Artifact<EventTypeId>
 
     static void ThrowIfEventTypeIdIsNull(EventTypeId id)
     {
-        if (id == null) throw new EventTypeIdCannotBeNull();
+        if (id == null)
+        {
+            throw new EventTypeIdCannotBeNull();
+        }
     }
 
     static void ThrowIfGenerationIsNull(Generation generation)
     {
-        if (generation == null) throw new EventTypeGenerationCannotBeNull();
+        if (generation == null)
+        {
+            throw new EventTypeGenerationCannotBeNull();
+        }
     }
 }

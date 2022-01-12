@@ -76,12 +76,17 @@ public class EventBuilder
 
     void ThrowIfEventTypeNotConfigured(EventType eventType)
     {
-        if (eventType == default) throw new EventTypeNotConfigured(_typeOfEvent);
+        if (eventType == default)
+        {
+            throw new EventTypeNotConfigured(_typeOfEvent);
+        }
     }
 
-    void ThrowIfEventTypeMismatch(EventType eventType, EventType associatedEventType)
+    static void ThrowIfEventTypeMismatch(EventType eventType, EventType associatedEventType)
     {
         if (eventType != default && eventType != associatedEventType)
+        {
             throw new ConfiguredEventTypeDoesNotMatchAssociatedEventType(eventType, associatedEventType);
+        }
     }
 }
