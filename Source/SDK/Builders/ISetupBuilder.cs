@@ -50,14 +50,14 @@ public interface ISetupBuilder
     /// </summary>
     /// <param name="callback">The builder callback.</param>
     /// <returns>The client builder for continuation.</returns>
-    public ISetupBuilder WithProjections(Action<ProjectionsBuilder> callback);
+    public ISetupBuilder WithProjections(Action<IProjectionsBuilder> callback);
 
     /// <summary>
     /// Sets the embeddings through the <see cref="EmbeddingsBuilder" />.
     /// </summary>
     /// <param name="callback">The builder callback.</param>
     /// <returns>The client builder for continuation.</returns>
-    public ISetupBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback);
+    public ISetupBuilder WithEmbeddings(Action<IEmbeddingsBuilder> callback);
 
     /// <summary>
     /// Sets the event horizons through the <see cref="SubscriptionsBuilder" />.

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Aggregates.Internal;
+using Dolittle.SDK.Builders;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Embeddings.Builder;
@@ -16,6 +17,7 @@ using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters;
+using Dolittle.SDK.Events.Filters.Builders;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Store.Builders;
@@ -42,69 +44,61 @@ namespace Dolittle.SDK;
 /// </summary>
 public class DolittleClient : IDisposable, IDolittleClient
 {
-    readonly EventTypesBuilder _eventTypesBuilder;
-    readonly IProjectionReadModelTypeAssociations _projectionAssociations;
-    readonly IEmbeddingReadModelTypeAssociations _embeddingAssociations;
-    readonly AggregateRootsBuilder _aggregateRootsBuilder;
-    readonly SubscriptionsBuilder _eventHorizonsBuilder;
-    readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
-    readonly EventHandlersBuilder _eventHandlersBuilder;
     readonly ICoordinateProcessing _processingCoordinator = new ProcessingCoordinator();
-    readonly EventFiltersBuilder _filtersBuilder;
     readonly IConvertProjectionsToSDK _projectionConverter = new ProjectionsToSDKConverter();
     readonly IResolveCallContext _callContextResolver = new CallContextResolver();
-    readonly ProjectionsBuilder _projectionsBuilder;
-    readonly EmbeddingsBuilder _embeddingsBuilder;
+    readonly IUnregisteredEventTypes _unregisteredEventTypes;
+    readonly IUnregisteredAggregateRoots _unregisteredAggregateRoots;
+    readonly IUnregisteredEventFilters _unregisteredEventFilters;
+    readonly EventHandlersBuilder _eventHandlersBuilder;
+    readonly IUnregisteredProjections _unregisteredProjections;
+    readonly IUnregisteredEmbeddings _unregisteredEmbeddings;
+    readonly SubscriptionsBuilder _eventHorizonsBuilder;
+    readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
 
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
     IEventProcessors _eventProcessors;
     IEventProcessingConverter _eventProcessingConverter;
-    IProjectionStoreBuilder _projections;
-    IEmbeddings _embeddings;
+    IProjectionStoreBuilder _projectionStoreBuilder;
+    IEventTypes _eventTypes;
+    IEmbeddings _embeddingStoreBuilder;
     ITenantScopedProviders _services;
 
     bool _disposed;
     IEnumerable<Tenant> _tenants;
     IResourcesBuilder _resources;
     IEventStoreBuilder _eventStore;
-    IEventTypes _eventTypes;
     IAggregatesBuilder _aggregates;
     CancellationTokenSource _eventProcessorCancellationTokenSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClient"/> class.
     /// </summary>
-    /// <param name="eventTypesBuilder">The <see cref="EventTypesBuilder"/>.</param>
-    /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations"/>.</param>
-    /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypeAssociations"/>.</param>
+    /// <param name="unregisteredEventTypes">The <see cref="IUnregisteredEventTypes"/>.</param>
+    /// <param name="unregisteredAggregateRoots">The <see cref="IUnregisteredAggregateRoots"/>.</param>
+    /// <param name="unregisteredEventFilters">The <see cref="IUnregisteredEventFilters"/>.</param>
     /// <param name="eventHandlersBuilder">The <see cref="EventHandlerBuilder"/>.</param>
-    /// <param name="aggregateRootsBuilder">The <see cref="AggregateRootsBuilder"/>.</param>
-    /// <param name="projectionsBuilder">The <see cref="ProjectionsBuilder"/>.</param>
-    /// <param name="embeddingsBuilder">The <see cref="EmbeddingsBuilder"/>.</param>
-    /// <param name="eventFiltersBuilder">The <see cref="EventFiltersBuilder"/>.</param>
+    /// <param name="unregisteredProjections">The <see cref="IUnregisteredProjections"/>.</param>
+    /// <param name="unregisteredEmbeddings">The <see cref="IUnregisteredEmbeddings"/>.</param>
     /// <param name="eventHorizonsBuilder">The <see cref="SubscriptionsBuilder"/>.</param>
     /// <param name="eventHorizonRetryPolicy">The <see cref="EventSubscriptionRetryPolicy"/>.</param>
     public DolittleClient(
-        EventTypesBuilder eventTypesBuilder,
-        IProjectionReadModelTypeAssociations projectionAssociations,
-        IEmbeddingReadModelTypeAssociations embeddingAssociations,
+        IUnregisteredEventTypes unregisteredEventTypes,
+        IUnregisteredAggregateRoots unregisteredAggregateRoots,
+        IUnregisteredEventFilters unregisteredEventFilters,
         EventHandlersBuilder eventHandlersBuilder,
-        AggregateRootsBuilder aggregateRootsBuilder,
-        ProjectionsBuilder projectionsBuilder,
-        EmbeddingsBuilder embeddingsBuilder,
-        EventFiltersBuilder eventFiltersBuilder,
+        IUnregisteredProjections unregisteredProjections,
+        IUnregisteredEmbeddings unregisteredEmbeddings,
         SubscriptionsBuilder eventHorizonsBuilder,
         EventSubscriptionRetryPolicy eventHorizonRetryPolicy)
     {
-        _eventTypesBuilder = eventTypesBuilder;
-        _projectionAssociations = projectionAssociations;
-        _embeddingAssociations = embeddingAssociations;
+        _unregisteredEventTypes = unregisteredEventTypes;
+        _unregisteredAggregateRoots = unregisteredAggregateRoots;
+        _unregisteredEventFilters = unregisteredEventFilters;
         _eventHandlersBuilder = eventHandlersBuilder;
-        _aggregateRootsBuilder = aggregateRootsBuilder;
-        _projectionsBuilder = projectionsBuilder;
-        _embeddingsBuilder = embeddingsBuilder;
-        _filtersBuilder = eventFiltersBuilder;
+        _unregisteredProjections = unregisteredProjections;
+        _unregisteredEmbeddings = unregisteredEmbeddings;
         _eventHorizonsBuilder = eventHorizonsBuilder;
         _eventHorizonRetryPolicy = eventHorizonRetryPolicy;
     }
@@ -157,15 +151,15 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <inheritdoc />
     public IProjectionStoreBuilder Projections
     {
-        get => GetOrThrowIfNotConnected(_projections);
-        private set => _projections = value;
+        get => GetOrThrowIfNotConnected(_projectionStoreBuilder);
+        private set => _projectionStoreBuilder = value;
     }
 
     /// <inheritdoc />
     public IEmbeddings Embeddings
     {
-        get => GetOrThrowIfNotConnected(_embeddings);
-        private set => _embeddings = value;
+        get => GetOrThrowIfNotConnected(_embeddingStoreBuilder);
+        private set => _embeddingStoreBuilder = value;
     }
 
     /// <inheritdoc />
@@ -179,10 +173,10 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// Create a client builder for a Microservice.
     /// </summary>
     /// <param name="setup">The optional <see cref="SetupDolittleClient"/> callback.</param>
-    /// <returns>The <see cref="DolittleClientBuilder"/> to build the <see cref="DolittleClient"/> from.</returns>
+    /// <returns>The built <see cref="IDolittleClient"/>.</returns>
     public static IDolittleClient Setup(SetupDolittleClient setup = default)
     {
-        var builder = new DolittleClientBuilder();
+        var builder = new SetupBuilder();
         setup?.Invoke(builder);
         return builder.Build();
     }
@@ -278,7 +272,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     {
         var aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
         EventTypes = new EventTypes(loggerFactory.CreateLogger<EventTypes>());
-        _eventTypesBuilder.AddAssociationsInto(_eventTypes);
+        _eventTypesBuilder.AddAssociationsInto(_unregisteredEventTypes);
         await _eventTypesBuilder.BuildAndRegister(
             new Events.Internal.EventTypesClient(
                 methodCaller,
@@ -290,7 +284,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             methodCaller,
             executionContext,
             loggerFactory);
-        var serializer = new EventContentSerializer(_eventTypes, eventSerializerProvider);
+        var serializer = new EventContentSerializer(_unregisteredEventTypes, eventSerializerProvider);
         _eventsToProtobufConverter = new EventToProtobufConverter(serializer);
         var eventToSDKConverter = new EventToSDKConverter(serializer);
         var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
@@ -308,11 +302,11 @@ public class DolittleClient : IDisposable, IDolittleClient
             aggregateEventToSDKConverter,
             executionContext,
             _callContextResolver,
-            _eventTypes,
+            _unregisteredEventTypes,
             loggerFactory);
         Aggregates = new AggregatesBuilder(
             _eventStore,
-            _eventTypes,
+            _unregisteredEventTypes,
             aggregateRoots,
             loggerFactory);
 
@@ -353,7 +347,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         _eventProcessorCancellationTokenSource = new CancellationTokenSource();
         _eventHandlersBuilder.BuildAndRegister(
             _eventProcessors,
-            _eventTypes,
+            _unregisteredEventTypes,
             _eventProcessingConverter,
             tenantScopedProvidersBuilder,
             () => Services,
@@ -368,7 +362,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             GetStopProcessingToken());
         _projectionsBuilder.BuildAndRegister(
             _eventProcessors,
-            _eventTypes,
+            _unregisteredEventTypes,
             _eventProcessingConverter,
             _projectionConverter,
             loggerFactory,
@@ -376,7 +370,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             GetStopProcessingToken());
         _embeddingsBuilder.BuildAndRegister(
             _eventProcessors,
-            _eventTypes,
+            _unregisteredEventTypes,
             _eventsToProtobufConverter,
             _projectionConverter,
             loggerFactory,

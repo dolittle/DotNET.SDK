@@ -7,14 +7,14 @@ using System.Reflection;
 using System.Threading.Tasks;
 using BaselineTypeDiscovery;
 using Dolittle.SDK.Aggregates.Builders;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Embeddings.Builder;
-using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Projections.Builder;
-using Dolittle.SDK.Projections.Store;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Builders;
@@ -24,26 +24,30 @@ namespace Dolittle.SDK.Builders;
 /// </summary>
 public class SetupBuilder : ISetupBuilder
 {
-    readonly EventTypesBuilder _eventTypesBuilder = new();
-    readonly AggregateRootsBuilder _aggregateRootsBuilder = new();
-    readonly EventFiltersBuilder _eventFiltersBuilder = new();
-    readonly EventHandlersBuilder _eventHandlersBuilder = new();
-    readonly SubscriptionsBuilder _eventHorizonsBuilder = new();
-    readonly ProjectionReadModelTypeAssociations _projectionAssociations = new();
-    readonly EmbeddingReadModelTypeAssociations _embeddingAssociations = new();
-    readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
+    readonly ModelBuilder _modelBuilder = new();
+    readonly ClientBuildResults _buildResults = new();
+    readonly EventTypesBuilder _eventTypesBuilder;
+    readonly AggregateRootsBuilder _aggregateRootsBuilder;
+    readonly EventFiltersBuilder _eventFiltersBuilder;
+    readonly EventHandlersBuilder _eventHandlersBuilder;
     readonly ProjectionsBuilder _projectionsBuilder;
     readonly EmbeddingsBuilder _embeddingsBuilder;
+    readonly SubscriptionsBuilder _eventHorizonsBuilder = new();
+    readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
     bool _withoutDiscovery;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SetupBuilder"/> class.
+    /// Initializes an instance of the <see cref="SetupBuilder"/> class.
     /// </summary>
     public SetupBuilder()
     {
-        _projectionsBuilder = new ProjectionsBuilder(_projectionAssociations);
-        _embeddingsBuilder = new EmbeddingsBuilder(_embeddingAssociations);
+        _eventTypesBuilder = new EventTypesBuilder(_modelBuilder, _buildResults);
+        _aggregateRootsBuilder = new AggregateRootsBuilder(_modelBuilder, _buildResults);
+        _eventFiltersBuilder = new EventFiltersBuilder(_modelBuilder);
+        _eventHandlersBuilder = new EventHandlersBuilder(_modelBuilder, _buildResults);
+        _projectionsBuilder = new ProjectionsBuilder(_modelBuilder, _buildResults);
+        _embeddingsBuilder = new EmbeddingsBuilder(_modelBuilder, _buildResults);
     }
 
     /// <inheritdoc />
@@ -75,14 +79,14 @@ public class SetupBuilder : ISetupBuilder
     }
 
     /// <inheritdoc />
-    public ISetupBuilder WithProjections(Action<ProjectionsBuilder> callback)
+    public ISetupBuilder WithProjections(Action<IProjectionsBuilder> callback)
     {
         callback(_projectionsBuilder);
         return this;
     }
 
     /// <inheritdoc />
-    public ISetupBuilder WithEmbeddings(Action<EmbeddingsBuilder> callback)
+    public ISetupBuilder WithEmbeddings(Action<IEmbeddingsBuilder> callback)
     {
         callback(_embeddingsBuilder);
         return this;
@@ -113,16 +117,15 @@ public class SetupBuilder : ISetupBuilder
             DiscoverAndRegisterAll();
         }
 
-        ApplyAllCallbacks();
+        var model = _modelBuilder.Build(_buildResults);
+        var unregisteredEventTypes = _eventTypesBuilder.Build(model);
         return new DolittleClient(
-            _eventTypesBuilder,
-            _projectionAssociations,
-            _embeddingAssociations,
+            unregisteredEventTypes,
+            _aggregateRootsBuilder.Build(model),
+            _eventFiltersBuilder.Build(model, _buildResults),
             _eventHandlersBuilder,
-            _aggregateRootsBuilder,
-            _projectionsBuilder,
-            _embeddingsBuilder,
-            _eventFiltersBuilder,
+            _projectionsBuilder.Build(model, unregisteredEventTypes, _buildResults),
+            _embeddingsBuilder.Build(model, unregisteredEventTypes, _buildResults),
             _eventHorizonsBuilder,
             _eventHorizonRetryPolicy);
     }
