@@ -3,116 +3,94 @@
 
 using System;
 using System.Linq;
-using System.Threading;
+using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Embeddings.Internal;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Events.Store.Converters;
-using Dolittle.SDK.Projections.Store.Converters;
-using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Methods for building <see cref="IEmbedding{TReadModel}"/> instances by convention from an instantiated embedding class.
+/// </summary>
+/// <typeparam name="TEmbedding">The <see cref="Type" /> of the embedding.</typeparam>
+public class ConventionEmbeddingBuilder<TEmbedding> : ICanTryBuildEmbedding
+    where TEmbedding : class, new()
 {
+    readonly Type _embeddingType = typeof(TEmbedding);
+    readonly EmbeddingAttribute _decorator;
+
     /// <summary>
-    /// Methods for building <see cref="IEmbedding{TReadModel}"/> instances by convention from an instantiated embedding class.
+    /// Initializes an instance of the <see cref="ConventionEmbeddingBuilder{TEmbedding}"/> class.
     /// </summary>
-    /// <typeparam name="TEmbedding">The <see cref="Type" /> of the embedding.</typeparam>
-    public class ConventionEmbeddingBuilder<TEmbedding> : ICanBuildAndRegisterAnEmbedding
-        where TEmbedding : class, new()
+    /// <param name="decorator">The <see cref="EmbeddingAttribute"/>.</param>
+    public ConventionEmbeddingBuilder(EmbeddingAttribute decorator)
     {
-        readonly Type _embeddingType = typeof(TEmbedding);
+        _decorator = decorator;
+    }
 
-        /// <inheritdoc/>
-        public void BuildAndRegister(
-            IEventProcessors eventProcessors,
-            IEventTypes eventTypes,
-            IConvertEventsToProtobuf eventsToProtobufConverter,
-            IConvertProjectionsToSDK projectionsConverter,
-            ILoggerFactory loggerFactory,
-            CancellationToken cancelConnectToken,
-            CancellationToken stopProcessingToken)
+    /// <inheritdoc/>
+    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
+    {
+        embedding = default;
+        buildResults.AddInformation($"Building embedding {_decorator.Identifier} from type {_embeddingType}");
+
+        if (!HasParameterlessConstructor())
         {
-            var logger = loggerFactory.CreateLogger(GetType());
-            logger.LogDebug("Building embedding from type {EmbeddingType}", _embeddingType);
-
-            if (!HasParameterlessConstructor())
-            {
-                logger.LogWarning("The embedding class {EmbeddingType} has no default/parameterless constructor", _embeddingType);
-                return;
-            }
-
-            if (HasMoreThanOneConstructor())
-            {
-                logger.LogWarning("The embedding class {EmbeddingType} has more than one constructor. It must only have one, parameterless, constructor", _embeddingType);
-                return;
-            }
-
-            if (!TryGetEmbeddingId(out var embeddingId))
-            {
-                logger.LogWarning("The embedding class {EmbeddingType} needs to be decorated with an [{EmbeddingAttribute}]", _embeddingType, nameof(EmbeddingAttribute));
-                return;
-            }
-
-            logger.LogTrace(
-                "Building embedding {Embedding} from type {EmbeddingType}",
-                embeddingId,
-                _embeddingType);
-
-            if (!ClassMethodBuilder<TEmbedding>
-                .ForProjection(embeddingId, eventTypes, loggerFactory)
-                .TryBuild(out var eventTypesToMethods))
-            {
-                return;
-            }
-
-            if (!ClassMethodBuilder<TEmbedding>
-                .ForUpdate(embeddingId, eventTypes, loggerFactory)
-                .TryBuild(out var updateMethod))
-            {
-                return;
-            }
-
-            if (!ClassMethodBuilder<TEmbedding>
-                .ForDelete(embeddingId, eventTypes, loggerFactory)
-                .TryBuild(out var deleteMethod))
-            {
-                return;
-            }
-
-            var embedding = new Embedding<TEmbedding>(
-                embeddingId,
-                eventTypes,
-                eventTypesToMethods,
-                updateMethod,
-                deleteMethod);
-            var embeddingsProcessor = new EmbeddingsProcessor<TEmbedding>(
-                embedding,
-                eventsToProtobufConverter,
-                projectionsConverter,
-                eventTypes,
-                loggerFactory.CreateLogger<EmbeddingsProcessor<TEmbedding>>());
-
-            eventProcessors.Register(
-                embeddingsProcessor,
-                new EmbeddingsProtocol(),
-                cancelConnectToken,
-                stopProcessingToken);
+            buildResults.AddFailure($"The embedding class {_embeddingType} has no default/parameterless constructor");
+            return false;
         }
 
-        bool TryGetEmbeddingId(out EmbeddingId embeddingId)
+        if (HasMoreThanOneConstructor())
         {
-            embeddingId = default;
-            var embedding = _embeddingType.GetCustomAttributes(typeof(EmbeddingAttribute), true).FirstOrDefault() as EmbeddingAttribute;
-            if (embedding == default) return false;
+            buildResults.AddFailure($"The embedding class {_embeddingType} has more than one constructor. It must only have one, parameterless, constructor");
+            return false;
+        }
 
-            embeddingId = embedding.Identifier;
+        var success = ClassMethodBuilder<TEmbedding>
+            .ForProjection(_decorator.Identifier, eventTypes, buildResults)
+            .TryBuild(out var eventTypesToMethods);
+
+        success = ClassMethodBuilder<TEmbedding>
+            .ForUpdate(_decorator.Identifier, eventTypes, buildResults)
+            .TryBuild(out var updateMethod) && success;
+
+
+        success = ClassMethodBuilder<TEmbedding>
+            .ForDelete(_decorator.Identifier, eventTypes, buildResults)
+            .TryBuild(out var deleteMethod) && success;
+
+        if (!success)
+        {
+            return false;
+        }
+            
+        embedding = new Embedding<TEmbedding>(
+            _decorator.Identifier,
+            eventTypes,
+            eventTypesToMethods,
+            updateMethod,
+            deleteMethod);
+
+        return false;
+    }
+
+
+    bool HasMoreThanOneConstructor()
+        => _embeddingType.GetConstructors().Length > 1;
+
+    bool HasParameterlessConstructor()
+        => _embeddingType.GetConstructors().Any(t => t.GetParameters().Length == 0);
+
+    /// <inheritdoc />
+    public bool Equals(ICanTryBuildEmbedding other)
+    {
+        if (ReferenceEquals(this, other))
+        {
             return true;
         }
 
-        bool HasMoreThanOneConstructor()
-            => _embeddingType.GetConstructors().Length > 1;
-
-        bool HasParameterlessConstructor()
-            => _embeddingType.GetConstructors().Any(t => t.GetParameters().Length == 0);
+        return other is ConventionEmbeddingBuilder<TEmbedding> otherBuilder
+            && _embeddingType == otherBuilder._embeddingType;
     }
+    
 }
