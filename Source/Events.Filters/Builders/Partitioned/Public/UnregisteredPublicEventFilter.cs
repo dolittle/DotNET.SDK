@@ -30,6 +30,9 @@ public class UnregisteredPublicEventFilter : ICanRegisterEventFilterProcessor
     }
 
     /// <inheritdoc />
+    public FilterModelId Identifier => new(_filterId, ScopeId.Default);
+
+    /// <inheritdoc />
     public void Register(
         IEventProcessors eventProcessors,
         IEventProcessingConverter converter,

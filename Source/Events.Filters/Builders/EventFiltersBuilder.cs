@@ -3,7 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events.Filters.Builders.Partitioned;
 using Dolittle.SDK.Events.Filters.Builders.Partitioned.Public;
 
@@ -14,46 +17,46 @@ namespace Dolittle.SDK.Events.Filters.Builders;
 /// </summary>
 public class EventFiltersBuilder : IEventFiltersBuilder
 {
-    readonly List<PrivateEventFilterBuilder> _privateFilterBuilders = new();
-    readonly List<PublicEventFilterBuilder> _publicFilterBuilders = new();
-    
+    readonly IModelBuilder _modelBuilder;
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="EventFiltersBuilder"/>.
+    /// </summary>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    public EventFiltersBuilder(IModelBuilder modelBuilder)
+    {
+        _modelBuilder = modelBuilder;
+    }
+
     /// <inheritdoc />
     public IEventFiltersBuilder CreatePrivateFilter(FilterId filterId, Action<IPrivateEventFilterBuilder> callback)
     {
-        var builder = new PrivateEventFilterBuilder(filterId);
+        var builder = new PrivateEventFilterBuilder(filterId, _modelBuilder);
         callback(builder);
-        _privateFilterBuilders.Add(builder);
         return this;
     }
 
     /// <inheritdoc />
     public IEventFiltersBuilder CreatePublicFilter(FilterId filterId, Action<IPartitionedEventFilterBuilder> callback)
     {
-        var builder = new PublicEventFilterBuilder(filterId);
+        var builder = new PublicEventFilterBuilder(filterId, _modelBuilder);
         callback(builder);
-        _publicFilterBuilders.Add(builder);
         return this;
     }
 
     /// <summary>
     /// Builds all the event filters.
     /// </summary>
+    /// <param name="model">The <see cref="IModel"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public IUnregisteredEventFilters Build(IClientBuildResults buildResults)
+    public IUnregisteredEventFilters Build(IModel model, IClientBuildResults buildResults)
     {
-        var filters = new List<ICanRegisterEventFilterProcessor>();
-        foreach (var builder in _privateFilterBuilders)
+        var filters = new UniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor>();
+        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildFilter>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(buildResults, out var filter))
             {
-                filters.Add(filter);
-            }
-        }
-        foreach (var builder in _publicFilterBuilders)
-        {
-            if (builder.TryBuild(buildResults, out var filter))
-            {
-                filters.Add(filter);
+                filters.Add(filter.Identifier, filter);
             }
         }
         return new UnregisteredEventFilters(filters);

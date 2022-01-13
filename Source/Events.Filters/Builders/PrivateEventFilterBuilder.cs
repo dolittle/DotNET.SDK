@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events.Filters.Builders.Partitioned;
 using Dolittle.SDK.Events.Filters.Builders.Unpartitioned;
 
@@ -10,33 +11,38 @@ namespace Dolittle.SDK.Events.Filters.Builders;
 /// <summary>
 /// Represents the builder for building private event filters.
 /// </summary>
-public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder
+public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder, ICanTryBuildFilter
 {
+    readonly FilterId _filterId;
+    readonly IModelBuilder _modelBuilder;
+    ScopeId _scopeId = ScopeId.Default;
     ICanBuildPrivateFilter _filterBuilder;
+
+    FilterModelId ModelId => new(_filterId, _scopeId);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivateEventFilterBuilder"/> class.
     /// </summary>
-    /// <param name="filterId">The <see cref="FilterId" />.</param>
-    public PrivateEventFilterBuilder(FilterId filterId) => FilterId = filterId;
-
-    /// <summary>
-    /// Gets the <see cref="FilterId" /> of the filter that this builder builds.
-    /// </summary>
-    public FilterId FilterId { get; }
-
-    /// <summary>
-    /// Gets the <see cref="ScopeId" /> the filter operates on.
-    /// </summary>
-    public ScopeId ScopeId { get; private set; } = ScopeId.Default;
+    /// <param name="filterId">The <see cref="_filterId" />.</param>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    public PrivateEventFilterBuilder(FilterId filterId, IModelBuilder modelBuilder)
+    {
+        _filterId = filterId;
+        _modelBuilder = modelBuilder;
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(ModelId, this);
+    }
+    
+    /// <inheritdoc />
+    public bool Equals(ICanTryBuildFilter other) => ReferenceEquals(this, other);
 
     /// <inheritdoc />
     public IPrivateEventFilterBuilder InScope(ScopeId scopeId)
     {
-        ScopeId = scopeId;
+        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildFilter>(ModelId, this);
+        _scopeId = scopeId;
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(ModelId, this);
         return this;
     }
-
 
     /// <inheritdoc />
     public IPartitionedEventFilterBuilder Partitioned()
@@ -53,22 +59,16 @@ public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder
         _filterBuilder = builder;
         return builder;
     }
-
-    /// <summary>
-    /// Builds the private filter.
-    /// </summary>
-    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="filter">The outputted <see cref="ICanRegisterEventFilterProcessor"/> that can register the private filter.</param>
-    /// <returns>A value indicating whether the building succeeded or not.</returns>
+    
+    /// <inheritdoc />
     public bool TryBuild(IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_filterBuilder != default)
         {
-            return _filterBuilder.TryBuild(FilterId, ScopeId, buildResults, out filter);
+            return _filterBuilder.TryBuild(_filterId, _scopeId, buildResults, out filter);
         }
-        buildResults.AddError(new FilterDefinitionIncomplete(FilterId, ScopeId, "Call Partitioned() or Handle(...) before building private filter"));
+        buildResults.AddError(new FilterDefinitionIncomplete(_filterId, _scopeId, "Call Partitioned() or Handle(...) before building private filter"));
         return false;
-
     }
 }

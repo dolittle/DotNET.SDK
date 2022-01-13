@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.Logging;
 
@@ -11,25 +12,23 @@ namespace Dolittle.SDK.Events.Filters.Builders;
 /// <summary>
 /// Represents an implementation of <see cref="IUnregisteredEventFilters"/>.
 /// </summary>
-public class UnregisteredEventFilters : IUnregisteredEventFilters
+public class UnregisteredEventFilters : UniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor>, IUnregisteredEventFilters
 {
-    readonly IEnumerable<ICanRegisterEventFilterProcessor> _eventProcessors;
-
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredEventFilters"/> class.
     /// </summary>
-    /// <param name="eventProcessors">The <see cref="IEnumerable{T}"/> of <see cref="ICanRegisterEventFilterProcessor"/>.</param>
-    public UnregisteredEventFilters(IEnumerable<ICanRegisterEventFilterProcessor> eventProcessors)
+    /// <param name="eventFilters">The <see cref="IEnumerable{T}"/> of <see cref="ICanRegisterEventFilterProcessor"/>.</param>
+    public UnregisteredEventFilters(IUniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor> eventFilters)
+        : base(eventFilters)
     {
-        _eventProcessors = eventProcessors;
     }
 
     /// <inheritdoc />
     public void Register(IEventProcessors eventProcessors, IEventProcessingConverter processingConverter, ILoggerFactory loggerFactory, CancellationToken cancelConnectToken, CancellationToken stopProcessingToken)
     {
-        foreach (var eventProcessor in _eventProcessors)
+        foreach (var eventFilter in Values)
         {
-            eventProcessor.Register(eventProcessors, processingConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
+            eventFilter.Register(eventProcessors, processingConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
         }
     }
 }

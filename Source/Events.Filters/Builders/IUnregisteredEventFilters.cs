@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading;
+using Dolittle.SDK.Common;
 using Dolittle.SDK.Events.Processing;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +11,7 @@ namespace Dolittle.SDK.Events.Filters.Builders;
 /// <summary>
 /// Defines a collection of unregistered event filters.
 /// </summary>
-public interface IUnregisteredEventFilters
+public interface IUnregisteredEventFilters : IUniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor>
 {
     /// <summary>
     /// Registers all the event filters.

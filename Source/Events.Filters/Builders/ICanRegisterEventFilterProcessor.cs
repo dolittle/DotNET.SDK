@@ -13,6 +13,11 @@ namespace Dolittle.SDK.Events.Filters.Builders;
 public interface ICanRegisterEventFilterProcessor
 {
     /// <summary>
+    /// Gets the <see cref="FilterModelId"/>.
+    /// </summary>
+    FilterModelId Identifier { get; }
+
+    /// <summary>
     /// Register the event filter processor.
     /// </summary>
     /// <param name="eventProcessors">The <see cref="IEventProcessors"/>.</param>
