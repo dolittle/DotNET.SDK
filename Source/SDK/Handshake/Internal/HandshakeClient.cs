@@ -8,6 +8,7 @@ using Dolittle.Runtime.Handshake.Contracts;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Version = Dolittle.SDK.Microservices.Version;
 
@@ -34,7 +35,7 @@ public class HandshakeClient : IPerformHandshake
     }
 
     /// <inheritdoc />
-    public async Task<HandshakeResult> Perform(Version headVersion, CancellationToken cancellationToken)
+    public async Task<HandshakeResult> Perform(uint attemptNum, TimeSpan timeSpent, Version headVersion, CancellationToken cancellationToken)
     {
         try
         {
@@ -43,10 +44,13 @@ public class HandshakeClient : IPerformHandshake
             Log.PerformHandshake(_logger, headVersion, sdkVersion, contractsVersion);
             var request = new HandshakeRequest
             {
-                Sdk = "DotNET",
+                SdkIdentifier = "DotNET",
                 ContractsVersion = contractsVersion.ToProtobuf(),
                 SdkVersion = sdkVersion.ToProtobuf(),
-                HeadVersion = headVersion.ToProtobuf()
+                HeadVersion = headVersion.ToProtobuf(),
+                Attempt = attemptNum,
+                TimeSpent = timeSpent.ToDuration()
+                
             };
             var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
             if (response.Failure != null)
@@ -57,7 +61,7 @@ public class HandshakeClient : IPerformHandshake
             }
 
             Log.SuccessfullyPerformedHandshake(_logger, headVersion, sdkVersion, contractsVersion, response.RuntimeVersion.ToVersion(), response.ContractsVersion.ToVersion());
-            return new HandshakeResult(response.MicroserviceId.ToGuid(), response.Environment);
+            return new HandshakeResult(response.MicroserviceId.ToGuid(), response.EnvironmentName);
         }
         catch (Exception ex)
         {

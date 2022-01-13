@@ -123,7 +123,7 @@ public class SetupBuilder : ISetupBuilder
             unregisteredEventTypes,
             _aggregateRootsBuilder.Build(model),
             _eventFiltersBuilder.Build(model, _buildResults),
-            _eventHandlersBuilder,
+            getServiceProviders => _eventHandlersBuilder.Build(model, unregisteredEventTypes, getServiceProviders, _buildResults),
             _projectionsBuilder.Build(model, unregisteredEventTypes, _buildResults),
             _embeddingsBuilder.Build(model, unregisteredEventTypes, _buildResults),
             _eventHorizonsBuilder,

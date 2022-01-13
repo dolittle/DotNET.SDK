@@ -12,11 +12,9 @@ using Dolittle.SDK.Builders;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Embeddings.Builder;
-using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
-using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Filters.Builders;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Events.Processing;
@@ -25,7 +23,6 @@ using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Handshake;
 using Dolittle.SDK.Handshake.Internal;
 using Dolittle.SDK.Projections.Builder;
-using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resources;
@@ -50,12 +47,13 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly IUnregisteredEventTypes _unregisteredEventTypes;
     readonly IUnregisteredAggregateRoots _unregisteredAggregateRoots;
     readonly IUnregisteredEventFilters _unregisteredEventFilters;
-    readonly EventHandlersBuilder _eventHandlersBuilder;
+    readonly Func<Func<ITenantScopedProviders>, IUnregisteredEventHandlers> _getUnregisteredEventHandlers;
     readonly IUnregisteredProjections _unregisteredProjections;
     readonly IUnregisteredEmbeddings _unregisteredEmbeddings;
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
 
+    IUnregisteredEventHandlers _unregisteredEventHandlers;
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
     IEventProcessors _eventProcessors;
@@ -78,7 +76,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <param name="unregisteredEventTypes">The <see cref="IUnregisteredEventTypes"/>.</param>
     /// <param name="unregisteredAggregateRoots">The <see cref="IUnregisteredAggregateRoots"/>.</param>
     /// <param name="unregisteredEventFilters">The <see cref="IUnregisteredEventFilters"/>.</param>
-    /// <param name="eventHandlersBuilder">The <see cref="EventHandlerBuilder"/>.</param>
+    /// <param name="getUnregisteredEventHandlers">The <see cref="EventHandlerBuilder"/>.</param>
     /// <param name="unregisteredProjections">The <see cref="IUnregisteredProjections"/>.</param>
     /// <param name="unregisteredEmbeddings">The <see cref="IUnregisteredEmbeddings"/>.</param>
     /// <param name="eventHorizonsBuilder">The <see cref="SubscriptionsBuilder"/>.</param>
@@ -87,7 +85,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         IUnregisteredEventTypes unregisteredEventTypes,
         IUnregisteredAggregateRoots unregisteredAggregateRoots,
         IUnregisteredEventFilters unregisteredEventFilters,
-        EventHandlersBuilder eventHandlersBuilder,
+        Func<Func<ITenantScopedProviders>, IUnregisteredEventHandlers> getUnregisteredEventHandlers,
         IUnregisteredProjections unregisteredProjections,
         IUnregisteredEmbeddings unregisteredEmbeddings,
         SubscriptionsBuilder eventHorizonsBuilder,
@@ -96,7 +94,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         _unregisteredEventTypes = unregisteredEventTypes;
         _unregisteredAggregateRoots = unregisteredAggregateRoots;
         _unregisteredEventFilters = unregisteredEventFilters;
-        _eventHandlersBuilder = eventHandlersBuilder;
+        _getUnregisteredEventHandlers = getUnregisteredEventHandlers;
         _unregisteredProjections = unregisteredProjections;
         _unregisteredEmbeddings = unregisteredEmbeddings;
         _eventHorizonsBuilder = eventHorizonsBuilder;
@@ -200,12 +198,13 @@ public class DolittleClient : IDisposable, IDolittleClient
         {
             throw new CannotConnectDolittleClientMultipleTimes();
         }
-
+        
         var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
         var loggerFactory = configuration.LoggerFactory;
         var runtimeConnector = new DolittleRuntimeConnector(
             configuration.RuntimeHost,
             configuration.RuntimePort,
+            configuration.Version,
             new HandshakeClient(methodCaller, loggerFactory.CreateLogger<HandshakeClient>()),
             new TenantsClient(methodCaller, loggerFactory.CreateLogger<TenantsClient>()),
             loggerFactory.CreateLogger<DolittleRuntimeConnector>());
@@ -271,14 +270,13 @@ public class DolittleClient : IDisposable, IDolittleClient
         CancellationToken cancellation)
     {
         var aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
-        EventTypes = new EventTypes(loggerFactory.CreateLogger<EventTypes>());
-        _eventTypesBuilder.AddAssociationsInto(_unregisteredEventTypes);
-        await _eventTypesBuilder.BuildAndRegister(
+        await _unregisteredEventTypes.Register(
             new Events.Internal.EventTypesClient(
                 methodCaller,
                 executionContext,
                 loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
             cancellation).ConfigureAwait(false);
+        EventTypes = _unregisteredEventTypes;
         var reverseCallClientsCreator = new ReverseCallClientCreator(
             pingInterval,
             methodCaller,
@@ -294,6 +292,8 @@ public class DolittleClient : IDisposable, IDolittleClient
             reverseCallClientsCreator,
             _processingCoordinator,
             loggerFactory.CreateLogger<EventProcessors>());
+
+        _unregisteredEventHandlers = _getUnregisteredEventHandlers(() => Services);
         EventStore = new EventStoreBuilder(
             methodCaller,
             _eventsToProtobufConverter,
@@ -310,7 +310,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             aggregateRoots,
             loggerFactory);
 
-        await _aggregateRootsBuilder.BuildAndRegister(
+        await _unregisteredAggregateRoots.Register(
             new AggregateRootsClient(
                 methodCaller,
                 executionContext,
@@ -329,13 +329,13 @@ public class DolittleClient : IDisposable, IDolittleClient
             methodCaller,
             executionContext,
             _callContextResolver,
-            _projectionAssociations,
+            _unregisteredProjections.ReadModelTypes,
             _projectionConverter,
             loggerFactory);
         Embeddings = new Embeddings.Embeddings(
             methodCaller,
             _callContextResolver,
-            _embeddingAssociations,
+            _unregisteredEmbeddings.ReadModelTypes,
             _projectionConverter,
             executionContext,
             loggerFactory);
@@ -345,34 +345,31 @@ public class DolittleClient : IDisposable, IDolittleClient
     void StartEventProcessors(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
         _eventProcessorCancellationTokenSource = new CancellationTokenSource();
-        _eventHandlersBuilder.BuildAndRegister(
+        _unregisteredEventHandlers.Register(
             _eventProcessors,
-            _unregisteredEventTypes,
             _eventProcessingConverter,
             tenantScopedProvidersBuilder,
-            () => Services,
             loggerFactory,
             cancellationToken,
             GetStopProcessingToken());
-        _filtersBuilder.BuildAndRegister(
+        _unregisteredEventFilters.Register(
             _eventProcessors,
             _eventProcessingConverter,
             loggerFactory,
             cancellationToken,
             GetStopProcessingToken());
-        _projectionsBuilder.BuildAndRegister(
+        _unregisteredProjections.Register(
             _eventProcessors,
-            _unregisteredEventTypes,
             _eventProcessingConverter,
             _projectionConverter,
             loggerFactory,
             cancellationToken,
             GetStopProcessingToken());
-        _embeddingsBuilder.BuildAndRegister(
+        _unregisteredEmbeddings.Register(
             _eventProcessors,
-            _unregisteredEventTypes,
             _eventsToProtobufConverter,
             _projectionConverter,
+            _unregisteredEventTypes,
             loggerFactory,
             cancellationToken,
             GetStopProcessingToken());

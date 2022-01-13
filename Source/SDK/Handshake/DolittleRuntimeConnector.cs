@@ -25,6 +25,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     static readonly TimeSpan _waitMaxTime = TimeSpan.FromSeconds(5);
     readonly string _runtimeHost;
     readonly ushort _runtimePort;
+    readonly Version _headVersion;
     readonly IPerformHandshake _handshakePerformer;
     readonly ITenants _tenants;
     readonly ILogger _logger;
@@ -34,18 +35,21 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     /// </summary>
     /// <param name="runtimeHost">The Dolittle Runtime host.</param>
     /// <param name="runtimePort">The Dolittle Runtime port.</param>
+    /// <param name="headVersion">The <see cref="Version"/> of the Head.</param>
     /// <param name="handshakePerformer">The <see cref="IPerformHandshake"/>.</param>
     /// <param name="tenants">The <see cref="ITenants"/>.</param>
     /// <param name="logger">The <see cref="ILogger"/>.</param>
     public DolittleRuntimeConnector(
         string runtimeHost,
         ushort runtimePort,
+        Version headVersion,
         IPerformHandshake handshakePerformer,
         ITenants tenants,
         ILogger logger)
     {
         _runtimeHost = runtimeHost;
         _runtimePort = runtimePort;
+        _headVersion = headVersion;
         _handshakePerformer = handshakePerformer;
         _tenants = tenants;
         _logger = logger;
@@ -74,12 +78,14 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     async Task<ExecutionContext> TryPerformHandshakeForever(CancellationToken cancellationToken)
     {
         var currentWaitTime = GetTimeToWait(TimeSpan.FromSeconds(1));
+        var startTime = DateTimeOffset.Now;
+        uint attempts = 1;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
                 Log.ConnectingToDolittleRuntime(_logger);
-                var handshakeResult = await _handshakePerformer.Perform(cancellationToken).ConfigureAwait(false);
+                var handshakeResult = await _handshakePerformer.Perform(attempts++, DateTimeOffset.Now - startTime, _headVersion, cancellationToken).ConfigureAwait(false);
                 return CreateExecutionContextFromHandshake(handshakeResult);
             }
             catch (RpcException ex) when (ex.Status.StatusCode == StatusCode.Unimplemented)

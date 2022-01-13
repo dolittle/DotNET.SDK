@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Builders;
 
 static partial class Log
 {
-    [LoggerMessage(0, LogLevel.Debug, "Retry attempt {RetryCount} processing subscription to events in {Timeout}ms () from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}")]
+    [LoggerMessage(0, LogLevel.Debug, "Retry attempt {RetryCount} processing subscription to events in {Timeout}ms () from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}")]
     internal static partial void RetryEventHorizonSubscription(
         ILogger logger,
         int retryCount,
