@@ -16,14 +16,14 @@ public interface IProjectionsBuilder
     /// </summary>
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionBuilder CreateProjection(ProjectionId projectionId);
+    IProjectionBuilder Create(ProjectionId projectionId);
     
     /// <summary>
     /// Registers a <see cref="Type" /> as a projection class.
     /// </summary>
     /// <typeparam name="TProjection">The <see cref="Type" /> that is the projection class.</typeparam>
     /// <returns>The builder for continuation.</returns>
-    IProjectionsBuilder RegisterProjection<TProjection>()
+    IProjectionsBuilder Register<TProjection>()
         where TProjection : class, new();
 
     /// <summary>
@@ -31,7 +31,7 @@ public interface IProjectionsBuilder
     /// </summary>
     /// <param name="type">The <see cref="Type" /> of the projection.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionsBuilder RegisterProjection(Type type);
+    IProjectionsBuilder Register(Type type);
 
     /// <summary>
     /// Registers all projection classes from an <see cref="Assembly" />.

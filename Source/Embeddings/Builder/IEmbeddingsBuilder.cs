@@ -16,14 +16,14 @@ public interface IEmbeddingsBuilder
     /// </summary>
     /// <param name="embeddingId">The <see cref="EmbeddingId" />.</param>
     /// <returns>The <see cref="IEmbeddingBuilder" /> for continuation.</returns>
-    IEmbeddingBuilder CreateEmbedding(EmbeddingId embeddingId);
+    IEmbeddingBuilder Create(EmbeddingId embeddingId);
 
     /// <summary>
     /// Registers a <see cref="Type" /> as an embedding class.
     /// </summary>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the embedding class.</typeparam>
     /// <returns>The <see cref="IEmbeddingsBuilder" /> for continuation.</returns>
-    public IEmbeddingsBuilder RegisterEmbedding<TProjection>()
+    public IEmbeddingsBuilder Register<TProjection>()
         where TProjection : class, new();
 
     /// <summary>
@@ -31,7 +31,7 @@ public interface IEmbeddingsBuilder
     /// </summary>
     /// <param name="type">The <see cref="Type" /> of the embedding.</param>
     /// <returns>The <see cref="IEmbeddingsBuilder" /> for continuation.</returns>
-    public IEmbeddingsBuilder RegisterEmbedding(Type type);
+    public IEmbeddingsBuilder Register(Type type);
 
     /// <summary>
     /// Registers all embedding classes from an <see cref="Assembly" />.

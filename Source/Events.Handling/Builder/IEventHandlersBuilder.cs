@@ -16,14 +16,14 @@ public interface IEventHandlersBuilder
     /// </summary>
     /// <param name="eventHandlerId">The <see cref="EventHandlerId" />.</param>
     /// <returns>The <see cref="IEventHandlersBuilder" /> for continuation.</returns>
-    public IEventHandlerBuilder CreateEventHandler(EventHandlerId eventHandlerId);
+    public IEventHandlerBuilder Create(EventHandlerId eventHandlerId);
 
     /// <summary>
     /// Registers a <see cref="Type" /> as an event handler class.
     /// </summary>
     /// <typeparam name="TEventHandler">The <see cref="Type" /> that is the event handler class.</typeparam>
     /// <returns>The <see cref="IEventHandlersBuilder" /> for continuation.</returns>
-    public IEventHandlersBuilder RegisterEventHandler<TEventHandler>()
+    public IEventHandlersBuilder Register<TEventHandler>()
         where TEventHandler : class;
 
     /// <summary>
@@ -31,7 +31,7 @@ public interface IEventHandlersBuilder
     /// </summary>
     /// <param name="type">The <see cref="Type" /> of the event handler.</param>
     /// <returns>The <see cref="IEventHandlersBuilder" /> for continuation.</returns>
-    public IEventHandlersBuilder RegisterEventHandler(Type type);
+    public IEventHandlersBuilder Register(Type type);
 
     /// <summary>
     /// Registers a <see cref="Type" /> as an event handler class.
@@ -39,7 +39,7 @@ public interface IEventHandlersBuilder
     /// <typeparam name="TEventHandler">The <see cref="Type" /> that is the event handler class.</typeparam>
     /// <param name="eventHandlerInstance">The <typeparamref name="TEventHandler"/>.</param>
     /// <returns>The <see cref="IEventHandlersBuilder" /> for continuation.</returns>
-    public IEventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
+    public IEventHandlersBuilder Register<TEventHandler>(TEventHandler eventHandlerInstance)
         where TEventHandler : class;
 
     /// <summary>

@@ -1,8 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
@@ -29,19 +27,17 @@ public class EventFiltersBuilder : IEventFiltersBuilder
     }
 
     /// <inheritdoc />
-    public IEventFiltersBuilder CreatePrivateFilter(FilterId filterId, Action<IPrivateEventFilterBuilder> callback)
+    public IPrivateEventFilterBuilder CreatePrivate(FilterId filterId)
     {
         var builder = new PrivateEventFilterBuilder(filterId, _modelBuilder);
-        callback(builder);
-        return this;
+        return builder;
     }
 
     /// <inheritdoc />
-    public IEventFiltersBuilder CreatePublicFilter(FilterId filterId, Action<IPartitionedEventFilterBuilder> callback)
+    public IPartitionedEventFilterBuilder CreatePublic(FilterId filterId)
     {
         var builder = new PublicEventFilterBuilder(filterId, _modelBuilder);
-        callback(builder);
-        return this;
+        return builder;
     }
 
     /// <summary>

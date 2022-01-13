@@ -34,19 +34,19 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     }
 
     /// <inheritdoc />
-    public IEventHandlerBuilder CreateEventHandler(EventHandlerId eventHandlerId)
+    public IEventHandlerBuilder Create(EventHandlerId eventHandlerId)
     {
         var builder = new EventHandlerBuilder(eventHandlerId, _modelBuilder);
         return builder;
     }
 
     /// <inheritdoc />
-    public IEventHandlersBuilder RegisterEventHandler<TEventHandler>()
+    public IEventHandlersBuilder Register<TEventHandler>()
         where TEventHandler : class
-        => RegisterEventHandler(typeof(TEventHandler));
+        => Register(typeof(TEventHandler));
 
     /// <inheritdoc />
-    public IEventHandlersBuilder RegisterEventHandler(Type type)
+    public IEventHandlersBuilder Register(Type type)
     {
         if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
         {
@@ -57,7 +57,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     }
 
     /// <inheritdoc />
-    public IEventHandlersBuilder RegisterEventHandler<TEventHandler>(TEventHandler eventHandlerInstance)
+    public IEventHandlersBuilder Register<TEventHandler>(TEventHandler eventHandlerInstance)
         where TEventHandler : class
     {
         if (!_decoratedTypeBindings.TryAdd(eventHandlerInstance.GetType(), out var decorator))

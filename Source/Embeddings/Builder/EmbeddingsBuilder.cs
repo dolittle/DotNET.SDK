@@ -33,7 +33,7 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     }
 
     /// <inheritdoc />
-    public IEmbeddingBuilder CreateEmbedding(EmbeddingId embeddingId)
+    public IEmbeddingBuilder Create(EmbeddingId embeddingId)
     {
         var builder = new EmbeddingBuilder(embeddingId, _modelBuilder);
         _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding>(new EmbeddingModelId(embeddingId), builder);
@@ -41,12 +41,12 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     }
 
     /// <inheritdoc />
-    public IEmbeddingsBuilder RegisterEmbedding<TProjection>()
+    public IEmbeddingsBuilder Register<TProjection>()
         where TProjection : class, new()
-        => RegisterEmbedding(typeof(TProjection));
+        => Register(typeof(TProjection));
 
     /// <inheritdoc />
-    public IEmbeddingsBuilder RegisterEmbedding(Type type)
+    public IEmbeddingsBuilder Register(Type type)
     {
         if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
         {

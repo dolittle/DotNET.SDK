@@ -36,20 +36,20 @@ public class ProjectionsBuilder : IProjectionsBuilder
 
 
     /// <inheritdoc />
-    public IProjectionBuilder CreateProjection(ProjectionId projectionId)
+    public IProjectionBuilder Create(ProjectionId projectionId)
     {
         var builder = new ProjectionBuilder(projectionId, _modelBuilder);
         return builder;
     }
 
     /// <inheritdoc />
-    public IProjectionsBuilder RegisterProjection<TProjection>()
+    public IProjectionsBuilder Register<TProjection>()
         where TProjection : class, new()
-        => RegisterProjection(typeof(TProjection));
+        => Register(typeof(TProjection));
 
 
     /// <inheritdoc />
-    public IProjectionsBuilder RegisterProjection(Type type)
+    public IProjectionsBuilder Register(Type type)
     {
         if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
         {
