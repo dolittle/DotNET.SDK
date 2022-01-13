@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Embeddings.Builder;
 /// <summary>
 /// Defines a collection of unregistered projections.
 /// </summary>
-public interface IUnregisteredEmbeddings : IUniqueBindings<EmbeddingId, Internal.IEmbedding>
+public interface IUnregisteredEmbeddings : IUniqueBindings<EmbeddingModelId, Internal.IEmbedding>
 {
     /// <summary>
     /// Registers projections.

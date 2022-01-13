@@ -19,15 +19,15 @@ namespace Dolittle.SDK.Embeddings.Builder;
 /// <summary>
 /// Represents an implementation of <see cref="IUnregisteredEmbeddings"/>.
 /// </summary>
-public class UnregisteredEmbeddings : UniqueBindings<EmbeddingId, Internal.IEmbedding>, IUnregisteredEmbeddings
+public class UnregisteredEmbeddings : UniqueBindings<EmbeddingModelId, Internal.IEmbedding>, IUnregisteredEmbeddings
 {
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredEmbeddings"/> class.
     /// </summary>
-    /// <param name="eventHandlers">The unique <see cref="IEmbedding"/> projections.</param>
+    /// <param name="embeddings">The unique <see cref="IEmbedding"/> embeddings.</param>
     /// <param name="readModelTypes">The <see cref="IEmbeddingReadModelTypes"/>.</param>
-    public UnregisteredEmbeddings(IUniqueBindings<EmbeddingId, Internal.IEmbedding> eventHandlers, IEmbeddingReadModelTypes readModelTypes)
-        : base(eventHandlers)
+    public UnregisteredEmbeddings(IUniqueBindings<EmbeddingModelId, Internal.IEmbedding> embeddings, IEmbeddingReadModelTypes readModelTypes)
+        : base(embeddings)
     {
         ReadModelTypes = readModelTypes;
     }

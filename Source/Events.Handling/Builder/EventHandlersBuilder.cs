@@ -20,14 +20,16 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 public class EventHandlersBuilder : IEventHandlersBuilder
 {
     readonly IModelBuilder _modelBuilder;
-    readonly IClientBuildResults _buildResults;
-
     readonly DecoratedTypeBindingsToModelAdder<EventHandlerAttribute, EventHandlerModelId, EventHandlerId> _decoratedTypeBindings;
 
+    /// <summary>
+    /// Initializes an instance of the <see cref="EventHandlersBuilder"/> class.
+    /// </summary>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     public EventHandlersBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
     {
         _modelBuilder = modelBuilder;
-        _buildResults = buildResults;
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<EventHandlerAttribute, EventHandlerModelId, EventHandlerId>("event handler", modelBuilder, buildResults);
     }
 
@@ -87,17 +89,16 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     public IUnregisteredEventHandlers Build(IModel model, IEventTypes eventTypes, Func<ITenantScopedProviders> tenantScopedProvidersFactory, IClientBuildResults buildResults)
     {
-        var builders = model.GetProcessorBuilderBindings<ICanTryBuildEventHandler>();
-        var eventHandlers = new List<IEventHandler>();
-        foreach (var builder in builders.Select(_ => _.ProcessorBuilder))
+        var eventHandlers = new UniqueBindings<EventHandlerModelId, IEventHandler>();
+        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildEventHandler>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(eventTypes, buildResults, tenantScopedProvidersFactory, out var eventHandler))
             {
-                eventHandlers.Add(eventHandler);
+                eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
             }
         }
         return new UnregisteredEventHandlers(
-            new UniqueBindings<EventHandlerId, IEventHandler>(eventHandlers.ToDictionary(_ => _.Identifier, _ => _)),
+            eventHandlers,
             model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>(),
             model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>());
     }

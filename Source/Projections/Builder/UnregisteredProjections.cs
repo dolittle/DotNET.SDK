@@ -17,15 +17,15 @@ namespace Dolittle.SDK.Projections.Builder;
 /// <summary>
 /// Represents an implementation of <see cref="IUnregisteredProjections"/>.
 /// </summary>
-public class UnregisteredProjections : UniqueBindings<ProjectionId, IProjection>, IUnregisteredProjections
+public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjection>, IUnregisteredProjections
 {
     /// <summary>
     /// Initializes an instance of the <see cref="UnregisteredProjections"/> class.
     /// </summary>
-    /// <param name="eventHandlers">The unique <see cref="IProjection"/> projections.</param>
+    /// <param name="projections">The unique <see cref="IProjection"/> projections.</param>
     /// <param name="readModelTypes">The <see cref="IProjectionReadModelTypes"/>.</param>
-    public UnregisteredProjections(IUniqueBindings<ProjectionId, IProjection> eventHandlers, IProjectionReadModelTypes readModelTypes)
-        : base(eventHandlers)
+    public UnregisteredProjections(IUniqueBindings<ProjectionModelId, IProjection> projections, IProjectionReadModelTypes readModelTypes)
+        : base(projections)
     {
         ReadModelTypes = readModelTypes;
     }

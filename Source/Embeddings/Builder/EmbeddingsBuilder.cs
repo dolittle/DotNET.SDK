@@ -86,13 +86,12 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
     public IUnregisteredEmbeddings Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
-        var builders = model.GetProcessorBuilderBindings<ICanTryBuildEmbedding>();
-        var embeddings = new List<Internal.IEmbedding>();
-        foreach (var builder in builders.Select(_ => _.ProcessorBuilder))
+        var embeddings = new UniqueBindings<EmbeddingModelId, Internal.IEmbedding>();
+        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildEmbedding>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(eventTypes, buildResults, out var embedding))
             {
-                embeddings.Add(embedding);
+                embeddings.Add(new EmbeddingModelId(embedding.Identifier), embedding);
             }
         }
         var identifiers = model.GetTypeBindings<EmbeddingModelId, EmbeddingId>();
@@ -101,8 +100,6 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
         {
             readModelTypes.Add(identifier.Id, type);
         }
-        return new UnregisteredEmbeddings(
-            new UniqueBindings<EmbeddingId, Internal.IEmbedding>(embeddings.ToDictionary(_ => _.Identifier, _ => _)),
-            readModelTypes);
+        return new UnregisteredEmbeddings(embeddings, readModelTypes);
     }
 }

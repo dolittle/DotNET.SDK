@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Projections.Builder;
 /// <summary>
 /// Defines a collection of unregistered projections.
 /// </summary>
-public interface IUnregisteredProjections : IUniqueBindings<ProjectionId, IProjection>
+public interface IUnregisteredProjections : IUniqueBindings<ProjectionModelId, IProjection>
 {
     /// <summary>
     /// Registers projections.

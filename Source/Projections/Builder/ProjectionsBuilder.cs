@@ -90,13 +90,12 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
     public IUnregisteredProjections Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
-        var builders = model.GetProcessorBuilderBindings<ICanTryBuildProjection>();
-        var projections = new List<IProjection>();
-        foreach (var builder in builders.Select(_ => _.ProcessorBuilder))
+        var projections = new UniqueBindings<ProjectionModelId, IProjection>();
+        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildProjection>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(eventTypes, buildResults, out var projection))
             {
-                projections.Add(projection);
+                projections.Add(new ProjectionModelId(projection.Identifier, projection.ScopeId), projection);
             }
         }
         var identifiers = model.GetTypeBindings<ProjectionModelId, ProjectionId>();
@@ -105,8 +104,6 @@ public class ProjectionsBuilder : IProjectionsBuilder
         {
             readModelTypes.Add(new ScopedProjectionId(identifier.Id, identifier.Scope), type);
         }
-        return new UnregisteredProjections(
-            new UniqueBindings<ProjectionId, IProjection>(projections.ToDictionary(_ => _.Identifier, _ => _)),
-            readModelTypes);
+        return new UnregisteredProjections(projections, readModelTypes);
     }
 }

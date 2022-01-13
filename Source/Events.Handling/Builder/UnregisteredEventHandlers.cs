@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Represents an implementation of <see cref="IUnregisteredEventHandlers"/>.
 /// </summary>
-public class UnregisteredEventHandlers : UniqueBindings<EventHandlerId, IEventHandler>, IUnregisteredEventHandlers
+public class UnregisteredEventHandlers : UniqueBindings<EventHandlerModelId, IEventHandler>, IUnregisteredEventHandlers
 {
     readonly IEnumerable<ProcessorBuilderBinding<ConventionInstanceEventHandlerBuilder>> _instanceBuilders;
     readonly IEnumerable<ProcessorBuilderBinding<ConventionTypeEventHandlerBuilder>> _typedBuilders;
@@ -31,7 +31,7 @@ public class UnregisteredEventHandlers : UniqueBindings<EventHandlerId, IEventHa
     /// <param name="instanceBuilders"></param>
     /// <param name="typedBuilders"></param>
     public UnregisteredEventHandlers(
-        IUniqueBindings<EventHandlerId, IEventHandler> eventHandlers,
+        IUniqueBindings<EventHandlerModelId, IEventHandler> eventHandlers,
         IEnumerable<ProcessorBuilderBinding<ConventionInstanceEventHandlerBuilder>> instanceBuilders,
         IEnumerable<ProcessorBuilderBinding<ConventionTypeEventHandlerBuilder>> typedBuilders)
         : base(eventHandlers)

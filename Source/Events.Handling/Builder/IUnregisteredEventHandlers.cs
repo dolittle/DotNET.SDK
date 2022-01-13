@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Defines a collection of unregistered event handlers.
 /// </summary>
-public interface IUnregisteredEventHandlers : IUniqueBindings<EventHandlerId, IEventHandler>
+public interface IUnregisteredEventHandlers : IUniqueBindings<EventHandlerModelId, IEventHandler>
 {
     /// <summary>
     /// Registers event handlers.
