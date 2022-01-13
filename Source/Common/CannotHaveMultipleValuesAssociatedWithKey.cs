@@ -19,7 +19,7 @@ public class CannotHaveMultipleValuesAssociatedWithKey<TKey, TValue> : Exception
     /// <param name="value"></param>
     /// <param name="existingValue"></param>
     public CannotHaveMultipleValuesAssociatedWithKey(TKey key, TValue value, TValue existingValue)
-        : base($"Value {value} cannot be associated with key {key} because it is already associated with {existingValue}")
+        : base($"Value {value} of type {value.GetType()} cannot be associated with key {key} of type {key.GetType()} because it is already associated with {existingValue}")
     {
     }
 }
