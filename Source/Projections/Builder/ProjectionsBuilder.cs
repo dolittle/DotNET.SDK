@@ -88,10 +88,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <param name="model">The <see cref="IModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
-    public IUnregisteredProjections Build(
-        IModel model,
-        IEventTypes eventTypes,
-        IClientBuildResults buildResults)
+    public IUnregisteredProjections Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var builders = model.GetProcessorBuilderBindings<ICanTryBuildProjection>();
         var projections = new List<IProjection>();

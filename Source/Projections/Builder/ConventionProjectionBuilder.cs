@@ -49,6 +49,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     {
         projection = default;
         buildResults.AddInformation($"Building projection {_decorator.Identifier} processing events in scope {_decorator.Scope} from type {_projectionType}");
+        
+        if (!HasParameterlessConstructor())
+        {
+            buildResults.AddFailure($"The projection class {_projectionType} has no default/parameterless constructor");
+            return false;
+        }
+        
         if (HasMoreThanOneConstructor())
         {
             buildResults.AddFailure($"The projection class {_projectionType} has more than one constructor", "It must only have one, parameterless, constructor");
@@ -64,10 +71,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods);
         return true;
     }
+    
+    
+    bool HasParameterlessConstructor()
+        => _projectionType.GetConstructors().Any(t => t.GetParameters().Length == 0);
 
     bool HasMoreThanOneConstructor() => _projectionType.GetConstructors().Length > 1;
-
-
+    
     bool TryBuildOnMethods(
         IEventTypes eventTypes,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
