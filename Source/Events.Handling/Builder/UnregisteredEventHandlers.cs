@@ -46,8 +46,7 @@ public class UnregisteredEventHandlers : UniqueBindings<EventHandlerModelId, IEv
         IEventProcessingConverter processingConverter,
         TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken)
+        CancellationToken cancellationToken)
     {
         foreach (var eventHandler in Values)
         {
@@ -57,8 +56,7 @@ public class UnregisteredEventHandlers : UniqueBindings<EventHandlerModelId, IEv
                     processingConverter,
                     loggerFactory.CreateLogger<EventHandlerProcessor>()),
                 new EventHandlerProtocol(),
-                cancelConnectToken,
-                stopProcessingToken);
+                cancellationToken);
             AddToContainer(eventHandler.Identifier, tenantScopedProvidersBuilder);
         }
     }

@@ -41,8 +41,7 @@ namespace Dolittle.SDK.Events.Processing
         public void Register<TIdentifier, TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse>(
             IEventProcessor<TIdentifier, TRegisterArguments, TRequest, TResponse> eventProcessor,
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse> protocol,
-            CancellationToken cancelConnectToken,
-            CancellationToken stopProcessorsToken)
+            CancellationToken cancellationToken)
             where TIdentifier : ConceptAs<Guid>
             where TClientMessage : class, IMessage
             where TServerMessage : class, IMessage
@@ -51,15 +50,14 @@ namespace Dolittle.SDK.Events.Processing
             where TRequest : class
             where TResponse : class
         {
-            var processor = Task.Run(() => RunProcessorForeverUntilCancelled(eventProcessor, protocol, cancelConnectToken, stopProcessorsToken), stopProcessorsToken);
+            var processor = Task.Run(() => RunProcessorForeverUntilCancelled(eventProcessor, protocol, cancellationToken));
             _processingCoordinator.RegisterProcessor(processor);
         }
 
         async Task RunProcessorForeverUntilCancelled<TIdentifier, TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse>(
             IEventProcessor<TIdentifier, TRegisterArguments, TRequest, TResponse> eventProcessor,
             IAmAReverseCallProtocol<TClientMessage, TServerMessage, TRegisterArguments, TRegisterResponse, TRequest, TResponse> protocol,
-            CancellationToken cancelConnectToken,
-            CancellationToken stopProcessorsToken)
+            CancellationToken cancellationToken)
             where TIdentifier : ConceptAs<Guid>
             where TClientMessage : class, IMessage
             where TServerMessage : class, IMessage
@@ -68,13 +66,13 @@ namespace Dolittle.SDK.Events.Processing
             where TRequest : class
             where TResponse : class
         {
-            while (!stopProcessorsToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     var client = _reverseCallClientsCreator.Create(protocol);
 
-                    var connected = await client.Connect(eventProcessor.RegistrationRequest, cancelConnectToken).ConfigureAwait(false);
+                    var connected = await client.Connect(eventProcessor.RegistrationRequest, cancellationToken).ConfigureAwait(false);
                     if (!connected)
                     {
                         _logger.LogWarning("{Kind} {Identifier} failed to connect to the Runtime, retrying in 1s.", eventProcessor.Kind, eventProcessor.Identifier);
@@ -91,9 +89,9 @@ namespace Dolittle.SDK.Events.Processing
                     }
 
                     _logger.LogInformation("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
-                    await client.Handle(eventProcessor, stopProcessorsToken).ConfigureAwait(false);
+                    await client.Handle(eventProcessor, cancellationToken).ConfigureAwait(false);
                 }
-                catch (Exception exception)
+                catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
                 {
                     _logger.LogWarning(exception, "{Kind} {Identifier} registration failed with exception, retrying in 1s", eventProcessor.Kind, eventProcessor.Identifier);
                     await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);

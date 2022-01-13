@@ -37,10 +37,9 @@ public class UnregisteredPublicEventFilter : ICanRegisterEventFilterProcessor
         IEventProcessors eventProcessors,
         IEventProcessingConverter converter,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken)
+        CancellationToken cancellationToken)
     {
         var filter = new PublicEventFilterProcessor(_filterId, _callback, converter, loggerFactory);
-        eventProcessors.Register(filter, _protocol, cancelConnectToken, stopProcessingToken);
+        eventProcessors.Register(filter, _protocol, cancellationToken);
     }
 }

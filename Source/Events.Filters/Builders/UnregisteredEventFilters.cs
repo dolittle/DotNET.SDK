@@ -24,11 +24,11 @@ public class UnregisteredEventFilters : UniqueBindings<FilterModelId, ICanRegist
     }
 
     /// <inheritdoc />
-    public void Register(IEventProcessors eventProcessors, IEventProcessingConverter processingConverter, ILoggerFactory loggerFactory, CancellationToken cancelConnectToken, CancellationToken stopProcessingToken)
+    public void Register(IEventProcessors eventProcessors, IEventProcessingConverter processingConverter, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
         foreach (var eventFilter in Values)
         {
-            eventFilter.Register(eventProcessors, processingConverter, loggerFactory, cancelConnectToken, stopProcessingToken);
+            eventFilter.Register(eventProcessors, processingConverter, loggerFactory, cancellationToken);
         }
     }
 }

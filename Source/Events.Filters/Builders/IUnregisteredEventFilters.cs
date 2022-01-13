@@ -19,12 +19,10 @@ public interface IUnregisteredEventFilters : IUniqueBindings<FilterModelId, ICan
     /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
     /// <param name="processingConverter">The <see cref="IEventProcessingConverter"/>.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-    /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
-    /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
     void Register(
         IEventProcessors eventProcessors,
         IEventProcessingConverter processingConverter,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken);
+        CancellationToken cancellationToken);
 }

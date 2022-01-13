@@ -25,16 +25,14 @@ public interface IUnregisteredEmbeddings : IUniqueBindings<EmbeddingModelId, Int
     /// <param name="projectionsConverter">The <see cref="IConvertProjectionsToSDK"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-    /// <param name="cancelConnectToken">The <see cref="CancellationToken" />.</param>
-    /// <param name="stopProcessingToken">The <see cref="CancellationToken" /> for stopping processing.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
     void Register(
         IEventProcessors eventProcessors,
         IConvertEventsToProtobuf eventsConverter,
         IConvertProjectionsToSDK projectionsConverter,
         IEventTypes eventTypes,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken);
+        CancellationToken cancellationToken);
     
     /// <summary>
     /// Gets the <see cref="IEmbeddingReadModelTypes"/>.

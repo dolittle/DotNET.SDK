@@ -36,8 +36,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         IEventProcessingConverter processingConverter,
         IConvertProjectionsToSDK projectionsConverter,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken)
+        CancellationToken cancellationToken)
     {
         foreach (var projection in Values)
         {
@@ -48,8 +47,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                     projectionsConverter,
                     loggerFactory),
                 new ProjectionsProtocol(),
-                cancelConnectToken,
-                stopProcessingToken);
+                cancellationToken);
         }
     }
 

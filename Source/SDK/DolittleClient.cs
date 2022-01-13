@@ -68,7 +68,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     IResourcesBuilder _resources;
     IEventStoreBuilder _eventStore;
     IAggregatesBuilder _aggregates;
-    CancellationTokenSource _eventProcessorCancellationTokenSource;
+    CancellationTokenSource _clientCancellationTokenSource;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -210,15 +210,15 @@ public class DolittleClient : IDisposable, IDolittleClient
             loggerFactory.CreateLogger<DolittleRuntimeConnector>());
         (var executionContext, Tenants) = await runtimeConnector.ConnectForever(cancellationToken).ConfigureAwait(false);
         var tenantScopedProvidersBuilder = new TenantScopedProvidersBuilder();
+        _clientCancellationTokenSource = new CancellationTokenSource();
         await RegisterAndCreateDependencies(
             methodCaller,
             configuration.PingInterval,
             configuration.EventSerializerProvider,
             loggerFactory,
             executionContext,
-            tenantScopedProvidersBuilder,
-            cancellationToken).ConfigureAwait(false);
-        StartEventProcessors(tenantScopedProvidersBuilder, configuration.LoggerFactory, cancellationToken);
+            tenantScopedProvidersBuilder).ConfigureAwait(false);
+        StartEventProcessors(tenantScopedProvidersBuilder, configuration.LoggerFactory);
         Connected = true;
 
         // It's currently important that the container gets built after registering and starting the event processors, because they add tenant scoped services themselves.
@@ -229,7 +229,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <inheritdoc />
     public Task Disconnect(CancellationToken cancellationToken = default)
     {
-        _eventProcessorCancellationTokenSource.Cancel();
+        _clientCancellationTokenSource.Cancel();
         return Task.WhenAny(_processingCoordinator.Completion, Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken));
     }
 
@@ -253,7 +253,7 @@ public class DolittleClient : IDisposable, IDolittleClient
 
         if (disposeManagedResources)
         {
-            _eventProcessorCancellationTokenSource?.Dispose();
+            _clientCancellationTokenSource?.Dispose();
             _eventHorizons?.Dispose();
         }
 
@@ -266,8 +266,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         Func<JsonSerializerSettings> eventSerializerProvider,
         ILoggerFactory loggerFactory,
         ExecutionContext executionContext,
-        TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
-        CancellationToken cancellation)
+        TenantScopedProvidersBuilder tenantScopedProvidersBuilder)
     {
         var aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
         await _unregisteredEventTypes.Register(
@@ -275,7 +274,7 @@ public class DolittleClient : IDisposable, IDolittleClient
                 methodCaller,
                 executionContext,
                 loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
-            cancellation).ConfigureAwait(false);
+            _clientCancellationTokenSource.Token).ConfigureAwait(false);
         EventTypes = _unregisteredEventTypes;
         var reverseCallClientsCreator = new ReverseCallClientCreator(
             pingInterval,
@@ -317,13 +316,13 @@ public class DolittleClient : IDisposable, IDolittleClient
                 loggerFactory.CreateLogger<AggregateRoots>()),
             tenantScopedProvidersBuilder,
             _aggregates,
-            cancellation).ConfigureAwait(false);
+            _clientCancellationTokenSource.Token).ConfigureAwait(false);
         EventHorizons = new EventHorizons(
             methodCaller,
             executionContext,
             _eventHorizonRetryPolicy,
             loggerFactory.CreateLogger<EventHorizons>());
-        _eventHorizonsBuilder.BuildAndSubscribe(_eventHorizons, cancellation);
+        _eventHorizonsBuilder.BuildAndSubscribe(_eventHorizons, _clientCancellationTokenSource.Token);
 
         Projections = new ProjectionStoreBuilder(
             methodCaller,
@@ -342,37 +341,32 @@ public class DolittleClient : IDisposable, IDolittleClient
         Resources = new ResourcesBuilder(methodCaller, executionContext, loggerFactory);
     }
 
-    void StartEventProcessors(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    void StartEventProcessors(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, ILoggerFactory loggerFactory)
     {
-        _eventProcessorCancellationTokenSource = new CancellationTokenSource();
         _unregisteredEventHandlers.Register(
             _eventProcessors,
             _eventProcessingConverter,
             tenantScopedProvidersBuilder,
             loggerFactory,
-            cancellationToken,
-            GetStopProcessingToken());
+            _clientCancellationTokenSource.Token);
         _unregisteredEventFilters.Register(
             _eventProcessors,
             _eventProcessingConverter,
             loggerFactory,
-            cancellationToken,
-            GetStopProcessingToken());
+            _clientCancellationTokenSource.Token);
         _unregisteredProjections.Register(
             _eventProcessors,
             _eventProcessingConverter,
             _projectionConverter,
             loggerFactory,
-            cancellationToken,
-            GetStopProcessingToken());
+            _clientCancellationTokenSource.Token);
         _unregisteredEmbeddings.Register(
             _eventProcessors,
             _eventsToProtobufConverter,
             _projectionConverter,
             _unregisteredEventTypes,
             loggerFactory,
-            cancellationToken,
-            GetStopProcessingToken());
+            _clientCancellationTokenSource.Token);
     }
 
     TRequiresStartService GetOrThrowIfNotConnected<TRequiresStartService>(TRequiresStartService service)
@@ -402,6 +396,4 @@ public class DolittleClient : IDisposable, IDolittleClient
             .AddScoped(_ => Projections.ForTenant(tenant))
             .AddScoped(_ => Embeddings.ForTenant(tenant))
             .AddScoped(_ => Resources.ForTenant(tenant));
-
-    CancellationToken GetStopProcessingToken() => _eventProcessorCancellationTokenSource.Token;
 }

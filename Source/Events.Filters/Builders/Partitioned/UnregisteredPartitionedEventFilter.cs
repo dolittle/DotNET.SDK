@@ -40,10 +40,9 @@ public class UnregisteredPartitionedEventFilter : ICanRegisterEventFilterProcess
         IEventProcessors eventProcessors,
         IEventProcessingConverter converter,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken)
+        CancellationToken cancellationToken)
     {
         var filter = new PartitionedEventFilterProcessor(_filterId, _scopeId, _callback, converter, loggerFactory);
-        eventProcessors.Register(filter, _protocol, cancelConnectToken, stopProcessingToken);
+        eventProcessors.Register(filter, _protocol, cancellationToken);
     }
 }

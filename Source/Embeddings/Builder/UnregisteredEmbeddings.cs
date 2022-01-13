@@ -39,8 +39,7 @@ public class UnregisteredEmbeddings : UniqueBindings<EmbeddingModelId, Internal.
         IConvertProjectionsToSDK projectionsConverter,
         IEventTypes eventTypes,
         ILoggerFactory loggerFactory,
-        CancellationToken cancelConnectToken,
-        CancellationToken stopProcessingToken)
+        CancellationToken cancellationToken)
     {
         foreach (var projection in Values)
         {
@@ -52,8 +51,7 @@ public class UnregisteredEmbeddings : UniqueBindings<EmbeddingModelId, Internal.
                     eventTypes,
                     loggerFactory),
                 new EmbeddingsProtocol(),
-                cancelConnectToken,
-                stopProcessingToken);
+                cancellationToken);
         }
     }
 
