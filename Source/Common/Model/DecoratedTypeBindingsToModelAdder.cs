@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
@@ -42,7 +43,6 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     /// </summary>
     /// <param name="type">The <see cref="Type"/> that is decorated with <typeparamref name="TDecorator"/> and is to be bound to the derived <typeparamref name="TIdentifier"/>.</param>
     /// <param name="decorator">The <typeparamref name="TDecorator"/> that has the <typeparamref name="TIdentifier"/>.</param>
-    /// <param name="identifier">The unique <typeparamref name="TIdentifier"/> that is bound to the given <see cref="Type"/>.</param>
     /// <returns>A value indicating whether the given <see cref="Type"/> is decorated with <typeparamref name="TDecorator"/>.</returns>
     public bool TryAdd(Type type, out TDecorator decorator)
     {
@@ -62,14 +62,20 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     public IEnumerable<(Type, TDecorator)> AddFromAssembly(Assembly assembly)
     {
         var result = new List<(Type, TDecorator)>();
-        foreach (var type in assembly.ExportedTypes)
+        try
         {
-            if (!type.TryGetDecorator<TDecorator>(out var decorator))
+            foreach (var type in assembly.ExportedTypes)
             {
-                continue;
+                if (!type.TryGetDecorator<TDecorator>(out var decorator))
+                {
+                    continue;
+                }
+                AddBinding(decorator.GetIdentifier(), type);
+                result.Add((type, decorator));
             }
-            AddBinding(decorator.GetIdentifier(), type);
-            result.Add((type, decorator));
+        }
+        catch
+        {
         }
         return result;
     }

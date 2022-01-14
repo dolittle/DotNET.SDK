@@ -3,6 +3,7 @@
 
 
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Common.ClientSetup;
 
@@ -11,6 +12,11 @@ namespace Dolittle.SDK.Common.ClientSetup;
 /// </summary>
 public interface IClientBuildResults
 {
+    /// <summary>
+    /// Gets a value indicating whether the client building failed or not.
+    /// </summary>
+    bool Failed { get; }
+    
     /// <summary>
     /// Adds the <see cref="ClientBuildResult"/>.
     /// </summary>
@@ -35,9 +41,10 @@ public interface IClientBuildResults
     /// </summary>
     /// <param name="error">The <see cref="Exception"/> that was thrown.</param>
     void AddError(Exception error);
-    
+
     /// <summary>
-    /// Gets a value indicating whether the client building failed or not.
+    /// Writes the build result to the provided logger.
     /// </summary>
-    bool Failed { get; }
+    /// <param name="logger">The provided <see cref="ILogger"/>.</param>
+    public void WriteTo(ILogger logger);
 }

@@ -44,18 +44,7 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
     public override string ToString() => $"{Tag}({Id.Value} {ExtrasAsString()})";
 
     string ExtrasAsString()
-    {
-        if (_extras == null)
-        {
-            return string.Empty;
-        }
-        var stringParts = new List<string>();
-        foreach (var property in typeof(TExtras).GetProperties())
-        {
-            stringParts.Add($"{property.Name}: {property.GetValue(_extras)}");
-        }
-        return string.Join(", ", stringParts);
-    }
+        => _extras == null ? string.Empty : $"{typeof(TExtras).Name}: {_extras}";
 }
 
 /// <summary>
@@ -76,10 +65,8 @@ public abstract class Identifier<TId> : IIdentifier<TId>
         Id = id;
     }
 
-
     /// <inheritdoc />
     public TId Id { get; }
-
 
     /// <inheritdoc />
     Guid IIdentifier.Id => Id.Value;
@@ -88,7 +75,6 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     /// Gets the tag name.
     /// </summary>
     protected string Tag { get; }
-
 
     /// <inheritdoc />
     public virtual bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier) => false;
@@ -99,7 +85,7 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     /// <inheritdoc />
     public override bool Equals(object obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (obj is null)
         {
             return false;
         }

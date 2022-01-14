@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,6 +13,7 @@ namespace Dolittle.SDK.Common.Model;
 /// <typeparam name="TValue"></typeparam>
 public class DeDuplicatedIdentifierMap<TValue> : IdentifierMap<TValue>
 {
+    record CountedBindings<TValue>(IdentifierMapBinding<TValue> Binding, int NumBindings);
     /// <summary>
     /// Initializes an instance of the <see cref="DeDuplicatedIdentifierMap{TValue}"/> 
     /// </summary>
@@ -21,22 +23,18 @@ public class DeDuplicatedIdentifierMap<TValue> : IdentifierMap<TValue>
     {
         foreach (var (identifierId, bindings) in map)
         {
-            var groupedBindings = bindings.GroupBy(binding => binding).ToArray();
-            PerformCallbackOnDuplicateBindings(groupedBindings, onDuplicate);
-            Add(identifierId, groupedBindings.Where(ThereAreNoDuplicates).Select(_ => _.Key).ToList());
+            var countedBindings = bindings.GroupBy(binding => binding, (binding, bindings) => new CountedBindings<TValue>(binding, bindings.Count())).ToArray();
+            PerformCallbackOnDuplicateBindings(countedBindings, onDuplicate);
+            Add(identifierId, countedBindings.Select(_ => _.Binding).ToList());
         }
     }
 
-    static void PerformCallbackOnDuplicateBindings(IEnumerable<IGrouping<IdentifierMapBinding<TValue>, IdentifierMapBinding<TValue>>> groupedBindings, OnDuplicateBindingsCallback<TValue> callback = default)
+    static void PerformCallbackOnDuplicateBindings(IEnumerable<CountedBindings<TValue>> countedBindings, OnDuplicateBindingsCallback<TValue> callback = default)
     {
-        foreach (var duplicate in groupedBindings
-                     .Where(ThereAreDuplicates)
-                     .Select(group => new {binding = group.Key, count = group.Count()}))
+        foreach (var ((binding, value), numDuplicates) in countedBindings.Where(_ => _.NumBindings > 1))
         {
-            callback?.Invoke(duplicate.binding.Binding, duplicate.binding.BindingValue, duplicate.count);
+            Console.WriteLine($"Performing duplicate callback for {binding} with {numDuplicates} duplicates");
+            callback?.Invoke(binding, value, numDuplicates);
         }
     }
-
-    static bool ThereAreDuplicates(IGrouping<IdentifierMapBinding<TValue>, IdentifierMapBinding<TValue>> bindings) => bindings.Count() > 1;
-    static bool ThereAreNoDuplicates(IGrouping<IdentifierMapBinding<TValue>, IdentifierMapBinding<TValue>> bindings) => !ThereAreDuplicates(bindings);
 }

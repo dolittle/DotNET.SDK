@@ -14,6 +14,7 @@ public class ClientBuildResults : IClientBuildResults
 {
     readonly List<ClientBuildResult> _results = new();
 
+    /// <inheritdoc />
     public void Add(ClientBuildResult result)
     {
         if (result.IsFailed)
@@ -38,10 +39,7 @@ public class ClientBuildResults : IClientBuildResults
     /// <inheritdoc />
     public bool Failed { get; private set; }
 
-    /// <summary>
-    /// Writes the build result to the provided logger.
-    /// </summary>
-    /// <param name="logger">The provided <see cref="ILogger"/>.</param>
+    /// <inheritdoc />
     public void WriteTo(ILogger logger)
     {
         foreach (var result in _results)
