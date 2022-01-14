@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Aggregates.Builders;
@@ -27,20 +28,21 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
     }
 
     /// <inheritdoc />
-    public async Task Register(
-        AggregateRootsClient aggregateRoots,
-        TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
-        IAggregatesBuilder aggregatesBuilder,
-        CancellationToken cancellationToken)
+    public ConfigureTenantServices AddTenantScopedServices(IAggregatesBuilder aggregatesBuilder)
+        => (tenant, serviceCollection) => AddToContainer(tenant, serviceCollection, aggregatesBuilder);
+
+    /// <inheritdoc />
+    public Task Register(AggregateRootsClient aggregateRoots, CancellationToken cancellationToken)
+        => aggregateRoots.Register(All, cancellationToken);
+
+    void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection, IAggregatesBuilder aggregatesBuilder)
     {
-        await aggregateRoots.Register(All, cancellationToken).ConfigureAwait(false);
         foreach (var type in Types)
         {
-            tenantScopedProvidersBuilder.AddTenantServices((tenant, services) =>
+            serviceCollection.AddSingleton(typeof(IAggregateOf<>).MakeGenericType(type), _ =>
             {
-                var aggregates = aggregatesBuilder.ForTenant(tenant);
-                var aggregateOfInstance = Activator.CreateInstance(typeof(AggregateOf<>).MakeGenericType(type), aggregates) ?? throw new CouldNotCreateAggregateOf(type, tenant);
-                services.AddSingleton(typeof(IAggregateOf<>).MakeGenericType(type), aggregateOfInstance);
+                var aggregates = aggregatesBuilder.ForTenant(tenantId);
+                return Activator.CreateInstance(typeof(AggregateOf<>).MakeGenericType(type), aggregates) ?? throw new CouldNotCreateAggregateOf(type, tenantId);
             });
         }
     }

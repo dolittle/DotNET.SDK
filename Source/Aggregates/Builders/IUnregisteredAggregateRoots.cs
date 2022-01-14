@@ -14,16 +14,16 @@ namespace Dolittle.SDK.Aggregates.Builders;
 public interface IUnregisteredAggregateRoots : IAggregateRootTypes
 {
     /// <summary>
+    /// Gets the callback for configuring the <see cref="ITenantScopedProviders"/>.
+    /// </summary>
+    /// <param name="aggregatesBuilder">The <see cref="IAggregatesBuilder"/></param>
+    ConfigureTenantServices AddTenantScopedServices(IAggregatesBuilder aggregatesBuilder);
+
+    /// <summary>
     /// Registers the aggregate roots by with the Runtime.
     /// </summary>
     /// <param name="aggregateRoots">The <see cref="Internal.AggregateRootsClient"/>.</param>
-    /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
-    /// <param name="aggregatesBuilder">The <see cref="IAggregatesBuilder"/>.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public Task Register(
-        AggregateRootsClient aggregateRoots,
-        TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
-        IAggregatesBuilder aggregatesBuilder,
-        CancellationToken cancellationToken);
+    public Task Register(AggregateRootsClient aggregateRoots, CancellationToken cancellationToken);
 }
