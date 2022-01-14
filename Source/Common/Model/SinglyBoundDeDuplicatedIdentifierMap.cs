@@ -22,23 +22,20 @@ public class SinglyBoundDeDuplicatedIdentifierMap<TValue> : IdentifierMap<TValue
     /// <param name="onBindingValueBoundToMultipleIdentifiers">The <see cref="OnBindingValueBoundToMultipleIdentifiers{TValue}"/> to perform on duplicated bindings.</param>
     public SinglyBoundDeDuplicatedIdentifierMap(DeDuplicatedIdentifierMap<TValue> map, OnBindingValueBoundToMultipleIdentifiers<TValue> onBindingValueBoundToMultipleIdentifiers = default)
     {
-        foreach (var (identifierId, bindings) in map)
+        var grouped = map
+            .Values
+            .SelectMany(mappedBindings=> mappedBindings)
+            .GroupBy(_ => _.BindingValue, (value, bindings) => new ValueToIdentifiersMap(value, bindings.Select(_ => _.Binding)));
+        foreach (var (bindingValue, groupedBindings) in grouped.Select(_ => (_.BindingValue, _.Identifiers.ToArray())))
         {
-            var grouped = bindings.GroupBy(
-                _ => _.BindingValue,
-                (value, bindings) => new ValueToIdentifiersMap(value, bindings.Select(_ => _.Binding)));
-            foreach (var (bindingValue, groupedBindings) in grouped.Select(_ => (_.BindingValue, _.Identifiers.ToArray())))
+            var identifiers = groupedBindings.Select(_ => _.Identifier).ToArray();
+            if (identifiers.Length > 1)
             {
-                var identifiers = groupedBindings.Select(_ => _.Identifier).ToArray();
-                if (identifiers.Length > 1)
-                {
-                    Console.WriteLine($"{bindingValue} is bound to multiple identifiers");
-                    onBindingValueBoundToMultipleIdentifiers?.Invoke(bindingValue, identifiers);
-                }
-                else
-                {
-                    AddBinding(groupedBindings[0], bindingValue);
-                }
+                onBindingValueBoundToMultipleIdentifiers?.Invoke(bindingValue, identifiers);
+            }
+            else
+            {
+                AddBinding(groupedBindings[0], bindingValue);
             }
         }
     }

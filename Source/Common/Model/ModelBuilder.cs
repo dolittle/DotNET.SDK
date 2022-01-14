@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
 
@@ -75,21 +76,25 @@ public class ModelBuilder : IModelBuilder
             deDuplicatedTypes,
             (type, identifiers) =>
             {
-                buildResults.AddFailure($"Type {type} is bound to multiple identifiers:");
+                var sb = new StringBuilder();
+                sb.Append($"Type {type} is bound to multiple identifiers:");
                 foreach (var identifier in identifiers)
                 {
-                    buildResults.AddFailure($"\t {identifier}. This binding will be ignored");
+                    sb.Append($"\n\t{identifier}. This binding will be ignored");
                 }
+                buildResults.AddFailure(sb.ToString());
             });
         var singlyBoundProcessorBuilders = new SinglyBoundDeDuplicatedIdentifierMap<object>(
             deDuplicatedProcessorBuilders,
             (processorBuilder, identifiers) =>
             {
-                buildResults.AddFailure($"Processor Builder {processorBuilder} is bound to multiple identifiers:");
+                var sb = new StringBuilder();
+                sb.Append($"Processor Builder {processorBuilder} is bound to multiple identifiers:");
                 foreach (var identifier in identifiers)
                 {
-                    buildResults.AddFailure($"\t {identifier}. This binding will be ignored");
+                    sb.Append($"\n\t{identifier}. This binding will be ignored");
                 }
+                buildResults.AddFailure(sb.ToString());
             });
         var ids = singlyBoundTypes.Select(_ => _.Key).Concat(singlyBoundProcessorBuilders.Select(_ => _.Key)).ToHashSet();
 
@@ -132,27 +137,31 @@ public class ModelBuilder : IModelBuilder
         {
             conflicts.Add("processors");
         }
-        buildResults.AddFailure($"The identifier {id} was bound to conflicting {string.Join(" and ", conflicts)}:");
+        var sb = new StringBuilder();
+        sb.Append($"The identifier {id} was bound to conflicting {string.Join(" and ", conflicts)}:");
         foreach (var (binding, type)  in conflictingTypes)
         {
-            buildResults.AddFailure($"\t {binding.Identifier} was bound to type {type.Name}. This binding will be ignored");
+            sb.Append($"\n\t{binding.Identifier} was bound to type {type.Name}. This binding will be ignored");
         }
         foreach (var (binding, processorBuilder) in conflictingProcessorBuilders)
         {
-            buildResults.AddFailure($"\t {binding.Identifier} was bound to processor builder {processorBuilder}. This binding will be ignored");
+            sb.Append($"\n\t{binding.Identifier} was bound to processor builder {processorBuilder}. This binding will be ignored");
         }
+        buildResults.AddFailure(sb.ToString());
     }
     static void AddFailedBuildResultsForCoexistentBindings(Guid id, IEnumerable<IdentifierMapBinding<Type>> coexistentTypes, IEnumerable<IdentifierMapBinding<object>> coexistentProcessorBuilders, IClientBuildResults buildResults)
     {
-        buildResults.AddFailure($"The identifier {id} was also bound to:");
+        var sb = new StringBuilder();
+        sb.Append($"The identifier {id} was also bound to:");
         foreach (var (binding, type) in coexistentTypes)
         {
-            buildResults.AddFailure($"\t {binding.Identifier} binding to type {type.Name}. This binding will be ignored");
+            sb.Append($"\n\t{binding.Identifier} binding to type {type.Name}. This binding will be ignored");
         }
         foreach (var (binding, processorBuilder) in coexistentProcessorBuilders)
         {
-            buildResults.AddFailure($"\t {binding.Identifier} binding to processor builder {processorBuilder}. This binding will be ignored");
+            sb.Append($"\n\t{binding.Identifier} binding to processor builder {processorBuilder}. This binding will be ignored");
         }
+        buildResults.AddFailure(sb.ToString());
     }
 
 
@@ -173,21 +182,6 @@ public class ModelBuilder : IModelBuilder
                 conflicts.Add(binding.Identifier);
                 conflicts.Add(otherBinding.Identifier);
             }
-            // foreach (var otherBindings in map
-            //              .Where(keyAndDeDuplicatedBindings => !keyAndDeDuplicatedBindings.Key.Equals(key))
-            //              .Select(_ => _.Value))
-            // {
-            //     foreach (var otherBindingItem in otherBindings)
-            //     {
-            //         var (otherBinding, otherBindingValue) = otherBindingItem;
-            //         if (!bindingValue.Equals(otherBindingValue))
-            //         {
-            //             continue;
-            //         }
-            //         conflicts.Add(binding.Identifier);
-            //         conflicts.Add(otherBinding.Identifier);
-            //     }
-            // }
         }
         var coexisting = bindings.Where(_ => !conflicts.Contains(_.Binding.Identifier));
         var conflicting = bindings.Where(_ => conflicts.Contains(_.Binding.Identifier));
