@@ -120,6 +120,7 @@ public class SetupBuilder : ISetupBuilder
         var model = _modelBuilder.Build(_buildResults);
         var unregisteredEventTypes = _eventTypesBuilder.Build(model);
         return new DolittleClient(
+            _buildResults,
             unregisteredEventTypes,
             _aggregateRootsBuilder.Build(model),
             _eventFiltersBuilder.Build(model, _buildResults),

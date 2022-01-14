@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Embeddings.Builder;
@@ -44,6 +45,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly ICoordinateProcessing _processingCoordinator = new ProcessingCoordinator();
     readonly IConvertProjectionsToSDK _projectionConverter = new ProjectionsToSDKConverter();
     readonly IResolveCallContext _callContextResolver = new CallContextResolver();
+    readonly IClientBuildResults _buildResults;
     readonly IUnregisteredEventTypes _unregisteredEventTypes;
     readonly IUnregisteredAggregateRoots _unregisteredAggregateRoots;
     readonly IUnregisteredEventFilters _unregisteredEventFilters;
@@ -73,6 +75,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClient"/> class.
     /// </summary>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="unregisteredEventTypes">The <see cref="IUnregisteredEventTypes"/>.</param>
     /// <param name="unregisteredAggregateRoots">The <see cref="IUnregisteredAggregateRoots"/>.</param>
     /// <param name="unregisteredEventFilters">The <see cref="IUnregisteredEventFilters"/>.</param>
@@ -82,6 +85,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <param name="eventHorizonsBuilder">The <see cref="SubscriptionsBuilder"/>.</param>
     /// <param name="eventHorizonRetryPolicy">The <see cref="EventSubscriptionRetryPolicy"/>.</param>
     public DolittleClient(
+        IClientBuildResults buildResults,
         IUnregisteredEventTypes unregisteredEventTypes,
         IUnregisteredAggregateRoots unregisteredAggregateRoots,
         IUnregisteredEventFilters unregisteredEventFilters,
@@ -91,6 +95,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         SubscriptionsBuilder eventHorizonsBuilder,
         EventSubscriptionRetryPolicy eventHorizonRetryPolicy)
     {
+        _buildResults = buildResults;
         _unregisteredEventTypes = unregisteredEventTypes;
         _unregisteredAggregateRoots = unregisteredAggregateRoots;
         _unregisteredEventFilters = unregisteredEventFilters;
@@ -218,6 +223,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             loggerFactory,
             executionContext,
             tenantScopedProvidersBuilder).ConfigureAwait(false);
+        _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
         StartEventProcessors(tenantScopedProvidersBuilder, configuration.LoggerFactory);
         Connected = true;
 
