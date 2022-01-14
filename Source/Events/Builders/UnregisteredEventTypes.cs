@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common;
@@ -26,7 +27,16 @@ public class UnregisteredEventTypes : EventTypes, IUnregisteredEventTypes
     /// <inheritdoc />
     public async Task<IEventTypes> Register(EventTypesClient eventTypesClientClient, CancellationToken cancellationToken)
     {
-        await eventTypesClientClient.Register(All, cancellationToken).ConfigureAwait(false);
+        await eventTypesClientClient.Register(Bindings.Select(WithDefaultAliasIfNotSet), cancellationToken).ConfigureAwait(false);
         return this;
+    }
+    static EventType WithDefaultAliasIfNotSet((EventType, Type) binding)
+    {
+        var (eventType, type) = binding;
+        if (!eventType.HasAlias)
+        {
+            eventType = new EventType(eventType.Id, eventType.Generation, type.Name);
+        }
+        return eventType;
     }
 }

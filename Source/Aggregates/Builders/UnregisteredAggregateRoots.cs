@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Internal;
@@ -33,7 +34,7 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
 
     /// <inheritdoc />
     public Task Register(AggregateRootsClient aggregateRoots, CancellationToken cancellationToken)
-        => aggregateRoots.Register(All, cancellationToken);
+        => aggregateRoots.Register(Bindings.Select(WithDefaultAliasIfNotSet), cancellationToken);
 
     void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection, IAggregatesBuilder aggregatesBuilder)
     {
@@ -45,5 +46,15 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
                 return Activator.CreateInstance(typeof(AggregateOf<>).MakeGenericType(type), aggregates) ?? throw new CouldNotCreateAggregateOf(type, tenantId);
             });
         }
+    }
+
+    static AggregateRootType WithDefaultAliasIfNotSet((AggregateRootType, Type) binding)
+    {
+        var (aggregateRootType, type) = binding;
+        if (!aggregateRootType.HasAlias)
+        {
+            aggregateRootType = new AggregateRootType(aggregateRootType.Id, aggregateRootType.Generation, type.Name);
+        }
+        return aggregateRootType;
     }
 }
