@@ -116,17 +116,17 @@ public class SetupBuilder : ISetupBuilder
         {
             DiscoverAndRegisterAll();
         }
-
+        
         var model = _modelBuilder.Build(_buildResults);
-        var unregisteredEventTypes = _eventTypesBuilder.Build(model);
+        var unregisteredEventTypes = EventTypesBuilder.Build(model);
         return new DolittleClient(
             _buildResults,
             unregisteredEventTypes,
-            _aggregateRootsBuilder.Build(model),
-            _eventFiltersBuilder.Build(model, _buildResults),
-            getServiceProviders => _eventHandlersBuilder.Build(model, unregisteredEventTypes, getServiceProviders, _buildResults),
-            _projectionsBuilder.Build(model, unregisteredEventTypes, _buildResults),
-            _embeddingsBuilder.Build(model, unregisteredEventTypes, _buildResults),
+            AggregateRootsBuilder.Build(model),
+            EventFiltersBuilder.Build(model, _buildResults),
+            EventHandlersBuilder.Build(model, unregisteredEventTypes, _buildResults),
+            ProjectionsBuilder.Build(model, unregisteredEventTypes, _buildResults),
+            EmbeddingsBuilder.Build(model, unregisteredEventTypes, _buildResults),
             _eventHorizonsBuilder,
             _eventHorizonRetryPolicy);
     }
