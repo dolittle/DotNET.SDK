@@ -40,7 +40,6 @@ public static class ArtifactExtensions
         where TArtifact : Artifact<TId>
         where TId : ArtifactId
     {
-        Console.WriteLine($"Try to");
         artifact = default;
 
         if (source == default)
@@ -54,8 +53,6 @@ public static class ArtifactExtensions
             error = new CouldNotConvertProtobufArtifact(typeof(TArtifact), source, idError.Message);
             return false;
         }
-        Console.WriteLine($"Got Id {artifactId}");
-        
 
         var idType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Id)).PropertyType;
         var generationType = typeof(TArtifact).GetProperty(nameof(Artifact<TId>.Generation)).PropertyType;
@@ -114,8 +111,6 @@ public static class ArtifactExtensions
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
     public static bool TryToArtifact(this PbArtifact source, out (ArtifactId Id, Generation Generation) artifact, out Exception error)
     {
-        
-        Console.WriteLine($"Try to artifact");
         artifact = default;
         if (!source.Id.TryTo<ArtifactId>(out var id, out error))
         {
