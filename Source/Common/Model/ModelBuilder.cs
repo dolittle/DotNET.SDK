@@ -60,22 +60,43 @@ public class ModelBuilder : IModelBuilder
         var validBindings = new List<IBinding>();
         var deDuplicatedTypes = new DeDuplicatedIdentifierMap<Type>(
             _typesByIdentifier,
-            (binding, type, numDuplicates) =>
+            (binding, _, numDuplicates) =>
             {
                 buildResults.AddInformation($"{binding} appeared {numDuplicates} times");
             });
         var deDuplicatedProcessorBuilders = new DeDuplicatedIdentifierMap<object>(
             _processorBuildersByIdentifier,
-            (binding, processorBuilder, numDuplicates) =>
+            (binding, _, numDuplicates) =>
             {
                 buildResults.AddInformation($"{binding} appeared {numDuplicates} times");
             });
-        var ids = deDuplicatedTypes.Select(_ => _.Key).Concat(deDuplicatedProcessorBuilders.Select(_ => _.Key)).ToHashSet();
+
+        var singlyBoundTypes = new SinglyBoundDeDuplicatedIdentifierMap<Type>(
+            deDuplicatedTypes,
+            (type, identifiers) =>
+            {
+                buildResults.AddFailure($"Type {type} is bound to multiple identifiers:");
+                foreach (var identifier in identifiers)
+                {
+                    buildResults.AddFailure($"\t {identifier}. This binding will be ignored");
+                }
+            });
+        var singlyBoundProcessorBuilders = new SinglyBoundDeDuplicatedIdentifierMap<object>(
+            deDuplicatedProcessorBuilders,
+            (processorBuilder, identifiers) =>
+            {
+                buildResults.AddFailure($"Processor Builder {processorBuilder} is bound to multiple identifiers:");
+                foreach (var identifier in identifiers)
+                {
+                    buildResults.AddFailure($"\t {identifier}. This binding will be ignored");
+                }
+            });
+        var ids = singlyBoundTypes.Select(_ => _.Key).Concat(singlyBoundProcessorBuilders.Select(_ => _.Key)).ToHashSet();
 
         foreach (var id in ids)
         {
-            var (coexistentTypes, conflictingTypes) = SplitCoexistingAndConflictingBindings(deDuplicatedTypes, id);
-            var (coexistentProcessorBuilders, conflictingProcessorBuilders) = SplitCoexistingAndConflictingBindings(deDuplicatedProcessorBuilders, id);
+            var (coexistentTypes, conflictingTypes) = SplitCoexistingAndConflictingBindings(singlyBoundTypes, id);
+            var (coexistentProcessorBuilders, conflictingProcessorBuilders) = SplitCoexistingAndConflictingBindings(singlyBoundProcessorBuilders, id);
 
             if (!conflictingTypes.Any() && !conflictingProcessorBuilders.Any())
             {
@@ -96,9 +117,12 @@ public class ModelBuilder : IModelBuilder
         return new Model(validBindings);
     }
 
-    static void AddFailedBuildResultsForConflictingBindings(Guid id, IdentifierMapBinding<Type>[] conflictingTypes, IdentifierMapBinding<object>[] conflictingProcessorBuilders, IClientBuildResults buildResults)
+    static void AddFailedBuildResultsForConflictingBindings(
+        Guid id,
+        IdentifierMapBinding<Type>[] conflictingTypes,
+        IdentifierMapBinding<object>[] conflictingProcessorBuilders,
+        IClientBuildResults buildResults)
     {
-        
         var conflicts = new List<string>();
         if (conflictingTypes.Any())
         {
@@ -132,14 +156,13 @@ public class ModelBuilder : IModelBuilder
     }
 
 
-    static (IdentifierMapBinding<TValue>[] coexisting, IdentifierMapBinding<TValue>[] conflicting) SplitCoexistingAndConflictingBindings<TValue>(DeDuplicatedIdentifierMap<TValue> map, Guid key)
+    static (IdentifierMapBinding<TValue>[] coexisting, IdentifierMapBinding<TValue>[] conflicting) SplitCoexistingAndConflictingBindings<TValue>(SinglyBoundDeDuplicatedIdentifierMap<TValue> map, Guid key)
     {
         if (!map.TryGetValue(key, out var bindings))
         {
             return (Enumerable.Empty<IdentifierMapBinding<TValue>>().ToArray(), Enumerable.Empty<IdentifierMapBinding<TValue>>().ToArray());
         }
         var conflicts = new HashSet<IIdentifier>();
-
         foreach (var (binding, bindingValue) in bindings)
         {
             foreach (var (otherBinding, _) in from otherBinding in bindings
@@ -150,6 +173,21 @@ public class ModelBuilder : IModelBuilder
                 conflicts.Add(binding.Identifier);
                 conflicts.Add(otherBinding.Identifier);
             }
+            // foreach (var otherBindings in map
+            //              .Where(keyAndDeDuplicatedBindings => !keyAndDeDuplicatedBindings.Key.Equals(key))
+            //              .Select(_ => _.Value))
+            // {
+            //     foreach (var otherBindingItem in otherBindings)
+            //     {
+            //         var (otherBinding, otherBindingValue) = otherBindingItem;
+            //         if (!bindingValue.Equals(otherBindingValue))
+            //         {
+            //             continue;
+            //         }
+            //         conflicts.Add(binding.Identifier);
+            //         conflicts.Add(otherBinding.Identifier);
+            //     }
+            // }
         }
         var coexisting = bindings.Where(_ => !conflicts.Contains(_.Binding.Identifier));
         var conflicting = bindings.Where(_ => conflicts.Contains(_.Binding.Identifier));

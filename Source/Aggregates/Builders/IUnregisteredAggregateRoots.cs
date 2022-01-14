@@ -16,8 +16,7 @@ public interface IUnregisteredAggregateRoots : IAggregateRootTypes
     /// <summary>
     /// Gets the callback for configuring the <see cref="ITenantScopedProviders"/>.
     /// </summary>
-    /// <param name="aggregatesBuilder">The <see cref="IAggregatesBuilder"/></param>
-    ConfigureTenantServices AddTenantScopedServices(IAggregatesBuilder aggregatesBuilder);
+    ConfigureTenantServices AddTenantScopedServices { get; }
 
     /// <summary>
     /// Registers the aggregate roots by with the Runtime.

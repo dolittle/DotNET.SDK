@@ -26,25 +26,25 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
     public UnregisteredAggregateRoots(IUniqueBindings<AggregateRootType, Type> bindings)
         : base(bindings)
     {
+        AddTenantScopedServices = AddToContainer;
     }
 
     /// <inheritdoc />
-    public ConfigureTenantServices AddTenantScopedServices(IAggregatesBuilder aggregatesBuilder)
-        => (tenant, serviceCollection) => AddToContainer(tenant, serviceCollection, aggregatesBuilder);
+    public ConfigureTenantServices AddTenantScopedServices { get; }
 
     /// <inheritdoc />
     public Task Register(AggregateRootsClient aggregateRoots, CancellationToken cancellationToken)
         => aggregateRoots.Register(Bindings.Select(WithDefaultAliasIfNotSet), cancellationToken);
 
-    void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection, IAggregatesBuilder aggregatesBuilder)
+    void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection)
     {
         foreach (var type in Types)
         {
-            serviceCollection.AddSingleton(typeof(IAggregateOf<>).MakeGenericType(type), _ =>
-            {
-                var aggregates = aggregatesBuilder.ForTenant(tenantId);
-                return Activator.CreateInstance(typeof(AggregateOf<>).MakeGenericType(type), aggregates) ?? throw new CouldNotCreateAggregateOf(type, tenantId);
-            });
+            serviceCollection.AddSingleton(
+                typeof(IAggregateOf<>).MakeGenericType(type),
+                serviceProvider => Activator.CreateInstance(
+                    typeof(AggregateOf<>).MakeGenericType(type),
+                    serviceProvider.GetService<IAggregates>()) ?? throw new CouldNotCreateAggregateOf(type, tenantId));
         }
     }
 

@@ -387,7 +387,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         Services = new TenantScopedProvidersBuilder()
             .AddTenantServices(AddBuilderServices)
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
-            .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices(_aggregates))
+            .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
             .AddTenantServices(config.ConfigureTenantServices)
             .Build(config.ServiceProvider, _tenants.Select(_ => _.Id).ToHashSet());
     }
