@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
@@ -52,7 +50,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         {
             return this;
         }
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(decorator.GetIdentifier(), new ConventionTypeEventHandlerBuilder(type, decorator));
+        _modelBuilder.BindIdentifierToProcessorBuilder(decorator.GetIdentifier(), new ConventionTypeEventHandlerBuilder(type, decorator));
         return this;
     }
 
@@ -64,7 +62,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         {
             return this;
         }
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(decorator.GetIdentifier(), new ConventionInstanceEventHandlerBuilder(eventHandlerInstance, decorator));
+        _modelBuilder.BindIdentifierToProcessorBuilder(decorator.GetIdentifier(), new ConventionInstanceEventHandlerBuilder(eventHandlerInstance, decorator));
         return this;
     }
 
@@ -74,7 +72,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         var addedEventHandlerBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
         foreach (var (type, decorator) in addedEventHandlerBindings)
         {
-            _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(decorator.GetIdentifier(), new ConventionTypeEventHandlerBuilder(type, decorator));
+            _modelBuilder.BindIdentifierToProcessorBuilder(decorator.GetIdentifier(), new ConventionTypeEventHandlerBuilder(type, decorator));
         }
 
         return this;
@@ -85,14 +83,27 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     /// </summary>
     /// <param name="model">The <see cref="IModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-    /// <param name="tenantScopedProvidersFactory">The <see cref="Func{TResult}"/> for getting <see cref="ITenantScopedProviders" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public IUnregisteredEventHandlers Build(IModel model, IEventTypes eventTypes, Func<ITenantScopedProviders> tenantScopedProvidersFactory, IClientBuildResults buildResults)
+    public static IUnregisteredEventHandlers Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var eventHandlers = new UniqueBindings<EventHandlerModelId, IEventHandler>();
-        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildEventHandler>().Select(_ => _.ProcessorBuilder))
+        foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, tenantScopedProvidersFactory, out var eventHandler))
+            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            {
+                eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
+            }
+        }
+        foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
+        {
+            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            {
+                eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
+            }
+        }
+        foreach (var (_, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
+        {
+            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
             {
                 eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
             }

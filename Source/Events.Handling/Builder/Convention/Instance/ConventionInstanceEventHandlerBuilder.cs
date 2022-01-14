@@ -39,7 +39,6 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
     public override bool TryBuild(
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
-        Func<ITenantScopedProviders> tenantScopedProvidersFactory,
         out IEventHandler eventHandler)
         => TryBuild(
             eventTypes,

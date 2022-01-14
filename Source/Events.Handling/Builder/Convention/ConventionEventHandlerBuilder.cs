@@ -44,7 +44,6 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
     public abstract bool TryBuild(
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
-        System.Func<ITenantScopedProviders> tenantScopedProvidersFactory,
         out IEventHandler eventHandler);
 
     /// <inheritdoc />

@@ -74,14 +74,14 @@ public class EventHandler : IEventHandler
     public bool HasAlias { get; }
 
     /// <inheritdoc/>
-    public async Task Handle(object @event, EventType eventType, EventContext context, CancellationToken cancellation)
+    public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
         if (!_eventHandlerMethods.TryGetValue(eventType, out var method))
         {
             throw new MissingEventHandlerForEventType(eventType);
         }
 
-        Exception exception = await method.TryHandle(@event, context).ConfigureAwait(false);
+        Exception exception = await method.TryHandle(@event, context, serviceProvider).ConfigureAwait(false);
         if (exception != default)
         {
             throw new EventHandlerMethodFailed(Identifier, eventType, @event, exception);

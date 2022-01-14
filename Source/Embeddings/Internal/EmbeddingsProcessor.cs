@@ -73,7 +73,7 @@ public class EmbeddingsProcessor<TReadModel> : EventProcessor<EmbeddingId, Embed
     }
 
     /// <inheritdoc/>
-    protected override Task<EmbeddingResponse> Process(EmbeddingRequest request, ExecutionContext executionContext, CancellationToken cancellation)
+    protected override Task<EmbeddingResponse> Process(EmbeddingRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation)
         => request switch
         {
             { RequestCase: EmbeddingRequest.RequestOneofCase.Compare } => Task.FromResult(HandleCompareRequest(request.Compare, executionContext, cancellation)),

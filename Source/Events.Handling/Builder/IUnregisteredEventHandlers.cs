@@ -15,17 +15,20 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 public interface IUnregisteredEventHandlers : IUniqueBindings<EventHandlerModelId, IEventHandler>
 {
     /// <summary>
+    /// Gets the callback for configuring the <see cref="ITenantScopedProviders"/>.
+    /// </summary>
+    ConfigureTenantServices AddTenantScopedServices { get; }
+    
+    /// <summary>
     /// Registers event handlers.
     /// </summary>
     /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
     /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-    /// <param name="tenantScopedProvidersBuilder">The <see cref="TenantScopedProvidersBuilder"/>.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
     void Register(
         IEventProcessors eventProcessors,
         IEventProcessingConverter processingConverter,
-        TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken);
 }

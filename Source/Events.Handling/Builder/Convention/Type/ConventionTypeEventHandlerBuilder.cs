@@ -5,7 +5,6 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
 namespace Dolittle.SDK.Events.Handling.Builder.Convention.Type;
@@ -33,16 +32,15 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
     public override bool TryBuild(
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
-        Func<ITenantScopedProviders> tenantScopedProvidersFactory,
         out IEventHandler eventHandler)
         => TryBuild(
             eventTypes,
-            method => CreateUntypedHandleMethod(tenantScopedProvidersFactory, method),
-            (eventParameterType, method) => CreateTypedHandleMethod(tenantScopedProvidersFactory, eventParameterType, method),
+            CreateUntypedHandleMethod,
+            CreateTypedHandleMethod,
             buildResults,
             out eventHandler);
 
-    IEventHandlerMethod CreateUntypedHandleMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, MethodInfo method)
+    IEventHandlerMethod CreateUntypedHandleMethod(MethodInfo method)
     {
         var eventHandlerSignatureType = method.ReturnType == typeof(Task) ?
             typeof(TaskEventHandlerMethodSignature<>)
@@ -51,11 +49,10 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
 
         return Activator.CreateInstance(
             typeof(ClassEventHandlerMethod<>).MakeGenericType(EventHandlerType),
-            tenantScopedProvidersFactory,
             eventHandlerSignature) as IEventHandlerMethod;
     }
 
-    IEventHandlerMethod CreateTypedHandleMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, System.Type eventParameterType, MethodInfo method)
+    IEventHandlerMethod CreateTypedHandleMethod(System.Type eventParameterType, MethodInfo method)
     {
         var eventHandlerSignatureGenericTypeDefinition = method.ReturnType == typeof(Task) ?
             typeof(TaskEventHandlerMethodSignature<,>)
@@ -65,7 +62,6 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
 
         return Activator.CreateInstance(
             typeof(TypedClassEventHandlerMethod<,>).MakeGenericType(EventHandlerType, eventParameterType),
-            tenantScopedProvidersFactory,
             eventHandlerSignature) as IEventHandlerMethod;
     }
 }

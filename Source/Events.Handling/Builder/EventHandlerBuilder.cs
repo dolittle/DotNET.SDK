@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Represents a building event handlers.
 /// </summary>
-public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandler
+public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandler, IEquatable<EventHandlerBuilder>
 {
     readonly EventHandlerId _eventHandlerId;
     readonly IModelBuilder _modelBuilder;
@@ -70,7 +70,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, Func<ITenantScopedProviders> tenantScopedProvidersFactory, out IEventHandler eventHandler)
+    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
     {
         eventHandler = default;
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
@@ -91,16 +91,20 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
             : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
         return true;
     }
-
+    
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildEventHandler other) => ReferenceEquals(this, other);
+    public bool Equals(EventHandlerBuilder other) => ReferenceEquals(this, other);
 
     void Bind()
     {
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(ModelId, this);
+        _modelBuilder.BindIdentifierToProcessorBuilder(ModelId, this);
     }
     void Unbind()
     {
-        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildEventHandler>(ModelId, this);
+        _modelBuilder.UnbindIdentifierToProcessorBuilder(ModelId, this);
     }
+
+    /// <inheritdoc />
+    public bool Equals(ICanTryBuildEventHandler other)
+        => ReferenceEquals(this, other);
 }

@@ -4,65 +4,58 @@
 using System;
 using System.Threading.Tasks;
 using Dolittle.SDK.Async;
-using Dolittle.SDK.DependencyInversion;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dolittle.SDK.Events.Handling.Builder.Methods
+namespace Dolittle.SDK.Events.Handling.Builder.Methods;
+
+/// <summary>
+/// An implementation of <see cref="IEventHandlerMethod" /> that invokes a method on an event handler instance for an event of a specific type.
+/// </summary>
+/// <typeparam name="TEventHandler">The <see cref="Type" /> of the event handler.</typeparam>
+/// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
+public class TypedClassEventHandlerMethod<TEventHandler, TEvent> : IEventHandlerMethod
+    where TEventHandler : class
+    where TEvent : class
 {
+    readonly TaskEventHandlerMethodSignature<TEventHandler, TEvent> _method;
+
     /// <summary>
-    /// An implementation of <see cref="IEventHandlerMethod" /> that invokes a method on an event handler instance for an event of a specific type.
+    /// Initializes a new instance of the <see cref="TypedClassEventHandlerMethod{TEventHandler, TEvent}"/> class.
     /// </summary>
-    /// <typeparam name="TEventHandler">The <see cref="Type" /> of the event handler.</typeparam>
-    /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
-    public class TypedClassEventHandlerMethod<TEventHandler, TEvent> : IEventHandlerMethod
-        where TEventHandler : class
-        where TEvent : class
+    /// <param name="method">The <see cref="TaskEventHandlerMethodSignature{TEvent}"/> method to invoke.</param>
+    public TypedClassEventHandlerMethod(TaskEventHandlerMethodSignature<TEventHandler, TEvent> method)
     {
-        readonly Func<ITenantScopedProviders> _tenantScopedProvidersFactory;
-        readonly TaskEventHandlerMethodSignature<TEventHandler, TEvent> _method;
+        _method = method;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedClassEventHandlerMethod{TEventHandler, TEvent}"/> class.
-        /// </summary>
-        /// <param name="tenantScopedProvidersFactory">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
-        /// <param name="method">The <see cref="TaskEventHandlerMethodSignature{TEvent}"/> method to invoke.</param>
-        public TypedClassEventHandlerMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, TaskEventHandlerMethodSignature<TEventHandler, TEvent> method)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TypedClassEventHandlerMethod{TEventHandler, TEvent}"/> class.
+    /// </summary>
+    /// <param name="method">The <see cref="VoidEventHandlerMethodSignature{TEvent}" /> method to invoke.</param>
+    public TypedClassEventHandlerMethod(VoidEventHandlerMethodSignature<TEventHandler, TEvent> method)
+        : this(
+            (instance, @event, context) =>
+            {
+                method(instance, @event, context);
+                return Task.CompletedTask;
+            })
+    { }
+
+    /// <inheritdoc/>
+    public async Task<Try> TryHandle(object @event, EventContext context, IServiceProvider serviceProvider)
+    {
+        if (@event is not TEvent typedEvent)
         {
-            _tenantScopedProvidersFactory = tenantScopedProvidersFactory;
-            _method = method;
+            return new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedClassEventHandlerMethod{TEventHandler, TEvent}"/> class.
-        /// </summary>
-        /// <param name="tenantScopedProvidersFactory">The <see cref="ITenantScopedProviders"/> to use for creating instances of the event handler.</param>
-        /// <param name="method">The <see cref="VoidEventHandlerMethodSignature{TEvent}" /> method to invoke.</param>
-        public TypedClassEventHandlerMethod(Func<ITenantScopedProviders> tenantScopedProvidersFactory, VoidEventHandlerMethodSignature<TEventHandler, TEvent> method)
-            : this(
-                tenantScopedProvidersFactory,
-                (TEventHandler instance, TEvent @event, EventContext context) =>
-                {
-                    method(instance, @event, context);
-                    return Task.CompletedTask;
-                })
-        { }
-
-        /// <inheritdoc/>
-        public async Task<Try> TryHandle(object @event, EventContext context)
+        using var scope = serviceProvider.CreateScope();
+        var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
+        if (eventHandler == null)
         {
-            if (@event is not TEvent typedEvent)
-            {
-                return new TypedEventHandlerMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
-            }
-
-            using var scope = _tenantScopedProvidersFactory().ForTenant(context.CurrentExecutionContext.Tenant).CreateScope();
-            var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
-            if (eventHandler == null)
-            {
-                throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
-            }
-
-            return await _method(eventHandler, typedEvent, context).TryTask().ConfigureAwait(false);
+            throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
         }
+
+        return await _method(eventHandler, typedEvent, context).TryTask().ConfigureAwait(false);
     }
 }

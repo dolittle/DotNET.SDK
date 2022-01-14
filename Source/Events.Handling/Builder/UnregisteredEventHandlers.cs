@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.Model;
@@ -11,6 +10,7 @@ using Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Type;
 using Dolittle.SDK.Events.Handling.Internal;
 using Dolittle.SDK.Events.Processing;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -38,13 +38,16 @@ public class UnregisteredEventHandlers : UniqueBindings<EventHandlerModelId, IEv
     {
         _instanceBuilders = instanceBuilders;
         _typedBuilders = typedBuilders;
+        AddTenantScopedServices = AddToContainer;
     }
+
+    /// <inheritdoc />
+    public ConfigureTenantServices AddTenantScopedServices { get; }
 
     /// <inheritdoc />
     public void Register(
         IEventProcessors eventProcessors,
         IEventProcessingConverter processingConverter,
-        TenantScopedProvidersBuilder tenantScopedProvidersBuilder,
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
@@ -57,23 +60,19 @@ public class UnregisteredEventHandlers : UniqueBindings<EventHandlerModelId, IEv
                     loggerFactory.CreateLogger<EventHandlerProcessor>()),
                 new EventHandlerProtocol(),
                 cancellationToken);
-            AddToContainer(eventHandler.Identifier, tenantScopedProvidersBuilder);
         }
     }
 
-    void AddToContainer(EventHandlerId eventHandlerId, TenantScopedProvidersBuilder tenantScopedProvidersBuilder)
+    void AddToContainer(TenantId tenant, IServiceCollection serviceCollection)
     {
-        var typedBuilderBinding = _typedBuilders.FirstOrDefault(_ => _.Identifier.Id.Equals(eventHandlerId.Value));
-        if (typedBuilderBinding != null)
+        foreach (var (_, builder) in _typedBuilders)
         {
-            tenantScopedProvidersBuilder.AddTenantServices((_, collection) => collection.AddScoped(typedBuilderBinding.ProcessorBuilder.EventHandlerType));
-            return;
+            serviceCollection.AddScoped(builder.EventHandlerType);
         }
-        
-        var instanceBuilderBinding = _instanceBuilders.FirstOrDefault(_ => _.Identifier.Id.Equals(eventHandlerId.Value));
-        if (instanceBuilderBinding != null)
+
+        foreach (var (_, builder) in _instanceBuilders)
         {
-            tenantScopedProvidersBuilder.AddTenantServices((_, collection) => collection.AddSingleton(instanceBuilderBinding.ProcessorBuilder.EventHandlerType, instanceBuilderBinding.ProcessorBuilder.EventHandlerInstance));
+            serviceCollection.AddSingleton(builder.EventHandlerType, builder.EventHandlerInstance);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Concepts;
+using Dolittle.SDK.Tenancy;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
@@ -53,17 +54,17 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
     public abstract TRegisterArguments RegistrationRequest { get; }
 
     /// <inheritdoc/>
-    public async Task<TResponse> Handle(TRequest request, ExecutionContext executionContext, CancellationToken cancellation)
+    public async Task<TResponse> Handle(TRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
         RetryProcessingState retryProcessingState = null;
         try
         {
             retryProcessingState = GetRetryProcessingStateFromRequest(request);
-            return await Process(request, executionContext, cancellation).ConfigureAwait(false);
+            return await Process(request, executionContext, serviceProvider, cancellation).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            var retryAttempt = retryProcessingState != default ? retryProcessingState.RetryCount : 1;
+            var retryAttempt = retryProcessingState?.RetryCount ?? 1;
             var retrySeconds = Math.Min(5 * retryAttempt, 60);
             var retryTimeout = new Duration
             {
@@ -87,9 +88,10 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
     /// </summary>
     /// <param name="request">The <typeparamref name="TRequest"/> to process.</param>
     /// <param name="executionContext">The execution context to handle the request in.</param>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> for the <see cref="TenantId"/> in the <see cref="ExecutionContext"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
     /// <returns>A <see cref="Task" /> that, when resolved, returns a <typeparamref name="TResponse"/>.</returns>
-    protected abstract Task<TResponse> Process(TRequest request, ExecutionContext executionContext, CancellationToken cancellation);
+    protected abstract Task<TResponse> Process(TRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation);
 
     /// <summary>
     /// Gets the <see cref="RetryProcessingState" /> from a <typeparamref name="TRequest"/>.
