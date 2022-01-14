@@ -84,7 +84,7 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     /// <param name="model">The <see cref="IModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
-    public IUnregisteredEmbeddings Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
+    public static IUnregisteredEmbeddings Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var embeddings = new UniqueBindings<EmbeddingModelId, Internal.IEmbedding>();
         foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildEmbedding>().Select(_ => _.ProcessorBuilder))

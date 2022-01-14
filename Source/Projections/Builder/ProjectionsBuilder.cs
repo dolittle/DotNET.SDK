@@ -88,7 +88,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <param name="model">The <see cref="IModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
-    public IUnregisteredProjections Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
+    public static IUnregisteredProjections Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var projections = new UniqueBindings<ProjectionModelId, IProjection>();
         foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildProjection>().Select(_ => _.ProcessorBuilder))

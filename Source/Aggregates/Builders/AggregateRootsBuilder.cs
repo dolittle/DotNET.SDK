@@ -55,7 +55,7 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     /// Builds the aggregate roots by registering them with the Runtime.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public IUnregisteredAggregateRoots Build(IModel model)
+    public static IUnregisteredAggregateRoots Build(IModel model)
     {
         var bindings = model.GetTypeBindings<AggregateRootType, AggregateRootId>();
         return new UnregisteredAggregateRoots(new UniqueBindings<AggregateRootType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));

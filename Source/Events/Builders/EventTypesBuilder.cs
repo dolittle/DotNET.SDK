@@ -38,6 +38,7 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <inheritdoc />
     public IEventTypesBuilder Associate(Type type, EventType eventType)
     {
+        Register(type);
         _modelBuilder.BindIdentifierToType<EventType, EventTypeId>(eventType, type);
         return this;
     }
@@ -82,7 +83,7 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <summary>
     /// Builds the <see cref="IEventTypes"/>.
     /// </summary>
-    public IUnregisteredEventTypes Build(IModel model)
+    public static IUnregisteredEventTypes Build(IModel model)
     {
         var bindings = model.GetTypeBindings<EventType, EventTypeId>();
         return new UnregisteredEventTypes(new UniqueBindings<EventType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));
