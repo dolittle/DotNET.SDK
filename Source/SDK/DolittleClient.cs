@@ -45,21 +45,19 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly ICoordinateProcessing _processingCoordinator = new ProcessingCoordinator();
     readonly IConvertProjectionsToSDK _projectionConverter = new ProjectionsToSDKConverter();
     readonly IResolveCallContext _callContextResolver = new CallContextResolver();
+
     readonly IClientBuildResults _buildResults;
     readonly IUnregisteredEventTypes _unregisteredEventTypes;
     readonly IUnregisteredAggregateRoots _unregisteredAggregateRoots;
     readonly IUnregisteredEventFilters _unregisteredEventFilters;
-    readonly Func<Func<ITenantScopedProviders>, IUnregisteredEventHandlers> _getUnregisteredEventHandlers;
+    readonly IUnregisteredEventHandlers _unregisteredEventHandlers;
     readonly IUnregisteredProjections _unregisteredProjections;
     readonly IUnregisteredEmbeddings _unregisteredEmbeddings;
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
 
-    IUnregisteredEventHandlers _unregisteredEventHandlers;
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
-    IEventProcessors _eventProcessors;
-    IEventProcessingConverter _eventProcessingConverter;
     IProjectionStoreBuilder _projectionStoreBuilder;
     IEventTypes _eventTypes;
     IEmbeddings _embeddingStoreBuilder;
@@ -71,6 +69,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     IEventStoreBuilder _eventStore;
     IAggregatesBuilder _aggregates;
     CancellationTokenSource _clientCancellationTokenSource;
+    EventToSDKConverter _eventToSDKConverter;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -79,7 +78,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <param name="unregisteredEventTypes">The <see cref="IUnregisteredEventTypes"/>.</param>
     /// <param name="unregisteredAggregateRoots">The <see cref="IUnregisteredAggregateRoots"/>.</param>
     /// <param name="unregisteredEventFilters">The <see cref="IUnregisteredEventFilters"/>.</param>
-    /// <param name="getUnregisteredEventHandlers">The <see cref="EventHandlerBuilder"/>.</param>
+    /// <param name="unregisteredEventHandlers">The <see cref="EventHandlerBuilder"/>.</param>
     /// <param name="unregisteredProjections">The <see cref="IUnregisteredProjections"/>.</param>
     /// <param name="unregisteredEmbeddings">The <see cref="IUnregisteredEmbeddings"/>.</param>
     /// <param name="eventHorizonsBuilder">The <see cref="SubscriptionsBuilder"/>.</param>
@@ -89,7 +88,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         IUnregisteredEventTypes unregisteredEventTypes,
         IUnregisteredAggregateRoots unregisteredAggregateRoots,
         IUnregisteredEventFilters unregisteredEventFilters,
-        Func<Func<ITenantScopedProviders>, IUnregisteredEventHandlers> getUnregisteredEventHandlers,
+        IUnregisteredEventHandlers unregisteredEventHandlers,
         IUnregisteredProjections unregisteredProjections,
         IUnregisteredEmbeddings unregisteredEmbeddings,
         SubscriptionsBuilder eventHorizonsBuilder,
@@ -99,7 +98,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         _unregisteredEventTypes = unregisteredEventTypes;
         _unregisteredAggregateRoots = unregisteredAggregateRoots;
         _unregisteredEventFilters = unregisteredEventFilters;
-        _getUnregisteredEventHandlers = getUnregisteredEventHandlers;
+        _unregisteredEventHandlers = unregisteredEventHandlers;
         _unregisteredProjections = unregisteredProjections;
         _unregisteredEmbeddings = unregisteredEmbeddings;
         _eventHorizonsBuilder = eventHorizonsBuilder;
@@ -204,8 +203,24 @@ public class DolittleClient : IDisposable, IDolittleClient
             throw new CannotConnectDolittleClientMultipleTimes();
         }
         
-        var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
         var loggerFactory = configuration.LoggerFactory;
+        _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
+        var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
+        (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+        CreateDependencies(
+            methodCaller,
+            configuration.EventSerializerProvider,
+            loggerFactory,
+            executionContext);
+        ConfigureContainer(configuration);
+        await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
+        Connected = true;
+        
+        return this;
+    }
+
+    static Task<ConnectionResult> ConnectToRuntime(IPerformMethodCalls methodCaller, DolittleClientConfiguration configuration, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    {
         var runtimeConnector = new DolittleRuntimeConnector(
             configuration.RuntimeHost,
             configuration.RuntimePort,
@@ -213,23 +228,8 @@ public class DolittleClient : IDisposable, IDolittleClient
             new HandshakeClient(methodCaller, loggerFactory.CreateLogger<HandshakeClient>()),
             new TenantsClient(methodCaller, loggerFactory.CreateLogger<TenantsClient>()),
             loggerFactory.CreateLogger<DolittleRuntimeConnector>());
-        (var executionContext, Tenants) = await runtimeConnector.ConnectForever(cancellationToken).ConfigureAwait(false);
-        var tenantScopedProvidersBuilder = new TenantScopedProvidersBuilder();
-        _clientCancellationTokenSource = new CancellationTokenSource();
-        await RegisterAndCreateDependencies(
-            methodCaller,
-            configuration.PingInterval,
-            configuration.EventSerializerProvider,
-            loggerFactory,
-            executionContext,
-            tenantScopedProvidersBuilder).ConfigureAwait(false);
-        _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
-        StartEventProcessors(tenantScopedProvidersBuilder, configuration.LoggerFactory);
-        Connected = true;
-
-        // It's currently important that the container gets built after registering and starting the event processors, because they add tenant scoped services themselves.
-        ConfigureContainer(tenantScopedProvidersBuilder, configuration);
-        return this;
+        
+        return runtimeConnector.ConnectForever(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -266,45 +266,24 @@ public class DolittleClient : IDisposable, IDolittleClient
         _disposed = true;
     }
 
-    async Task RegisterAndCreateDependencies(
+    void CreateDependencies(
         IPerformMethodCalls methodCaller,
-        TimeSpan pingInterval,
         Func<JsonSerializerSettings> eventSerializerProvider,
         ILoggerFactory loggerFactory,
-        ExecutionContext executionContext,
-        TenantScopedProvidersBuilder tenantScopedProvidersBuilder)
+        ExecutionContext executionContext)
     {
-        var aggregateRoots = new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>());
-        await _unregisteredEventTypes.Register(
-            new Events.Internal.EventTypesClient(
-                methodCaller,
-                executionContext,
-                loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
-            _clientCancellationTokenSource.Token).ConfigureAwait(false);
-        EventTypes = _unregisteredEventTypes;
-        var reverseCallClientsCreator = new ReverseCallClientCreator(
-            pingInterval,
-            methodCaller,
-            executionContext,
-            loggerFactory);
+        _clientCancellationTokenSource = new CancellationTokenSource();
         var serializer = new EventContentSerializer(_unregisteredEventTypes, eventSerializerProvider);
         _eventsToProtobufConverter = new EventToProtobufConverter(serializer);
-        var eventToSDKConverter = new EventToSDKConverter(serializer);
-        var aggregateEventToProtobufConverter = new AggregateEventToProtobufConverter(serializer);
-        var aggregateEventToSDKConverter = new AggregateEventToSDKConverter(serializer);
-        _eventProcessingConverter = new EventProcessingConverter(eventToSDKConverter);
-        _eventProcessors = new EventProcessors(
-            reverseCallClientsCreator,
-            _processingCoordinator,
-            loggerFactory.CreateLogger<EventProcessors>());
+        _eventToSDKConverter = new EventToSDKConverter(serializer);
 
-        _unregisteredEventHandlers = _getUnregisteredEventHandlers(() => Services);
+        EventTypes = _unregisteredEventTypes;
         EventStore = new EventStoreBuilder(
             methodCaller,
             _eventsToProtobufConverter,
-            eventToSDKConverter,
-            aggregateEventToProtobufConverter,
-            aggregateEventToSDKConverter,
+            _eventToSDKConverter,
+            new AggregateEventToProtobufConverter(serializer),
+            new AggregateEventToSDKConverter(serializer),
             executionContext,
             _callContextResolver,
             _unregisteredEventTypes,
@@ -312,24 +291,13 @@ public class DolittleClient : IDisposable, IDolittleClient
         Aggregates = new AggregatesBuilder(
             _eventStore,
             _unregisteredEventTypes,
-            aggregateRoots,
+            new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>()),
             loggerFactory);
-
-        await _unregisteredAggregateRoots.Register(
-            new AggregateRootsClient(
-                methodCaller,
-                executionContext,
-                loggerFactory.CreateLogger<AggregateRoots>()),
-            tenantScopedProvidersBuilder,
-            _aggregates,
-            _clientCancellationTokenSource.Token).ConfigureAwait(false);
         EventHorizons = new EventHorizons(
             methodCaller,
             executionContext,
             _eventHorizonRetryPolicy,
             loggerFactory.CreateLogger<EventHorizons>());
-        _eventHorizonsBuilder.BuildAndSubscribe(_eventHorizons, _clientCancellationTokenSource.Token);
-
         Projections = new ProjectionStoreBuilder(
             methodCaller,
             executionContext,
@@ -347,27 +315,56 @@ public class DolittleClient : IDisposable, IDolittleClient
         Resources = new ResourcesBuilder(methodCaller, executionContext, loggerFactory);
     }
 
-    void StartEventProcessors(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, ILoggerFactory loggerFactory)
+    async Task RegisterAllUnregistered(IPerformMethodCalls methodCaller, TimeSpan pingInterval, ExecutionContext executionContext, ILoggerFactory loggerFactory)
     {
+        _eventHorizonsBuilder.BuildAndSubscribe(_eventHorizons, _clientCancellationTokenSource.Token);
+        await _unregisteredEventTypes.Register(
+            new Events.Internal.EventTypesClient(
+                methodCaller,
+                executionContext,
+                loggerFactory.CreateLogger<Events.Internal.EventTypesClient>()),
+            _clientCancellationTokenSource.Token).ConfigureAwait(false);
+        await _unregisteredAggregateRoots.Register(
+            new AggregateRootsClient(
+                methodCaller,
+                executionContext,
+                loggerFactory.CreateLogger<AggregateRoots>()),   
+            _clientCancellationTokenSource.Token).ConfigureAwait(false);
+        StartEventProcessors(methodCaller, pingInterval, executionContext, loggerFactory);
+    }
+
+    void StartEventProcessors(IPerformMethodCalls methodCaller, TimeSpan pingInterval, ExecutionContext executionContext, ILoggerFactory loggerFactory)
+    {
+        var reverseCallClientsCreator = new ReverseCallClientCreator(
+            pingInterval,
+            methodCaller,
+            executionContext,
+            _services,
+            loggerFactory);
+        var eventProcessors = new EventProcessors(
+            reverseCallClientsCreator,
+            _processingCoordinator,
+            loggerFactory.CreateLogger<EventProcessors>());
+        
+        var eventProcessingConverter = new EventProcessingConverter(_eventToSDKConverter);
         _unregisteredEventHandlers.Register(
-            _eventProcessors,
-            _eventProcessingConverter,
-            tenantScopedProvidersBuilder,
+            eventProcessors,
+            eventProcessingConverter,
             loggerFactory,
             _clientCancellationTokenSource.Token);
         _unregisteredEventFilters.Register(
-            _eventProcessors,
-            _eventProcessingConverter,
+            eventProcessors,
+            eventProcessingConverter,
             loggerFactory,
             _clientCancellationTokenSource.Token);
         _unregisteredProjections.Register(
-            _eventProcessors,
-            _eventProcessingConverter,
+            eventProcessors,
+            eventProcessingConverter,
             _projectionConverter,
             loggerFactory,
             _clientCancellationTokenSource.Token);
         _unregisteredEmbeddings.Register(
-            _eventProcessors,
+            eventProcessors,
             _eventsToProtobufConverter,
             _projectionConverter,
             _unregisteredEventTypes,
@@ -385,14 +382,14 @@ public class DolittleClient : IDisposable, IDolittleClient
         return service;
     }
 
-    void ConfigureContainer(TenantScopedProvidersBuilder tenantScopedProvidersBuilder, DolittleClientConfiguration config)
+    void ConfigureContainer(DolittleClientConfiguration config)
     {
-        Services = tenantScopedProvidersBuilder
-            .WithRoot(config.ServiceProvider)
-            .WithTenants(_tenants.Select(_ => _.Id))
+        Services = new TenantScopedProvidersBuilder()
             .AddTenantServices(AddBuilderServices)
+            .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
+            .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices(_aggregates))
             .AddTenantServices(config.ConfigureTenantServices)
-            .Build();
+            .Build(config.ServiceProvider, _tenants.Select(_ => _.Id).ToHashSet());
     }
 
     void AddBuilderServices(TenantId tenant, IServiceCollection services)
