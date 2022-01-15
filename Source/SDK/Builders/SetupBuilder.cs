@@ -171,11 +171,11 @@ public class SetupBuilder : ISetupBuilder
 
     void DiscoverAndRegisterAll()
     {
-        RegisterAllEmbeddings();
-        RegisterAllProjections();
+        RegisterAllEventTypes();
         RegisterAllAggregateRoots();
         RegisterAllEventHandlers();
-        RegisterAllEventTypes();
+        RegisterAllProjections();
+        RegisterAllEmbeddings();
     }
 
     void RegisterAllEventTypes() => ForAllAllScannedAssemblies(assembly => _eventTypesBuilder.RegisterAllFrom(assembly));
