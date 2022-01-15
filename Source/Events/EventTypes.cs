@@ -21,4 +21,11 @@ public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
         : base(bindings)
     {
     }
+
+    /// <summary>
+    /// Initializes an instance of the <see cref="EventTypes"/> class.w
+    /// </summary>
+    public EventTypes()
+    {
+    }
 }
