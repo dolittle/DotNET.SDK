@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using System.Threading;
 using Dolittle.Runtime.Embeddings.Contracts;
 using Dolittle.SDK.Common;
@@ -41,11 +42,11 @@ public class UnregisteredEmbeddings : UniqueBindings<EmbeddingModelId, Internal.
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
-        foreach (var projection in Values)
+        foreach (var embedding in Values)
         {
             eventProcessors.Register(
-                CreateProjectionsProcessor(
-                    projection,
+                CreateEmbeddingsProcessor(
+                    embedding,
                     eventsConverter,
                     projectionsConverter,
                     eventTypes,
@@ -58,14 +59,14 @@ public class UnregisteredEmbeddings : UniqueBindings<EmbeddingModelId, Internal.
     /// <inheritdoc />
     public IEmbeddingReadModelTypes ReadModelTypes { get; }
 
-    static EventProcessor<EmbeddingId, EmbeddingRegistrationRequest, EmbeddingRequest, EmbeddingResponse> CreateProjectionsProcessor(
+    static EventProcessor<EmbeddingId, EmbeddingRegistrationRequest, EmbeddingRequest, EmbeddingResponse> CreateEmbeddingsProcessor(
         Internal.IEmbedding embedding,
         IConvertEventsToProtobuf eventsConverter,
         IConvertProjectionsToSDK projectionConverter,
         IEventTypes eventTypes,
         ILoggerFactory loggerFactory)
     {
-        var processorType = typeof(EmbeddingsProcessor<>).MakeGenericType(embedding.ReadModelType); 
+        var processorType = typeof(EmbeddingsProcessor<>).MakeGenericType(embedding.ReadModelType);
         return Activator.CreateInstance(
             processorType,
             embedding,

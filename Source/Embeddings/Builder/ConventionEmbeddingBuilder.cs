@@ -71,7 +71,7 @@ public class ConventionEmbeddingBuilder<TEmbedding> : ICanTryBuildEmbedding
             updateMethod,
             deleteMethod);
 
-        return false;
+        return true;
     }
 
 
