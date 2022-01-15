@@ -308,7 +308,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         var attributes = method
             .GetCustomAttributes()
             .OfType<IKeySelectorAttribute>().ToArray();
-        if (attributes.Any())
+        if (attributes.Length > 1)
         {
             buildResults.AddFailure($"Method {method} on projection {_projectionType} has more than one key selector attributes", "Use only one key selector");
             return false;
