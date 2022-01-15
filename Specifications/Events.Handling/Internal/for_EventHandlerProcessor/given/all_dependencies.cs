@@ -9,6 +9,7 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Machine.Specifications;
+using Moq;
 using Newtonsoft.Json;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
@@ -25,6 +26,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
         protected static some_event event_to_handle;
         protected static EventType event_type_to_handle;
         protected static CancellationToken cancellation_token;
+        protected static Mock<IServiceProvider> service_provider; 
 
         Establish context = () =>
         {
@@ -64,6 +66,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
                 RetryProcessingState = null
             };
             cancellation_token = new CancellationToken(false);
+            service_provider = new Mock<IServiceProvider>();
         };
     }
 }

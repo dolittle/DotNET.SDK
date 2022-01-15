@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts
             associated_type = typeof(string);
         };
 
-        Because of = () => artifacts.Associate(associated_type, associated_artifact);
+        Because of = () => artifacts.Add(associated_artifact, associated_type);
 
         It should_hold_a_associated_artifact_by_generic_type = () => artifacts.HasFor<string>().ShouldBeTrue();
         It should_hold_the_correct_associated_artifact_by_generic_type = () => artifacts.GetFor<string>().ShouldEqual(associated_artifact);

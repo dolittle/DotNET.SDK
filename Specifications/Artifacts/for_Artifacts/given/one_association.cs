@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Artifacts.for_Artifacts.given
             associated_type = typeof(string);
             associated_artifact = new artifact_type("ba89fde2-e57a-4eba-8f9c-f20e2b021f82");
             artifacts = new artifact_types();
-            artifacts.Associate(associated_type, associated_artifact);
+            artifacts.Add(associated_artifact, associated_type);
         };
     }
 }
