@@ -4,6 +4,7 @@
 using System;
 using Dolittle.SDK;
 using System.Threading.Tasks;
+using Dolittle.SDK.Builders;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Tenancy;
@@ -24,14 +25,12 @@ await client.EventStore
 await host.WaitForShutdownAsync();
 
 
-static void SetupDolittle(DolittleClientBuilder builder)
+static void SetupDolittle(ISetupBuilder builder)
     => builder
-        .WithEventTypes(eventTypes => eventTypes.Register<DishPrepared>())
-        .WithEventHandlers(eventHandlers => eventHandlers.RegisterEventHandler<DishHandler>())
         .WithFilters(filters => filters
-            .CreatePublicFilter("2c087657-b318-40b1-ae92-a400de44e507", filterBuilder =>
-                filterBuilder.Handle((@event, eventContext) =>
+            .CreatePublic("2c087657-b318-40b1-ae92-a400de44e507")
+                .Handle((@event, eventContext) =>
                 {
                     Console.WriteLine($"Filtering event {@event} to public streams");
                     return Task.FromResult(new PartitionedFilterResult(true, PartitionId.Unspecified));
-                })));
+                }));
