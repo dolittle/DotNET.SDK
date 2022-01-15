@@ -4,12 +4,13 @@
 
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
+using Grpc.Core.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var host = Host.CreateDefaultBuilder()
-    .UseDolittle(clientBuilder => clientBuilder
-        .WithEventTypes(eventTypes => eventTypes.Register<DishPrepared>())
-        .WithEventHandlers(eventHandlers => eventHandlers.RegisterEventHandler<DishHandler>()))
+    .UseDolittle()
     .Build();
 
 await host.StartAsync();
@@ -17,8 +18,6 @@ await host.StartAsync();
 var client = await host.GetDolittleClient();
 await client.EventStore
     .ForTenant(TenantId.Development)
-    .Commit(eventsBuilder => eventsBuilder
-        .CreateEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"))
-        .FromEventSource("Dolittle Tacos"));
+    .CommitEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"), "Dolittle Tacos");
 
 await host.WaitForShutdownAsync();

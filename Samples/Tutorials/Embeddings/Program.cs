@@ -10,12 +10,7 @@ using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;
 
 var host = Host.CreateDefaultBuilder()
-    .UseDolittle(clientBuilder => clientBuilder
-        .WithEventTypes(eventTypes => eventTypes
-            .Register<EmployeeHired>()
-            .Register<EmployeeTransferred>()
-            .Register<EmployeeRetired>())
-        .WithEmbeddings(embeddings => embeddings.RegisterEmbedding<Employee>()))
+    .UseDolittle()
     .Build();
 
 await host.StartAsync();
@@ -28,7 +23,7 @@ var updatedEmployee = new Employee
     Workplace = "Street Food Taco Truck"
 };
 // Wait for embedding to be registered in the Runtime
-await Task.Delay(TimeSpan.FromSeconds(2));
+await Task.Delay(TimeSpan.FromSeconds(4));
 
 await client.Embeddings
     .ForTenant(TenantId.Development)
