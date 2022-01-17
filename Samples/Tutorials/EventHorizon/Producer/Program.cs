@@ -11,7 +11,14 @@ using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;
 
 var host = Host.CreateDefaultBuilder()
-    .UseDolittle(SetupDolittle)
+    .UseDolittle(_ => _
+        .WithFilters(_ => _
+            .CreatePublic("2c087657-b318-40b1-ae92-a400de44e507")
+            .Handle((@event, eventContext) =>
+            {
+                Console.WriteLine($"Filtering event {@event} to public streams");
+                return Task.FromResult(new PartitionedFilterResult(true, PartitionId.Unspecified));
+            })))
     .Build();
 
 await host.StartAsync();
@@ -23,14 +30,3 @@ await client.EventStore
     .CommitPublicEvent(preparedTaco, "Dolittle Tacos");
 
 await host.WaitForShutdownAsync();
-
-
-static void SetupDolittle(ISetupBuilder builder)
-    => builder
-        .WithFilters(filters => filters
-            .CreatePublic("2c087657-b318-40b1-ae92-a400de44e507")
-                .Handle((@event, eventContext) =>
-                {
-                    Console.WriteLine($"Filtering event {@event} to public streams");
-                    return Task.FromResult(new PartitionedFilterResult(true, PartitionId.Unspecified));
-                }));
