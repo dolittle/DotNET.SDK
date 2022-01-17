@@ -72,4 +72,8 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
             EventHandlerInstance,
             eventHandlerSignature) as IEventHandlerMethod;
     }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj)
+        => Equals(obj as ConventionInstanceEventHandlerBuilder);
 }

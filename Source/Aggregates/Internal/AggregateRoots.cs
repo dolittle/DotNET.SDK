@@ -79,10 +79,7 @@ public class AggregateRoots : IAggregateRoots
     }
 
     static bool ConstructorIsInvalid(Type type, ConstructorInfo constructor, out Exception ex)
-    {
-        ex = default;
-        return IncorrectParameter(type, constructor.GetParameters(), out ex);
-    }
+        => IncorrectParameter(type, constructor.GetParameters(), out ex);
 
     static bool IncorrectParameter(Type type, ParameterInfo[] parameters, out Exception ex)
     {

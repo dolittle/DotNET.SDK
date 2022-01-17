@@ -15,7 +15,7 @@ using MongoDBBaseResource = Dolittle.SDK.Resources.Resource<Dolittle.Runtime.Res
 namespace Dolittle.SDK.Resources.MongoDB.Internal;
 
 /// <summary>
-/// Represents a client for <see cref="Contracts.Resources"/> and an implementation of <see cref="IResources"/>.
+/// Represents a client for <see cref="Runtime.Resources.Contracts.Resources"/> and an implementation of <see cref="IResources"/>.
 /// </summary>
 public class MongoDBResource : MongoDBBaseResource, IMongoDBResource
 {

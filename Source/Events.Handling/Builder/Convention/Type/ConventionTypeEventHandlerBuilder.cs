@@ -64,4 +64,8 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
             typeof(TypedClassEventHandlerMethod<,>).MakeGenericType(EventHandlerType, eventParameterType),
             eventHandlerSignature) as IEventHandlerMethod;
     }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj)
+        => Equals(obj as ConventionTypeEventHandlerBuilder);
 }

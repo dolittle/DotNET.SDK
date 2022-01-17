@@ -104,6 +104,6 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildEventHandler other)
-        => ReferenceEquals(this, other);
+    public override bool Equals(object obj)
+        => Equals(obj as EventHandlerBuilder);
 }
