@@ -5,7 +5,7 @@ using Dolittle.SDK.Concepts;
 
 namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.given
 {
-    public class some_event : Value<some_event>
+    public class some_event
     {
         public string some_string { get; set; }
     }

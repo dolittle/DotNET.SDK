@@ -5,56 +5,55 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represents a sequence of Events that have been committed to the Event Store.
+/// </summary>
+public class CommittedEvents : IReadOnlyList<CommittedEvent>
 {
+    readonly ImmutableList<CommittedEvent> _events;
+
     /// <summary>
-    /// Represents a sequence of Events that have been committed to the Event Store.
+    /// Initializes a new instance of the <see cref="CommittedEvents"/> class.
     /// </summary>
-    public class CommittedEvents : IReadOnlyList<CommittedEvent>
+    /// <param name="events">The <see cref="CommittedEvent">events</see>.</param>
+    public CommittedEvents(IReadOnlyList<CommittedEvent> events)
     {
-        readonly ImmutableList<CommittedEvent> _events;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommittedEvents"/> class.
-        /// </summary>
-        /// <param name="events">The <see cref="CommittedEvent">events</see>.</param>
-        public CommittedEvents(IReadOnlyList<CommittedEvent> events)
+        for (var i = 0; i < events.Count; i++)
         {
-            for (var i = 0; i < events.Count; i++)
-            {
-                var @event = events[i];
-                ThrowIfEventIsNull(@event);
-                if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
-            }
-
-            _events = ImmutableList<CommittedEvent>.Empty.AddRange(events);
+            var @event = events[i];
+            ThrowIfEventIsNull(@event);
+            if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
         }
 
-        /// <summary>
-        /// Gets a value indicating whether or not there are any events in the committed sequence.
-        /// </summary>
-        public bool HasEvents => Count > 0;
+        _events = ImmutableList<CommittedEvent>.Empty.AddRange(events);
+    }
 
-        /// <inheritdoc/>
-        public int Count => _events.Count;
+    /// <summary>
+    /// Gets a value indicating whether or not there are any events in the committed sequence.
+    /// </summary>
+    public bool HasEvents => Count > 0;
 
-        /// <inheritdoc/>
-        public CommittedEvent this[int index] => _events[index];
+    /// <inheritdoc/>
+    public int Count => _events.Count;
 
-        /// <inheritdoc/>
-        public IEnumerator<CommittedEvent> GetEnumerator() => _events.GetEnumerator();
+    /// <inheritdoc/>
+    public CommittedEvent this[int index] => _events[index];
 
-        /// <inheritdoc/>
-        IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
+    /// <inheritdoc/>
+    public IEnumerator<CommittedEvent> GetEnumerator() => _events.GetEnumerator();
 
-        void ThrowIfEventIsNull(CommittedEvent @event)
-        {
-            if (@event == null) throw new EventCannotBeNull();
-        }
+    /// <inheritdoc/>
+    IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
 
-        void ThrowIfEventLogVersionIsOutOfOrder(CommittedEvent @event, CommittedEvent previousEvent)
-        {
-            if (@event.EventLogSequenceNumber <= previousEvent.EventLogSequenceNumber) throw new EventLogSequenceNumberIsOutOfOrder(@event.EventLogSequenceNumber, previousEvent.EventLogSequenceNumber);
-        }
+    void ThrowIfEventIsNull(CommittedEvent @event)
+    {
+        if (@event == null) throw new EventCannotBeNull();
+    }
+
+    void ThrowIfEventLogVersionIsOutOfOrder(CommittedEvent @event, CommittedEvent previousEvent)
+    {
+        if (@event.EventLogSequenceNumber <= previousEvent.EventLogSequenceNumber) throw new EventLogSequenceNumberIsOutOfOrder(@event.EventLogSequenceNumber, previousEvent.EventLogSequenceNumber);
     }
 }

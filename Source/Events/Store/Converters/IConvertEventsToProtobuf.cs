@@ -5,20 +5,19 @@ using System;
 using System.Collections.Generic;
 using PbUncommittedEvent = Dolittle.Runtime.Events.Contracts.UncommittedEvent;
 
-namespace Dolittle.SDK.Events.Store.Converters
+namespace Dolittle.SDK.Events.Store.Converters;
+
+/// <summary>
+/// Defines a system that is capable of converting events to protobuf.
+/// </summary>
+public interface IConvertEventsToProtobuf
 {
     /// <summary>
-    /// Defines a system that is capable of converting events to protobuf.
+    /// Convert from <see cref="UncommittedEvents" /> to <see cref="IReadOnlyList{T}"/> of type <see cref="PbUncommittedEvent"/>.
     /// </summary>
-    public interface IConvertEventsToProtobuf
-    {
-        /// <summary>
-        /// Convert from <see cref="UncommittedEvents" /> to <see cref="IReadOnlyList{T}"/> of type <see cref="PbUncommittedEvent"/>.
-        /// </summary>
-        /// <param name="source"><see cref="UncommittedEvents"/>.</param>
-        /// <param name="events">When the method returns, the converted <see cref="IReadOnlyList{T}"/> of type <see cref="PbUncommittedEvent"/>. if conversion was successful, otherwise null.</param>
-        /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
-        /// <returns>A value indicating whether or not the conversion was successful.</returns>
-        bool TryConvert(UncommittedEvents source, out IReadOnlyList<PbUncommittedEvent> events, out Exception error);
-    }
+    /// <param name="source"><see cref="UncommittedEvents"/>.</param>
+    /// <param name="events">When the method returns, the converted <see cref="IReadOnlyList{T}"/> of type <see cref="PbUncommittedEvent"/>. if conversion was successful, otherwise null.</param>
+    /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
+    /// <returns>A value indicating whether or not the conversion was successful.</returns>
+    bool TryConvert(UncommittedEvents source, out IReadOnlyList<PbUncommittedEvent> events, out Exception error);
 }

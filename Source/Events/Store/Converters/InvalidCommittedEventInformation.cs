@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Store.Converters
+namespace Dolittle.SDK.Events.Store.Converters;
+
+/// <summary>
+/// Exception that gets thrown when there is invalid information on a committed event.
+/// </summary>
+public class InvalidCommittedEventInformation : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is invalid information on a committed event.
+    /// Initializes a new instance of the <see cref="InvalidCommittedEventInformation"/> class.
     /// </summary>
-    public class InvalidCommittedEventInformation : Exception
+    /// <param name="details">The details on what is invalid.</param>
+    /// <param name="innerException">The inner exception that caused the failure.</param>
+    public InvalidCommittedEventInformation(string details, Exception innerException)
+        : base($"Committed event contains invalid information about its {details}", innerException)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidCommittedEventInformation"/> class.
-        /// </summary>
-        /// <param name="details">The details on what is invalid.</param>
-        /// <param name="innerException">The inner exception that caused the failure.</param>
-        public InvalidCommittedEventInformation(string details, Exception innerException)
-            : base($"Committed event contains invalid information about its {details}", innerException)
-        {
-        }
     }
 }

@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor.when_h
             .Setup(_ => _.ToSDK(request.Event))
             .Throws(new System.Exception());
 
-        Because of = () => response = event_handler_processor.Handle(request, execution_context, CancellationToken.None).GetAwaiter().GetResult();
+        Because of = () => response = event_handler_processor.Handle(request, execution_context, service_provider.Object, CancellationToken.None).GetAwaiter().GetResult();
 
         It should_get_a_response = () => response.ShouldNotBeNull();
         It should_have_a_failure = () => response.Failure.ShouldNotBeNull();

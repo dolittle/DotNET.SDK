@@ -28,7 +28,7 @@ namespace Dolittle.SDK.Embeddings
         readonly IPerformMethodCalls _caller;
         readonly IResolveCallContext _callContextResolver;
         readonly ExecutionContext _executionContext;
-        readonly IEmbeddingReadModelTypeAssociations _embeddingAssociations;
+        readonly IEmbeddingReadModelTypes _embeddingAssociations;
         readonly IConvertProjectionsToSDK _toSDK;
         readonly ILogger _logger;
 
@@ -38,14 +38,14 @@ namespace Dolittle.SDK.Embeddings
         /// <param name="caller">The <see cref="IPerformMethodCalls" />.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
         /// <param name="executionContext">The <see cref="ExecutionContext" />.</param>
-        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypeAssociations" />.</param>
+        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypes" />.</param>
         /// <param name="toSDK">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public Embedding(
             IPerformMethodCalls caller,
             IResolveCallContext callContextResolver,
             ExecutionContext executionContext,
-            IEmbeddingReadModelTypeAssociations embeddingAssociations,
+            IEmbeddingReadModelTypes embeddingAssociations,
             IConvertProjectionsToSDK toSDK,
             ILoggerFactory loggerFactory)
             : base(caller, callContextResolver, executionContext, embeddingAssociations, toSDK, loggerFactory.CreateLogger<EmbeddingStore>())

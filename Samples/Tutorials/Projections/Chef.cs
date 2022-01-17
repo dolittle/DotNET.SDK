@@ -7,5 +7,5 @@ using System.Collections.Generic;
 public class Chef
 {
     public string Name = "";
-    public List<string> Dishes = new List<string>();
+    public List<string> Dishes = new();
 }

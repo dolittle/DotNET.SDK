@@ -8,47 +8,46 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Events.Filters.Internal
+namespace Dolittle.SDK.Events.Filters.Internal;
+
+/// <summary>
+/// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter public events.
+/// </summary>
+public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegistrationRequest, PartitionedFilterResponse>
 {
+    readonly PartitionedFilterEventCallback _filterEventCallback;
+    readonly FilterId _filterId;
+
     /// <summary>
-    /// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter public events.
+    /// Initializes a new instance of the <see cref="PublicEventFilterProcessor"/> class.
     /// </summary>
-    public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegistrationRequest, PartitionedFilterResponse>
+    /// <param name="filterId">The <see cref="FilterId" />.</param>
+    /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
+    /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+    /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
+    public PublicEventFilterProcessor(
+        FilterId filterId,
+        PartitionedFilterEventCallback filterEventCallback,
+        IEventProcessingConverter converter,
+        ILoggerFactory loggerFactory)
+        : base("Public Filter", filterId, converter, loggerFactory)
     {
-        readonly PartitionedFilterEventCallback _filterEventCallback;
-        readonly FilterId _filterId;
+        _filterEventCallback = filterEventCallback;
+        _filterId = filterId;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PublicEventFilterProcessor"/> class.
-        /// </summary>
-        /// <param name="filterId">The <see cref="FilterId" />.</param>
-        /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
-        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        public PublicEventFilterProcessor(
-            FilterId filterId,
-            PartitionedFilterEventCallback filterEventCallback,
-            IEventProcessingConverter converter,
-            ILoggerFactory loggerFactory)
-            : base("Public Filter", filterId, converter, loggerFactory)
-        {
-            _filterEventCallback = filterEventCallback;
-            _filterId = filterId;
-        }
+    /// <inheritdoc/>
+    public override PublicFilterRegistrationRequest RegistrationRequest
+        => new() { FilterId = _filterId.ToProtobuf() };
 
-        /// <inheritdoc/>
-        public override PublicFilterRegistrationRequest RegistrationRequest
-            => new PublicFilterRegistrationRequest { FilterId = _filterId.ToProtobuf() };
+    /// <inheritdoc/>
+    protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)
+        => new() { Failure = failure };
 
-        /// <inheritdoc/>
-        protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)
-            => new PartitionedFilterResponse { Failure = failure };
-
-        /// <inheritdoc/>
-        protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
-        {
-            var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
-            return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.Value };
-        }
+    /// <inheritdoc/>
+    protected override async Task<PartitionedFilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
+    {
+        var result = await _filterEventCallback(@event, context).ConfigureAwait(false);
+        return new PartitionedFilterResponse { IsIncluded = result.ShouldInclude, PartitionId = result.PartitionId.Value };
     }
 }

@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Builders
+namespace Dolittle.SDK.Events.Builders;
+
+/// <summary>
+/// Exception that gets thrown when building an event and there is no <see cref="EventType" /> configured for the event.
+/// </summary>
+public class EventTypeNotConfigured : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when building an event and there is no <see cref="EventType" /> configured for the event.
+    /// Initializes a new instance of the <see cref="EventTypeNotConfigured"/> class.
     /// </summary>
-    public class EventTypeNotConfigured : Exception
+    /// <param name="typeOfEvent">The <see cref="Type" /> of the event.</param>
+    public EventTypeNotConfigured(Type typeOfEvent)
+        : base($"Could not build event because no event type was configured and {typeOfEvent} is not decorated with [{typeof(EventTypeAttribute).Name}]. Call {nameof(EventBuilder.WithEventType)}() on event builder or decorate the type of the event with [{typeof(EventTypeAttribute).Name}]")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventTypeNotConfigured"/> class.
-        /// </summary>
-        /// <param name="typeOfEvent">The <see cref="Type" /> of the event.</param>
-        public EventTypeNotConfigured(Type typeOfEvent)
-            : base($"Could not build event because no event type was configured and {typeOfEvent} is not decorated with [{typeof(EventTypeAttribute).Name}]. Call {nameof(EventBuilder.WithEventType)}() on event builder or decorate the type of the event with [{typeof(EventTypeAttribute).Name}]")
-        {
-        }
     }
 }

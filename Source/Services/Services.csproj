@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="../DependencyInversion/DependencyInversion.csproj" />
     <ProjectReference Include="../Execution/Execution.csproj" />
     <ProjectReference Include="../Protobuf/Protobuf.csproj" />
   </ItemGroup>

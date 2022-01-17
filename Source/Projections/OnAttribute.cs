@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Projections
         public OnAttribute(string eventTypeId, uint generation = 0)
             => EventType = new EventType(
                 Guid.Parse(eventTypeId),
-                generation == 0 ? Generation.First : new Generation { Value = generation });
+                generation == 0 ? Generation.First : new(generation));
 
         /// <summary>
         /// Gets the <see cref="Events.EventType" />.

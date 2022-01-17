@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using Machine.Specifications;
+using Moq;
 
 namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling.given
 {
@@ -11,6 +12,7 @@ namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling.given
     {
         protected static EventContext event_context;
         protected static object @event;
+        protected static Mock<IServiceProvider> service_provider;
 
         Establish context = () =>
         {
@@ -36,6 +38,7 @@ namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling.given
                     Security.Claims.Empty,
                     CultureInfo.InvariantCulture));
             @event = new object();
+            service_provider = new Mock<IServiceProvider>();
         };
     }
 }

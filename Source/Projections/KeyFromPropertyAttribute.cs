@@ -24,6 +24,6 @@ namespace Dolittle.SDK.Projections
         public KeySelectorExpression Expression { get; }
 
         /// <inheritdoc/>
-        public KeySelector KeySelector => new KeySelectorBuilder().KeyFromProperty(Expression);
+        public KeySelector KeySelector => KeySelectorBuilder.KeyFromProperty(Expression);
     }
 }

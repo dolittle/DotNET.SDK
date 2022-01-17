@@ -5,12 +5,11 @@ using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.given
 {
-    public class artifact_id_without_parameterless_constructor : ArtifactId
+    public record artifact_id_without_parameterless_constructor : ArtifactId
     {
         public artifact_id_without_parameterless_constructor(ArtifactId id)
-            : base()
+            : base(id)
         {
-            Value = id.Value;
         }
     }
 }

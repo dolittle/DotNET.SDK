@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling
 
         Establish context = () => event_type = new EventType("4b6ace2e-b95f-485e-a68f-75b944218391");
 
-        Because of = () => exception = Catch.Exception(() => event_handler.Handle(new object(), event_type, event_context, CancellationToken.None).GetAwaiter().GetResult());
+        Because of = () => exception = Catch.Exception(() => event_handler.Handle(new object(), event_type, event_context, service_provider.Object, CancellationToken.None).GetAwaiter().GetResult());
 
         It should_throw_exception_because_event_handler_does_not_handle_event_type = () => exception.ShouldBeOfExactType<MissingEventHandlerForEventType>();
     }

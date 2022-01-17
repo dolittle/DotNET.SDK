@@ -18,7 +18,7 @@ namespace Dolittle.SDK.Embeddings.Store.Builders
         readonly IPerformMethodCalls _caller;
         readonly ExecutionContext _executionContext;
         readonly IResolveCallContext _callContextResolver;
-        readonly IEmbeddingReadModelTypeAssociations _projectionAssociations;
+        readonly IEmbeddingReadModelTypes _projectionAssociations;
         readonly IConvertProjectionsToSDK _projectionsToSDKConverter;
         readonly ILoggerFactory _loggerFactory;
 
@@ -28,14 +28,14 @@ namespace Dolittle.SDK.Embeddings.Store.Builders
         /// <param name="caller">The caller for unary calls.</param>
         /// <param name="executionContext">The base <see cref="ExecutionContext"/> to use.</param>
         /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
-        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypeAssociations" />.</param>
+        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypes" />.</param>
         /// <param name="projectionsToSDKConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
         public EmbeddingStoreBuilder(
             IPerformMethodCalls caller,
             ExecutionContext executionContext,
             IResolveCallContext callContextResolver,
-            IEmbeddingReadModelTypeAssociations embeddingAssociations,
+            IEmbeddingReadModelTypes embeddingAssociations,
             IConvertProjectionsToSDK projectionsToSDKConverter,
             ILoggerFactory loggerFactory)
         {

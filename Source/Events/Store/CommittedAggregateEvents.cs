@@ -5,110 +5,109 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represents a sequence of Events applied by an AggregateRoot to an Event Source that have been committed to the Event Store.
+/// </summary>
+public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
 {
+    readonly ImmutableList<CommittedAggregateEvent> _events;
+    readonly AggregateRootVersion _nextAggregateRootVersion;
+
     /// <summary>
-    /// Represents a sequence of Events applied by an AggregateRoot to an Event Source that have been committed to the Event Store.
+    /// Initializes a new instance of the <see cref="CommittedAggregateEvents"/> class.
     /// </summary>
-    public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
+    /// <param name="eventSource">The <see cref="EventSourceId"/> that the Events were applied to.</param>
+    /// <param name="aggregateRootId">The <see cref="AggregateRootId"/> of the Aggregate Root that applied the Events to the Event Source.</param>
+    /// <param name="events">The <see cref="CommittedAggregateEvent">events</see>.</param>
+    public CommittedAggregateEvents(EventSourceId eventSource, AggregateRootId aggregateRootId, IReadOnlyList<CommittedAggregateEvent> events)
     {
-        readonly ImmutableList<CommittedAggregateEvent> _events;
-        readonly AggregateRootVersion _nextAggregateRootVersion;
+        ThrowIfEventsSourceIdIsNull(eventSource);
+        ThrowIfAggregateRootIdIsNull(aggregateRootId);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommittedAggregateEvents"/> class.
-        /// </summary>
-        /// <param name="eventSource">The <see cref="EventSourceId"/> that the Events were applied to.</param>
-        /// <param name="aggregateRootId">The <see cref="AggregateRootId"/> of the Aggregate Root that applied the Events to the Event Source.</param>
-        /// <param name="events">The <see cref="CommittedAggregateEvent">events</see>.</param>
-        public CommittedAggregateEvents(EventSourceId eventSource, AggregateRootId aggregateRootId, IReadOnlyList<CommittedAggregateEvent> events)
+        EventSource = eventSource;
+        AggregateRoot = aggregateRootId;
+
+        for (var i = 0; i < events.Count; i++)
         {
-            ThrowIfEventsSourceIdIsNull(eventSource);
-            ThrowIfAggregateRootIdIsNull(aggregateRootId);
-
-            EventSource = eventSource;
-            AggregateRoot = aggregateRootId;
-
-            for (var i = 0; i < events.Count; i++)
-            {
-                if (i == 0) _nextAggregateRootVersion = events[0].AggregateRootVersion;
-                var @event = events[i];
-                ThrowIfEventIsNull(@event);
-                ThrowIfEventWasAppliedToOtherEventSource(@event);
-                ThrowIfEventWasAppliedByOtherAggregateRoot(@event);
-                ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
-                if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
-                _nextAggregateRootVersion++;
-            }
-
-            _events = ImmutableList<CommittedAggregateEvent>.Empty.AddRange(events);
+            if (i == 0) _nextAggregateRootVersion = events[0].AggregateRootVersion;
+            var @event = events[i];
+            ThrowIfEventIsNull(@event);
+            ThrowIfEventWasAppliedToOtherEventSource(@event);
+            ThrowIfEventWasAppliedByOtherAggregateRoot(@event);
+            ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
+            if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
+            _nextAggregateRootVersion++;
         }
 
-        /// <summary>
-        /// Gets the <see cref="EventSourceId"/> that the Events were applied to.
-        /// </summary>
-        public EventSourceId EventSource { get; }
+        _events = ImmutableList<CommittedAggregateEvent>.Empty.AddRange(events);
+    }
 
-        /// <summary>
-        /// Gets the <see cref="AggregateRootId"/> of the Aggregate Root that applied the Events to the Event Source.
-        /// </summary>
-        public AggregateRootId AggregateRoot { get; }
+    /// <summary>
+    /// Gets the <see cref="EventSourceId"/> that the Events were applied to.
+    /// </summary>
+    public EventSourceId EventSource { get; }
 
-        /// <summary>
-        /// Gets the <see cref="AggregateRootVersion"/>  of the Aggregate Root after all the Events was applied.
-        /// </summary>
-        public AggregateRootVersion AggregateRootVersion => _events.Count == 0 ? AggregateRootVersion.Initial : _events[^1].AggregateRootVersion;
+    /// <summary>
+    /// Gets the <see cref="AggregateRootId"/> of the Aggregate Root that applied the Events to the Event Source.
+    /// </summary>
+    public AggregateRootId AggregateRoot { get; }
 
-        /// <summary>
-        /// Gets a value indicating whether or not there are any events in the committed sequence.
-        /// </summary>
-        public bool HasEvents => Count > 0;
+    /// <summary>
+    /// Gets the <see cref="AggregateRootVersion"/>  of the Aggregate Root after all the Events was applied.
+    /// </summary>
+    public AggregateRootVersion AggregateRootVersion => _events.Count == 0 ? AggregateRootVersion.Initial : _events[^1].AggregateRootVersion;
 
-        /// <inheritdoc/>
-        public int Count => _events.Count;
+    /// <summary>
+    /// Gets a value indicating whether or not there are any events in the committed sequence.
+    /// </summary>
+    public bool HasEvents => Count > 0;
 
-        /// <inheritdoc/>
-        public CommittedAggregateEvent this[int index] => _events[index];
+    /// <inheritdoc/>
+    public int Count => _events.Count;
 
-        /// <inheritdoc/>
-        public IEnumerator<CommittedAggregateEvent> GetEnumerator() => _events.GetEnumerator();
+    /// <inheritdoc/>
+    public CommittedAggregateEvent this[int index] => _events[index];
 
-        /// <inheritdoc/>
-        IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
+    /// <inheritdoc/>
+    public IEnumerator<CommittedAggregateEvent> GetEnumerator() => _events.GetEnumerator();
 
-        void ThrowIfEventsSourceIdIsNull(EventSourceId eventSource)
-        {
-            if (eventSource == null) throw new EventSourceIdCannotBeNull();
-        }
+    /// <inheritdoc/>
+    IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
 
-        void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
-        {
-            if (aggregateRootId == null) throw new AggregateRootIdCannotBeNull();
-        }
+    void ThrowIfEventsSourceIdIsNull(EventSourceId eventSource)
+    {
+        if (eventSource == null) throw new EventSourceIdCannotBeNull();
+    }
 
-        void ThrowIfEventIsNull(CommittedAggregateEvent @event)
-        {
-            if (@event == null) throw new EventCannotBeNull();
-        }
+    void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
+    {
+        if (aggregateRootId == null) throw new AggregateRootIdCannotBeNull();
+    }
 
-        void ThrowIfEventWasAppliedToOtherEventSource(CommittedAggregateEvent @event)
-        {
-            if (@event.EventSource != EventSource) throw new EventWasAppliedToOtherEventSource(@event.EventSource, EventSource);
-        }
+    void ThrowIfEventIsNull(CommittedAggregateEvent @event)
+    {
+        if (@event == null) throw new EventCannotBeNull();
+    }
 
-        void ThrowIfEventWasAppliedByOtherAggregateRoot(CommittedAggregateEvent @event)
-        {
-            if (@event.AggregateRoot != AggregateRoot) throw new EventWasAppliedByOtherAggregateRoot(@event.AggregateRoot, AggregateRoot);
-        }
+    void ThrowIfEventWasAppliedToOtherEventSource(CommittedAggregateEvent @event)
+    {
+        if (@event.EventSource != EventSource) throw new EventWasAppliedToOtherEventSource(@event.EventSource, EventSource);
+    }
 
-        void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
-        {
-            if (@event.AggregateRootVersion != _nextAggregateRootVersion) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, _nextAggregateRootVersion);
-        }
+    void ThrowIfEventWasAppliedByOtherAggregateRoot(CommittedAggregateEvent @event)
+    {
+        if (@event.AggregateRoot != AggregateRoot) throw new EventWasAppliedByOtherAggregateRoot(@event.AggregateRoot, AggregateRoot);
+    }
 
-        void ThrowIfEventLogVersionIsOutOfOrder(CommittedAggregateEvent @event, CommittedAggregateEvent previousEvent)
-        {
-            if (@event.EventLogSequenceNumber <= previousEvent.EventLogSequenceNumber) throw new EventLogSequenceNumberIsOutOfOrder(@event.EventLogSequenceNumber, previousEvent.EventLogSequenceNumber);
-        }
+    void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
+    {
+        if (@event.AggregateRootVersion != _nextAggregateRootVersion) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, _nextAggregateRootVersion);
+    }
+
+    void ThrowIfEventLogVersionIsOutOfOrder(CommittedAggregateEvent @event, CommittedAggregateEvent previousEvent)
+    {
+        if (@event.EventLogSequenceNumber <= previousEvent.EventLogSequenceNumber) throw new EventLogSequenceNumberIsOutOfOrder(@event.EventLogSequenceNumber, previousEvent.EventLogSequenceNumber);
     }
 }

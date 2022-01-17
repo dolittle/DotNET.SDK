@@ -13,6 +13,6 @@ namespace Dolittle.SDK.Projections
     public class KeyFromEventSourceAttribute : Attribute, IKeySelectorAttribute
     {
         /// <inheritdoc/>
-        public KeySelector KeySelector { get; } = new KeySelectorBuilder().KeyFromEventSource();
+        public KeySelector KeySelector { get; } = KeySelectorBuilder.KeyFromEventSource();
     }
 }

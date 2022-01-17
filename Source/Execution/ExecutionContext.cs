@@ -7,74 +7,23 @@ using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.Execution
-{
-    /// <summary>
-    /// Represents a <see cref="ExecutionContext"/>.
-    /// </summary>
-    public class ExecutionContext : Value<ExecutionContext>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExecutionContext"/> class.
-        /// </summary>
-        /// <param name="microservice"><see cref="Microservice"/> that is currently executing.</param>
-        /// <param name="tenant"><see cref="TenantId"/> that is currently part of the <see cref="ExecutionContext"/>.</param>
-        /// <param name="version"><see cref="Version" /> of the <see cref="Microservice" />.</param>
-        /// <param name="environment"><see cref="Environment"/> for this <see cref="ExecutionContext"/>.</param>
-        /// <param name="correlationId"><see cref="CorrelationId"/> for this <see cref="ExecutionContext"/>.</param>
-        /// <param name="claims"><see cref="Claims"/> to populate with.</param>
-        /// <param name="cultureInfo"><see cref="CultureInfo"/> for the <see cref="ExecutionContext"/>.</param>
-        public ExecutionContext(
-            MicroserviceId microservice,
-            TenantId tenant,
-            Version version,
-            Environment environment,
-            CorrelationId correlationId,
-            Claims claims,
-            CultureInfo cultureInfo)
-        {
-            Microservice = microservice;
-            Tenant = tenant;
-            Version = version;
-            Environment = environment;
-            CorrelationId = correlationId;
-            Claims = claims;
-            Culture = cultureInfo;
-        }
+namespace Dolittle.SDK.Execution;
 
-        /// <summary>
-        /// Gets the <see cref="Microservice"/> for the <see cref="ExecutionContext">execution context</see>.
-        /// </summary>
-        public MicroserviceId Microservice { get; }
-
-        /// <summary>
-        /// Gets the <see cref="TenantId"/> for the <see cref="ExecutionContext">execution context</see>.
-        /// </summary>
-        public TenantId Tenant { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Version" /> of the <see cref="Microservice" />.
-        /// </summary>
-        public Version Version { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Environment"/> for the <see cref="ExecutionContext">execution context</see>.
-        /// </summary>
-        public Environment Environment { get; }
-
-        /// <summary>
-        /// Gets the <see cref="CorrelationId"/> for the <see cref="ExecutionContext">execution context</see>.
-        /// </summary>
-        public CorrelationId CorrelationId { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Claims"/> for the <see cref="ExecutionContext">execution context</see>.
-        /// </summary>
-        public Claims Claims { get; }
-
-        /// <summary>
-        /// Gets the <see cref="CultureInfo"/> for the <see cref="ExecutionContext">execution context</see>.
-        /// </summary>
-        public CultureInfo Culture { get; }
-    }
-}
+/// <summary>
+/// Represents a <see cref="ExecutionContext"/>.
+/// </summary>
+/// <param name="Microservice"><see cref="Microservice"/> that is currently executing.</param>
+/// <param name="Tenant"><see cref="TenantId"/> that is currently part of the <see cref="ExecutionContext"/>.</param>
+/// <param name="Version"><see cref="Version" /> of the <see cref="Microservice" />.</param>
+/// <param name="Environment"><see cref="Environment"/> for this <see cref="ExecutionContext"/>.</param>
+/// <param name="CorrelationId"><see cref="CorrelationId"/> for this <see cref="ExecutionContext"/>.</param>
+/// <param name="Claims"><see cref="Claims"/> to populate with.</param>
+/// <param name="Culture"><see cref="CultureInfo"/> for the <see cref="ExecutionContext"/>.</param>
+public record ExecutionContext(
+    MicroserviceId Microservice,
+    TenantId Tenant,
+    Version Version,
+    Environment Environment,
+    CorrelationId CorrelationId,
+    Claims Claims,
+    CultureInfo Culture);

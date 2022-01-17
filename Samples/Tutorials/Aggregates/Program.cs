@@ -3,25 +3,17 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/csharp/
 
 using Dolittle.SDK;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;
 
-
 var host = Host.CreateDefaultBuilder()
-    .UseDolittle(clientBuilder => clientBuilder
-        .WithEventTypes(eventTypes => eventTypes.Register<DishPrepared>())
-        .WithEventHandlers(eventHandlers => eventHandlers.RegisterEventHandler<DishHandler>())
-        .WithAggregateRoots(aggregateRoots => aggregateRoots.Register<Kitchen>()))
+    .UseDolittle()
     .Build();
 
 await host.StartAsync();
 
 var client = await host.GetDolittleClient();
-await client.EventStore
-    .ForTenant(TenantId.Development)
-    .Commit(eventsBuilder => eventsBuilder
-        .CreateEvent(new DishPrepared("Bean Blaster Taco", "Mr. Taco"))
-        .FromEventSource("Dolittle Tacos"));
 
 await client.Aggregates
     .ForTenant(TenantId.Development)

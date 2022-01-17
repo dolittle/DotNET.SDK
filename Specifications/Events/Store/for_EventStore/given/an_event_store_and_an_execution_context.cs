@@ -20,9 +20,9 @@ namespace Dolittle.SDK.Events.Store.for_EventStore.given
         protected static Mock<IEventTypes> event_types;
         protected static Mock<IResolveCallContext> call_context_resolver;
         protected static IEventStore event_store;
-        protected static Contracts.CommitEventsRequest commit_events_request;
-        protected static Contracts.CommitEventsResponse commit_events_response;
-        protected static IEnumerable<Contracts.UncommittedEvent> pb_uncommitted_events;
+        protected static Runtime.Events.Contracts.CommitEventsRequest commit_events_request;
+        protected static Runtime.Events.Contracts.CommitEventsResponse commit_events_response;
+        protected static IEnumerable<Runtime.Events.Contracts.UncommittedEvent> pb_uncommitted_events;
 
         Establish context = () =>
         {

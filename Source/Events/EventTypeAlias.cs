@@ -3,17 +3,16 @@
 
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events;
+
+/// <summary>
+/// Represents the alias of an event type.
+/// </summary>
+public record EventTypeAlias(string Value) : ConceptAs<string>(Value)
 {
     /// <summary>
-    /// Represents the alias of an event type.
+    /// Implicitly convert from a <see cref="string"/> to an <see cref="EventTypeAlias"/>.
     /// </summary>
-    public class EventTypeAlias : ConceptAs<string>
-    {
-        /// <summary>
-        /// Implicitly convert from a <see cref="string"/> to an <see cref="EventTypeAlias"/>.
-        /// </summary>
-        /// <param name="alias">EventTypeAlias as <see cref="string"/>.</param>
-        public static implicit operator EventTypeAlias(string alias) => new EventTypeAlias { Value = alias };
-    }
+    /// <param name="alias">EventTypeAlias as <see cref="string"/>.</param>
+    public static implicit operator EventTypeAlias(string alias) => new(alias);
 }
