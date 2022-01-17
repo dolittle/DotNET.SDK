@@ -46,13 +46,13 @@ public interface IUniqueBindings<TKey, TValue>
     /// Gets the <typeparamref name="TValue"/> bound to the <typeparamref name="TKey"/>.
     /// </summary>
     /// <param name="key">The <typeparamref name="TKey"/>.</param>
-    /// <returns><see cref="TValue"/>.</returns>
+    /// <returns><typeparamref name="TValue"/>.</returns>
     TValue GetFor(TKey key);
     
     /// <summary>
     /// Gets the <typeparamref name="TKey"/> bound to the <typeparamref name="TValue"/>.
     /// </summary>
     /// <param name="value">The <typeparamref name="TValue"/>.</param>
-    /// <returns><see cref="TKey"/>.</returns>
+    /// <returns><typeparamref name="TKey"/>.</returns>
     TKey GetFor(TValue value);
 }

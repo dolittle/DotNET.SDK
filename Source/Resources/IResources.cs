@@ -3,16 +3,15 @@
 
 using Dolittle.SDK.Resources.MongoDB;
 
-namespace Dolittle.SDK.Resources
+namespace Dolittle.SDK.Resources;
+
+/// <summary>
+/// Defines a system that knows all the resources for a Tenant.
+/// </summary>
+public interface IResources
 {
     /// <summary>
-    /// Defines a system that knows all the resources for a Tenant.
+    /// Gets the <see cref="IMongoDBResource"/>.
     /// </summary>
-    public interface IResources
-    {
-        /// <summary>
-        /// Gets the <see cref="IMongoDBResource"/>.
-        /// </summary>
-        IMongoDBResource MongoDB { get; }
-    }
+    IMongoDBResource MongoDB { get; }
 }

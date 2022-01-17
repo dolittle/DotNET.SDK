@@ -3,32 +3,31 @@
 
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Projections
+namespace Dolittle.SDK.Projections;
+
+/// <summary>
+/// Represents a projection event selector.
+/// </summary>
+public class EventSelector
 {
     /// <summary>
-    /// Represents a projection event selector.
+    /// Initializes a new instance of the <see cref="EventSelector"/> class.
     /// </summary>
-    public class EventSelector
+    /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
+    /// <param name="keySelector">The <see cref="KeySelector" />.</param>
+    public EventSelector(EventType eventType, KeySelector keySelector)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventSelector"/> class.
-        /// </summary>
-        /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
-        /// <param name="keySelector">The <see cref="KeySelector" />.</param>
-        public EventSelector(EventType eventType, KeySelector keySelector)
-        {
-            EventType = eventType;
-            KeySelector = keySelector;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Events.EventType" />.
-        /// </summary>
-        public EventType EventType { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Projections.KeySelector" />.
-        /// </summary>
-        public KeySelector KeySelector { get; }
+        EventType = eventType;
+        KeySelector = keySelector;
     }
+
+    /// <summary>
+    /// Gets the <see cref="Events.EventType" />.
+    /// </summary>
+    public EventType EventType { get; }
+
+    /// <summary>
+    /// Gets the <see cref="Projections.KeySelector" />.
+    /// </summary>
+    public KeySelector KeySelector { get; }
 }

@@ -80,7 +80,7 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     public virtual bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier) => false;
 
     /// <inheritdoc />
-    public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith((IIdentifier<ConceptAs<Guid>>)typedIdentifier);
+    public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith(typedIdentifier);
 
     /// <inheritdoc />
     public override bool Equals(object obj)

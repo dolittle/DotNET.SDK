@@ -4,18 +4,17 @@
 using System;
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.DependencyInversion
+namespace Dolittle.SDK.DependencyInversion;
+
+/// <summary>
+/// Defines an system that knows about <see cref="IServiceProvider"/> for specific Dolittle Tenants.
+/// </summary>
+public interface ITenantScopedProviders
 {
     /// <summary>
-    /// Defines an system that knows about <see cref="IServiceProvider"/> for specific Dolittle Tenants.
+    /// Gets the <see cref="IServiceProvider"/> for a specific <see cref="TenantId"/>.
     /// </summary>
-    public interface ITenantScopedProviders
-    {
-        /// <summary>
-        /// Gets the <see cref="IServiceProvider"/> for a specific <see cref="TenantId"/>.
-        /// </summary>
-        /// <param name="tenant">The <see cref="TenantId"/>.</param>
-        /// <returns>The <see cref="IServiceProvider"/>.</returns>
-        IServiceProvider ForTenant(TenantId tenant);
-    }
+    /// <param name="tenant">The <see cref="TenantId"/>.</param>
+    /// <returns>The <see cref="IServiceProvider"/>.</returns>
+    IServiceProvider ForTenant(TenantId tenant);
 }

@@ -4,9 +4,8 @@
 using System;
 using Dolittle.SDK.Artifacts;
 
-namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.given
+namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.given;
+
+public record custom_artifact_id(Guid Value) : ArtifactId(Value)
 {
-    public record custom_artifact_id(Guid Value) : ArtifactId(Value)
-    {
-    }
 }

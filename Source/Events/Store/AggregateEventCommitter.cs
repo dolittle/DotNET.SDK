@@ -34,5 +34,5 @@ public class AggregateEventCommitter : ICommitAggregateEvents
 
     /// <inheritdoc/>
     public CommitForAggregateBuilder ForAggregate(AggregateRootId aggregateRootId, CancellationToken cancellationToken = default)
-        => new CommitForAggregateBuilder(_aggregateEvents, _eventTypes, aggregateRootId, _logger);
+        => new(_aggregateEvents, _eventTypes, aggregateRootId, _logger);
 }

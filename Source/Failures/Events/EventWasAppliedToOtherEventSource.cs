@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when an event is being used with an Event Source with a different event source id than it was applied to.
+/// </summary>
+public class EventWasAppliedToOtherEventSource : ArgumentException
 {
     /// <summary>
-    /// Exception that gets thrown when an event is being used with an Event Source with a different event source id than it was applied to.
+    /// Initializes a new instance of the <see cref="EventWasAppliedToOtherEventSource"/> class.
     /// </summary>
-    public class EventWasAppliedToOtherEventSource : ArgumentException
+    /// <param name="reason">The failure reason.</param>
+    public EventWasAppliedToOtherEventSource(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventWasAppliedToOtherEventSource"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public EventWasAppliedToOtherEventSource(string reason)
-            : base(reason)
-        {
-        }
     }
 }

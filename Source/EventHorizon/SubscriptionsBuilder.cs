@@ -13,7 +13,7 @@ namespace Dolittle.SDK.EventHorizon;
 /// </summary>
 public class SubscriptionsBuilder
 {
-    readonly SubscriptionCallbacks _callbacks = new SubscriptionCallbacks();
+    readonly SubscriptionCallbacks _callbacks = new();
     readonly IList<SubscriptionsBuilderForConsumerTenant> _builders = new List<SubscriptionsBuilderForConsumerTenant>();
 
     /// <summary>

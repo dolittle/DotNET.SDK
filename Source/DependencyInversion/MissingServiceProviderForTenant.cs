@@ -4,20 +4,19 @@
 using System;
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.DependencyInversion
+namespace Dolittle.SDK.DependencyInversion;
+
+/// <summary>
+/// Exception that gets thrown when there is no <see cref="IServiceProvider"/> configured for a tenant.
+/// </summary>
+public class MissingServiceProviderForTenant : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is no <see cref="IServiceProvider"/> configured for a tenant.
+    /// Initializes a new instance of the <see cref="MissingServiceProviderForTenant"/> class.
     /// </summary>
-    public class MissingServiceProviderForTenant : Exception
+    /// <param name="tenant">The <see cref="TenantId"/>.</param>
+    public MissingServiceProviderForTenant(TenantId tenant)
+        : base($"Tenant {tenant} has no configured service provider.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingServiceProviderForTenant"/> class.
-        /// </summary>
-        /// <param name="tenant">The <see cref="TenantId"/>.</param>
-        public MissingServiceProviderForTenant(TenantId tenant)
-            : base($"Tenant {tenant} has no configured service provider.")
-        {
-        }
     }
 }

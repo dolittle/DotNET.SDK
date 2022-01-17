@@ -3,13 +3,12 @@
 
 using Dolittle.SDK.Artifacts;
 
-namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.given
+namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.given;
+
+public record artifact_type_with_base_artifact_id : Artifact<ArtifactId>
 {
-    public record artifact_type_with_base_artifact_id : Artifact<ArtifactId>
+    public artifact_type_with_base_artifact_id(ArtifactId id, Generation generation)
+        : base(id, generation)
     {
-        public artifact_type_with_base_artifact_id(ArtifactId id, Generation generation)
-            : base(id, generation)
-        {
-        }
     }
 }

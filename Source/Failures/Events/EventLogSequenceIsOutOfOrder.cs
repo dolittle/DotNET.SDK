@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when a event log sequence numbers in a sequence of events are out of order, meaning that an event has a lower event log sequence number than the previous event.
+/// </summary>
+public class EventLogSequenceIsOutOfOrder : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a event log sequence numbers in a sequence of events are out of order, meaning that an event has a lower event log sequence number than the previous event.
+    /// Initializes a new instance of the <see cref="EventLogSequenceIsOutOfOrder"/> class.
     /// </summary>
-    public class EventLogSequenceIsOutOfOrder : Exception
+    /// <param name="reason">The failure reason.</param>
+    public EventLogSequenceIsOutOfOrder(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventLogSequenceIsOutOfOrder"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public EventLogSequenceIsOutOfOrder(string reason)
-            : base(reason)
-        {
-        }
     }
 }

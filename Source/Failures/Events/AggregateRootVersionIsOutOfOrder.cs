@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when a sequence of events are not valid for the Aggregate Root it is being used with.
+/// </summary>s
+public class AggregateRootVersionIsOutOfOrder : ArgumentException
 {
     /// <summary>
-    /// Exception that gets thrown when a sequence of events are not valid for the Aggregate Root it is being used with.
-    /// </summary>s
-    public class AggregateRootVersionIsOutOfOrder : ArgumentException
+    /// Initializes a new instance of the <see cref="AggregateRootVersionIsOutOfOrder"/> class.
+    /// </summary>
+    /// <param name="reason">The failure reason.</param>
+    public AggregateRootVersionIsOutOfOrder(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateRootVersionIsOutOfOrder"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public AggregateRootVersionIsOutOfOrder(string reason)
-            : base(reason)
-        {
-        }
     }
 }

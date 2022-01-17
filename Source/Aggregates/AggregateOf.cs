@@ -5,28 +5,27 @@ using System;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Aggregates
+namespace Dolittle.SDK.Aggregates;
+
+/// <summary>
+/// Represents an implementation of <see cref="IAggregateOf{TAggregateRoot}"/>.
+/// </summary>
+/// <typeparam name="TAggregateRoot">The <see cref="Type"/> of the <see cref="AggregateRoot"/> class.</typeparam>
+public class AggregateOf<TAggregateRoot> : IAggregateOf<TAggregateRoot>
+    where TAggregateRoot : AggregateRoot
 {
+    readonly IAggregates _aggregates;
+
     /// <summary>
-    /// Represents an implementation of <see cref="IAggregateOf{TAggregateRoot}"/>.
+    /// Initializes a new instance of the <see cref="AggregateOf{TAggregateRoot}"/> class.
     /// </summary>
-    /// <typeparam name="TAggregateRoot">The <see cref="Type"/> of the <see cref="AggregateRoot"/> class.</typeparam>
-    public class AggregateOf<TAggregateRoot> : IAggregateOf<TAggregateRoot>
-        where TAggregateRoot : AggregateRoot
+    /// <param name="aggregates">The <see cref="IAggregates"/>.</param>
+    public AggregateOf(IAggregates aggregates)
     {
-        readonly IAggregates _aggregates;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateOf{TAggregateRoot}"/> class.
-        /// </summary>
-        /// <param name="aggregates">The <see cref="IAggregates"/>.</param>
-        public AggregateOf(IAggregates aggregates)
-        {
-            _aggregates = aggregates;
-        }
-
-        /// <inheritdoc />
-        public IAggregateRootOperations<TAggregateRoot> Get(EventSourceId eventSourceId)
-            => _aggregates.Get<TAggregateRoot>(eventSourceId);
+        _aggregates = aggregates;
     }
+
+    /// <inheritdoc />
+    public IAggregateRootOperations<TAggregateRoot> Get(EventSourceId eventSourceId)
+        => _aggregates.Get<TAggregateRoot>(eventSourceId);
 }

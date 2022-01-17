@@ -17,7 +17,7 @@ public static class CommittedEventExtensions
     /// <param name="currentExecutionContext">The <see cref="ExecutionContext"/> in which the event is currently being processed.</param>
     /// <returns>The <see cref="EventContext"/> for a <see cref="CommittedEvent"/>.</returns>
     public static EventContext GetEventContext(this CommittedEvent @event, ExecutionContext currentExecutionContext)
-        => new EventContext(
+        => new(
             @event.EventLogSequenceNumber,
             @event.EventType,
             @event.EventSource,

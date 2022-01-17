@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections.Store
+namespace Dolittle.SDK.Projections.Store;
+
+/// <summary>
+/// Exception that gets thrown when trying to associate a type that isn't a projection.
+/// </summary>
+public class TypeIsNotAProjection : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to associate a type that isn't a projection.
+    /// Initializes a new instance of the <see cref="TypeIsNotAProjection"/> class.
     /// </summary>
-    public class TypeIsNotAProjection : Exception
+    /// <param name="type">The type trying to associate.</param>
+    public TypeIsNotAProjection(Type type)
+        : base($"Type {type} is not a projection. Did you add the [Projection()] attribute to it?")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypeIsNotAProjection"/> class.
-        /// </summary>
-        /// <param name="type">The type trying to associate.</param>
-        public TypeIsNotAProjection(Type type)
-            : base($"Type {type} is not a projection. Did you add the [Projection()] attribute to it?")
-        {
-        }
     }
 }

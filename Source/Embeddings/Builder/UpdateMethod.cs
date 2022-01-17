@@ -5,46 +5,45 @@ using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Async;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// An implementation of <see cref="IUpdateMethod{TReadModel}" />.
+/// </summary>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
+public class UpdateMethod<TReadModel> : IUpdateMethod<TReadModel>
+    where TReadModel : class, new()
 {
+    readonly UpdateEnumerableReturnSignature<TReadModel> _method;
+
     /// <summary>
-    /// An implementation of <see cref="IUpdateMethod{TReadModel}" />.
+    /// Initializes a new instance of the <see cref="UpdateMethod{TReadModel}"/> class.
     /// </summary>
-    /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    public class UpdateMethod<TReadModel> : IUpdateMethod<TReadModel>
-        where TReadModel : class, new()
+    /// <param name="method">The <see cref="UpdateEnumerableReturnSignature{TReadModel}" />.</param>
+    public UpdateMethod(UpdateEnumerableReturnSignature<TReadModel> method)
     {
-        readonly UpdateEnumerableReturnSignature<TReadModel> _method;
+        _method = method;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateMethod{TReadModel}"/> class.
-        /// </summary>
-        /// <param name="method">The <see cref="UpdateEnumerableReturnSignature{TReadModel}" />.</param>
-        public UpdateMethod(UpdateEnumerableReturnSignature<TReadModel> method)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateMethod{TReadModel}"/> class.
+    /// </summary>
+    /// <param name="method">The <see cref="SyncOnSignature{TReadModel}" />.</param>
+    public UpdateMethod(UpdateSignature<TReadModel> method)
+        : this((receivedState, currentState, context) => new[] { method(receivedState, currentState, context) })
+    {
+    }
+
+    /// <inheritdoc/>
+    public Try<IEnumerable<object>> TryUpdate(TReadModel receivedState, TReadModel currentState, EmbeddingContext context)
+    {
+        try
         {
-            _method = method;
+            return new Try<IEnumerable<object>>(_method(receivedState, currentState, context));
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateMethod{TReadModel}"/> class.
-        /// </summary>
-        /// <param name="method">The <see cref="SyncOnSignature{TReadModel}" />.</param>
-        public UpdateMethod(UpdateSignature<TReadModel> method)
-            : this((receivedState, currentState, context) => new[] { method(receivedState, currentState, context) })
+        catch (Exception ex)
         {
-        }
-
-        /// <inheritdoc/>
-        public Try<IEnumerable<object>> TryUpdate(TReadModel receivedState, TReadModel currentState, EmbeddingContext context)
-        {
-            try
-            {
-                return new Try<IEnumerable<object>>(_method(receivedState, currentState, context));
-            }
-            catch (Exception ex)
-            {
-                return ex;
-            }
+            return ex;
         }
     }
 }

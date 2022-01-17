@@ -4,20 +4,19 @@
 using System;
 using Dolittle.SDK.DependencyInversion;
 
-namespace Dolittle.SDK.Events.Handling.Builder
+namespace Dolittle.SDK.Events.Handling.Builder;
+
+/// <summary>
+/// Exception that gets thrown when <see cref="ITenantScopedProviders" /> could not instantitate event handler.
+/// </summary>
+public class CouldNotInstantiateEventHandler : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when <see cref="ITenantScopedProviders" /> could not instantitate event handler.
+    /// Initializes a new instance of the <see cref="CouldNotInstantiateEventHandler"/> class.
     /// </summary>
-    public class CouldNotInstantiateEventHandler : Exception
+    /// <param name="eventHandlerType">The <see cref="Type" /> of the event handler.</param>
+    public CouldNotInstantiateEventHandler(Type eventHandlerType)
+        : base($"{eventHandlerType} could not be instantiated by IoC container.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CouldNotInstantiateEventHandler"/> class.
-        /// </summary>
-        /// <param name="eventHandlerType">The <see cref="Type" /> of the event handler.</param>
-        public CouldNotInstantiateEventHandler(Type eventHandlerType)
-            : base($"{eventHandlerType} could not be instantiated by IoC container.")
-        {
-        }
     }
 }

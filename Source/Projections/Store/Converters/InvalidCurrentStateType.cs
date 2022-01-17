@@ -4,20 +4,19 @@
 using System;
 using Dolittle.Runtime.Projections.Contracts;
 
-namespace Dolittle.SDK.Projections.Store.Converters
+namespace Dolittle.SDK.Projections.Store.Converters;
+
+/// <summary>
+/// Exception that gets thrown when converting projection to SDK and <see cref="ProjectionCurrentState.Type" /> is invalid.
+/// </summary>
+public class InvalidCurrentStateType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when converting projection to SDK and <see cref="ProjectionCurrentState.Type" /> is invalid.
+    /// Initializes a new instance of the <see cref="InvalidCurrentStateType"/> class.
     /// </summary>
-    public class InvalidCurrentStateType : Exception
+    /// <param name="type">The <see cref="ProjectionCurrentStateType" />.</param>
+    public InvalidCurrentStateType(ProjectionCurrentStateType type)
+        : base($"Could not convert {nameof(ProjectionCurrentStateType)} because {type} is an invalid type")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidCurrentStateType"/> class.
-        /// </summary>
-        /// <param name="type">The <see cref="ProjectionCurrentStateType" />.</param>
-        public InvalidCurrentStateType(ProjectionCurrentStateType type)
-            : base($"Could not convert {nameof(ProjectionCurrentStateType)} because {type} is an invalid type")
-        {
-        }
     }
 }

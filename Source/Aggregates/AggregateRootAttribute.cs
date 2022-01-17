@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.SDK.Artifacts;
-using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
 

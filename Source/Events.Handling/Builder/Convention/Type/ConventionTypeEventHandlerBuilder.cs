@@ -26,7 +26,7 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
     
     /// <inheritdoc />
     public bool Equals(ConventionTypeEventHandlerBuilder other)
-        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other as ICanTryBuildEventHandler);
+        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other);
 
     /// <inheritdoc/>
     public override bool TryBuild(

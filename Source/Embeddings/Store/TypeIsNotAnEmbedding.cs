@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Store
+namespace Dolittle.SDK.Embeddings.Store;
+
+/// <summary>
+/// Exception that gets thrown when trying to associate a type that isn't an embedding.
+/// </summary>
+public class TypeIsNotAnEmbedding : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to associate a type that isn't an embedding.
+    /// Initializes a new instance of the <see cref="TypeIsNotAnEmbedding"/> class.
     /// </summary>
-    public class TypeIsNotAnEmbedding : Exception
+    /// <param name="type">The type trying to associate.</param>
+    public TypeIsNotAnEmbedding(Type type)
+        : base($"Type {type} is not an embedding. Did you add the [Embedding()] attribute to it?")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypeIsNotAnEmbedding"/> class.
-        /// </summary>
-        /// <param name="type">The type trying to associate.</param>
-        public TypeIsNotAnEmbedding(Type type)
-            : base($"Type {type} is not an embedding. Did you add the [Embedding()] attribute to it?")
-        {
-        }
     }
 }

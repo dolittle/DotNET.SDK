@@ -6,7 +6,6 @@ using System.Reflection;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Type;
 

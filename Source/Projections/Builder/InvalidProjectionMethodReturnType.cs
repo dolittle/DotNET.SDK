@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections.Builder
+namespace Dolittle.SDK.Projections.Builder;
+
+/// <summary>
+/// Exception that gets thrown when a projection method has an invalid return type.
+/// </summary>
+public class InvalidProjectionMethodReturnType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a projection method has an invalid return type.
+    /// Initializes a new instance of the <see cref="InvalidProjectionMethodReturnType"/> class.
     /// </summary>
-    public class InvalidProjectionMethodReturnType : Exception
+    /// <param name="returnType">The return <see cref="Type" /> of the projection method.</param>
+    public InvalidProjectionMethodReturnType(Type returnType)
+        : base($"{returnType} is not a valid projection method")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidProjectionMethodReturnType"/> class.
-        /// </summary>
-        /// <param name="returnType">The return <see cref="Type" /> of the projection method.</param>
-        public InvalidProjectionMethodReturnType(Type returnType)
-            : base($"{returnType} is not a valid projection method")
-        {
-        }
     }
 }

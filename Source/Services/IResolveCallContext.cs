@@ -4,18 +4,17 @@
 using Dolittle.Services.Contracts;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
-namespace Dolittle.SDK.Services
+namespace Dolittle.SDK.Services;
+
+/// <summary>
+/// Defines a system that can resolve <see cref="CallRequestContext" />.
+/// </summary>
+public interface IResolveCallContext
 {
     /// <summary>
-    /// Defines a system that can resolve <see cref="CallRequestContext" />.
+    /// Resolves the current <see cref="CallRequestContext" /> from the <see cref="ExecutionContext" />.
     /// </summary>
-    public interface IResolveCallContext
-    {
-        /// <summary>
-        /// Resolves the current <see cref="CallRequestContext" /> from the <see cref="ExecutionContext" />.
-        /// </summary>
-        /// <param name="executionContext">The <see cref="ExecutionContext" /> to resolve from.</param>
-        /// <returns>The resolved <see cref="CallRequestContext" />.</returns>
-        CallRequestContext ResolveFrom(ExecutionContext executionContext);
-    }
+    /// <param name="executionContext">The <see cref="ExecutionContext" /> to resolve from.</param>
+    /// <returns>The resolved <see cref="CallRequestContext" />.</returns>
+    CallRequestContext ResolveFrom(ExecutionContext executionContext);
 }

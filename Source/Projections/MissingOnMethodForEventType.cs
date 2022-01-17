@@ -4,20 +4,19 @@
 using System;
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Projections
+namespace Dolittle.SDK.Projections;
+
+/// <summary>
+/// Exception that gets thrown when there is no on-method for a specific event type.
+/// </summary>
+public class MissingOnMethodForEventType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is no on-method for a specific event type.
+    /// Initializes a new instance of the <see cref="MissingOnMethodForEventType"/> class.
     /// </summary>
-    public class MissingOnMethodForEventType : Exception
+    /// <param name="eventType">The <see cref="EventType" />.</param>
+    public MissingOnMethodForEventType(EventType eventType)
+        : base($"Missing on-method for '{eventType}'")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingOnMethodForEventType"/> class.
-        /// </summary>
-        /// <param name="eventType">The <see cref="EventType" />.</param>
-        public MissingOnMethodForEventType(EventType eventType)
-            : base($"Missing on-method for '{eventType}'")
-        {
-        }
     }
 }

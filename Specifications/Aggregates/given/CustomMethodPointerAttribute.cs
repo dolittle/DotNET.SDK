@@ -1,16 +1,15 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Dolittle.SDK.Aggregates.given
-{
-    [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple = false)]
-    public class CustomMethodPointerAttribute : System.Attribute
-    {
-        public CustomMethodPointerAttribute(string id)
-        {
-            Id = id;
-        }
+namespace Dolittle.SDK.Aggregates.given;
 
-        public string Id { get; }
+[System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple = false)]
+public class CustomMethodPointerAttribute : System.Attribute
+{
+    public CustomMethodPointerAttribute(string id)
+    {
+        Id = id;
     }
+
+    public string Id { get; }
 }

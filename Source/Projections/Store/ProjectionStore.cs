@@ -20,8 +20,8 @@ namespace Dolittle.SDK.Projections.Store;
 /// </summary>
 public class ProjectionStore : IProjectionStore
 {
-    static readonly ProjectionsGetOne _getOneMethod = new ProjectionsGetOne();
-    static readonly ProjectionsGetAll _getAllMethod = new ProjectionsGetAll();
+    static readonly ProjectionsGetOne _getOneMethod = new();
+    static readonly ProjectionsGetAll _getAllMethod = new();
     readonly IPerformMethodCalls _caller;
     readonly IResolveCallContext _callContextResolver;
     readonly ExecutionContext _executionContext;

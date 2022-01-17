@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Events.Internal;
 /// </summary>
 public class EventTypesClient
 {
-    static readonly EventTypesRegisterMethod _method = new EventTypesRegisterMethod();
+    static readonly EventTypesRegisterMethod _method = new();
     readonly IPerformMethodCalls _caller;
     readonly ExecutionContext _executionContext;
     readonly ILogger _logger;

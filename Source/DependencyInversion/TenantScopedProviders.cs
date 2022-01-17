@@ -6,33 +6,32 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.DependencyInversion
+namespace Dolittle.SDK.DependencyInversion;
+
+/// <summary>
+/// Represents an implementation of <see cref="ITenantScopedProviders" />.
+/// </summary>
+public class TenantScopedProviders : ITenantScopedProviders
 {
+    readonly IReadOnlyDictionary<TenantId, IServiceProvider> _serviceProviders;
+
     /// <summary>
-    /// Represents an implementation of <see cref="ITenantScopedProviders" />.
+    /// Initializes a new instance of the <see cref="TenantScopedProviders"/> class.
     /// </summary>
-    public class TenantScopedProviders : ITenantScopedProviders
+    /// <param name="tenantScopedServiceProviders">The <see cref="IDictionary{TKey,TValue}"/> of <see cref="IServiceProvider"/> per <see cref="TenantId" />.</param>
+    public TenantScopedProviders(IDictionary<TenantId, IServiceProvider> tenantScopedServiceProviders)
     {
-        readonly IReadOnlyDictionary<TenantId, IServiceProvider> _serviceProviders;
+        _serviceProviders = new ReadOnlyDictionary<TenantId, IServiceProvider>(tenantScopedServiceProviders);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TenantScopedProviders"/> class.
-        /// </summary>
-        /// <param name="tenantScopedServiceProviders">The <see cref="IDictionary{TKey,TValue}"/> of <see cref="IServiceProvider"/> per <see cref="TenantId" />.</param>
-        public TenantScopedProviders(IDictionary<TenantId, IServiceProvider> tenantScopedServiceProviders)
+    /// <inheritdoc />
+    public IServiceProvider ForTenant(TenantId tenant)
+    {
+        if (!_serviceProviders.TryGetValue(tenant, out var provider))
         {
-            _serviceProviders = new ReadOnlyDictionary<TenantId, IServiceProvider>(tenantScopedServiceProviders);
+            throw new MissingServiceProviderForTenant(tenant);
         }
 
-        /// <inheritdoc />
-        public IServiceProvider ForTenant(TenantId tenant)
-        {
-            if (!_serviceProviders.TryGetValue(tenant, out var provider))
-            {
-                throw new MissingServiceProviderForTenant(tenant);
-            }
-
-            return provider;
-        }
+        return provider;
     }
 }

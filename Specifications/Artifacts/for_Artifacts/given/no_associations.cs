@@ -3,12 +3,11 @@
 
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Artifacts.for_Artifacts.given
-{
-    public class no_associations
-    {
-        protected static artifact_types artifacts;
+namespace Dolittle.SDK.Artifacts.for_Artifacts.given;
 
-        Establish context = () => artifacts = new artifact_types();
-    }
+public class no_associations
+{
+    protected static artifact_types artifacts;
+
+    Establish context = () => artifacts = new artifact_types();
 }
