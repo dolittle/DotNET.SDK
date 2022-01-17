@@ -47,6 +47,12 @@ namespace Dolittle.SDK.Extensions.AspNet
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
+            if (_client == null)
+            {
+                DolittleClientNotReady();
+                await _next(context).ConfigureAwait(false);
+                return;
+            }
             TenantId tenantId;
             if (Guid.TryParse(context.Request.Headers[TenantIdHeader], out var tenantGuid))
             {
@@ -56,17 +62,16 @@ namespace Dolittle.SDK.Extensions.AspNet
             {
                 if (!_env.IsDevelopment())
                 {
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    await context.Response.WriteAsync("No tenant id provided").ConfigureAwait(false);
+                    NoTenantIdInNonDevelopmentEnvironment();
+                    await _next(context).ConfigureAwait(false);
                     return;
                 }
 
                 var availableTenantIds = _client.Tenants.Select(_ => _.Id).ToArray();
-                if (availableTenantIds.Length == 0)
+                if (!availableTenantIds.Any())
                 {
                     NoTenantsConfigured();
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    await context.Response.WriteAsync("No tenants configured").ConfigureAwait(false);
+                    await _next(context).ConfigureAwait(false);
                     return;
                 }
 
@@ -92,9 +97,13 @@ namespace Dolittle.SDK.Extensions.AspNet
 
         [LoggerMessage(0, LogLevel.Debug, "No tenant configured in the Tenant-ID header. Falling back to the first tenant in the tenant list ordered: {Tenant}")]
         partial void DefaultingToFirstTenant(TenantId tenant);
+        
+        [LoggerMessage(0, LogLevel.Error, "No Tenant ID provided by header in non-development environment")]
+        partial void NoTenantIdInNonDevelopmentEnvironment();
 
         [LoggerMessage(0, LogLevel.Error, "No tenant configured in the Tenant-ID header and there are no tenants configured for the Dolittle Client")]
         partial void NoTenantsConfigured();
-
+        [LoggerMessage(0, LogLevel.Error, "Dolittle client is not ready. Thr resources will not be set on the request")]
+        partial void DolittleClientNotReady();
     }
 }
