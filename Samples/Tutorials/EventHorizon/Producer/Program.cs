@@ -17,7 +17,7 @@ var host = Host.CreateDefaultBuilder()
             .Handle((@event, eventContext) =>
             {
                 Console.WriteLine($"Filtering event {@event} to public streams");
-                return Task.FromResult(new PartitionedFilterResult(true, PartitionId.Unspecified));
+                return Task.FromResult(new PartitionedFilterResult(true, eventContext.EventSourceId.Value));
             })))
     .Build();
 
