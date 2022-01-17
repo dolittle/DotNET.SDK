@@ -189,9 +189,13 @@ public class ModelBuilder : IModelBuilder
     }
 
     static bool Unbind<TValue>(IdentifierMap<TValue> map, IIdentifier identifier, TValue value)
-        => map.TryGetValue(identifier.Id, out var bindings) && bindings.RemoveAll(identifierAndType =>
+    {
+        if (!map.TryGetValue(identifier.Id, out var bindings))
         {
-            var (existingIdentifier, existingValue) = identifierAndType;
-            return identifier.Equals(existingIdentifier) && value.Equals(existingValue);
-        }) > 0;
+            return false;
+        }
+        var numRemoved = bindings.RemoveAll(mappedBinding => identifier.Equals(mappedBinding.Binding.Identifier) && value.Equals(mappedBinding.BindingValue));
+        map[identifier.Id] = bindings;
+        return numRemoved > 0;
+    }
 }
