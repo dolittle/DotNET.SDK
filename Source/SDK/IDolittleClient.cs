@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
+using Dolittle.SDK.Builders;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.EventHorizon;

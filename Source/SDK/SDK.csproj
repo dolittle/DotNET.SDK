@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK</AssemblyName>
+    <RootNamespace>Dolittle.SDK</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
