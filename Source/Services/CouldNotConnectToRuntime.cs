@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Dolittle.SDK.Services
+namespace Dolittle.SDK.Services;
+
+/// <summary>
+/// Exception that gets thrown when not the Client is not able to connect to a Runtime.
+/// </summary>
+public class CouldNotConnectToRuntime : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when not the Client is not able to connect to a Runtime.
+    /// Initializes a new instance of the <see cref="CouldNotConnectToRuntime"/> class.
     /// </summary>
-    public class CouldNotConnectToRuntime : Exception
+    /// <param name="host">The host the Client attempted to connect to.</param>
+    /// <param name="port">The port the Client attempted to connect to.</param>
+    public CouldNotConnectToRuntime(string host, ushort port)
+        : base($"Could not connect to a Runtime on '{host}:{port}'. Please make sure a Runtime is running, and that the private port (usually 50053) is accessible on the specified port.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CouldNotConnectToRuntime"/> class.
-        /// </summary>
-        /// <param name="host">The host the Client attempted to connect to.</param>
-        /// <param name="port">The port the Client attempted to connect to.</param>
-        public CouldNotConnectToRuntime(string host, ushort port)
-            : base($"Could not connect to a Runtime on '{host}:{port}'. Please make sure a Runtime is running, and that the private port (usually 50053) is accessible on the specified port.")
-        {
-        }
     }
 }

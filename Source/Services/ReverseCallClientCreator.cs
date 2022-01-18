@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Tenancy;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;

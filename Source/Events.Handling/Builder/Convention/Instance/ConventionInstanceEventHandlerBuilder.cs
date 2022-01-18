@@ -5,7 +5,6 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
 namespace Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
@@ -33,7 +32,7 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
     
     /// <inheritdoc />
     public bool Equals(ConventionInstanceEventHandlerBuilder other)
-        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other as ICanTryBuildEventHandler);
+        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other);
 
     /// <inheritdoc/>
     public override bool TryBuild(
@@ -73,4 +72,8 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
             EventHandlerInstance,
             eventHandlerSignature) as IEventHandlerMethod;
     }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj)
+        => Equals(obj as ConventionInstanceEventHandlerBuilder);
 }

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Common;
@@ -19,7 +18,6 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionsBuilder : IProjectionsBuilder
 {
     readonly IModelBuilder _modelBuilder;
-    readonly IClientBuildResults _buildResults;
     readonly DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId> _decoratedTypeBindings;
 
     /// <summary>
@@ -30,7 +28,6 @@ public class ProjectionsBuilder : IProjectionsBuilder
     public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
     {
         _modelBuilder = modelBuilder;
-        _buildResults = buildResults;
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId>("projection", modelBuilder, buildResults);
     }
 

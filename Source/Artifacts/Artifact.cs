@@ -40,5 +40,5 @@ public abstract record Artifact<TId>(TId Id, Generation Generation) : IIdentifie
     }
 
     /// <inheritdoc />
-    public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith((IIdentifier<ConceptAs<Guid>>)typedIdentifier);
+    public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith(typedIdentifier);
 }

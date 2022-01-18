@@ -7,18 +7,17 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling
+namespace Dolittle.SDK.Events.Handling.for_EventHandler.when_handling;
+
+public class an_event : given.all_dependencies
 {
-    public class an_event : given.all_dependencies
-    {
-        static Exception exception;
+    static Exception exception;
 
-        Establish context = ()
-            => event_handler_method.Setup(_ => _.TryHandle(Moq.It.IsAny<object>(), Moq.It.IsAny<EventContext>(), Moq.It.IsAny<IServiceProvider>())).Returns(Task.FromResult(new Try()));
+    Establish context = ()
+        => event_handler_method.Setup(_ => _.TryHandle(Moq.It.IsAny<object>(), Moq.It.IsAny<EventContext>(), Moq.It.IsAny<IServiceProvider>())).Returns(Task.FromResult(new Try()));
 
-        Because of = () => exception = Catch.Exception(() => event_handler.Handle(@event, handled_event_type, event_context, service_provider.Object, CancellationToken.None).GetAwaiter().GetResult());
+    Because of = () => exception = Catch.Exception(() => event_handler.Handle(@event, handled_event_type, event_context, service_provider.Object, CancellationToken.None).GetAwaiter().GetResult());
 
-        It should_invoke_handler_with_correct_arguments = () => event_handler_method.Verify(_ => _.TryHandle(@event, event_context, service_provider.Object), Moq.Times.Once);
-        It should_not_throw_exception = () => exception.ShouldBeNull();
-    }
+    It should_invoke_handler_with_correct_arguments = () => event_handler_method.Verify(_ => _.TryHandle(@event, event_context, service_provider.Object), Moq.Times.Once);
+    It should_not_throw_exception = () => exception.ShouldBeNull();
 }

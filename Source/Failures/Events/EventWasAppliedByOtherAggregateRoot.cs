@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when an event is being used with an Aggregate Root with a different Aggregate Root than it was applied by.
+/// </summary>
+public class EventWasAppliedByOtherAggregateRoot : ArgumentException
 {
     /// <summary>
-    /// Exception that gets thrown when an event is being used with an Aggregate Root with a different Aggregate Root than it was applied by.
+    /// Initializes a new instance of the <see cref="EventWasAppliedByOtherAggregateRoot"/> class.
     /// </summary>
-    public class EventWasAppliedByOtherAggregateRoot : ArgumentException
+    /// <param name="reason">The failure reason.</param>
+    public EventWasAppliedByOtherAggregateRoot(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventWasAppliedByOtherAggregateRoot"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public EventWasAppliedByOtherAggregateRoot(string reason)
-            : base(reason)
-        {
-        }
     }
 }

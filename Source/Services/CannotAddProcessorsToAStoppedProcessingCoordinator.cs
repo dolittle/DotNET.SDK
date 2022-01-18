@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Services
+namespace Dolittle.SDK.Services;
+
+/// <summary>
+/// Exception that gets thrown when a processor is added to an already stopped processing coordinator.
+/// </summary>
+public class CannotAddProcessorsToAStoppedProcessingCoordinator : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a processor is added to an already stopped processing coordinator.
+    /// Initializes a new instance of the <see cref="CannotAddProcessorsToAStoppedProcessingCoordinator"/> class.
     /// </summary>
-    public class CannotAddProcessorsToAStoppedProcessingCoordinator : Exception
+    public CannotAddProcessorsToAStoppedProcessingCoordinator()
+        : base("Cannot add a processor to an already stopped processing coordinator.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CannotAddProcessorsToAStoppedProcessingCoordinator"/> class.
-        /// </summary>
-        public CannotAddProcessorsToAStoppedProcessingCoordinator()
-            : base("Cannot add a processor to an already stopped processing coordinator.")
-            {
-            }
     }
 }

@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.EventHorizon
+namespace Dolittle.SDK.Failures.EventHorizon;
+
+/// <summary>
+/// Exception that gets thrown when an event horizon subscription is cancelled.
+/// </summary>
+public class SubscriptionCancelled : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when an event horizon subscription is cancelled.
+    /// Initializes a new instance of the <see cref="SubscriptionCancelled"/> class.
     /// </summary>
-    public class SubscriptionCancelled : Exception
+    /// <param name="reason">The failure reason.</param>
+    public SubscriptionCancelled(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SubscriptionCancelled"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public SubscriptionCancelled(string reason)
-            : base(reason)
-        {
-        }
     }
 }

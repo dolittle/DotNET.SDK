@@ -56,7 +56,7 @@ public class Embedding<TReadModel> : IEmbedding<TReadModel>
     public EmbeddingId Identifier { get; }
 
     /// <inheritdoc/>
-    public TReadModel InitialState { get; } = new TReadModel();
+    public TReadModel InitialState { get; } = new();
 
     /// <inheritdoc/>
     public IEnumerable<EventType> Events { get; }

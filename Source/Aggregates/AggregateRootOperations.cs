@@ -80,7 +80,6 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
 
     bool TryGetAggregateRoot(EventSourceId eventSourceId, out TAggregate aggregateRoot, out Exception exception)
     {
-        aggregateRoot = default;
         var getAggregateRoot = _aggregateRoots.TryGet<TAggregate>(eventSourceId);
         aggregateRoot = getAggregateRoot.Result;
         exception = getAggregateRoot.Exception;

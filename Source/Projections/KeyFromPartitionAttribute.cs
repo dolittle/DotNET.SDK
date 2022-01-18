@@ -4,15 +4,14 @@
 using System;
 using Dolittle.SDK.Projections.Builder;
 
-namespace Dolittle.SDK.Projections
+namespace Dolittle.SDK.Projections;
+
+/// <summary>
+/// Decorates a projection method with the <see cref="KeySelectorType.PartitionId" />.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public class KeyFromPartitionAttribute : Attribute, IKeySelectorAttribute
 {
-    /// <summary>
-    /// Decorates a projection method with the <see cref="KeySelectorType.PartitionId" />.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class KeyFromPartitionAttribute : Attribute, IKeySelectorAttribute
-    {
-        /// <inheritdoc/>
-        public KeySelector KeySelector { get; } = KeySelectorBuilder.KeyFromPartitionId();
-    }
+    /// <inheritdoc/>
+    public KeySelector KeySelector { get; } = KeySelectorBuilder.KeyFromPartitionId();
 }

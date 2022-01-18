@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.DependencyInversion;
@@ -226,7 +225,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
     }
 
     ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
-        => new ReverseCallArgumentsContext
+        => new()
         {
             HeadId = Guid.NewGuid().ToProtobuf(),
             ExecutionContext = _executionContext.ToProtobuf(),

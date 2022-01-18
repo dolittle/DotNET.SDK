@@ -6,29 +6,28 @@ using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Defines an embedding on-method.
+/// </summary>
+/// <typeparam name="TReadModel">The type of the read model.</typeparam>
+public interface IOnMethod<TReadModel>
+    where TReadModel : class, new()
 {
     /// <summary>
-    /// Defines an embedding on-method.
+    /// Invokes the on method.
     /// </summary>
-    /// <typeparam name="TReadModel">The type of the read model.</typeparam>
-    public interface IOnMethod<TReadModel>
-        where TReadModel : class, new()
-    {
-        /// <summary>
-        /// Invokes the on method.
-        /// </summary>
-        /// <param name="readModel">The read model.</param>
-        /// <param name="event">The event.</param>
-        /// <param name="context">The context of the embedding projection.</param>
-        /// <returns>A <see cref="Task" /> that, when resolved, returns a <see cref="Try{TResult}" /> with <see cref="ProjectionResult{TReadModel}" />.</returns>
-        Task<Try<ProjectionResult<TReadModel>>> TryOn(TReadModel readModel, object @event, EmbeddingProjectContext context);
+    /// <param name="readModel">The read model.</param>
+    /// <param name="event">The event.</param>
+    /// <param name="context">The context of the embedding projection.</param>
+    /// <returns>A <see cref="Task" /> that, when resolved, returns a <see cref="Try{TResult}" /> with <see cref="ProjectionResult{TReadModel}" />.</returns>
+    Task<Try<ProjectionResult<TReadModel>>> TryOn(TReadModel readModel, object @event, EmbeddingProjectContext context);
 
-        /// <summary>
-        /// Gets the <see cref="EventType" />.
-        /// </summary>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <returns>The <see cref="EventType" />.</returns>
-        EventType GetEventType(IEventTypes eventTypes);
-    }
+    /// <summary>
+    /// Gets the <see cref="EventType" />.
+    /// </summary>
+    /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+    /// <returns>The <see cref="EventType" />.</returns>
+    EventType GetEventType(IEventTypes eventTypes);
 }

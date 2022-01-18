@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK
+namespace Dolittle.SDK;
+
+/// <summary>
+/// Exception that gets thrown when calling <see cref="IDolittleClient.Connect(Dolittle.SDK.ConfigureDolittleClient,System.Threading.CancellationToken)"/> more than once.
+/// </summary>
+public class CannotConnectDolittleClientMultipleTimes : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when calling <see cref="IDolittleClient.Connect(Dolittle.SDK.ConfigureDolittleClient,System.Threading.CancellationToken)"/> more than once.
+    /// Initializes a new instance of the <see cref="CannotConnectDolittleClientMultipleTimes"/> class.
     /// </summary>
-    public class CannotConnectDolittleClientMultipleTimes : Exception
+    public CannotConnectDolittleClientMultipleTimes()
+        : base($"Cannot call {nameof(DolittleClient.Connect)}() more than once on the Dolittle Client.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CannotConnectDolittleClientMultipleTimes"/> class.
-        /// </summary>
-        public CannotConnectDolittleClientMultipleTimes()
-            : base($"Cannot call {nameof(DolittleClient.Connect)}() more than once on the Dolittle Client.")
-        {
-        }
     }
 }

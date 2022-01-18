@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Handling.Builder.Methods
+namespace Dolittle.SDK.Events.Handling.Builder.Methods;
+
+/// <summary>
+/// Exception that gets thrown when a <see cref="TypedEventHandlerMethod{T}" /> is invoked on an event of the wrong type.
+/// </summary>
+public class TypedEventHandlerMethodInvokedOnEventOfWrongType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a <see cref="TypedEventHandlerMethod{T}" /> is invoked on an event of the wrong type.
+    /// Initializes a new instance of the <see cref="TypedEventHandlerMethodInvokedOnEventOfWrongType"/> class.
     /// </summary>
-    public class TypedEventHandlerMethodInvokedOnEventOfWrongType : Exception
+    /// <param name="expectedType">The expected <see cref="Type" />.</param>
+    /// <param name="wrongType">The wrong <see cref="Type" />.</param>
+    public TypedEventHandlerMethodInvokedOnEventOfWrongType(Type expectedType, Type wrongType)
+        : base($"Could not handle event of type {wrongType} because it was expected to be of type {expectedType}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedEventHandlerMethodInvokedOnEventOfWrongType"/> class.
-        /// </summary>
-        /// <param name="expectedType">The expected <see cref="Type" />.</param>
-        /// <param name="wrongType">The wrong <see cref="Type" />.</param>
-        public TypedEventHandlerMethodInvokedOnEventOfWrongType(Type expectedType, Type wrongType)
-            : base($"Could not handle event of type {wrongType} because it was expected to be of type {expectedType}")
-        {
-        }
     }
 }

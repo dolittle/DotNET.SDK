@@ -3,16 +3,15 @@
 
 using Dolittle.SDK.Microservices;
 
-namespace Dolittle.SDK
+namespace Dolittle.SDK;
+
+/// <summary>
+/// Represents a container for the Dolittle DotNET SDK version.
+/// </summary>
+public static class VersionInfo
 {
     /// <summary>
-    /// Represents a container for the Dolittle DotNET SDK version.
+    /// Gets the current <see cref="Version"/> of the Dolittle DotNET SDK.
     /// </summary>
-    public static class VersionInfo
-    {
-        /// <summary>
-        /// Gets the current <see cref="Version"/> of the Dolittle DotNET SDK.
-        /// </summary>
-        public static Version CurrentVersion => new Version(377, 389, 368, 0, "PRERELEASE");
-    }
+    public static Version CurrentVersion => new(377, 389, 368, 0, "PRERELEASE");
 }

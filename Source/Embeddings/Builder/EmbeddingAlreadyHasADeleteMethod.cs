@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Exception that gets thrown when trying to define another deletion method for an embedding.
+/// </summary>
+public class EmbeddingAlreadyHasADeleteMethod : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to define another deletion method for an embedding.
+    /// Initializes a new instance of the <see cref="EmbeddingAlreadyHasADeleteMethod"/> class.
     /// </summary>
-    public class EmbeddingAlreadyHasADeleteMethod : Exception
+    /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
+    public EmbeddingAlreadyHasADeleteMethod(EmbeddingId embeddingId)
+        : base($"Embedding {embeddingId} already has a deletion method defined for it.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EmbeddingAlreadyHasADeleteMethod"/> class.
-        /// </summary>
-        /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
-        public EmbeddingAlreadyHasADeleteMethod(EmbeddingId embeddingId)
-            : base($"Embedding {embeddingId} already has a deletion method defined for it.")
-        {
-        }
     }
 }

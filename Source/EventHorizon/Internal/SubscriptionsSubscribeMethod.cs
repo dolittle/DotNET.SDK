@@ -7,18 +7,17 @@ using Grpc.Core;
 using static Dolittle.Runtime.EventHorizon.Contracts.Subscriptions;
 using SubscriptionRequest = Dolittle.Runtime.EventHorizon.Contracts.Subscription;
 
-namespace Dolittle.SDK.EventHorizon.Internal
+namespace Dolittle.SDK.EventHorizon.Internal;
+
+/// <summary>
+/// Represents a wrapper for gRPC Subscriptions.Subscribe.
+/// </summary>
+public class SubscriptionsSubscribeMethod : ICanCallAUnaryMethod<SubscriptionRequest, SubscriptionResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC Subscriptions.Subscribe.
-    /// </summary>
-    public class SubscriptionsSubscribeMethod : ICanCallAUnaryMethod<SubscriptionRequest, SubscriptionResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<SubscriptionResponse> Call(SubscriptionRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<SubscriptionResponse> Call(SubscriptionRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new SubscriptionsClient(channel);
-            return client.SubscribeAsync(message, callOptions);
-        }
+        var client = new SubscriptionsClient(channel);
+        return client.SubscribeAsync(message, callOptions);
     }
 }

@@ -3,23 +3,22 @@
 
 using Dolittle.SDK.Resources.MongoDB;
 
-namespace Dolittle.SDK.Resources
+namespace Dolittle.SDK.Resources;
+
+/// <summary>
+/// Represents an implementation of <see cref="IResources"/>.
+/// </summary>
+public class Resources : IResources
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IResources"/>.
+    /// Initializes a new instance of the <see cref="Resources"/> class.
     /// </summary>
-    public class Resources : IResources
+    /// <param name="mongoDBResource">The <see cref="IMongoDBResource"/>.</param>
+    public Resources(IMongoDBResource mongoDBResource)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Resources"/> class.
-        /// </summary>
-        /// <param name="mongoDBResource">The <see cref="IMongoDBResource"/>.</param>
-        public Resources(IMongoDBResource mongoDBResource)
-        {
-            MongoDB = mongoDBResource;
-        }
-
-        /// <inheritdoc />
-        public IMongoDBResource MongoDB { get; }
+        MongoDB = mongoDBResource;
     }
+
+    /// <inheritdoc />
+    public IMongoDBResource MongoDB { get; }
 }

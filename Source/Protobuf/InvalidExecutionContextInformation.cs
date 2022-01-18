@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Dolittle.SDK.Protobuf
+namespace Dolittle.SDK.Protobuf;
+
+/// <summary>
+/// Exception that gets thrown when there is invalid information on an execution context.
+/// </summary>
+public class InvalidExecutionContextInformation : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is invalid information on an execution context.
+    /// Initializes a new instance of the <see cref="InvalidExecutionContextInformation"/> class.
     /// </summary>
-    public class InvalidExecutionContextInformation : Exception
+    /// <param name="details">The details on what is invalid.</param>
+    /// <param name="innerException">The inner exception that caused the failure.</param>
+    public InvalidExecutionContextInformation(string details, Exception innerException)
+        : base($"Execution context contains invalid information about its {details}", innerException)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidExecutionContextInformation"/> class.
-        /// </summary>
-        /// <param name="details">The details on what is invalid.</param>
-        /// <param name="innerException">The inner exception that caused the failure.</param>
-        public InvalidExecutionContextInformation(string details, Exception innerException)
-            : base($"Execution context contains invalid information about its {details}", innerException)
-        {
-        }
     }
 }
