@@ -41,7 +41,7 @@ public class DolittleClientService : IHostedService
         }
         catch (Exception ex)
         {
-            Log.ErrorWhileConnectingDolittleCLient(_logger, ex);
+            Log.ErrorWhileConnectingDolittleClient(_logger, ex);
             throw;
         }
     }
