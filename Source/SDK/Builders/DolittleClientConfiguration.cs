@@ -3,45 +3,46 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
-namespace Dolittle.SDK;
+namespace Dolittle.SDK.Builders;
 
 /// <summary>
 /// Represents the <see cref="IDolittleClient"/> configuration.
 /// </summary>
-public class DolittleClientConfiguration
+public class DolittleClientConfiguration : IConfigurationBuilder
 {
     /// <summary>
     /// Gets or sets the <see cref="Version"/> of the Head.
     /// </summary>
-    public Version Version { get; set; } = Version.NotSet;
+    public Version Version { get; private set; } = Version.NotSet;
 
     /// <summary>
     /// Gets or sets the Runtime host.
     /// </summary>
-    public string RuntimeHost { get; set; } = "localhost";
+    public string RuntimeHost { get; private set; } = "localhost";
 
     /// <summary>
     /// Gets or sets theRuntime port.
     /// </summary>
-    public ushort RuntimePort { get; set; } = 50053;
+    public ushort RuntimePort { get; private set; } = 50053;
 
     /// <summary>
     /// Gets or sets the ping-interval <see cref="TimeSpan"/>.
     /// </summary>
-    public TimeSpan PingInterval { get; set; } = TimeSpan.FromSeconds(5);
+    public TimeSpan PingInterval { get; private set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// Gets or sets the event serializer provider.
     /// </summary>
-    public Func<JsonSerializerSettings> EventSerializerProvider { get; set; } = () => new JsonSerializerSettings();
+    public Func<JsonSerializerSettings> EventSerializerProvider { get; private set; } = () => new JsonSerializerSettings();
 
     /// <summary>
     /// Gets or sets the<see cref="ILoggerFactory"/>.
     /// </summary>
-    public ILoggerFactory LoggerFactory { get; set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
+    public ILoggerFactory LoggerFactory { get; private set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
     {
         _.SetMinimumLevel(LogLevel.Information);
         _.AddConsole();
@@ -50,19 +51,51 @@ public class DolittleClientConfiguration
     /// <summary>
     /// Gets or sets the<see cref="IServiceProvider"/>.
     /// </summary>
-    public IServiceProvider ServiceProvider { get; set; }
+    public IServiceProvider ServiceProvider { get; private set; }
 
     /// <summary>
     /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
     /// </summary>
-    public ConfigureTenantServices ConfigureTenantServices { get; set; }
+    public ConfigureTenantServices ConfigureTenantServices { get; private set; }
 
+    /// <summary>
+    /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
+    /// </summary>
+    /// <param name="config">The <see cref="Configurations.Dolittle"/>.</param>
+    /// <returns>The <see cref="DolittleClientConfiguration"/>.</returns>
+    public static DolittleClientConfiguration FromConfiguration(Configurations.Dolittle config)
+    {
+        var result = new DolittleClientConfiguration();
+        if (config.Runtime != default)
+        {
+            var runtime = config.Runtime;
+            if (!string.IsNullOrEmpty(runtime.Host))
+            {
+                result.RuntimeHost = config.Runtime.Host;
+            }
+        
+            if (runtime.Port.HasValue)
+            {
+                result.RuntimePort = runtime.Port.Value;
+            }
+        }
+        if (config.PingInterval.HasValue)
+        {
+            result.PingInterval = TimeSpan.FromSeconds(config.PingInterval.Value);
+        }
+        if (!string.IsNullOrEmpty(config.HeadVersion))
+        {
+            result.Version = new VersionConverter().FromString(config.HeadVersion);
+        }
+        return result;
+    }
+    
     /// <summary>
     /// Sets the <see cref="Version"/> of the Head.
     /// </summary>
     /// <param name="version">The <see cref="Version"/>.</param>
     /// <returns></returns>
-    public DolittleClientConfiguration WithVersion(Version version)
+    public IConfigurationBuilder WithVersion(Version version)
     {
         Version = version;
         return this;
@@ -75,7 +108,7 @@ public class DolittleClientConfiguration
     /// <param name="port">The port to connect to.</param>
     /// <returns>the client configuration builder for continuation.</returns>
     /// <remarks>If not specified, host 'localhost' and port 50053 will be used.</remarks>
-    public DolittleClientConfiguration WithRuntimeOn(string host, ushort port)
+    public IConfigurationBuilder WithRuntimeOn(string host, ushort port)
     {
         RuntimeHost = host;
         RuntimePort = port;
@@ -88,7 +121,7 @@ public class DolittleClientConfiguration
     /// <param name="factory">The given <see cref="ILoggerFactory"/>.</param>
     /// <returns>the client configuration builder for continuation.</returns>
     /// <remarks>If not used, a factory with 'Trace' level logging will be used.</remarks>
-    public DolittleClientConfiguration WithLogging(ILoggerFactory factory)
+    public IConfigurationBuilder WithLogging(ILoggerFactory factory)
     {
         LoggerFactory = factory;
         return this;
@@ -99,7 +132,7 @@ public class DolittleClientConfiguration
     /// </summary>
     /// <param name="jsonSerializerSettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="JsonSerializerSettings"/> to modify settings.</param>
     /// <returns>the client configuration builder for continuation.</returns>
-    public DolittleClientConfiguration WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
+    public IConfigurationBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
     {
         EventSerializerProvider = () =>
         {
@@ -115,7 +148,7 @@ public class DolittleClientConfiguration
     /// </summary>
     /// <param name="interval">The ping interval.</param>
     /// <returns>the client configuration builder for continuation.</returns>
-    public DolittleClientConfiguration WithPingInterval(TimeSpan interval)
+    public IConfigurationBuilder WithPingInterval(TimeSpan interval)
     {
         PingInterval = interval;
         return this;
@@ -126,7 +159,7 @@ public class DolittleClientConfiguration
     /// </summary>
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
     /// <returns>The client for continuation.</returns>
-    public DolittleClientConfiguration WithServiceProvider(IServiceProvider serviceProvider)
+    public IConfigurationBuilder WithServiceProvider(IServiceProvider serviceProvider)
     {
         ServiceProvider = serviceProvider;
         return this;
@@ -137,7 +170,7 @@ public class DolittleClientConfiguration
     /// </summary>
     /// <param name="configureTenantServices">The <see cref="ConfigureTenantServices"/> callback.</param>
     /// <returns>The client for continuation.</returns>
-    public DolittleClientConfiguration WithTenantServices(ConfigureTenantServices configureTenantServices)
+    public IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices)
     {
         ConfigureTenantServices = configureTenantServices;
         return this;

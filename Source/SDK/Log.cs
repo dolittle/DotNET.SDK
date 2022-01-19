@@ -12,9 +12,8 @@ static partial class Log
     internal static partial void ConnectingDolittleClient(ILogger logger);
     
     [LoggerMessage(0, LogLevel.Error, "An error occurred while connecting Dolittle Client")]
-    internal static partial void ErrorWhileConnectingDolittleCLient(ILogger logger, Exception ex);
+    internal static partial void ErrorWhileConnectingDolittleClient(ILogger logger, Exception ex);
     
     [LoggerMessage(0, LogLevel.Information, "Disconnecting Dolittle Client")]
     internal static partial void DisconnectingDolittleClient(ILogger logger);
-    
 }

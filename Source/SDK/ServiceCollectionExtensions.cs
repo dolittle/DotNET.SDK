@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Dolittle.SDK;
 
@@ -22,37 +24,39 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient = default, ConfigureDolittleClient configureClient = default)
     {
         return services
-            .AddDolittleOptions(configureClient)
-            .AddDolittleClient(setupClient);
+            .AddDolittleOptions()
+            .AddDolittleClient(setupClient, configureClient);
     }
 
-    static IServiceCollection AddDolittleOptions(this IServiceCollection services, ConfigureDolittleClient configureClient = default)
+    static IServiceCollection AddDolittleOptions(this IServiceCollection services)
     {
         services
-            .AddOptions<DolittleClientConfiguration>()
-            .BindConfiguration(nameof(DolittleClientConfiguration))
-            .Configure<IServiceProvider>(ConfigureWithDefaultsFromServiceProvider)
-            .PostConfigure(clientConfig => configureClient?.Invoke(clientConfig));
+            .AddOptions<Configurations.Dolittle>()
+            .BindConfiguration(nameof(Configurations.Dolittle));
         return services;
     }
 
-    static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default)
+    static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default, ConfigureDolittleClient configureClient = default)
     {
         var dolittleClient = DolittleClient.Setup(setupClient);
         return services
             .AddSingleton(dolittleClient)
-            .AddHostedService<DolittleClientService>();
+            .AddHostedService(provider => new DolittleClientService(dolittleClient, ConfigureWithDefaultsFromServiceProvider(provider, configureClient)));
     }
 
-    static void ConfigureWithDefaultsFromServiceProvider(DolittleClientConfiguration config, IServiceProvider provider)
+    static DolittleClientConfiguration ConfigureWithDefaultsFromServiceProvider(IServiceProvider provider, ConfigureDolittleClient configureClient = default)
     {
-        config ??= new DolittleClientConfiguration();
+        var config = provider.GetService<IOptions<Configurations.Dolittle>>()?.Value;
+        
+        var clientConfig = config != default ? DolittleClientConfiguration.FromConfiguration(config) : new DolittleClientConfiguration();
         var loggerFactory = provider.GetService<ILoggerFactory>();
         if (loggerFactory != default)
         {
-            config.WithLogging(loggerFactory);
+            clientConfig.WithLogging(loggerFactory);
         }
 
-        config.WithServiceProvider(provider);
+        clientConfig.WithServiceProvider(provider);
+        configureClient?.Invoke(clientConfig);
+        return clientConfig;
     }
 }

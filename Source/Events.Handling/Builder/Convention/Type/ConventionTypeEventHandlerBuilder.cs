@@ -26,7 +26,7 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
     
     /// <inheritdoc />
     public bool Equals(ConventionTypeEventHandlerBuilder other)
-        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other);
+        => other is not null && ((ICanTryBuildEventHandler)this).Equals(other as ICanTryBuildEventHandler);
 
     /// <inheritdoc/>
     public override bool TryBuild(
@@ -64,8 +64,4 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
             typeof(TypedClassEventHandlerMethod<,>).MakeGenericType(EventHandlerType, eventParameterType),
             eventHandlerSignature) as IEventHandlerMethod;
     }
-
-    /// <inheritdoc />
-    public override bool Equals(object obj)
-        => Equals(obj as ConventionTypeEventHandlerBuilder);
 }

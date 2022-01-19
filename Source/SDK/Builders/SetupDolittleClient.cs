@@ -1,9 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Builders;
-
-namespace Dolittle.SDK;
+namespace Dolittle.SDK.Builders;
 
 /// <summary>
 /// The callback for setting up an <see cref="IDolittleClient"/> by configuring the <see cref="SetupBuilder"/>.
