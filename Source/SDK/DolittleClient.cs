@@ -55,6 +55,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly IUnregisteredEmbeddings _unregisteredEmbeddings;
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
+    readonly SemaphoreSlim _connectLock = new(1, 1);
 
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
@@ -202,21 +203,32 @@ public class DolittleClient : IDisposable, IDolittleClient
         {
             throw new CannotConnectDolittleClientMultipleTimes();
         }
-        
-        var loggerFactory = configuration.LoggerFactory;
-        _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
-        var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
-        (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
-        CreateDependencies(
-            methodCaller,
-            configuration.EventSerializerProvider,
-            loggerFactory,
-            executionContext);
-        ConfigureContainer(configuration);
-        await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
-        Connected = true;
-        
-        return this;
+
+        await _connectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (Connected)
+            {
+                return this;
+            }
+            var loggerFactory = configuration.LoggerFactory;
+            _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
+            var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
+            (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            CreateDependencies(
+                methodCaller,
+                configuration.EventSerializerProvider,
+                loggerFactory,
+                executionContext);
+            ConfigureContainer(configuration);
+            await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
+            Connected = true;
+            return this;
+        }
+        finally
+        {
+            _connectLock.Release();
+        }
     }
 
     static Task<ConnectionResult> ConnectToRuntime(IPerformMethodCalls methodCaller, DolittleClientConfiguration configuration, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
