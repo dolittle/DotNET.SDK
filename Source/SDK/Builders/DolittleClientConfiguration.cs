@@ -65,20 +65,26 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <returns>The <see cref="DolittleClientConfiguration"/>.</returns>
     public static DolittleClientConfiguration FromConfiguration(Configurations.Dolittle config)
     {
+        Console.WriteLine($"Ping Interval {config.PingInterval}");
         var result = new DolittleClientConfiguration();
-        if (!string.IsNullOrEmpty(config?.Runtime?.Host))
+        if (config.Runtime != default)
         {
-            result.RuntimeHost = config.Runtime.Host;
+            var runtime = config.Runtime;
+            if (!string.IsNullOrEmpty(runtime.Host))
+            {
+                result.RuntimeHost = config.Runtime.Host;
+            }
+        
+            if (runtime.Port.HasValue)
+            {
+                result.RuntimePort = runtime.Port.Value;
+            }
         }
-        if (config?.Runtime?.Port != default)
+        if (config.PingInterval.HasValue)
         {
-            result.RuntimePort = config.Runtime.Port;
+            result.PingInterval = TimeSpan.FromSeconds(config.PingInterval.Value);
         }
-        if (config?.PingInterval != default)
-        {
-            result.PingInterval = TimeSpan.FromSeconds(config.PingInterval);
-        }
-        if (!string.IsNullOrEmpty(config?.HeadVersion))
+        if (!string.IsNullOrEmpty(config.HeadVersion))
         {
             result.Version = new VersionConverter().FromString(config.HeadVersion);
         }

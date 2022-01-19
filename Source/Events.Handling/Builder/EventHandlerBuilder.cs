@@ -102,8 +102,4 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     {
         _modelBuilder.UnbindIdentifierToProcessorBuilder(ModelId, this);
     }
-
-    /// <inheritdoc />
-    public override bool Equals(object obj)
-        => Equals(obj as EventHandlerBuilder);
 }
