@@ -5,4 +5,4 @@ namespace Dolittle.SDK.Configurations;
 
 public record Runtime(string Host, ushort Port);
 
-public record Dolittle(Runtime Runtime, uint PingInterval, string Version);
+public record Dolittle(Runtime Runtime, string HeadVersion, ushort PingInterval);

@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -16,32 +17,32 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <summary>
     /// Gets or sets the <see cref="Version"/> of the Head.
     /// </summary>
-    public Version Version { get; set; } = Version.NotSet;
+    public Version Version { get; private set; } = Version.NotSet;
 
     /// <summary>
     /// Gets or sets the Runtime host.
     /// </summary>
-    public string RuntimeHost { get; set; } = "localhost";
+    public string RuntimeHost { get; private set; } = "localhost";
 
     /// <summary>
     /// Gets or sets theRuntime port.
     /// </summary>
-    public ushort RuntimePort { get; set; } = 50053;
+    public ushort RuntimePort { get; private set; } = 50053;
 
     /// <summary>
     /// Gets or sets the ping-interval <see cref="TimeSpan"/>.
     /// </summary>
-    public TimeSpan PingInterval { get; set; } = TimeSpan.FromSeconds(5);
+    public TimeSpan PingInterval { get; private set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// Gets or sets the event serializer provider.
     /// </summary>
-    public Func<JsonSerializerSettings> EventSerializerProvider { get; set; } = () => new JsonSerializerSettings();
+    public Func<JsonSerializerSettings> EventSerializerProvider { get; private set; } = () => new JsonSerializerSettings();
 
     /// <summary>
     /// Gets or sets the<see cref="ILoggerFactory"/>.
     /// </summary>
-    public ILoggerFactory LoggerFactory { get; set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
+    public ILoggerFactory LoggerFactory { get; private set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
     {
         _.SetMinimumLevel(LogLevel.Information);
         _.AddConsole();
@@ -50,13 +51,40 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <summary>
     /// Gets or sets the<see cref="IServiceProvider"/>.
     /// </summary>
-    public IServiceProvider ServiceProvider { get; set; }
+    public IServiceProvider ServiceProvider { get; private set; }
 
     /// <summary>
     /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
     /// </summary>
-    public ConfigureTenantServices ConfigureTenantServices { get; set; }
+    public ConfigureTenantServices ConfigureTenantServices { get; private set; }
 
+    /// <summary>
+    /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
+    /// </summary>
+    /// <param name="config">The <see cref="Configurations.Dolittle"/>.</param>
+    /// <returns>The <see cref="DolittleClientConfiguration"/>.</returns>
+    public static DolittleClientConfiguration FromConfiguration(Configurations.Dolittle config)
+    {
+        var result = new DolittleClientConfiguration();
+        if (!string.IsNullOrEmpty(config?.Runtime?.Host))
+        {
+            result.RuntimeHost = config.Runtime.Host;
+        }
+        if (config?.Runtime?.Port != default)
+        {
+            result.RuntimePort = config.Runtime.Port;
+        }
+        if (config?.PingInterval != default)
+        {
+            result.PingInterval = TimeSpan.FromSeconds(config.PingInterval);
+        }
+        if (!string.IsNullOrEmpty(config?.HeadVersion))
+        {
+            result.Version = new VersionConverter().FromString(config.HeadVersion);
+        }
+        return result;
+    }
+    
     /// <summary>
     /// Sets the <see cref="Version"/> of the Head.
     /// </summary>

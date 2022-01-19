@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Builders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Dolittle.SDK;
 
@@ -17,28 +16,28 @@ namespace Dolittle.SDK;
 public class DolittleClientService : IHostedService
 {
     readonly IDolittleClient _dolittleClient;
-    readonly DolittleClientConfiguration _dolittleConfigurationAccessor;
+    readonly DolittleClientConfiguration _clientConfiguration;
     ILogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClientService"/> class.
     /// </summary>
     /// <param name="dolittleClient">The <see cref="IDolittleClient"/>.</param>
-    /// <param name="dolittleConfigurationAccessor">The <see cref="IOptions{TOptions}"/> of <see cref="DolittleClientConfiguration"/>.</param>
-    public DolittleClientService(IDolittleClient dolittleClient, IOptions<DolittleClientConfiguration> dolittleConfigurationAccessor)
+    /// <param name="clientConfiguration">The <see cref="DolittleClientConfiguration"/>.</param>
+    public DolittleClientService(IDolittleClient dolittleClient, DolittleClientConfiguration clientConfiguration)
     {
         _dolittleClient = dolittleClient;
-        _dolittleConfigurationAccessor = dolittleConfigurationAccessor.Value;
+        _clientConfiguration = clientConfiguration;
     }
 
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger = _dolittleConfigurationAccessor.LoggerFactory.CreateLogger<DolittleClientService>();
+        _logger = _clientConfiguration.LoggerFactory.CreateLogger<DolittleClientService>();
         Log.ConnectingDolittleClient(_logger);
         try
         {
-            await _dolittleClient.Connect(_dolittleConfigurationAccessor, cancellationToken).ConfigureAwait(false);
+            await _dolittleClient.Connect(_clientConfiguration, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
