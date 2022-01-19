@@ -6,5 +6,5 @@ namespace Dolittle.SDK.Builders;
 /// <summary>
 /// The callback for configuring an <see cref="DolittleClientConfiguration"/> by configuring the <see cref="DolittleClientConfiguration"/>.
 /// </summary>
-/// <param name="clientConfiguration">The <see cref="IDolittleClient"/> to configure.</param>
-public delegate void ConfigureDolittleClient(DolittleClientConfiguration clientConfiguration);
+/// <param name="configurationBuilder">The <see cref="IConfigurationBuilder"/> for building the <see cref="DolittleClientConfiguration"/>.</param>
+public delegate void ConfigureDolittleClient(IConfigurationBuilder configurationBuilder);

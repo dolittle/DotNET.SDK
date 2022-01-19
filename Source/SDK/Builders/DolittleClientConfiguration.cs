@@ -65,7 +65,6 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <returns>The <see cref="DolittleClientConfiguration"/>.</returns>
     public static DolittleClientConfiguration FromConfiguration(Configurations.Dolittle config)
     {
-        Console.WriteLine($"Ping Interval {config.PingInterval}");
         var result = new DolittleClientConfiguration();
         if (config.Runtime != default)
         {

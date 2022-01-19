@@ -25,5 +25,5 @@ Host.CreateDefaultBuilder()
                     .Partitioned()
                     .Handle<DishPrepared>((@event, context) => Console.WriteLine($"Handled event {@event} from public stream")));
         },
-        configuration => configuration.RuntimePort = 50055 ) // Also set in the appsettings.json
+        configuration => configuration.WithRuntimeOn("localhost", 50055)) // Also set in the appsettings.json
     .Build().Run();

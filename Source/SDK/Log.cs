@@ -16,5 +16,4 @@ static partial class Log
     
     [LoggerMessage(0, LogLevel.Information, "Disconnecting Dolittle Client")]
     internal static partial void DisconnectingDolittleClient(ILogger logger);
-    
 }
