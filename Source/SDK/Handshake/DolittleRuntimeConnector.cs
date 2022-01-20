@@ -65,11 +65,11 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     static TimeSpan GetTimeToWait(TimeSpan current)
         => TimeSpan.FromMilliseconds(Math.Min(current.TotalMilliseconds, _waitMaxTime.TotalMilliseconds));
 
-    static ExecutionContext CreateExecutionContextFromHandshake(HandshakeResult result)
+    ExecutionContext CreateExecutionContextFromHandshake(HandshakeResult result)
         => new(
             result.MicroserviceId,
             TenantId.System,
-            Version.NotSet, //TODO: Head Version
+            _headVersion,
             result.Environment,
             CorrelationId.System,
             Claims.Empty,

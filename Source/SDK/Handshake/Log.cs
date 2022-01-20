@@ -11,6 +11,6 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Debug, "Connecting to Dolittle Runtime")]
     internal static partial void ConnectingToDolittleRuntime(ILogger logger);
 
-    [LoggerMessage(0, LogLevel.Warning, "Failed connecting to Dolittle Runtime. Retrying in {RetryTime}. {FailureReason}")]
+    [LoggerMessage(0, LogLevel.Debug, "Failed connecting to Dolittle Runtime. Retrying in {RetryTime}. {FailureReason}")]
     internal static partial void RetryConnect(ILogger logger, TimeSpan retryTime, string failureReason);
 }

@@ -209,12 +209,15 @@ public class DolittleClient : IDisposable, IDolittleClient
         {
             if (Connected)
             {
-                return this;
+                throw new CannotConnectDolittleClientMultipleTimes();
             }
+            
             var loggerFactory = configuration.LoggerFactory;
             _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
+            
             var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
             (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            
             CreateDependencies(
                 methodCaller,
                 configuration.EventSerializerProvider,
@@ -222,6 +225,7 @@ public class DolittleClient : IDisposable, IDolittleClient
                 executionContext);
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
+            
             Connected = true;
             return this;
         }

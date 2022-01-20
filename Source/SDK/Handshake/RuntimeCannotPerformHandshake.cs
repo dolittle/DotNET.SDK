@@ -16,7 +16,7 @@ public class RuntimeCannotPerformHandshake : Exception
     /// <param name="runtimeHost">The configured Runtime host.</param>
     /// <param name="runtimePort">The configured Runtime port.</param>
     public RuntimeCannotPerformHandshake(string runtimeHost, ushort runtimePort)
-        : base($"Cannot connect to Dolittle Runtime on {runtimeHost}:{runtimePort} because it does not support handshakes. Make sure that the Dolittle Runtime is running version 7.4.0 or higher.")
+        : base($"This version of the SDK {VersionInfo.CurrentVersion} is not compatible with the Dolittle Runtime you are connecting to on {runtimeHost}:{runtimePort}. Please upgrade the Runtime to version 7.4.0 or later.")
     {
     }
 }

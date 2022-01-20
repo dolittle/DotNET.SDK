@@ -3,7 +3,6 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/embeddings/
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
@@ -16,13 +15,13 @@ var host = Host.CreateDefaultBuilder()
 await host.StartAsync();
 
 var client = await host.GetDolittleClient();
-// Mock of the state from the external HR system
+
 var updatedEmployee = new Employee
 {
     Name = "Mr. Taco",
     Workplace = "Street Food Taco Truck"
 };
-// Wait for embedding to be registered in the Runtime
+
 await Task.Delay(TimeSpan.FromSeconds(4));
 
 await client.Embeddings

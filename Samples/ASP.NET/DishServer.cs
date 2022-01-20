@@ -5,7 +5,6 @@ using System;
 using System.Threading.Tasks;
 using Customers;
 using Dolittle.SDK.Aggregates;
-using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Handling;
 using Kitchen;

@@ -3,7 +3,6 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/csharp/
 
 using Dolittle.SDK;
-using Dolittle.SDK.Events;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;
 

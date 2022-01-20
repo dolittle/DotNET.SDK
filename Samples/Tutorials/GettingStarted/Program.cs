@@ -4,10 +4,7 @@
 
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
-using Grpc.Core.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 var host = Host.CreateDefaultBuilder()
     .UseDolittle()
