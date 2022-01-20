@@ -4,8 +4,6 @@
 using System;
 using Dolittle.SDK;
 using System.Threading.Tasks;
-using Dolittle.SDK.Builders;
-using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;

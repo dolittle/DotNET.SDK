@@ -4,9 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
-using DnsClient.Protocol;
 using Dolittle.SDK;
-using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;
 

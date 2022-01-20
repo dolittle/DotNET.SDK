@@ -3,7 +3,6 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/embeddings/
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;

@@ -3,7 +3,6 @@
 
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
-using Dolittle.SDK.Aggregates.Builders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kitchen;

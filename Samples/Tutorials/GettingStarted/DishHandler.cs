@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/csharp/
 
-using System;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Handling;
 using Microsoft.Extensions.Logging;
