@@ -6,26 +6,25 @@ using Dolittle.SDK.Artifacts;
 using Machine.Specifications;
 using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 
-namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.when_converting_to_generic_artifact
+namespace Dolittle.SDK.Protobuf.for_ArtifactExtensions.when_converting_to_generic_artifact;
+
+public class a_protobuf_artifact_type_with_custom_artifact_id
 {
-    public class a_protobuf_artifact_type_with_custom_artifact_id
+    static Guid id;
+    static Generation generation;
+    static PbArtifact artifact;
+    static given.artifact_type_with_custom_artifact_id result;
+
+    Establish context = () =>
     {
-        static Guid id;
-        static Generation generation;
-        static PbArtifact artifact;
-        static given.artifact_type_with_custom_artifact_id result;
+        id = Guid.Parse("226429ad-06db-4868-b61a-bff9a7057faa");
+        generation = 3;
+        artifact = new PbArtifact { Id = id.ToProtobuf(), Generation = generation };
+    };
 
-        Establish context = () =>
-        {
-            id = Guid.Parse("226429ad-06db-4868-b61a-bff9a7057faa");
-            generation = 3;
-            artifact = new PbArtifact { Id = id.ToProtobuf(), Generation = generation };
-        };
+    Because of = () => result = artifact.To<given.artifact_type_with_custom_artifact_id, given.custom_artifact_id>();
 
-        Because of = () => result = artifact.To<given.artifact_type_with_custom_artifact_id, given.custom_artifact_id>();
-
-        It should_have_the_same_id = () => result.Id.Value.ShouldEqual(id);
-        It should_have_the_same_id_type = () => result.Id.ShouldBeOfExactType<given.custom_artifact_id>();
-        It should_have_the_same_generation = () => result.Generation.ShouldEqual(generation);
-    }
+    It should_have_the_same_id = () => result.Id.Value.ShouldEqual(id);
+    It should_have_the_same_id_type = () => result.Id.ShouldBeOfExactType<given.custom_artifact_id>();
+    It should_have_the_same_generation = () => result.Generation.ShouldEqual(generation);
 }

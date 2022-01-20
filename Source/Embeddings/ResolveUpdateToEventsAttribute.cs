@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings
+namespace Dolittle.SDK.Embeddings;
+
+/// <summary>
+/// Decorates a method to indicate that it's an embeddings update method.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public class ResolveUpdateToEventsAttribute : Attribute
 {
     /// <summary>
-    /// Decorates a method to indicate that it's an embeddings update method.
+    /// Initializes a new instance of the <see cref="ResolveUpdateToEventsAttribute"/> class.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class ResolveUpdateToEventsAttribute : Attribute
+    public ResolveUpdateToEventsAttribute()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ResolveUpdateToEventsAttribute"/> class.
-        /// </summary>
-        public ResolveUpdateToEventsAttribute()
-        {
-        }
     }
 }

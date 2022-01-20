@@ -6,18 +6,17 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represents a wrapper for gRPC EventStore.Commit.
+/// </summary>
+public class EventStoreCommitMethod : ICanCallAUnaryMethod<CommitEventsRequest, CommitEventsResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC EventStore.Commit.
-    /// </summary>
-    public class EventStoreCommitMethod : ICanCallAUnaryMethod<CommitEventsRequest, CommitEventsResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<CommitEventsResponse> Call(CommitEventsRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<CommitEventsResponse> Call(CommitEventsRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new EventStoreClient(channel);
-            return client.CommitAsync(message, callOptions);
-        }
+        var client = new EventStoreClient(channel);
+        return client.CommitAsync(message, callOptions);
     }
 }

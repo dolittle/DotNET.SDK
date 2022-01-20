@@ -6,18 +6,17 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represents a wrapper for gRPC EventStore.FetchForAggregate.
+/// </summary>
+public class EventStoreFetchForAggregateMethod : ICanCallAUnaryMethod<FetchForAggregateRequest, FetchForAggregateResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC EventStore.FetchForAggregate.
-    /// </summary>
-    public class EventStoreFetchForAggregateMethod : ICanCallAUnaryMethod<FetchForAggregateRequest, FetchForAggregateResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<FetchForAggregateResponse> Call(FetchForAggregateRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<FetchForAggregateResponse> Call(FetchForAggregateRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new EventStoreClient(channel);
-            return client.FetchForAggregateAsync(message, callOptions);
-        }
+        var client = new EventStoreClient(channel);
+        return client.FetchForAggregateAsync(message, callOptions);
     }
 }

@@ -1,53 +1,31 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Aggregates.Internal;
+using System;
+using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store;
-using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Aggregates
+namespace Dolittle.SDK.Aggregates;
+
+/// <summary>
+/// Represents an implementation of <see cref="IAggregateOf{TAggregateRoot}"/>.
+/// </summary>
+/// <typeparam name="TAggregateRoot">The <see cref="Type"/> of the <see cref="AggregateRoot"/> class.</typeparam>
+public class AggregateOf<TAggregateRoot> : IAggregateOf<TAggregateRoot>
+    where TAggregateRoot : AggregateRoot
 {
+    readonly IAggregates _aggregates;
+
     /// <summary>
-    /// Represents an implementation of <see cref="IAggregateOf{T}"/>.
+    /// Initializes a new instance of the <see cref="AggregateOf{TAggregateRoot}"/> class.
     /// </summary>
-    /// <typeparam name="TAggregateRoot">Type of <see cref="AggregateRoot"/>.</typeparam>
-    public class AggregateOf<TAggregateRoot> : IAggregateOf<TAggregateRoot>
-        where TAggregateRoot : AggregateRoot
+    /// <param name="aggregates">The <see cref="IAggregates"/>.</param>
+    public AggregateOf(IAggregates aggregates)
     {
-        readonly IEventStore _eventStore;
-        readonly IEventTypes _eventTypes;
-        readonly IAggregateRoots _aggregateRoots;
-        readonly ILoggerFactory _loggerFactory;
-        readonly ILogger _logger;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateOf{T}"/> class.
-        /// </summary>
-        /// <param name="eventStore">The <see cref="IEventStore" />.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
-        /// <param name="loggerFactory">The <see cref="ILogger" />.</param>
-        public AggregateOf(IEventStore eventStore, IEventTypes eventTypes, IAggregateRoots aggregateRoots, ILoggerFactory loggerFactory)
-        {
-            _eventTypes = eventTypes;
-            _aggregateRoots = aggregateRoots;
-            _eventStore = eventStore;
-            _loggerFactory = loggerFactory;
-            _logger = loggerFactory.CreateLogger<AggregateOf<TAggregateRoot>>();
-        }
-
-        /// <inheritdoc/>
-        public IAggregateRootOperations<TAggregateRoot> Create()
-            => Get(EventSourceId.New());
-
-        /// <inheritdoc/>
-        public IAggregateRootOperations<TAggregateRoot> Get(EventSourceId eventSourceId)
-            => new AggregateRootOperations<TAggregateRoot>(
-                eventSourceId,
-                _eventStore,
-                _eventTypes,
-                _aggregateRoots,
-                _loggerFactory.CreateLogger<AggregateRootOperations<TAggregateRoot>>());
+        _aggregates = aggregates;
     }
+
+    /// <inheritdoc />
+    public IAggregateRootOperations<TAggregateRoot> Get(EventSourceId eventSourceId)
+        => _aggregates.Get<TAggregateRoot>(eventSourceId);
 }

@@ -6,18 +6,17 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Embeddings.Contracts.Embeddings;
 
-namespace Dolittle.SDK.Embeddings
+namespace Dolittle.SDK.Embeddings;
+
+/// <summary>
+/// Represents a wrapper for gRPC Embeddings.Update.
+/// </summary>
+public class EmbeddingsUpdate : ICanCallAUnaryMethod<UpdateRequest, UpdateResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC Embeddings.Update.
-    /// </summary>
-    public class EmbeddingsUpdate : ICanCallAUnaryMethod<UpdateRequest, UpdateResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<UpdateResponse> Call(UpdateRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<UpdateResponse> Call(UpdateRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new EmbeddingsClient(channel);
-            return client.UpdateAsync(message, callOptions);
-        }
+        var client = new EmbeddingsClient(channel);
+        return client.UpdateAsync(message, callOptions);
     }
 }

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../specs.props" />
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK.Common.Specs</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Common</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Source\Common\Common.csproj" />
+    </ItemGroup>
+</Project>

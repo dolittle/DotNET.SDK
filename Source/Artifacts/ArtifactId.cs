@@ -4,31 +4,24 @@
 using System;
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Artifacts
+namespace Dolittle.SDK.Artifacts;
+
+/// <summary>
+/// Represents the concept of a unique identifier for an artifact.
+/// </summary>
+public record ArtifactId(Guid Value) : ConceptAs<Guid>(Value)
 {
     /// <summary>
-    /// Represents the concept of a unique identifier for an artifact.
+    /// Implicitly converts from a <see cref="Guid"/> to an <see cref="ArtifactId"/>.
     /// </summary>
-    public class ArtifactId : ConceptAs<Guid>
-    {
-        /// <summary>
-        /// Implicitly converts from a <see cref="Guid"/> to an <see cref="ArtifactId"/>.
-        /// </summary>
-        /// <param name="artifactId">The <see cref="Guid"/> representation.</param>
-        /// <returns>The converted <see cref="ArtifactId"/>.</returns>
-        public static implicit operator ArtifactId(Guid artifactId) => new ArtifactId { Value = artifactId };
+    /// <param name="artifactId">The <see cref="Guid"/> representation.</param>
+    /// <returns>The converted <see cref="ArtifactId"/>.</returns>
+    public static implicit operator ArtifactId(Guid artifactId) => new(artifactId);
 
-        /// <summary>
-        /// Implicitly converts from a <see cref="string"/> to an <see cref="ArtifactId"/>.
-        /// </summary>
-        /// <param name="artifactId">The <see cref="string"/> representation.</param>
-        /// <returns>The converted <see cref="ArtifactId"/>.</returns>
-        public static implicit operator ArtifactId(string artifactId) => new ArtifactId { Value = Guid.Parse(artifactId) };
-
-        /// <summary>
-        /// Create a new <see cref="ArtifactId"/>.
-        /// </summary>
-        /// <returns><see cref="ArtifactId">New artifact identifier</see>.</returns>
-        public static ArtifactId New() => Guid.NewGuid();
-    }
+    /// <summary>
+    /// Implicitly converts from a <see cref="string"/> to an <see cref="ArtifactId"/>.
+    /// </summary>
+    /// <param name="artifactId">The <see cref="string"/> representation.</param>
+    /// <returns>The converted <see cref="ArtifactId"/>.</returns>
+    public static implicit operator ArtifactId(string artifactId) => new(Guid.Parse(artifactId));
 }

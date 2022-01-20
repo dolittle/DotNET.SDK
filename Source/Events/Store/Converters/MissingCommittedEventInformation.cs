@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Store.Converters
+namespace Dolittle.SDK.Events.Store.Converters;
+
+/// <summary>
+/// Exception that gets thrown when there is information missing on a committed event.
+/// </summary>
+public class MissingCommittedEventInformation : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is information missing on a committed event.
+    /// Initializes a new instance of the <see cref="MissingCommittedEventInformation"/> class.
     /// </summary>
-    public class MissingCommittedEventInformation : Exception
+    /// <param name="details">The details on what is missing.</param>
+    public MissingCommittedEventInformation(string details)
+        : base($"Committed event is missing information about its {details}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingCommittedEventInformation"/> class.
-        /// </summary>
-        /// <param name="details">The details on what is missing.</param>
-        public MissingCommittedEventInformation(string details)
-            : base($"Committed event is missing information about its {details}")
-        {
-        }
     }
 }

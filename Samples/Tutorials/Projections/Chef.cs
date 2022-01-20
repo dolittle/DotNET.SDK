@@ -4,11 +4,8 @@
 
 using System.Collections.Generic;
 
-namespace Kitchen
+public class Chef
 {
-    public class Chef
-    {
-        public string Name = "";
-        public List<string> Dishes = new List<string>();
-    }
+    public string Name = "";
+    public List<string> Dishes = new();
 }

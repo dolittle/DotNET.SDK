@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Handling
+namespace Dolittle.SDK.Events.Handling;
+
+/// <summary>
+/// Exception that gets thrown when there is no event handler for a specific event type.
+/// </summary>
+public class MissingEventHandlerForEventType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is no event handler for a specific event type.
+    /// Initializes a new instance of the <see cref="MissingEventHandlerForEventType"/> class.
     /// </summary>
-    public class MissingEventHandlerForEventType : Exception
+    /// <param name="eventType">The <see cref="EventType" />.</param>
+    public MissingEventHandlerForEventType(EventType eventType)
+        : base($"Missing event handler for '{eventType}'")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingEventHandlerForEventType"/> class.
-        /// </summary>
-        /// <param name="eventType">The <see cref="EventType" />.</param>
-        public MissingEventHandlerForEventType(EventType eventType)
-            : base($"Missing event handler for '{eventType}'")
-        {
-        }
     }
 }

@@ -4,29 +4,28 @@
 using System;
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events;
+
+/// <summary>
+/// Represents the identification of an event source.
+/// </summary>
+public record EventSourceId(string Value) : ConceptAs<string>(Value)
 {
     /// <summary>
-    /// Represents the identification of an event source.
+    /// Implicitly convert from a <see cref="Guid"/> to an <see cref="EventSourceId"/>.
     /// </summary>
-    public class EventSourceId : ConceptAs<string>
-    {
-        /// <summary>
-        /// Implicitly convert from a <see cref="Guid"/> to an <see cref="EventSourceId"/>.
-        /// </summary>
-        /// <param name="eventSourceId">EventSourceId as <see cref="Guid"/>.</param>
-        public static implicit operator EventSourceId(Guid eventSourceId) => new EventSourceId { Value = eventSourceId.ToString() };
+    /// <param name="eventSourceId">EventSourceId as <see cref="Guid"/>.</param>
+    public static implicit operator EventSourceId(Guid eventSourceId) => new(eventSourceId.ToString());
 
-        /// <summary>
-        /// Implicitly convert from a <see cref="string"/> to an <see cref="EventSourceId"/>.
-        /// </summary>
-        /// <param name="eventSourceId">EventSourceId as <see cref="string"/>.</param>
-        public static implicit operator EventSourceId(string eventSourceId) => new EventSourceId { Value = eventSourceId };
+    /// <summary>
+    /// Implicitly convert from a <see cref="string"/> to an <see cref="EventSourceId"/>.
+    /// </summary>
+    /// <param name="eventSourceId">EventSourceId as <see cref="string"/>.</param>
+    public static implicit operator EventSourceId(string eventSourceId) => new(eventSourceId);
 
-        /// <summary>
-        /// Creates a new instance of <see cref="EventSourceId"/> with a unique id.
-        /// </summary>
-        /// <returns>A new <see cref="EventSourceId"/>.</returns>
-        public static EventSourceId New() => new EventSourceId { Value = Guid.NewGuid().ToString() };
-    }
+    /// <summary>
+    /// Creates a new instance of <see cref="EventSourceId"/> with a unique id.
+    /// </summary>
+    /// <returns>A new <see cref="EventSourceId"/>.</returns>
+    public static EventSourceId New() => new (Guid.NewGuid().ToString());
 }

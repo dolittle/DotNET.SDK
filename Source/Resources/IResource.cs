@@ -3,21 +3,20 @@
 
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.Resources
+namespace Dolittle.SDK.Resources;
+
+/// <summary>
+/// Defines a resource for a specific Tenant.
+/// </summary>
+public interface IResource
 {
     /// <summary>
-    /// Defines a resource for a specific Tenant.
+    /// Gets the <see cref="ResourceName"/> of the resource.
     /// </summary>
-    public interface IResource
-    {
-        /// <summary>
-        /// Gets the <see cref="ResourceName"/> of the resource.
-        /// </summary>
-        ResourceName Name { get; }
+    ResourceName Name { get; }
 
-        /// <summary>
-        /// Gets the <see cref="TenantId"/> that this resource belongs to.
-        /// </summary>
-        TenantId Tenant { get; }
-    }
+    /// <summary>
+    /// Gets the <see cref="TenantId"/> that this resource belongs to.
+    /// </summary>
+    TenantId Tenant { get; }
 }

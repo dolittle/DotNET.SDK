@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Exception that gets thrown when trying to construct a <see cref="CommittedEvent"/> without an <see cref="EventLogSequenceNumber"/>.
+/// </summary>
+public class EventLogSequenceNumberCannotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct a <see cref="CommittedEvent"/> without an <see cref="EventLogSequenceNumber"/>.
+    /// Initializes a new instance of the <see cref="EventLogSequenceNumberCannotBeNull"/> class.
     /// </summary>
-    public class EventLogSequenceNumberCannotBeNull : Exception
+    public EventLogSequenceNumberCannotBeNull()
+        : base($"The {nameof(EventLogSequenceNumber)} of an {nameof(CommittedEvent)} cannot be null")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventLogSequenceNumberCannotBeNull"/> class.
-        /// </summary>
-        public EventLogSequenceNumberCannotBeNull()
-            : base($"The {nameof(EventLogSequenceNumber)} of an {nameof(CommittedEvent)} cannot be null")
-        {
-        }
     }
 }

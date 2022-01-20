@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections.Store
+namespace Dolittle.SDK.Projections.Store;
+
+/// <summary>
+/// Exception that gets thrown when a type has no projection associated with it.
+/// </summary>
+public class NoProjectionAssociatedWithType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a type has no projection associated with it.
+    /// Initializes a new instance of the <see cref="NoProjectionAssociatedWithType"/> class.
     /// </summary>
-    public class NoProjectionAssociatedWithType : Exception
+    /// <param name="type">The type without a projection.</param>
+    public NoProjectionAssociatedWithType(Type type)
+        : base($"No projection associated with type {type}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NoProjectionAssociatedWithType"/> class.
-        /// </summary>
-        /// <param name="type">The type without a projection.</param>
-        public NoProjectionAssociatedWithType(Type type)
-            : base($"No projection associated with type {type}")
-        {
-        }
     }
 }

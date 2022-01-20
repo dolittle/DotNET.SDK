@@ -4,12 +4,11 @@
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Aggregates
+namespace Dolittle.SDK.Aggregates;
+
+/// <summary>
+/// Defines a system that knows about <see cref="AggregateRootType" />.
+/// </summary>
+public interface IAggregateRootTypes : IArtifacts<AggregateRootType, AggregateRootId>
 {
-    /// <summary>
-    /// Defines a system that knows about <see cref="AggregateRootType" />.
-    /// </summary>
-    public interface IAggregateRootTypes : IArtifacts<AggregateRootType, AggregateRootId>
-    {
-    }
 }

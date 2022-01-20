@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings
+namespace Dolittle.SDK.Embeddings;
+
+/// <summary>
+/// Decorates a method to indicate that it's an embeddings remove method.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+public class ResolveDeletionToEventsAttribute : Attribute
 {
     /// <summary>
-    /// Decorates a method to indicate that it's an embeddings remove method.
+    /// Initializes a new instance of the <see cref="ResolveDeletionToEventsAttribute"/> class.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class ResolveDeletionToEventsAttribute : Attribute
+    public ResolveDeletionToEventsAttribute()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ResolveDeletionToEventsAttribute"/> class.
-        /// </summary>
-        public ResolveDeletionToEventsAttribute()
-        {
-        }
     }
 }

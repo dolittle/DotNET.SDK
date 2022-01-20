@@ -3,18 +3,17 @@
 
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.Projections.Store.Builders
+namespace Dolittle.SDK.Projections.Store.Builders;
+
+/// <summary>
+/// Defines a builder for <see cref="IProjectionStore"/>.
+/// </summary>
+public interface IProjectionStoreBuilder
 {
     /// <summary>
-    /// Defines a builder for <see cref="IProjectionStore"/>.
+    /// Gets the projection store <see cref="IProjectionStore"/> for the given tenant.
     /// </summary>
-    public interface IProjectionStoreBuilder
-    {
-        /// <summary>
-        /// Gets the projection store <see cref="IProjectionStore"/> for the given tenant.
-        /// </summary>
-        /// <param name="tenantId">The <see cref="TenantId">tenant</see> to get projections for.</param>
-        /// <returns>An <see cref="IProjectionStore"/>.</returns>
-        IProjectionStore ForTenant(TenantId tenantId);
-    }
+    /// <param name="tenantId">The <see cref="TenantId">tenant</see> to get projections for.</param>
+    /// <returns>An <see cref="IProjectionStore"/>.</returns>
+    IProjectionStore ForTenant(TenantId tenantId);
 }

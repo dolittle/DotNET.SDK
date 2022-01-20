@@ -13,42 +13,41 @@ using Dolittle.SDK.Services;
 using Machine.Specifications;
 using SubscriptionRequest = Dolittle.Runtime.EventHorizon.Contracts.Subscription;
 
-namespace Dolittle.SDK.EventHorizon.for_EventHorizons.when_subscribing
+namespace Dolittle.SDK.EventHorizon.for_EventHorizons.when_subscribing;
+
+public class and_subscription_succeeds : given.an_event_horizons_and_a_subscription
 {
-    public class and_subscription_succeeds : given.an_event_horizons_and_a_subscription
+    static Uuid consent_id;
+    static SubscriptionResponse response_to_return;
+
+    static SubscriptionRequest request;
+    static SubscribeResponse response;
+
+    Establish context = () =>
     {
-        static Uuid consent_id;
-        static SubscriptionResponse response_to_return;
+        consent_id = Guid.Parse("c67e078e-83a4-4850-a931-7c04ab41e42a").ToProtobuf();
 
-        static SubscriptionRequest request;
-        static SubscribeResponse response;
-
-        Establish context = () =>
+        response_to_return = new SubscriptionResponse
         {
-            consent_id = Guid.Parse("c67e078e-83a4-4850-a931-7c04ab41e42a").ToProtobuf();
-
-            response_to_return = new SubscriptionResponse
-            {
-                ConsentId = consent_id,
-                Failure = null,
-            };
-
-            caller
-                .Setup(_ => _.Call(Moq.It.IsAny<SubscriptionsSubscribeMethod>(), Moq.It.IsAny<SubscriptionRequest>(), Moq.It.IsAny<CancellationToken>()))
-                .Callback<ICanCallAUnaryMethod<SubscriptionRequest, SubscriptionResponse>, SubscriptionRequest, CancellationToken>((m, r, t) => request = r)
-                .Returns(Task.FromResult(response_to_return));
+            ConsentId = consent_id,
+            Failure = null,
         };
 
-        Because of = () => response = event_horizons.Subscribe(subscription).GetAwaiter().GetResult();
+        caller
+            .Setup(_ => _.Call(Moq.It.IsAny<SubscriptionsSubscribeMethod>(), Moq.It.IsAny<SubscriptionRequest>(), Moq.It.IsAny<CancellationToken>()))
+            .Callback<ICanCallAUnaryMethod<SubscriptionRequest, SubscriptionResponse>, SubscriptionRequest, CancellationToken>((m, r, t) => request = r)
+            .Returns(Task.FromResult(response_to_return));
+    };
 
-        It should_send_a_request_with_the_correct_execution_context = () => request.CallContext.ExecutionContext.ShouldEqual(execution_context.ForTenant(subscription.ConsumerTenant).ToProtobuf());
-        It should_send_a_request_with_the_correct_microservice_id = () => request.MicroserviceId.ShouldEqual(subscription.ProducerMicroservice.ToProtobuf());
-        It should_send_a_request_with_the_correct_tenant_id = () => request.TenantId.ShouldEqual(subscription.ProducerTenant.ToProtobuf());
-        It should_send_a_request_with_the_correct_stream_id = () => request.StreamId.ShouldEqual(subscription.ProducerStream.ToProtobuf());
-        It should_send_a_request_with_the_correct_partition_id = () => request.PartitionId.ShouldEqual(subscription.ProducerPartition.Value);
-        It should_send_a_request_with_the_correct_scope_id = () => request.ScopeId.ShouldEqual(subscription.ConsumerScope.ToProtobuf());
-        It should_return_a_response_that_is_not_failed = () => response.Failed.ShouldBeFalse();
-        It should_return_the_correct_consent_id = () => response.Consent.ShouldEqual(consent_id.To<ConsentId>());
-        It should_not_set_the_failure = () => response.Failure.ShouldBeNull();
-    }
+    Because of = () => response = event_horizons.Subscribe(subscription).GetAwaiter().GetResult();
+
+    It should_send_a_request_with_the_correct_execution_context = () => request.CallContext.ExecutionContext.ShouldEqual(execution_context.ForTenant(subscription.ConsumerTenant).ToProtobuf());
+    It should_send_a_request_with_the_correct_microservice_id = () => request.MicroserviceId.ShouldEqual(subscription.ProducerMicroservice.ToProtobuf());
+    It should_send_a_request_with_the_correct_tenant_id = () => request.TenantId.ShouldEqual(subscription.ProducerTenant.ToProtobuf());
+    It should_send_a_request_with_the_correct_stream_id = () => request.StreamId.ShouldEqual(subscription.ProducerStream.ToProtobuf());
+    It should_send_a_request_with_the_correct_partition_id = () => request.PartitionId.ShouldEqual(subscription.ProducerPartition.Value);
+    It should_send_a_request_with_the_correct_scope_id = () => request.ScopeId.ShouldEqual(subscription.ConsumerScope.ToProtobuf());
+    It should_return_a_response_that_is_not_failed = () => response.Failed.ShouldBeFalse();
+    It should_return_the_correct_consent_id = () => response.Consent.ShouldEqual(consent_id.To<ConsentId>());
+    It should_not_set_the_failure = () => response.Failure.ShouldBeNull();
 }

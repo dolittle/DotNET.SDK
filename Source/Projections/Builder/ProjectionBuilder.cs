@@ -1,84 +1,69 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Threading;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Projections.Store;
-using Dolittle.SDK.Projections.Store.Converters;
-using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Projections.Builder
+
+namespace Dolittle.SDK.Projections.Builder;
+
+/// <summary>
+/// Represents a builder for building projections.
+/// </summary>
+public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
 {
+    readonly ProjectionId _projectionId;
+    readonly IModelBuilder _modelBuilder;
+    ICanTryBuildProjection _methodsBuilder;
+
+    ScopeId _scopeId = ScopeId.Default;
+
     /// <summary>
-    /// Represents a builder for building projections.
+    /// Initializes a new instance of the <see cref="ProjectionBuilder"/> class.
     /// </summary>
-    public class ProjectionBuilder : ICanBuildAndRegisterAProjection
+    /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder" />.</param>
+    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder)
     {
-        readonly ProjectionId _projectionId;
-        readonly IProjectionReadModelTypeAssociations _projectionAssociations;
-        ICanBuildAndRegisterAProjection _methodsBuilder;
+        _projectionId = projectionId;
+        _modelBuilder = modelBuilder;
+    }
 
-        ScopeId _scopeId = ScopeId.Default;
+    /// <inheritdoc />
+    public bool Equals(ICanTryBuildProjection other) => ReferenceEquals(this, other);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectionBuilder"/> class.
-        /// </summary>
-        /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
-        /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypeAssociations" />.</param>
-        public ProjectionBuilder(ProjectionId projectionId, IProjectionReadModelTypeAssociations projectionAssociations)
+    /// <inheritdoc />
+    public IProjectionBuilder InScope(ScopeId scopeId)
+    {
+        _scopeId = scopeId;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
+        where TReadModel : class, new()
+    {
+        if (_methodsBuilder != default)
         {
-            _projectionId = projectionId;
-            _projectionAssociations = projectionAssociations;
+            throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
         }
+        
+        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, this);
+        _methodsBuilder = builder;
+        return builder;
+    }
 
-        /// <summary>
-        /// Defines the projection to operate in a specific <see cref="_scopeId" />.
-        /// </summary>
-        /// <param name="scopeId">The <see cref="_scopeId" />.</param>
-        /// <returns>The builder for continuation.</returns>
-        public ProjectionBuilder InScope(ScopeId scopeId)
+    /// <inheritdoc/>
+    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    {
+        projection = default;
+        if (_methodsBuilder != null)
         {
-            _scopeId = scopeId;
-            return this;
+            return _methodsBuilder.TryBuild(eventTypes, buildResults, out projection);
         }
+        buildResults.AddFailure($"Failed to build projection {_projectionId}. No read model defined for projection.");
+        return false;
 
-        /// <summary>
-        /// Creates a <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for the specified read model type.
-        /// </summary>
-        /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-        /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-        /// <exception cref="ReadModelAlreadyDefinedForProjection">Is thrown when called multiple times.</exception>
-        public ProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
-            where TReadModel : class, new()
-        {
-            if (_methodsBuilder != default)
-            {
-                throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
-            }
-
-            _projectionAssociations.Associate<TReadModel>(_projectionId, _scopeId);
-            var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId);
-            _methodsBuilder = builder;
-            return builder;
-        }
-
-        /// <inheritdoc/>
-        public void BuildAndRegister(
-            IEventProcessors eventProcessors,
-            IEventTypes eventTypes,
-            IEventProcessingConverter processingConverter,
-            IConvertProjectionsToSDK projectionConverter,
-            ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
-        {
-            if (_methodsBuilder == null)
-            {
-                throw new ProjectionNeedsToBeForReadModel(_projectionId);
-            }
-
-            _methodsBuilder.BuildAndRegister(eventProcessors, eventTypes, processingConverter, projectionConverter, loggerFactory, cancellation);
-        }
     }
 }

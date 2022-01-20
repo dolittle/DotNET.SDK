@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when the Event Store is unavailable.
+/// </summary>
+public class EventStoreUnavailable : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when the Event Store is unavailable.
+    /// Initializes a new instance of the <see cref="EventStoreUnavailable"/> class.
     /// </summary>
-    public class EventStoreUnavailable : Exception
+    /// <param name="reason">The failure reason.</param>
+    public EventStoreUnavailable(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventStoreUnavailable"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public EventStoreUnavailable(string reason)
-            : base(reason)
-        {
-        }
     }
 }

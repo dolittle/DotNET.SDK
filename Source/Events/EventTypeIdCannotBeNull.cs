@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events;
+
+/// <summary>
+/// Exception that gets thrown when trying to construct an <see cref="EventType"/> without an <see cref="EventTypeId"/>.
+/// </summary>
+public class EventTypeIdCannotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct an <see cref="EventType"/> without an <see cref="EventTypeId"/>.
+    /// Initializes a new instance of the <see cref="EventTypeIdCannotBeNull"/> class.
     /// </summary>
-    public class EventTypeIdCannotBeNull : Exception
+    public EventTypeIdCannotBeNull()
+        : base($"The {nameof(EventTypeId)} of an {nameof(EventType)} cannot be null")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventTypeIdCannotBeNull"/> class.
-        /// </summary>
-        public EventTypeIdCannotBeNull()
-            : base($"The {nameof(EventTypeId)} of an {nameof(EventType)} cannot be null")
-        {
-        }
     }
 }

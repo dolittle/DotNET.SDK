@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Exception that gets thrown when trying to define another readmodel for an embedding.
+/// </summary>
+public class ReadModelAlreadyDefinedForEmbedding : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to define another readmodel for an embedding.
+    /// Initializes a new instance of the <see cref="ReadModelAlreadyDefinedForEmbedding"/> class.
     /// </summary>
-    public class ReadModelAlreadyDefinedForEmbedding : Exception
+    /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
+    /// <param name="type">The type of the readmodel already defined.</param>
+    public ReadModelAlreadyDefinedForEmbedding(EmbeddingId embeddingId, Type type)
+        : base($"Embedding {embeddingId} already has a readmodel of type {type} defined for it.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadModelAlreadyDefinedForEmbedding"/> class.
-        /// </summary>
-        /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
-        /// <param name="type">The type of the readmodel already defined.</param>
-        public ReadModelAlreadyDefinedForEmbedding(EmbeddingId embeddingId, Type type)
-            : base($"Embedding {embeddingId} already has a readmodel of type {type} defined for it.")
-        {
-        }
     }
 }

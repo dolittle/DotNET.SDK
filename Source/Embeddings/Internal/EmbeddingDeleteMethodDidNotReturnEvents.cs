@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Internal
+namespace Dolittle.SDK.Embeddings.Internal;
+
+/// <summary>
+/// Exception that gets thrown when an embeddings delete method doesn't return any events.
+/// </summary>
+public class EmbeddingDeleteMethodDidNotReturnEvents : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when an embeddings delete method doesn't return any events.
+    /// Initializes a new instance of the <see cref="EmbeddingDeleteMethodDidNotReturnEvents"/> class.
     /// </summary>
-    public class EmbeddingDeleteMethodDidNotReturnEvents : Exception
+    /// <param name="embedding">The <see cref="EmbeddingId" />.</param>
+    /// <param name="context">The <see cref="EmbeddingContext" />.</param>
+    public EmbeddingDeleteMethodDidNotReturnEvents(EmbeddingId embedding, EmbeddingContext context)
+        : base($"Embedding {embedding} didn't return any events from its delete method for the key of: {context.Key}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EmbeddingDeleteMethodDidNotReturnEvents"/> class.
-        /// </summary>
-        /// <param name="embedding">The <see cref="EmbeddingId" />.</param>
-        /// <param name="context">The <see cref="EmbeddingContext" />.</param>
-        public EmbeddingDeleteMethodDidNotReturnEvents(EmbeddingId embedding, EmbeddingContext context)
-            : base($"Embedding {embedding} didn't return any events from its delete method for the key of: {context.Key}")
-        {
-        }
     }
 }

@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Exception that gets thrown when a deletion method has an invalid return type.
+/// </summary>
+public class InvalidDeleteMethodReturnType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a deletion method has an invalid return type.
+    /// Initializes a new instance of the <see cref="InvalidDeleteMethodReturnType"/> class.
     /// </summary>
-    public class InvalidDeleteMethodReturnType : Exception
+    /// <param name="returnType">The return <see cref="Type" /> of the deletion method.</param>
+    public InvalidDeleteMethodReturnType(Type returnType)
+        : base($"{returnType} is not a valid deletion method return type.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidDeleteMethodReturnType"/> class.
-        /// </summary>
-        /// <param name="returnType">The return <see cref="Type" /> of the deletion method.</param>
-        public InvalidDeleteMethodReturnType(Type returnType)
-            : base($"{returnType} is not a valid deletion method return type.")
-        {
-        }
     }
 }

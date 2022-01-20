@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events.Filters
+namespace Dolittle.SDK.Failures.Events.Filters;
+
+/// <summary>
+/// Exception that gets thrown when no filter registration arguments is recevied by the runtime.
+/// </summary>
+public class NoFilterRegistrationReceived : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when no filter registration arguments is recevied by the runtime.
+    /// Initializes a new instance of the <see cref="NoFilterRegistrationReceived"/> class.
     /// </summary>
-    public class NoFilterRegistrationReceived : Exception
+    /// <param name="reason">The failure reason.</param>
+    public NoFilterRegistrationReceived(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NoFilterRegistrationReceived"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public NoFilterRegistrationReceived(string reason)
-            : base(reason)
-        {
-        }
     }
 }
