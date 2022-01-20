@@ -1,3 +1,31 @@
+# [13.0.0] - 2022-1-20 [PR: #103](https://github.com/dolittle/DotNET.SDK/pull/103)
+## Summary
+
+Major improvements to the Dolittle Client, in how it connects to the Runtime, configuration, setup and integrations with ASP.Net Core. Combined these changes aim to make the SDK easier to setup and configure, and to make it easier to detect when incompatible versions are used.
+
+### Added
+
+- Support for Dependency Injection using Microsoft Dependency Injection internally, also supporting tenant-specific bindings.
+- The DolittleClient and tenant specific resources (IEventStore, IAggregates, IProjections, ...) are bound in the service provider used and exposed by the client. They can be used in e.g. Event Handlers, or with the AspNetCore integration in Controllers.
+- AspNetCore integration by adding `.UseDolittle()` on both the host and application builder that uses the Microsoft Configuration system, starts the DolittleClient as a hosted service, and a middleware that sets the Request service provider based on the `Tenant-ID` header (provided by the platform). See the AspNetCore sample.
+- When starting up a DolittleClient, it now performs an initial handshake with the configured Runtime to determine that the versions of the SDK and the Runtime are compatible, and retrieves the MicroserviceId to configure its execution context (provided by the platform).
+
+### Changed
+
+- Building a DolittleClient has been split into two steps, namely `.Setup()` and `.Connect()`, to make integrations easier.
+- The automatic discovery of types and processors is now enabled by default.
+- The configured Tenants are retrieved during the first connection to the Runtime, so the `.Tenants` on the DolittleClient is no longer an asynchronous call.
+- The builder APIs exposed in the `.Setup(...)` call have been changed so they are all called `.Register(...)` or `.Create(...)`.
+- The `AggregateOf` methods on the client have been changed to an `Aggregates` property that behaves more like the other tenant specific resources.
+
+### Fixed
+
+- The SDK de-duplicates registered types and processors (Event Handlers, ...) so that you can use both automatic discovery and manual registration.
+
+### Removed
+ - The builders exposed in the `.Setup(...)` call have been changed to interfaces that don't expose the internal `.Build(...)` method.
+
+
 # [12.0.0] - 2021-11-18 [PR: #100](https://github.com/dolittle/DotNET.SDK/pull/100)
 ## Summary
 
