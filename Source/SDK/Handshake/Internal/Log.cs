@@ -13,7 +13,7 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Debug, "Performing handshake between Head v{HeadVersion} using Dolittle DotNET SDK v{SDKVersion} using version {ContractsVersion} Contracts and Dolittle Runtime")]
     internal static partial void PerformHandshake(ILogger logger, Version headVersion, Version sdkVersion, Version contractsVersion);
 
-    [LoggerMessage(0, LogLevel.Warning, "Error performing handshake with Dolittle Runtime")]
+    [LoggerMessage(0, LogLevel.Debug, "Error performing handshake with Dolittle Runtime")]
     internal static partial void ErrorPerformingHandshake(ILogger logger, Exception ex);
 
     [LoggerMessage(0, LogLevel.Warning, "Dolittle Runtime failed performing handshake. ({FailureId}){FailureReason}")]
