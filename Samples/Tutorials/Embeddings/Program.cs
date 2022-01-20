@@ -15,13 +15,13 @@ var host = Host.CreateDefaultBuilder()
 await host.StartAsync();
 
 var client = await host.GetDolittleClient();
-// Mock of the state from the external HR system
+
 var updatedEmployee = new Employee
 {
     Name = "Mr. Taco",
     Workplace = "Street Food Taco Truck"
 };
-// Wait for embedding to be registered in the Runtime
+
 await Task.Delay(TimeSpan.FromSeconds(4));
 
 await client.Embeddings
