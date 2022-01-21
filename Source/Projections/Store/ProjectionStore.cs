@@ -154,6 +154,10 @@ public class ProjectionStore : IProjectionStore
             }
             foreach (var (key, value) in states.ToDictionary(_ => _.Key))
             {
+                if (!result.TryAdd(key, value))
+                {
+                    throw new ReceivedDuplicateProjectionKeys(projectionId, key);
+                }
                 result.Add(key, value);
             }
         }
