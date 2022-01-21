@@ -16,7 +16,7 @@ public class ReceivedDuplicateProjectionKeys : Exception
     /// <param name="projection">The <see cref="ProjectionId"/> that has multiple states with the same <see cref="Key"/>.</param>
     /// <param name="key">The <see cref="Key"/> that occurs multiple times.</param>
     public ReceivedDuplicateProjectionKeys(ProjectionId projection, Key key)
-        : base($"For projection {projection} there are several states with the key {key}")
+        : base($"For projection {projection} multiple states with the key {key} was received from the Runtime")
     {
     }
 }
