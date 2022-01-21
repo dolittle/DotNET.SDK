@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ namespace Dolittle.SDK.Services;
 /// Represents an implementation of <see cref="IServerStreamingMethodHandler{TServerMessage}"/>.
 /// </summary>
 /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
-public class ServerStreamingMethodHandler<TServerMessage> : IServerStreamingMethodHandler<TServerMessage>, IDisposable
+public class ServerStreamingMethodHandler<TServerMessage> : IServerStreamingMethodHandler<TServerMessage>
 {
     readonly AsyncServerStreamingCall<TServerMessage> _call;
     bool _disposed;

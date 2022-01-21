@@ -60,18 +60,19 @@ public class MethodCaller : IPerformMethodCalls
     }
 
     /// <inheritdoc />
-    public AsyncServerStreamingCall<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+    public IServerStreamingMethodHandler<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
         where TClientMessage : IMessage where TServerMessage : IMessage
     {
         try
         {
             var originalStream = method.Call(request, CreateChannel(), CreateCallOptions(token));
-            return new AsyncServerStreamingCall<TServerMessage>(
-                new CatchingAsyncStreamReader<TServerMessage>(_host, _port, originalStream.ResponseStream),
-                originalStream.ResponseHeadersAsync,
-                originalStream.GetStatus,
-                originalStream.GetTrailers,
-                originalStream.Dispose);
+            return new ServerStreamingMethodHandler<TServerMessage>(
+                new AsyncServerStreamingCall<TServerMessage>(
+                    new CatchingAsyncStreamReader<TServerMessage>(_host, _port, originalStream.ResponseStream),
+                        originalStream.ResponseHeadersAsync,
+                        originalStream.GetStatus,
+                        originalStream.GetTrailers,
+                        originalStream.Dispose));
         }
         catch (Exception)
         {

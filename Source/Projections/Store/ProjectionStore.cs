@@ -145,10 +145,10 @@ public class ProjectionStore : IProjectionStore
         };
 
         var result = new Dictionary<Key, CurrentState<TProjection>>();
-        using var stream = _caller.Call(_getAllInBatchesMethod, request, cancellation);
-        while (await stream.ResponseStream.MoveNext(cancellation).ConfigureAwait(false))
+        using var streamHandler = _caller.Call(_getAllInBatchesMethod, request, cancellation);
+        var messages = await streamHandler.AggregateResponses(cancellation).ConfigureAwait(false);
+        foreach (var response in messages)
         {
-            var response = stream.ResponseStream.Current;
             response.Failure.ThrowIfFailureIsSet();
 
             if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
