@@ -92,7 +92,7 @@ public class ProjectionStore : IProjectionStore
 
         if (_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
         {
-            // Verify that the state is expected
+            ThrowIfIncorrectCurrentState(key, projectionId, state);
             return state;
         }
         _logger.LogError(error, "The Runtime returned the projection state '{State}'. But it could not be converted to {ProjectionType}.", response.State, typeof(TProjection));
@@ -142,5 +142,14 @@ public class ProjectionStore : IProjectionStore
         }
         _logger.LogError(error, "The Runtime returned the projection states '{States}'. But it could not be converted to {ProjectionType}.", response.States, typeof(TProjection));
         throw error;
+    }
+    
+    static void ThrowIfIncorrectCurrentState<TProjection>(Key key, ProjectionId projectionId, CurrentState<TProjection> state)
+        where TProjection : class, new()
+    {
+        if (!state.Key.Equals(key))
+        {
+            throw new WrongKeyOnProjectionCurrentState(projectionId, key, state.Key);
+        }
     }
 }

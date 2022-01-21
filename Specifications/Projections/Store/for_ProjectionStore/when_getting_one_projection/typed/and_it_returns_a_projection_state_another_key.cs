@@ -35,5 +35,5 @@ public class and_it_returns_a_projection_state_another_key : given.all_dependenc
         Moq.It.IsAny<CancellationToken>()));
     
     It should_only_call_it_once = () => method_caller.VerifyNoOtherCalls();
-    It should_fail_because_different_keys = () => result.ShouldNotBeNull();
+    It should_fail_because_stored_projection_state_has_different_key = () => result.ShouldBeOfExactType<WrongKeyOnProjectionCurrentState>();
 }
