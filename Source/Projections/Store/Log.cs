@@ -20,8 +20,8 @@ static partial class Log
     internal static partial void ProcessingProjectionsInBatch(ILogger logger, int batchNumber, int numProjections);
     
     [LoggerMessage(0, LogLevel.Error, "Could not convert projection state to {ProjectionType}. State: {State}")]
-    internal static partial void FailedToConvertProjection(ILogger logger, Exception exception, string state, Type projectionType);
+    internal static partial void FailedToConvertProjectionState(ILogger logger, Exception exception, string state, Type projectionType);
     
     [LoggerMessage(0, LogLevel.Error, "Could not convert projection states to {ProjectionType}. States: {State}")]
-    internal static partial void FailedToConvertProjection(ILogger logger, Exception exception, IEnumerable<string> state, Type projectionType);
+    internal static partial void FailedToConvertProjectionStates(ILogger logger, Exception exception, IEnumerable<string> state, Type projectionType);
 }

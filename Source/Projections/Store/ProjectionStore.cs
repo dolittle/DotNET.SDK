@@ -96,7 +96,7 @@ public class ProjectionStore : IProjectionStore
         {
             return state;
         }
-        Log.FailedToConvertProjection(_logger, error, response.State.State, typeof(TProjection));
+        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TProjection));
         throw error;
     }
 
@@ -149,7 +149,7 @@ public class ProjectionStore : IProjectionStore
 
             if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
             {
-                Log.FailedToConvertProjection(_logger, error, response.States.Select(_ => _.State), typeof(TProjection));
+                Log.FailedToConvertProjectionStates(_logger, error, response.States.Select(_ => _.State), typeof(TProjection));
                 throw error;
             }
             foreach (var (key, value) in states.ToDictionary(_ => _.Key))
