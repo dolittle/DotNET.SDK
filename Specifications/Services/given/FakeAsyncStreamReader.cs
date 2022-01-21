@@ -24,7 +24,7 @@ public class FakeAsyncStreamReader<TMessage> : IAsyncStreamReader<TMessage>
     }
 
     public Task<bool> MoveNext(CancellationToken cancellationToken)
-        => Task.FromResult(_messages.MoveNext());
+        => Task.FromResult(!cancellationToken.IsCancellationRequested && _messages.MoveNext());
 
     public TMessage Current => _messages.Current ?? throw new InvalidOperationException("No current element is available.");
 }

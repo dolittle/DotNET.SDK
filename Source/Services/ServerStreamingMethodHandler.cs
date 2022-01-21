@@ -29,8 +29,19 @@ public class ServerStreamingMethodHandler<TServerMessage> : IServerStreamingMeth
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<TServerMessage>> AggregateResponses(CancellationToken token = default)
-        => throw new System.NotImplementedException();
+    public async Task<IEnumerable<TServerMessage>> AggregateResponses(CancellationToken token = default)
+    {
+        if (_disposed)
+        {
+            throw new CannotUseDisposedServerStreamingMethodHandler();
+        }
+        var messages = new List<TServerMessage>();
+        while (await _call.ResponseStream.MoveNext(token).ConfigureAwait(false))
+        {
+            messages.Add(_call.ResponseStream.Current);
+        }
+        return messages;
+    }
 
     /// <inheritdoc />
     public void Dispose()
