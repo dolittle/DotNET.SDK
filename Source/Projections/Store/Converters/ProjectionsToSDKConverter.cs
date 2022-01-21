@@ -29,7 +29,10 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
         var currentStates = new List<CurrentState<TProjection>>();
         foreach (var protobufState in source)
         {
-            if (!TryDeserializeWithSettings<TProjection>(protobufState, out var state, out error)) return false;
+            if (!TryDeserializeWithSettings<TProjection>(protobufState, out var state, out error))
+            {
+                return false;
+            }
             currentStates.Add(state);
         }
 
@@ -37,7 +40,7 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
         return true;
     }
 
-    bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
+    static bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
         where TProjection : class, new()
     {
         projectionState = null;
@@ -46,17 +49,16 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
         var stateType = GetCurrentStateType(currentState.Type);
         var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
 
-        if (exceptionCatcher.Failed)
-            deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error);
-        else
-            deserializationError = null;
+        deserializationError = exceptionCatcher.Failed
+            ? new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error)
+            : null;
 
         projectionState = new CurrentState<TProjection>(state, stateType, currentState.Key);
 
         return !exceptionCatcher.Failed;
     }
 
-    CurrentStateType GetCurrentStateType(PbCurrentStateType type)
+    static CurrentStateType GetCurrentStateType(PbCurrentStateType type)
         => type switch
         {
             PbCurrentStateType.CreatedFromInitialState => CurrentStateType.CreatedFromInitialState,

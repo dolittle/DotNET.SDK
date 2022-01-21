@@ -56,7 +56,7 @@ public class ProjectionStoreBuilder : IProjectionStoreBuilder
 
         return new ProjectionStore(
             _caller,
-            _callContextResolver,
+            new ProjectionStoreRequestCreator(_callContextResolver),
             executionContext,
             _projectionAssociations,
             _projectionsToSDKConverter,
