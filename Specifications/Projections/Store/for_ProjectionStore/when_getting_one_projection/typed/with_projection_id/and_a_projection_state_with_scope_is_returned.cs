@@ -23,7 +23,6 @@ public class and_a_projection_state_with_scope_is_returned : given.all_dependenc
             Value = 42
         };
         another_id = "91A4FC7D-2153-410C-80B5-3E37B22F913B";
-        with_projection_types(typeof(given.a_decorated_projection_type_with_scope));
         get_one_returns(key, stored_state, ProjectionCurrentStateType.Persisted);
     };
 

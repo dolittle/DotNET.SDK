@@ -9,6 +9,12 @@ public class a_decorated_projection_type
     public int Value { get; set; }
     
 }
+public class a_different_projection_type
+{
+    public int SomeOtherValue { get; set; }
+    public int AnotherField { get; set; }
+    
+}
 public class an_undecorated_projection_type
 {
     public int Value { get; set; }
