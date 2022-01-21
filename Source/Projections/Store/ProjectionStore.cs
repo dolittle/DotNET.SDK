@@ -21,7 +21,7 @@ namespace Dolittle.SDK.Projections.Store;
 public class ProjectionStore : IProjectionStore
 {
     static readonly ProjectionsGetOne _getOneMethod = new();
-    static readonly ProjectionsGetAll _getAllMethod = new();
+    static readonly ProjectionsGetAllInBatches _getAllInBatchesMethod = new();
     readonly IPerformMethodCalls _caller;
     readonly IResolveCallContext _callContextResolver;
     readonly ExecutionContext _executionContext;
@@ -144,15 +144,23 @@ public class ProjectionStore : IProjectionStore
             ScopeId = scopeId.ToProtobuf()
         };
 
-        var response = await _caller.Call(_getAllMethod, request, cancellation).ConfigureAwait(false);
-        response.Failure.ThrowIfFailureIsSet();
-
-        if (_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
+        var result = new Dictionary<Key, CurrentState<TProjection>>();
+        using var stream = _caller.Call(_getAllInBatchesMethod, request, cancellation);
+        while (await stream.ResponseStream.MoveNext(cancellation).ConfigureAwait(false))
         {
-            return states.ToDictionary(_ => _.Key);
-        }
-        _logger.LogError(error, "The Runtime returned the projection states '{States}'. But it could not be converted to {ProjectionType}.", response.States, typeof(TProjection));
-        throw error;
+            var response = stream.ResponseStream.Current;
+            response.Failure.ThrowIfFailureIsSet();
 
+            if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
+            {
+                _logger.LogError(error, "The Runtime returned the projection states '{States}'. But it could not be converted to {ProjectionType}.", response.States, typeof(TProjection));
+            }
+            foreach (var (key, value) in states.ToDictionary(_ => _.Key))
+            {
+                result.Add(key, value);
+            }
+            throw error;
+        }
+        return result;
     }
 }
