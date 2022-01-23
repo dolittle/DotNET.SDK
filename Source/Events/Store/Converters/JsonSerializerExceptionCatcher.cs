@@ -31,5 +31,6 @@ public class JsonSerializerExceptionCatcher
     {
         Failed = true;
         Error = eventArgs.ErrorContext.Error;
+        eventArgs.ErrorContext.Handled = true;
     }
 }
