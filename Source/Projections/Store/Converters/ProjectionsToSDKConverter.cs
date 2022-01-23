@@ -43,26 +43,36 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
     static bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
         where TProjection : class, new()
     {
-        projectionState = null;
+        projectionState = default;
         var exceptionCatcher = new JsonSerializerExceptionCatcher();
         var serializerSettings = new JsonSerializerSettings { Error = exceptionCatcher.OnError };
-        var stateType = GetCurrentStateType(currentState.Type);
+        if (!TryGetCurrentStateType(currentState.Type, out var stateType, out deserializationError))
+        {
+            return false;
+        }
         var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
 
-        deserializationError = exceptionCatcher.Failed
-            ? new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error)
-            : null;
-
+        if (exceptionCatcher.Failed)
+        {
+            deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error);
+            return false;
+        }
+        
         projectionState = new CurrentState<TProjection>(state, stateType, currentState.Key);
-
-        return !exceptionCatcher.Failed;
+        return true;
     }
 
-    static CurrentStateType GetCurrentStateType(PbCurrentStateType type)
-        => type switch
+    static bool TryGetCurrentStateType(PbCurrentStateType pbType, out CurrentStateType type, out Exception error)
+    {
+        type = default;
+        error = default;
+
+        (type, error) = pbType switch
         {
-            PbCurrentStateType.CreatedFromInitialState => CurrentStateType.CreatedFromInitialState,
-            PbCurrentStateType.Persisted => CurrentStateType.Persisted,
-            _ => throw new InvalidCurrentStateType(type)
+            PbCurrentStateType.CreatedFromInitialState => (CurrentStateType.CreatedFromInitialState, default),
+            PbCurrentStateType.Persisted => (CurrentStateType.Persisted, default),
+            _ => ((CurrentStateType)pbType, new InvalidCurrentStateType(pbType))
         };
+        return error == default;
+    }
 }
