@@ -20,8 +20,8 @@ public class and_projection_type_has_additional_field : a_converter
     {
         projection_state = new a_projection_type_with_additional_fields()
         {
-            AValue = "hello",
-            AnotherValue = 42
+            AValue = 42,
+            AnotherValue = 43
         };
         key = "some_key";
         current_state_type = CurrentStateType.Persisted;

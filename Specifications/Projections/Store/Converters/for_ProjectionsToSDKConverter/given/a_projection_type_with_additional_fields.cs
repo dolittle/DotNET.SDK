@@ -5,6 +5,6 @@ namespace Dolittle.SDK.Projections.Store.Converters.for_ProjectionsToSDKConverte
 
 public record a_projection_type_with_additional_fields
 {
-    public string AValue { get; set; }
+    public int AValue { get; set; }
     public int AnotherValue { get; set; }
 }

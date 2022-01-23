@@ -20,7 +20,7 @@ public class and_it_has_Invalid_state_type : a_converter
     {
         projection_state = new a_projection_type()
         {
-            AValue = "hello"
+            AValue = 42
         };
         key = "some_key";
         current_state_type = (CurrentStateType)10;

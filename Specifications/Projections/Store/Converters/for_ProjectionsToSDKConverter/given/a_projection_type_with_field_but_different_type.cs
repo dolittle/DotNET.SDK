@@ -5,5 +5,5 @@ namespace Dolittle.SDK.Projections.Store.Converters.for_ProjectionsToSDKConverte
 
 public record a_projection_type_with_field_but_different_type
 {
-    public int AValue { get; set; }
+    public string AValue { get; set; }
 }

@@ -18,9 +18,9 @@ public class and_projection_type_has_field_of_incompatible_type : a_converter
     
     Establish context = () =>
     {
-        projection_state = new a_projection_type_with_field_but_different_type()
+        projection_state = new a_projection_type_with_field_but_different_type
         {
-            AValue = 42
+            AValue = "a string"
         };
         key = "some_key";
         current_state_type = CurrentStateType.Persisted;
