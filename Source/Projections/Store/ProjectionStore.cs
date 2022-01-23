@@ -125,15 +125,11 @@ public class ProjectionStore : IProjectionStore
             typeof(TProjection),
             scopeId);
 
-        var request = new GetAllRequest
-        {
-            CallContext = _callContextResolver.ResolveFrom(_executionContext),
-            ProjectionId = projectionId.ToProtobuf(),
-            ScopeId = scopeId.ToProtobuf()
-        };
-
         var result = new Dictionary<Key, CurrentState<TProjection>>();
-        using var streamHandler = _caller.Call(_getAllInBatchesMethod, request, cancellation);
+        using var streamHandler = _caller.Call(
+            _getAllInBatchesMethod,
+            _requestCreator.CreateGetAll(new ScopedProjectionId(projectionId, scopeId), _executionContext),
+            cancellation);
         var messages = await streamHandler.AggregateResponses(cancellation).ConfigureAwait(false);
         var batchNumber = 0;
         foreach (var response in messages)
@@ -156,5 +152,13 @@ public class ProjectionStore : IProjectionStore
             }
         }
         return result;
+    }
+    static void ThrowIfIncorrectCurrentState<TProjection>(Key key, ProjectionId projectionId, CurrentState<TProjection> state)
+        where TProjection : class, new()
+    {
+        if (!state.Key.Equals(key))
+        {
+            throw new WrongKeyOnProjectionCurrentState(projectionId, key, state.Key);
+        }
     }
 }
