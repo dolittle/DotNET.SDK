@@ -19,7 +19,7 @@ namespace Dolittle.SDK.Projections.Store;
 public class ProjectionStore : IProjectionStore
 {
     static readonly ProjectionsGetOne _getOneMethod = new();
-    static readonly ProjectionsGetAll _getAllMethod = new();
+    static readonly ProjectionsGetAllInBatches _getAllInBatchesMethod = new();
     readonly IPerformMethodCalls _caller;
     readonly ICreateProjectionStoreRequest _requestCreator;
     readonly ExecutionContext _executionContext;
@@ -77,12 +77,7 @@ public class ProjectionStore : IProjectionStore
     public async Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
         where TProjection : class, new()
     {
-        _logger.LogDebug(
-            "Getting current projection state with key {Key} for projection of {ProjectionType} with id {ProjectionId} in scope {Scope}",
-            key,
-            typeof(TProjection),
-            projectionId,
-            scopeId);
+        Log.GettingOneProjection(_logger, key, projectionId, typeof(TProjection), scopeId);
 
         var response = await _caller.Call(
             _getOneMethod,
@@ -95,7 +90,7 @@ public class ProjectionStore : IProjectionStore
             ThrowIfIncorrectCurrentState(key, projectionId, state);
             return state;
         }
-        _logger.LogError(error, "The Runtime returned the projection state '{State}'. But it could not be converted to {ProjectionType}.", response.State, typeof(TProjection));
+        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TProjection));
         throw error;
     }
 
@@ -124,32 +119,42 @@ public class ProjectionStore : IProjectionStore
     public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
         where TProjection : class, new()
     {
-        _logger.LogDebug(
-            "Getting all current projection states for projection of {ProjectionType} with id {ProjectionId} in scope {Scope}",
-            typeof(TProjection),
+        Log.GettingAllProjections(
+            _logger,
             projectionId,
+            typeof(TProjection),
             scopeId);
 
-        var response = await _caller.Call(
-            _getAllMethod,
-            _requestCreator.CreateGetAll(new ScopedProjectionId(projectionId, scopeId),_executionContext),
-            cancellation).ConfigureAwait(false);
-        response.Failure.ThrowIfFailureIsSet();
+        var request = new GetAllRequest
+        {
+            CallContext = _callContextResolver.ResolveFrom(_executionContext),
+            ProjectionId = projectionId.ToProtobuf(),
+            ScopeId = scopeId.ToProtobuf()
+        };
 
-        if (_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
+        var result = new Dictionary<Key, CurrentState<TProjection>>();
+        using var streamHandler = _caller.Call(_getAllInBatchesMethod, request, cancellation);
+        var messages = await streamHandler.AggregateResponses(cancellation).ConfigureAwait(false);
+        var batchNumber = 0;
+        foreach (var response in messages)
         {
-            return states.ToDictionary(_ => _.Key);
+            response.Failure.ThrowIfFailureIsSet();
+            Log.ProcessingProjectionsInBatch(_logger, ++batchNumber, response.States.Count);
+
+            if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
+            {
+                Log.FailedToConvertProjectionStates(_logger, error, response.States.Select(_ => _.State), typeof(TProjection));
+                throw error;
+            }
+            foreach (var (key, value) in states.ToDictionary(_ => _.Key))
+            {
+                if (!result.TryAdd(key, value))
+                {
+                    throw new ReceivedDuplicateProjectionKeys(projectionId, key);
+                }
+                result.Add(key, value);
+            }
         }
-        _logger.LogError(error, "The Runtime returned the projection states '{States}'. But it could not be converted to {ProjectionType}.", response.States, typeof(TProjection));
-        throw error;
-    }
-    
-    static void ThrowIfIncorrectCurrentState<TProjection>(Key key, ProjectionId projectionId, CurrentState<TProjection> state)
-        where TProjection : class, new()
-    {
-        if (!state.Key.Equals(key))
-        {
-            throw new WrongKeyOnProjectionCurrentState(projectionId, key, state.Key);
-        }
+        return result;
     }
 }

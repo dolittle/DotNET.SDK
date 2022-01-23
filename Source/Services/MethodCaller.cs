@@ -59,6 +59,27 @@ public class MethodCaller : IPerformMethodCalls
         }
     }
 
+    /// <inheritdoc />
+    public IServerStreamingMethodHandler<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+        where TClientMessage : IMessage where TServerMessage : IMessage
+    {
+        try
+        {
+            var originalStream = method.Call(request, CreateChannel(), CreateCallOptions(token));
+            return new ServerStreamingMethodHandler<TServerMessage>(
+                new AsyncServerStreamingCall<TServerMessage>(
+                    new CatchingAsyncStreamReader<TServerMessage>(_host, _port, originalStream.ResponseStream),
+                        originalStream.ResponseHeadersAsync,
+                        originalStream.GetStatus,
+                        originalStream.GetTrailers,
+                        originalStream.Dispose));
+        }
+        catch (Exception)
+        {
+            throw new CouldNotConnectToRuntime(_host, _port);
+        }
+    }
+
     /// <inheritdoc/>
     public async Task<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAUnaryMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
         where TClientMessage : IMessage
@@ -76,5 +97,5 @@ public class MethodCaller : IPerformMethodCalls
 
     Channel CreateChannel() => new(_host, _port, _channelCredentials, _channelOptions);
 
-    CallOptions CreateCallOptions(CancellationToken token) => new(cancellationToken: token);
+    static CallOptions CreateCallOptions(CancellationToken token) => new(cancellationToken: token);
 }
