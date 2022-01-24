@@ -26,6 +26,19 @@ public interface IPerformMethodCalls
         where TServerMessage : IMessage;
 
     /// <summary>
+    /// Performs the provided server streaming method call.
+    /// </summary>
+    /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
+    /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
+    /// <param name="method">The <see cref="ICanCallAServerStreamingMethod{TClientMessage, TServerMessage}"/> method to call.</param>
+    /// <param name="request">The <see cref="IMessage"/> to send to the server.</param>
+    /// <param name="token">A <see cref="CancellationToken"/> used to cancel the call.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
+    IServerStreamingEnumerable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+        where TClientMessage : IMessage
+        where TServerMessage : IMessage;
+    
+    /// <summary>
     /// Performs the provided unary method call.
     /// </summary>
     /// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
