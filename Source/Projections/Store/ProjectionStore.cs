@@ -126,13 +126,11 @@ public class ProjectionStore : IProjectionStore
             scopeId);
 
         var result = new Dictionary<Key, CurrentState<TProjection>>();
-        using var streamHandler = _caller.Call(
-            _getAllInBatchesMethod,
-            _requestCreator.CreateGetAll(new ScopedProjectionId(projectionId, scopeId), _executionContext),
-            cancellation);
-        var messages = await streamHandler.AggregateResponses(cancellation).ConfigureAwait(false);
         var batchNumber = 0;
-        foreach (var response in messages)
+        await foreach (var response in _caller.Call(
+                           _getAllInBatchesMethod,
+                           _requestCreator.CreateGetAll(new ScopedProjectionId(projectionId, scopeId), _executionContext),
+                           cancellation))
         {
             response.Failure.ThrowIfFailureIsSet();
             Log.ProcessingProjectionsInBatch(_logger, ++batchNumber, response.States.Count);
@@ -148,7 +146,6 @@ public class ProjectionStore : IProjectionStore
                 {
                     throw new ReceivedDuplicateProjectionKeys(projectionId, key);
                 }
-                result.Add(key, value);
             }
         }
         return result;

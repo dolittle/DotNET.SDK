@@ -16,7 +16,7 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Debug, "Getting all states from projection {Projection} of type {ProjectionType} in scope {Scope}")]
     internal static partial void GettingAllProjections(ILogger logger, ProjectionId projection, Type projectionType, ScopeId scope);
     
-    [LoggerMessage(0, LogLevel.Debug, "Received batch number {BatchNumber} consisting of {NumProjections} projection states")]
+    [LoggerMessage(0, LogLevel.Trace, "Received batch number {BatchNumber} consisting of {NumProjections} projection states")]
     internal static partial void ProcessingProjectionsInBatch(ILogger logger, int batchNumber, int numProjections);
     
     [LoggerMessage(0, LogLevel.Error, "Could not convert projection state to {ProjectionType}. State: {State}")]

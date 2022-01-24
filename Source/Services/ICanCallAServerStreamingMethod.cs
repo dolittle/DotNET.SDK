@@ -7,9 +7,9 @@ using Grpc.Core;
 namespace Dolittle.SDK.Services;
 
 /// <summary>
-/// Defines a duplex streaming method call.
+/// Defines a server streaming method call.
 /// </summary>
-/// <typeparam name="TClientMessage">Type of the <see cref="IMessage">messages</see> that is sent from the client to the server.</typeparam>
+/// <typeparam name="TClientMessage">Type of the <see cref="IMessage">message</see> that is sent from the client to the server.</typeparam>
 /// <typeparam name="TServerMessage">Type of the <see cref="IMessage">messages</see> that is sent from the server to the client.</typeparam>
 public interface ICanCallAServerStreamingMethod<in TClientMessage, TServerMessage>
     where TClientMessage : IMessage

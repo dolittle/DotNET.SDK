@@ -7,14 +7,10 @@ using Grpc.Core;
 using Machine.Specifications;
 using Status = Grpc.Core.Status;
 
-namespace Dolittle.SDK.Services.for_ServerStreamingMethodHandler.given;
+namespace Dolittle.SDK.Services.for_ServerStreamingEnumerable.given;
 
 public class all_dependencies
 {
-    Establish context = () =>
-    {
-    };
-
-    protected static ServerStreamingMethodHandler<Message> create_handler(FakeAsyncStreamReader<Message> reader)
+    protected static ServerStreamingEnumerable<Message> create_enumerable(FakeAsyncStreamReader<Message> reader)
         => new(new AsyncServerStreamingCall<Message>(reader, Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => {}));
 }
