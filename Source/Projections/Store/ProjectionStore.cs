@@ -95,7 +95,7 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc/>
-    public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(System.Threading.CancellationToken cancellation = default)
+    public async Task<IEnumerable<TProjection>> GetAll<TProjection>(System.Threading.CancellationToken cancellation = default)
         where TProjection : class, new()
     {
         var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
@@ -103,20 +103,20 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc/>
-    public Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+    public Task<IEnumerable<TProjection>> GetAll<TProjection>(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
         where TProjection : class, new()
         => GetAll<TProjection>(projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
-    public Task<IDictionary<Key, CurrentState<object>>> GetAll(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+    public Task<IEnumerable<object>> GetAll(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
         => GetAll<object>(projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
-    public Task<IDictionary<Key, CurrentState<object>>> GetAll(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+    public Task<IEnumerable<object>> GetAll(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
         => GetAll<object>(projectionId, scopeId, cancellation);
 
     /// <inheritdoc/>
-    public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+    public async Task<IEnumerable<TProjection>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
         where TProjection : class, new()
     {
         Log.GettingAllProjections(
@@ -148,7 +148,7 @@ public class ProjectionStore : IProjectionStore
                 }
             }
         }
-        return result;
+        return result.Values.Select(_ => _.State);
     }
     static void ThrowIfIncorrectCurrentState<TProjection>(Key key, ProjectionId projectionId, CurrentState<TProjection> state)
         where TProjection : class, new()
