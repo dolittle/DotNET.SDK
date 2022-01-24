@@ -3,7 +3,7 @@
         <AutofacVersion>6.3.0</AutofacVersion>
         <AutofacExtensionsDependencyInjectionVersion>7.2.0</AutofacExtensionsDependencyInjectionVersion>
         <BaselineTypeDiscoveryVersion>1.1.2</BaselineTypeDiscoveryVersion>
-        <ContractsVersion>6.4.0</ContractsVersion>
+        <ContractsVersion>6.5.0</ContractsVersion>
         <MachineSpecificationsRunnerVersion>2.9.0</MachineSpecificationsRunnerVersion>
         <MachineSpecificationsVersion>1.0.0</MachineSpecificationsVersion>
         <MicrosoftExtensionsVersion>6.0.0</MicrosoftExtensionsVersion>
@@ -14,5 +14,6 @@
         <MongoDBDriverVersion>2.13.2</MongoDBDriverVersion>
         <NewtonsoftVersion>12.0.3</NewtonsoftVersion>
         <SystemImmutableVersion>1.7.1</SystemImmutableVersion>
+        <SystemLinqAsyncVersion>5.1.0</SystemLinqAsyncVersion>
     </PropertyGroup>
 </Project>
