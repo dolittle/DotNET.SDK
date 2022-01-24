@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Projections.Store;
 public interface IProjectionStore
 {
     /// <summary>
-    /// Gets a projection state by key for a projection associated with a type.
+    /// Gets a projection read model by key for a projection associated with a type.
     /// </summary>
     /// <param name="key">THe <see cref="Key" /> of the projection.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
@@ -25,7 +25,7 @@ public interface IProjectionStore
         where TProjection : class, new();
 
     /// <summary>
-    /// Gets a projection state by key for a projection specified by projection identifier.
+    /// Gets a projection read model by key for a projection specified by projection identifier.
     /// </summary>
     /// <param name="key">THe <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
@@ -36,7 +36,7 @@ public interface IProjectionStore
         where TProjection : class, new();
 
     /// <summary>
-    /// Gets a projection state by key for a projection specified by projection identifier.
+    /// Gets a projection read model by key for a projection specified by projection identifier.
     /// </summary>
     /// <param name="key">THe <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
@@ -45,7 +45,7 @@ public interface IProjectionStore
     Task<object> Get(Key key, ProjectionId projectionId, CancellationToken cancellation = default);
 
     /// <summary>
-    /// Gets a projection state by key for a projection specified by projection and scope identifier.
+    /// Gets a projection read model by key for a projection specified by projection and scope identifier.
     /// </summary>
     /// <param name="key">THe <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
@@ -57,7 +57,7 @@ public interface IProjectionStore
         where TProjection : class, new();
 
     /// <summary>
-    /// Gets a projection state by key for a projection specified by projection and scope identifier.
+    /// Gets a projection read model by key for a projection specified by projection and scope identifier.
     /// </summary>
     /// <param name="key">THe <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>

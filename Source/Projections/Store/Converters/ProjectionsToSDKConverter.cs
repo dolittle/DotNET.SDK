@@ -64,15 +64,22 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
 
     static bool TryGetCurrentStateType(PbCurrentStateType pbType, out CurrentStateType type, out Exception error)
     {
-        type = default;
-        error = default;
-
-        (type, error) = pbType switch
+        switch (pbType)
         {
-            PbCurrentStateType.CreatedFromInitialState => (CurrentStateType.CreatedFromInitialState, default),
-            PbCurrentStateType.Persisted => (CurrentStateType.Persisted, default),
-            _ => ((CurrentStateType)pbType, new InvalidCurrentStateType(pbType))
-        };
-        return error == default;
+            case PbCurrentStateType.CreatedFromInitialState:
+                type = CurrentStateType.CreatedFromInitialState;
+                error = default;
+                return true;
+            case PbCurrentStateType.Persisted:
+                type = CurrentStateType.Persisted;
+                error = default;
+                return true;
+            
+            default:
+                error = new InvalidCurrentStateType(pbType);
+                type = default;
+                return false;
+
+        }
     }
 }

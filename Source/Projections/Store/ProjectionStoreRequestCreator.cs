@@ -16,9 +16,9 @@ public class ProjectionStoreRequestCreator : ICreateProjectionStoreRequest
     readonly IResolveCallContext _callContextResolver;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="ProjectionStoreRequestCreator"/> class.
     /// </summary>
-    /// <param name="callContextResolver"></param>
+    /// <param name="callContextResolver">The <see cref="IResolveCallContext"/>.</param>
     public ProjectionStoreRequestCreator(IResolveCallContext callContextResolver)
     {
         _callContextResolver = callContextResolver;
