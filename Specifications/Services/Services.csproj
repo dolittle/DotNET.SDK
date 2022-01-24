@@ -9,6 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Reactive.Testing" Version="$(RxVersion)" />
+        <PackageReference Include="System.Linq.Async" Version="$(SystemLinqAsyncVersion)" />
+        
     </ItemGroup>
 
     <ItemGroup>

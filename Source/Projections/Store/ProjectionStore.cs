@@ -139,10 +139,8 @@ public class ProjectionStore : IProjectionStore
         };
 
         var result = new Dictionary<Key, CurrentState<TProjection>>();
-        using var streamHandler = _caller.Call(_getAllInBatchesMethod, request, cancellation);
-        var messages = await streamHandler.AggregateResponses(cancellation).ConfigureAwait(false);
         var batchNumber = 0;
-        foreach (var response in messages)
+        await foreach (var response in _caller.Call(_getAllInBatchesMethod, request, cancellation))
         {
             response.Failure.ThrowIfFailureIsSet();
             Log.ProcessingProjectionsInBatch(_logger, ++batchNumber, response.States.Count);

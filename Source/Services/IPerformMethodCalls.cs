@@ -34,7 +34,7 @@ public interface IPerformMethodCalls
     /// <param name="request">The <see cref="IMessage"/> to send to the server.</param>
     /// <param name="token">A <see cref="CancellationToken"/> used to cancel the call.</param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    IServerStreamingMethodHandler<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+    IServerStreamingEnumerable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
         where TClientMessage : IMessage
         where TServerMessage : IMessage;
     
