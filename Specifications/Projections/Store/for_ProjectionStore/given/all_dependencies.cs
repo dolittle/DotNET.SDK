@@ -2,8 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Text.Json;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Projections.Contracts;
@@ -12,12 +13,16 @@ using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
+using Grpc.Core;
 using Machine.Specifications;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using GetOneRequest = Dolittle.Runtime.Projections.Contracts.GetOneRequest;
 using GetOneResponse = Dolittle.Runtime.Projections.Contracts.GetOneResponse;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+using Status = Grpc.Core.Status;
 using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Dolittle.SDK.Projections.Store.for_ProjectionStore.given;
@@ -83,13 +88,14 @@ public class all_dependencies
                 }
             }));
 
-    protected static void get_all_returns(GetAllResponse response)
+    protected static void get_all_returns(ServerStreamingEnumerable<GetAllResponse> enumerable)
         => method_caller
             .Setup(_ => _.Call(
-            Moq.It.IsAny<ProjectionsGetAll>(),
+            Moq.It.IsAny<ProjectionsGetAllInBatches>(),
             Moq.It.IsAny<GetAllRequest>(),
             Moq.It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(response));
+            .Returns(enumerable);
+    
 
     protected static GetOneRequest request_like(Key key, ScopedProjectionId id)
         => Moq.It.Is<GetOneRequest>(_ =>
@@ -97,4 +103,44 @@ public class all_dependencies
             && _.ProjectionId.Equals(id.Identifier.ToProtobuf())
             && _.ScopeId.Equals(id.ScopeId.ToProtobuf())
             && _.CallContext.ExecutionContext.ToExecutionContext().Equals(an_execution_context));
+
+    protected static ServerStreamingEnumerable<GetAllResponse> create_enumerable(params ProjectionCurrentState[][] batches)
+        => create_enumerable(batches.Select(batch =>
+        {
+            var response = new GetAllResponse();
+            response.States.AddRange(batch);
+            return response;
+        }));
+
+    protected static ServerStreamingEnumerable<GetAllResponse> create_enumerable(params GetAllResponse[] responses)
+        => create_enumerable(responses.AsEnumerable());
+    
+    protected static ServerStreamingEnumerable<GetAllResponse> create_enumerable(IEnumerable<GetAllResponse> responses)
+        => new(new AsyncServerStreamingCall<GetAllResponse>(
+            new FakeAsyncStreamReader<GetAllResponse>(responses),
+            Task.FromResult(Metadata.Empty),
+            () => Status.DefaultSuccess,
+            () => Metadata.Empty,
+            () => {}));
+    
+    protected static ProjectionCurrentState create_protobuf_projection_current_state<TReadModel>(TReadModel currentState, Key key, CurrentStateType type)
+        where TReadModel : class, new()
+        => new()
+        {
+            State = JsonConvert.SerializeObject(currentState, Formatting.None),
+            Key = key,
+            Type = get_current_state_type(type)
+        };
+
+    protected static ProjectionCurrentState create_protobuf_projection_current_state<TReadModel>(CurrentState<TReadModel> currentState, CurrentStateType type)
+        where TReadModel : class, new()
+        => create_protobuf_projection_current_state(currentState.State, currentState.Key, type);
+
+    static ProjectionCurrentStateType get_current_state_type(CurrentStateType type)
+        => type switch
+        {
+            CurrentStateType.Persisted => ProjectionCurrentStateType.Persisted,
+            CurrentStateType.CreatedFromInitialState => ProjectionCurrentStateType.CreatedFromInitialState,
+            _ => (ProjectionCurrentStateType) type
+        };
 }
