@@ -37,9 +37,9 @@ var dishes = await client.Projections
     .ForTenant(TenantId.Development)
     .GetAll<DishCounter>().ConfigureAwait(false);
 
-foreach (var (dish, state) in dishes )
+foreach (var dish in dishes)
 {
-    Console.WriteLine($"The kitchen has prepared {dish} {state.State.NumberOfTimesPrepared} times");
+    Console.WriteLine($"The kitchen has prepared {dish.Name} {dish.NumberOfTimesPrepared} times");
 }
 
 var chef = await client.Projections
