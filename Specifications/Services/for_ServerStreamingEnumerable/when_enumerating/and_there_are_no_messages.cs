@@ -2,22 +2,22 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using Dolittle.SDK.Services.for_ServerStreamingMethodHandler.given;
+using Dolittle.SDK.Services.for_ServerStreamingEnumerable.given;
 using Dolittle.SDK.Services.given;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Services.for_ServerStreamingMethodHandler.when_aggregating_responses;
+namespace Dolittle.SDK.Services.for_ServerStreamingEnumerable.when_enumerating;
 
 public class and_there_are_no_messages : given.all_dependencies
 {
-    static ServerStreamingMethodHandler<Message> handler;
+    static ServerStreamingEnumerable<Message> enumerable;
     static IEnumerable<Message> result;
     Establish context = () =>
     {
-        handler = create_handler(new FakeAsyncStreamReader<Message>());
+        enumerable = create_enumerable(new FakeAsyncStreamReader<Message>());
     };
 
-    Because of = () => result = handler.AggregateResponses().GetAwaiter().GetResult();
+    Because of = () => result = enumerable.().GetAwaiter().GetResult();
 
     It should_not_get_any_messages = () => result.ShouldBeEmpty();
 }
