@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
@@ -53,29 +52,29 @@ public class MethodCaller : IPerformMethodCalls
                 originalStream.GetTrailers,
                 originalStream.Dispose);
         }
-        catch (Exception)
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
         {
             throw new CouldNotConnectToRuntime(_host, _port);
         }
     }
 
     /// <inheritdoc />
-    public IServerStreamingMethodHandler<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
+    public IServerStreamingEnumerable<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
         where TClientMessage : IMessage
         where TServerMessage : IMessage
     {
         try
         {
             var originalStream = method.Call(request, CreateChannel(), CreateCallOptions(token));
-            return new ServerStreamingMethodHandler<TServerMessage>(
+            return new ServerStreamingEnumerable<TServerMessage>(
                 new AsyncServerStreamingCall<TServerMessage>(
                     new CatchingAsyncStreamReader<TServerMessage>(_host, _port, originalStream.ResponseStream),
-                        originalStream.ResponseHeadersAsync,
-                        originalStream.GetStatus,
-                        originalStream.GetTrailers,
-                        originalStream.Dispose));
+                    originalStream.ResponseHeadersAsync,
+                    originalStream.GetStatus,
+                    originalStream.GetTrailers,
+                    originalStream.Dispose));
         }
-        catch (Exception)
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Unavailable)
         {
             throw new CouldNotConnectToRuntime(_host, _port);
         }
