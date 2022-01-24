@@ -8,10 +8,12 @@ using Dolittle.SDK.Projections;
 public class DishCounter
 {
     public int NumberOfTimesPrepared = 0;
+    public string Name = "";
 
     [KeyFromProperty("Dish")]
     public void On(DishPrepared @event, ProjectionContext context)
     {
+        Name = @event.Dish; 
         NumberOfTimesPrepared ++;
     }
 }
