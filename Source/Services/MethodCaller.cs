@@ -61,7 +61,8 @@ public class MethodCaller : IPerformMethodCalls
 
     /// <inheritdoc />
     public IServerStreamingMethodHandler<TServerMessage> Call<TClientMessage, TServerMessage>(ICanCallAServerStreamingMethod<TClientMessage, TServerMessage> method, TClientMessage request, CancellationToken token)
-        where TClientMessage : IMessage where TServerMessage : IMessage
+        where TClientMessage : IMessage
+        where TServerMessage : IMessage
     {
         try
         {
