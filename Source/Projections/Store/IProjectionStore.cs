@@ -65,7 +65,59 @@ public interface IProjectionStore
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="object"/> read model.</returns>
     Task<object> Get(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default);
+    
+    /// <summary>
+    /// Gets a projection state by key for a projection associated with a type.
+    /// </summary>
+    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <typeparamref name="TProjection"/>.</returns>
+    Task<CurrentState<TProjection>> GetState<TProjection>(Key key, CancellationToken cancellation = default)
+        where TProjection : class, new();
 
+    /// <summary>
+    /// Gets a projection state by key for a projection specified by projection identifier.
+    /// </summary>
+    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
+    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <typeparamref name="TProjection"/>.</returns>
+    Task<CurrentState<TProjection>> GetState<TProjection>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
+        where TProjection : class, new();
+
+    /// <summary>
+    /// Gets a projection state by key for a projection specified by projection identifier.
+    /// </summary>
+    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
+    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <see cref="object"/>.</returns>
+    Task<CurrentState<object>> GetState(Key key, ProjectionId projectionId, CancellationToken cancellation = default);
+
+    /// <summary>
+    /// Gets a projection state by key for a projection specified by projection and scope identifier.
+    /// </summary>
+    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
+    /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
+    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <typeparamref name="TProjection"/>.</returns>
+    Task<CurrentState<TProjection>> GetState<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        where TProjection : class, new();
+
+    /// <summary>
+    /// Gets a projection state by key for a projection specified by projection and scope identifier.
+    /// </summary>
+    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
+    /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
+    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <see cref="object"/>.</returns>
+    Task<CurrentState<object>> GetState(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default);
+    
     /// <summary>
     /// Gets all projection read models for a projection associated with a type.
     /// </summary>

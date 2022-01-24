@@ -12,6 +12,9 @@ static partial class Log
 {
     [LoggerMessage(0, LogLevel.Debug, "Getting one read model from projection {Projection} of type {ProjectionType} in scope {Scope} with key {Key}")]
     internal static partial void GettingOneProjection(ILogger logger, Key key, ProjectionId projection, Type projectionType, ScopeId scope);
+    
+    [LoggerMessage(0, LogLevel.Debug, "Getting one the state of projection {Projection} of type {ProjectionType} in scope {Scope} with key {Key}")]
+    internal static partial void GettingOneProjectionState(ILogger logger, Key key, ProjectionId projection, Type projectionType, ScopeId scope);
 
     [LoggerMessage(0, LogLevel.Debug, "Getting all read models from projection {Projection} of type {ProjectionType} in scope {Scope}")]
     internal static partial void GettingAllProjections(ILogger logger, ProjectionId projection, Type projectionType, ScopeId scope);
