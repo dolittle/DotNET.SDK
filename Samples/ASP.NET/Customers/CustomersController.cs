@@ -24,6 +24,6 @@ public class CustomerController : ControllerBase
             .Get<DishesEaten>(customer, HttpContext.RequestAborted)
             .ConfigureAwait(false);
 
-        return state.State.Dishes;
+        return state.Dishes;
     }
 }

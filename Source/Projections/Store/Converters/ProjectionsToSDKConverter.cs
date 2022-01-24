@@ -29,7 +29,10 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
         var currentStates = new List<CurrentState<TProjection>>();
         foreach (var protobufState in source)
         {
-            if (!TryDeserializeWithSettings<TProjection>(protobufState, out var state, out error)) return false;
+            if (!TryDeserializeWithSettings<TProjection>(protobufState, out var state, out error))
+            {
+                return false;
+            }
             currentStates.Add(state);
         }
 
@@ -37,30 +40,46 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
         return true;
     }
 
-    bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
+    static bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
         where TProjection : class, new()
     {
-        projectionState = null;
+        projectionState = default;
         var exceptionCatcher = new JsonSerializerExceptionCatcher();
         var serializerSettings = new JsonSerializerSettings { Error = exceptionCatcher.OnError };
-        var stateType = GetCurrentStateType(currentState.Type);
+        if (!TryGetCurrentStateType(currentState.Type, out var stateType, out deserializationError))
+        {
+            return false;
+        }
         var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
 
         if (exceptionCatcher.Failed)
+        {
             deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error);
-        else
-            deserializationError = null;
-
+            return false;
+        }
+        
         projectionState = new CurrentState<TProjection>(state, stateType, currentState.Key);
-
-        return !exceptionCatcher.Failed;
+        return true;
     }
 
-    CurrentStateType GetCurrentStateType(PbCurrentStateType type)
-        => type switch
+    static bool TryGetCurrentStateType(PbCurrentStateType pbType, out CurrentStateType type, out Exception error)
+    {
+        switch (pbType)
         {
-            PbCurrentStateType.CreatedFromInitialState => CurrentStateType.CreatedFromInitialState,
-            PbCurrentStateType.Persisted => CurrentStateType.Persisted,
-            _ => throw new InvalidCurrentStateType(type)
-        };
+            case PbCurrentStateType.CreatedFromInitialState:
+                type = CurrentStateType.CreatedFromInitialState;
+                error = default;
+                return true;
+            case PbCurrentStateType.Persisted:
+                type = CurrentStateType.Persisted;
+                error = default;
+                return true;
+            
+            default:
+                error = new InvalidCurrentStateType(pbType);
+                type = default;
+                return false;
+
+        }
+    }
 }

@@ -56,9 +56,15 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     /// <inheritdoc/>
     public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context, CancellationToken cancellation)
     {
-        if (!_onMethods.TryGetValue(eventType, out var method)) throw new MissingOnMethodForEventType(eventType);
+        if (!_onMethods.TryGetValue(eventType, out var method))
+        {
+            throw new MissingOnMethodForEventType(eventType);
+        }
         var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
-        if (tryOn.Exception != default) throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
+        if (tryOn.Exception != default)
+        {
+            throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
+        }
         return tryOn.Result;
     }
 }

@@ -53,7 +53,10 @@ public class TypedProjectionMethod<TReadModel, TEvent> : IProjectionMethod<TRead
     /// <inheritdoc/>
     public Task<Try<ProjectionResult<TReadModel>>> TryOn(TReadModel readModel, object @event, ProjectionContext context)
     {
-        if (@event is TEvent typedEvent) return _method(readModel, typedEvent, context).TryTask();
+        if (@event is TEvent typedEvent)
+        {
+            return _method(readModel, typedEvent, context).TryTask();
+        }
 
         return Task.FromResult<Try<ProjectionResult<TReadModel>>>(new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType()));
     }
