@@ -158,7 +158,6 @@ public class ProjectionStore : IProjectionStore
                 {
                     throw new ReceivedDuplicateProjectionKeys(projectionId, key);
                 }
-                result.Add(key, value);
             }
         }
         return result;
