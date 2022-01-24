@@ -45,7 +45,7 @@ foreach (var (dish, state) in dishes )
 var chef = await client.Projections
     .ForTenant(TenantId.Development)
     .Get<Chef>("Mrs. Tex Mex").ConfigureAwait(false);
-Console.WriteLine($"{chef.Key} has prepared {string.Join(", ", chef.State.Dishes)}");
+Console.WriteLine($"Mrs. Tex Mex has prepared {string.Join(", ", chef.Dishes)}");
 
 await host.WaitForShutdownAsync();
 
