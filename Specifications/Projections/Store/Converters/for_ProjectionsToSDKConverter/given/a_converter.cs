@@ -24,6 +24,10 @@ public class a_converter
             Type = get_current_state_type(type)
         };
 
+    protected static ProjectionCurrentState create_protobuf_projection_current_state<TReadModel>(CurrentState<TReadModel> currentState, CurrentStateType type)
+        where TReadModel : class, new()
+        => create_protobuf_projection_current_state(currentState.State, currentState.Key, type);
+
     static ProjectionCurrentStateType get_current_state_type(CurrentStateType type)
         => type switch
         {
