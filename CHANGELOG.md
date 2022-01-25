@@ -1,3 +1,18 @@
+# [14.0.0] - 2022-1-25 [PR: #119](https://github.com/dolittle/DotNET.SDK/pull/119)
+## Summary
+
+Simplifies the `IProjectionStore` apis by removing the `CurrentState<>` wrapper around the returned types from `Get(...)` and `GetAll(...)` methods, and returns an `IEnumerable<>` instead of an `IDicationary<,>` when getting multiple read models. And introduces a new `GetState(...)` method that has the wrapped types for when it is interesting.
+
+### Added
+
+- `IProjectionStore.GetState(...)` method that keeps the syntax of the previous `.Get(...)` method.
+
+### Changed
+
+- `IProjectionStore.Get(...)` returns the specified type or `object` instead of wrapping with `CurrentState<>`
+- `IProjectionStore.GetAll(...)` returns an `IEnumerable<>` of the specified type or `object` instead of an `Dictionary<,>` of keys to `CurrentState<>`.
+
+
 # [13.0.1] - 2022-1-24 [PR: #116](https://github.com/dolittle/DotNET.SDK/pull/116)
 ## Summary
 
