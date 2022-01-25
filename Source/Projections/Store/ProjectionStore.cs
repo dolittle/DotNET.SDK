@@ -3,13 +3,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Services;
 using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Projections.Store;
 
@@ -53,70 +54,94 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc/>
-    public async Task<TProjection> Get<TProjection>(Key key, System.Threading.CancellationToken cancellation = default)
+    public Task<TProjection> Get<TProjection>(Key key, CancellationToken cancellation = default)
         where TProjection : class, new()
     {
         var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
-        return await Get<TProjection>(key, projectionId, scopeId, cancellation).ConfigureAwait(false);
+        return Get<TProjection>(key, projectionId, scopeId, cancellation);
     }
 
     /// <inheritdoc/>
-    public Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+    public Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
         where TProjection : class, new()
         => Get<TProjection>(key, projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
-    public Task<object> Get(Key key, ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+    public Task<object> Get(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
         => Get<object>(key, projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
-    public Task<object> Get(Key key, ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+    public Task<object> Get(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         => Get<object>(key, projectionId, scopeId, cancellation);
 
-    /// <inheritdoc/>
-    public async Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
-        where TProjection : class, new()
-    {
-        Log.GettingOneProjection(_logger, key, projectionId, typeof(TProjection), scopeId);
-
-        var response = await _caller.Call(
-            _getOneMethod,
-            _requestCreator.CreateGetOne(key, new ScopedProjectionId(projectionId, scopeId),_executionContext),
-            cancellation).ConfigureAwait(false);
-        response.Failure.ThrowIfFailureIsSet();
-
-        if (_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
-        {
-            ThrowIfIncorrectCurrentState(key, projectionId, state);
-            return state;
-        }
-        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TProjection));
-        throw error;
-    }
-
-    /// <inheritdoc/>
-    public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(System.Threading.CancellationToken cancellation = default)
+    /// <inheritdoc />
+    public Task<CurrentState<TProjection>> GetState<TProjection>(Key key, CancellationToken cancellation = default)
         where TProjection : class, new()
     {
         var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
-        return await GetAll<TProjection>(projectionId, scopeId, cancellation).ConfigureAwait(false);
+        return GetState<TProjection>(key, projectionId, scopeId, cancellation);
+    }
+
+    /// <inheritdoc />
+    public Task<CurrentState<TProjection>> GetState<TProjection>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
+        where TProjection : class, new()
+        => GetState<TProjection>(key, projectionId, ScopeId.Default, cancellation);
+
+    /// <inheritdoc />
+    public Task<CurrentState<object>> GetState(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
+        => GetState<object>(key, projectionId, ScopeId.Default, cancellation);
+
+    /// <inheritdoc />
+    public Task<CurrentState<object>> GetState(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        => GetState<object>(key, projectionId, scopeId, cancellation);
+
+    /// <inheritdoc />
+    public Task<CurrentState<TProjection>> GetState<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        where TProjection : class, new()
+    {
+        Log.GettingOneProjectionState(_logger, key, projectionId, typeof(TProjection), scopeId);
+        return GetStateInternal<TProjection>(
+            key,
+            projectionId,
+            scopeId,
+            cancellation);
     }
 
     /// <inheritdoc/>
-    public Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+    public Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        where TProjection : class, new()
+    {
+        Log.GettingOneProjection(_logger, key, projectionId, typeof(TProjection), scopeId);
+        return GetStateInternal<TProjection>(
+            key,
+            projectionId,
+            scopeId,
+            cancellation).ContinueWith(_ => _.GetAwaiter().GetResult().State, cancellation);
+    }
+
+    /// <inheritdoc/>
+    public Task<IEnumerable<TProjection>> GetAll<TProjection>(CancellationToken cancellation = default)
+        where TProjection : class, new()
+    {
+        var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
+        return GetAll<TProjection>(projectionId, scopeId, cancellation);
+    }
+
+    /// <inheritdoc/>
+    public Task<IEnumerable<TProjection>> GetAll<TProjection>(ProjectionId projectionId, CancellationToken cancellation = default)
         where TProjection : class, new()
         => GetAll<TProjection>(projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
-    public Task<IDictionary<Key, CurrentState<object>>> GetAll(ProjectionId projectionId, System.Threading.CancellationToken cancellation = default)
+    public Task<IEnumerable<object>> GetAll(ProjectionId projectionId, CancellationToken cancellation = default)
         => GetAll<object>(projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
-    public Task<IDictionary<Key, CurrentState<object>>> GetAll(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+    public Task<IEnumerable<object>> GetAll(ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         => GetAll<object>(projectionId, scopeId, cancellation);
 
     /// <inheritdoc/>
-    public async Task<IDictionary<Key, CurrentState<TProjection>>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, System.Threading.CancellationToken cancellation = default)
+    public async Task<IEnumerable<TProjection>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         where TProjection : class, new()
     {
         Log.GettingAllProjections(
@@ -148,7 +173,29 @@ public class ProjectionStore : IProjectionStore
                 }
             }
         }
-        return result;
+        return result.Values.Select(_ => _.State);
+    }
+    
+    async Task<CurrentState<TProjection>> GetStateInternal<TProjection>(
+        Key key,
+        ProjectionId projectionId,
+        ScopeId scopeId,
+        CancellationToken cancellation = default)
+        where TProjection : class, new()
+    {
+        var response = await _caller.Call(
+            _getOneMethod,
+            _requestCreator.CreateGetOne(key, new ScopedProjectionId(projectionId, scopeId),_executionContext),
+            cancellation).ConfigureAwait(false);
+        response.Failure.ThrowIfFailureIsSet();
+
+        if (_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
+        {
+            ThrowIfIncorrectCurrentState(key, projectionId, state);
+            return state;
+        }
+        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TProjection));
+        throw error;
     }
     static void ThrowIfIncorrectCurrentState<TProjection>(Key key, ProjectionId projectionId, CurrentState<TProjection> state)
         where TProjection : class, new()
