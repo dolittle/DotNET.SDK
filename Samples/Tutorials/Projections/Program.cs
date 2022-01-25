@@ -37,15 +37,15 @@ var dishes = await client.Projections
     .ForTenant(TenantId.Development)
     .GetAll<DishCounter>().ConfigureAwait(false);
 
-foreach (var (dish, state) in dishes )
+foreach (var dish in dishes)
 {
-    Console.WriteLine($"The kitchen has prepared {dish} {state.State.NumberOfTimesPrepared} times");
+    Console.WriteLine($"The kitchen has prepared {dish.Name} {dish.NumberOfTimesPrepared} times");
 }
 
 var chef = await client.Projections
     .ForTenant(TenantId.Development)
     .Get<Chef>("Mrs. Tex Mex").ConfigureAwait(false);
-Console.WriteLine($"{chef.Key} has prepared {string.Join(", ", chef.State.Dishes)}");
+Console.WriteLine($"{chef.Name} has prepared {string.Join(", ", chef.Dishes)}");
 
 await host.WaitForShutdownAsync();
 

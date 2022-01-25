@@ -4,6 +4,7 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Projections</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Projections</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
