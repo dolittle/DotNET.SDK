@@ -17,7 +17,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection read model by key for a projection associated with a type.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TProjection"/> read model.</returns>
@@ -27,7 +27,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
@@ -38,7 +38,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="object"/> read model.</returns>
@@ -47,7 +47,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection and scope identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
@@ -59,7 +59,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection and scope identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
@@ -69,7 +69,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection state by key for a projection associated with a type.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <typeparamref name="TProjection"/>.</returns>
@@ -79,7 +79,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection state by key for a projection specified by projection identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
@@ -90,7 +90,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection state by key for a projection specified by projection identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TProjection}"/> of <see cref="object"/>.</returns>
@@ -99,7 +99,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection state by key for a projection specified by projection and scope identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
@@ -111,7 +111,7 @@ public interface IProjectionStore
     /// <summary>
     /// Gets a projection state by key for a projection specified by projection and scope identifier.
     /// </summary>
-    /// <param name="key">THe <see cref="Key" /> of the projection.</param>
+    /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
     /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
