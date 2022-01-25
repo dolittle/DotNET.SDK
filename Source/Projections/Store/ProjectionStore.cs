@@ -116,7 +116,7 @@ public class ProjectionStore : IProjectionStore
             key,
             projectionId,
             scopeId,
-            cancellation).ContinueWith(_ => _.Result.State, cancellation);
+            cancellation).ContinueWith(_ => _.GetAwaiter().GetResult().State, cancellation);
     }
 
     /// <inheritdoc/>
