@@ -5,11 +5,14 @@ using System;
 using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Common;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Projections.Internal;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
+using Dolittle.SDK.Tenancy;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -28,7 +31,11 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         : base(projections)
     {
         ReadModelTypes = readModelTypes;
+        AddTenantScopedServices = AddToContainer;
     }
+    
+    /// <inheritdoc />
+    public ConfigureTenantServices AddTenantScopedServices { get; }
 
     /// <inheritdoc />
     public void Register(
@@ -67,5 +74,18 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
             processingConverter,
             projectionConverter,
             loggerFactory.CreateLogger(processorType)) as EventProcessor<ProjectionId, ProjectionRegistrationRequest, ProjectionRequest, ProjectionResponse>;
+    }
+    void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection)
+    {
+        foreach (var projection in Values)
+        {
+            var readModelType = projection.ProjectionType;
+            serviceCollection.AddSingleton(
+                typeof(IProjectionOf<>).MakeGenericType(readModelType),
+                serviceProvider => Activator.CreateInstance(
+                    typeof(ProjectionOf<>).MakeGenericType(readModelType),
+                    serviceProvider.GetService<IProjectionStore>(),
+                    new ScopedProjectionId(projection.Identifier, projection.ScopeId)) ?? throw new CouldNotCreateProjectionOf(projection.ProjectionType, tenantId));
+        }
     }
 }
