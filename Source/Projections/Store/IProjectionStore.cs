@@ -15,6 +15,33 @@ namespace Dolittle.SDK.Projections.Store;
 public interface IProjectionStore
 {
     /// <summary>
+    /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TProjection"/> projection read model class.
+    /// </summary>
+    /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+    /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TProjection"/> projection read model class.</returns>
+    IProjectionOf<TProjection> Of<TProjection>()
+        where TProjection : class, new();
+
+    /// <summary>
+    /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.
+    /// </summary>
+    /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
+    /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
+    /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
+    IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
+        where TReadModel : class, new();
+
+    /// <summary>
+    /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.
+    /// </summary>
+    /// <param name="projectionId">The <see cref="ProjectionId"/>.</param>
+    /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
+    /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
+    /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
+    IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
+        where TReadModel : class, new();
+    
+    /// <summary>
     /// Gets a projection read model by key for a projection associated with a type.
     /// </summary>
     /// <param name="key">The <see cref="Key" /> of the projection.</param>

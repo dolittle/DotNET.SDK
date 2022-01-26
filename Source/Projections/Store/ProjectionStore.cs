@@ -53,6 +53,18 @@ public class ProjectionStore : IProjectionStore
         _logger = logger;
     }
 
+    /// <inheritdoc />
+    public IProjectionOf<TProjection> Of<TProjection>() where TProjection : class, new()
+        => new ProjectionOf<TProjection>(this, _projectionAssociations.GetFor<TProjection>());
+
+    /// <inheritdoc />
+    public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId) where TReadModel : class, new()
+        => new ProjectionOf<TReadModel>(this, new ScopedProjectionId(projectionId, ScopeId.Default));
+
+    /// <inheritdoc />
+    public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId) where TReadModel : class, new()
+        => new ProjectionOf<TReadModel>(this, new ScopedProjectionId(projectionId, scopeId));
+
     /// <inheritdoc/>
     public Task<TProjection> Get<TProjection>(Key key, CancellationToken cancellation = default)
         where TProjection : class, new()
