@@ -58,18 +58,10 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
                 ProjectionId = _projection.Identifier.ToProtobuf(),
                 ScopeId = _projection.ScopeId.ToProtobuf(),
                 InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None),
-                Copies = new ProjectionCopies()
+                Copies = _projection.Copies.ToProtobuf()
             };
             registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());
-            if (ProjectionMongoDBCopyCollectionName.TryGetFrom(_projection.ProjectionType, out var mongoDbCopyCollectionName))
-            {
-                registrationRequest.Copies.MongoDB = new ProjectionCopyToMongoDB
-                {
-                    Collection = mongoDbCopyCollectionName,
-                };
-                
-            }
-            
+
             return registrationRequest;
         }
     }

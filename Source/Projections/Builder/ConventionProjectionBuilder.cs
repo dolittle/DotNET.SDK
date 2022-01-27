@@ -20,6 +20,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     where TProjection : class, new()
 {
     readonly ProjectionAttribute _decorator;
+    readonly ICreateProjection _projectionCreator;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
 
@@ -27,9 +28,11 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// Initializes an instance of the <see cref="ConventionProjectionBuilder{TProjection}"/> class.
     /// </summary>
     /// <param name="decorator">The <see cref="ProjectionAttribute"/> decorator.</param>
-    public ConventionProjectionBuilder(ProjectionAttribute decorator)
+    /// <param name="projectionCreator">The <see cref="ICreateProjection"/>.</param>
+    public ConventionProjectionBuilder(ProjectionAttribute decorator, ICreateProjection projectionCreator)
     {
         _decorator = decorator;
+        _projectionCreator = projectionCreator;
     }
 
     /// <inheritdoc />
@@ -63,13 +66,8 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         }
 
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TProjection>>();
-        if (!TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults))
-        {
-            return false;
-        }
-
-        projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods);
-        return true;
+        return TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults)
+            && _projectionCreator.TryCreate(_decorator.Identifier, _decorator.Scope, eventTypesToMethods, buildResults, out projection);
     }
     
     

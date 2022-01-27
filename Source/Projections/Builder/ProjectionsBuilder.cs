@@ -18,6 +18,7 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionsBuilder : IProjectionsBuilder
 {
     readonly IModelBuilder _modelBuilder;
+    readonly ICreateProjection _projectionCreator;
     readonly DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId> _decoratedTypeBindings;
 
     /// <summary>
@@ -25,9 +26,11 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// </summary>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
+    /// <param name="projectionCreator">Thh <see cref="ICreateProjection"/>.</param>
+    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults, ICreateProjection projectionCreator)
     {
         _modelBuilder = modelBuilder;
+        _projectionCreator = projectionCreator;
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId>("projection", modelBuilder, buildResults);
     }
 
@@ -35,7 +38,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <inheritdoc />
     public IProjectionBuilder Create(ProjectionId projectionId)
     {
-        var builder = new ProjectionBuilder(projectionId, _modelBuilder);
+        var builder = new ProjectionBuilder(projectionId, _modelBuilder, _projectionCreator);
         return builder;
     }
 
@@ -73,10 +76,11 @@ public class ProjectionsBuilder : IProjectionsBuilder
             decorator.GetIdentifier(),
             CreateConventionProjectionBuilderFor(type, decorator));
     
-    static ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type type, ProjectionAttribute decorator)
+    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type type, ProjectionAttribute decorator)
         => Activator.CreateInstance(
                 typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
-                decorator)
+                decorator,
+                _projectionCreator)
             as ICanTryBuildProjection;
 
     /// <summary>

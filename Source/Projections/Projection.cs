@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Builder;
+using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections;
 
@@ -26,16 +27,19 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     /// <param name="identifier">The <see cref="ProjectionId" />.</param>
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
+    /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
     public Projection(
         ProjectionId identifier,
         ScopeId scopeId,
-        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods)
+        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
+        ProjectionCopies copies)
     {
         _onMethods = onMethods;
         Identifier = identifier;
         ScopeId = scopeId;
         Events = onMethods.Select(_ => new EventSelector(_.Key, _.Value.KeySelector)).ToList();
         ProjectionType = typeof(TReadModel);
+        Copies = copies;
     }
 
     /// <inheritdoc />
@@ -52,6 +56,9 @@ public class Projection<TReadModel> : IProjection<TReadModel>
 
     /// <inheritdoc/>
     public IEnumerable<EventSelector> Events { get; }
+
+    /// <inheritdoc />
+    public ProjectionCopies Copies { get; }
 
     /// <inheritdoc/>
     public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context, CancellationToken cancellation)

@@ -15,6 +15,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
 {
     readonly ProjectionId _projectionId;
     readonly IModelBuilder _modelBuilder;
+    readonly ICreateProjection _projectionCreator;
     ICanTryBuildProjection _methodsBuilder;
 
     ScopeId _scopeId = ScopeId.Default;
@@ -24,10 +25,12 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     /// </summary>
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder" />.</param>
-    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder)
+    /// <param name="projectionCreator">The <see cref="ICreateProjection"/>.</param>
+    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder, ICreateProjection projectionCreator)
     {
         _projectionId = projectionId;
         _modelBuilder = modelBuilder;
+        _projectionCreator = projectionCreator;
     }
 
     /// <inheritdoc />
@@ -49,7 +52,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
             throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
         }
         
-        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, this);
+        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, _projectionCreator, this);
         _methodsBuilder = builder;
         return builder;
     }

@@ -22,6 +22,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     readonly ProjectionId _projectionId;
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
+    readonly ICreateProjection _projectionCreator;
     readonly ProjectionBuilder _parentBuilder;
 
     ProjectionModelId ModelId => new(_projectionId, _scopeId);
@@ -32,12 +33,14 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="projectionCreator">The <see cref="ICreateProjection"/>.</param>
     /// <param name="parentBuilder">The <see cref="ProjectionBuilder"/>.</param>
-    public ProjectionBuilderForReadModel(ProjectionId projectionId, ScopeId scopeId, IModelBuilder modelBuilder, ProjectionBuilder parentBuilder)
+    public ProjectionBuilderForReadModel(ProjectionId projectionId, ScopeId scopeId, IModelBuilder modelBuilder, ICreateProjection projectionCreator, ProjectionBuilder parentBuilder)
     {
         _projectionId = projectionId;
         _scopeId = scopeId;
         _modelBuilder = modelBuilder;
+        _projectionCreator = projectionCreator;
         _parentBuilder = parentBuilder;
         modelBuilder.BindIdentifierToType<ProjectionModelId, ProjectionId>(ModelId, typeof(TReadModel));
         modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
@@ -114,14 +117,12 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
             return false;
         }
 
-        if (!eventTypesToMethods.Any())
+        if (eventTypesToMethods.Any())
         {
-            buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");
-            return false;
+            return _projectionCreator.TryCreate(_projectionId, _scopeId, eventTypesToMethods, buildResults, out projection);
         }
-
-        projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods);
-        return true;
+        buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");
+        return false;
     }
     
     bool TryAddOnMethods(IEventTypes eventTypes, IDictionary<EventType, IProjectionMethod<TReadModel>> eventTypesToMethods, IClientBuildResults buildResults)
