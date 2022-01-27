@@ -9,6 +9,7 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
@@ -56,9 +57,19 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
             {
                 ProjectionId = _projection.Identifier.ToProtobuf(),
                 ScopeId = _projection.ScopeId.ToProtobuf(),
-                InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None)
+                InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None),
+                Copies = new ProjectionCopies()
             };
             registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());
+            if (ProjectionMongoDBCopyCollectionName.TryGetFrom(_projection.ProjectionType, out var mongoDbCopyCollectionName))
+            {
+                registrationRequest.Copies.MongoDB = new ProjectionCopyToMongoDB
+                {
+                    Collection = mongoDbCopyCollectionName,
+                };
+                
+            }
+            
             return registrationRequest;
         }
     }
