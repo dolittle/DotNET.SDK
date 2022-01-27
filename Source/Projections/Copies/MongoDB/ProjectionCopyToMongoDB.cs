@@ -7,6 +7,11 @@ using PbProjectionCopyToMongoDB = Dolittle.Runtime.Events.Processing.Contracts.P
 
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
+/// <summary>
+/// Represents the SDK version of <see cref="PbProjectionCopyToMongoDB"/>.
+/// </summary>
+/// <param name="CollectionName">The <see cref="ProjectionMongoDBCopyCollectionName"/>.</param>
+/// <param name="Conversions">The BsonType per field conversions.</param>
 public record ProjectionCopyToMongoDB(ProjectionMongoDBCopyCollectionName CollectionName, IDictionary<string, BsonType> Conversions)
 {
     /// <summary>

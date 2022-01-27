@@ -23,4 +23,3 @@ public interface IResolveConversions
     bool TryResolve<TProjection>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions)
         where TProjection : class, new();
 }
-
