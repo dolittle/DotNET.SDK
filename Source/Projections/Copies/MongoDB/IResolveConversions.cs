@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using Dolittle.SDK.Common.ClientSetup;
+using MongoDB.Bson;
 
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
@@ -14,9 +16,11 @@ public interface IResolveConversions
     /// <summary>
     /// Resolves the BSON conversions for fields of the <typeparamref name="TProjection"/> projection read model <see cref="Type"/>.
     /// </summary>
-    /// <param name="projection">The <see cref="IProjection{TReadModel}"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    /// <param name="conversions">The resolved conversions per field.</param>
     /// <typeparam name="TProjection">The <see cref="Type"/> of the projection read model.</typeparam>
-    /// <returns>The conversions per field.</returns>
-    IDictionary<string, Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType> Resolve<TProjection>(IProjection<TProjection> projection)
+    /// <returns>True if resolved, false if not.</returns>
+    bool TryResolve<TProjection>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions)
         where TProjection : class, new();
 }
+

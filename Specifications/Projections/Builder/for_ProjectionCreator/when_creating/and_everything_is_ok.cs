@@ -8,6 +8,7 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 using Machine.Specifications;
+using MongoDB.Bson;
 using Moq;
 using It = Machine.Specifications.It;
 
@@ -18,7 +19,7 @@ public class and_everything_is_ok : given.all_dependencies
     static ProjectionCopies projection_copies;
     Establish context = () =>
     {
-        projection_copies = new ProjectionCopies(new ProjectionCopyToMongoDB("SomeName", new Dictionary<string, Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType>()));
+        projection_copies = new ProjectionCopies(new ProjectionCopyToMongoDB("SomeName", new Dictionary<string, BsonType>()));
         projection_copies_resolver
             .Setup(_ => _.TryResolveFor<given.projection_type>(Moq.It.IsAny<IClientBuildResults>(), out projection_copies))
             .Returns(true);
