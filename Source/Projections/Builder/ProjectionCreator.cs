@@ -13,17 +13,17 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 public class ProjectionCreator : ICreateProjection
 {
-    readonly IResolveProjectionCopiesDefinition _projetionCopiesResolver;
+    readonly IResolveProjectionCopiesDefinition _projectionCopiesResolver;
 
     /// <summary>
     /// Initializes a new instance of thee <see cref="ProjectionCreator"/> class.
     /// </summary>
-    /// <param name="_projetionCopiesResolver"></param>
-    public ProjectionCreator(IResolveProjectionCopiesDefinition _projetionCopiesResolver)
+    /// <param name="projectionCopiesResolver">The <see cref="IResolveProjectionCopiesDefinition" />.</param>
+    public ProjectionCreator(IResolveProjectionCopiesDefinition projectionCopiesResolver)
     {
-        this._projetionCopiesResolver = _projetionCopiesResolver;
+        _projectionCopiesResolver = projectionCopiesResolver;
     }
-    
+
     /// <inheritdoc />
     public bool TryCreate<TReadModel>(
         ProjectionId identifier,
@@ -32,5 +32,13 @@ public class ProjectionCreator : ICreateProjection
         IClientBuildResults buildResults,
         out IProjection projection)
         where TReadModel : class, new()
-        => throw new System.NotImplementedException();
+    {
+        projection = default;
+        if (!_projectionCopiesResolver.TryResolveFor<TReadModel>(buildResults, out var copies))
+        {
+            return false;
+        }
+        projection = new Projection<TReadModel>(identifier, scopeId, onMethods, copies);
+        return true;
+    }
 }
