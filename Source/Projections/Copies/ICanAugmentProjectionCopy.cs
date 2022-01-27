@@ -12,6 +12,14 @@ namespace Dolittle.SDK.Projections.Copies;
 public interface ICanAugmentProjectionCopy
 {
     /// <summary>
+    /// Gets whether the given <typeparamref namef="TProjection"/>.
+    /// </summary>
+    /// <typeparam name="TProjection">The <see cref="Type"/> of the projection read model.</typeparam>
+    /// <returns>True if <typeparamref name="TProjection"/> can be augmented, false if not.</returns>
+    bool CanAugment<TProjection>()
+        where TProjection : class, new();
+    
+    /// <summary>
     /// Adds to the given <see cref="ProjectionCopies"/>.
     /// </summary>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
