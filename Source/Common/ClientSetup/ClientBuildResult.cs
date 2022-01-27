@@ -30,15 +30,13 @@ public abstract class ClientBuildResult
         IsFailed = failed;
     }
     
-
     /// <summary>
     /// Creates an <see cref="InformationBuildResult"/>.
     /// </summary>
     /// <param name="message">The build message.</param>
     /// <returns>The <see cref="InformationBuildResult"/>.</returns>
     public static InformationBuildResult Information(string message) => new(message);
-
-
+    
     /// <summary>
     /// Creates an <see cref="FailureBuildResult"/>.
     /// </summary>

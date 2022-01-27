@@ -33,4 +33,5 @@ public class and_everything_is_ok : given.all_dependencies
     It should_have_the_correct_scope = () => projection_result.ScopeId.ShouldEqual(scope);
     It should_have_the_correct_copies = () => projection_result.Copies.ShouldEqual(projection_copies);
     It should_have_the_correct_read_model_type = () => projection_result.ProjectionType.ShouldEqual(typeof(given.projection_type));
+    It should_not_result_in_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

@@ -12,4 +12,5 @@ public class and_there_are_no_augmenters : given.all_dependencies
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_output_projection_copies = () => copies_result.ShouldNotBeNull();
+    It should_not_result_in_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

@@ -36,6 +36,7 @@ public class ProjectionCreator : ICreateProjection
         projection = default;
         if (!_projectionCopiesResolver.TryResolveFor<TReadModel>(buildResults, out var copies))
         {
+            buildResults.AddFailure($"Failed to create projection for read model type {typeof(TReadModel)} with projection id {identifier} in scope {scopeId}");
             return false;
         }
         projection = new Projection<TReadModel>(identifier, scopeId, onMethods, copies);

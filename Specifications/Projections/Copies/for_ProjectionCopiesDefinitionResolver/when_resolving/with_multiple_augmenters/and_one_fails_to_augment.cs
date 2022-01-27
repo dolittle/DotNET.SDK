@@ -37,4 +37,5 @@ public class and_one_fails_to_augment : given.all_dependencies
     It should_call_failing_augmenter_once = () => failing_augmenter.Verify(_ => _.TryAugment<given.projection_type>(build_results, Moq.It.IsAny<ProjectionCopies>(), out Moq.It.Ref<ProjectionCopies>.IsAny), Times.Once);
     It should_not_succeed = () => succeeded.ShouldBeFalse();
     It should_not_output_projection_copies = () => copies_result.ShouldBeNull();
+    It should_result_in_failed_build_results = () => build_results.Failed.ShouldBeTrue();
 }

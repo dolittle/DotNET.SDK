@@ -39,4 +39,5 @@ public class and_everything_is_ok : given.all_dependencies
     It should_call_second_augmenter_once = () => second_augmenter.Verify(_ => _.TryAugment<given.projection_type>(build_results, Moq.It.IsAny<ProjectionCopies>(), out Moq.It.Ref<ProjectionCopies>.IsAny), Times.Once);
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_output_projection_copies = () => copies_result.ShouldNotBeNull();
+    It should_not_result_in_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

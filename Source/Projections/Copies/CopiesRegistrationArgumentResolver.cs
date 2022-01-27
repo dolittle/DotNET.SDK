@@ -43,7 +43,7 @@ public class ProjectionCopiesDefinitionResolver : IResolveProjectionCopiesDefini
         {
             return true;
         }
-
+        buildResults.AddFailure($"Could not resolve projection copies definition for projection for read model type {typeof(TProjection)}");
         copies = default;
         return false;
     }
