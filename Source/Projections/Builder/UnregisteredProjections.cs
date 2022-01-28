@@ -2,10 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reflection;
 using System.Threading;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Projections.Internal;
@@ -80,12 +83,32 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         foreach (var projection in Values)
         {
             var readModelType = projection.ProjectionType;
+            var projectionOfType = typeof(IProjectionOf<>).MakeGenericType(readModelType);
             serviceCollection.AddSingleton(
-                typeof(IProjectionOf<>).MakeGenericType(readModelType),
-                serviceProvider => Activator.CreateInstance(
-                    typeof(ProjectionOf<>).MakeGenericType(readModelType),
-                    serviceProvider.GetService<IProjectionStore>(),
-                    new ScopedProjectionId(projection.Identifier, projection.ScopeId)) ?? throw new CouldNotCreateProjectionOf(projection.ProjectionType, tenantId));
+                projectionOfType,
+                serviceProvider =>
+                {
+                    var projectionStore = serviceProvider.GetRequiredService<IProjectionStore>();
+                    var getProjectionOfMethod = GetOfMethodForReadModel(readModelType);
+                    return getProjectionOfMethod.Invoke(
+                        projectionStore,
+                        new object[]
+                        {
+                            projection.Identifier,
+                            projection.ScopeId
+                        });
+                });
         }
     }
+
+    static MethodInfo GetOfMethodForReadModel(Type readModelType)
+        => typeof(IProjectionStore).GetMethod(
+            nameof(IProjectionStore.Of),
+            new[]
+            {
+                typeof(ProjectionId),
+                typeof(ScopeId)
+            })
+            ?.MakeGenericMethod(readModelType);
+
 }
