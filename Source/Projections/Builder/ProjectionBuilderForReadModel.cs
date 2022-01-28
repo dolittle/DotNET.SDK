@@ -104,7 +104,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
-
+    
 
     /// <inheritdoc />
     public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)

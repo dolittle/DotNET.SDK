@@ -15,5 +15,8 @@ public class ConversionsResolver : IResolveConversions
 {
     /// <inheritdoc />
     public bool TryResolve<TProjection>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions) where TProjection : class, new()
-        => throw new NotImplementedException();
+    {
+        conversions = new Dictionary<string, BsonType>();
+        return true;
+    }
 }

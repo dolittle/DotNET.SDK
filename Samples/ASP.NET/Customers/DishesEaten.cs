@@ -3,10 +3,12 @@
 
 using System.Linq;
 using Dolittle.SDK.Projections;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Customers;
 
 [Projection("185107c2-f897-40c8-bb06-643b3642f229")]
+[CopyProjectionToMongoDB]
 public class DishesEaten
 {
     public string[] Dishes { get; set; } = {};
