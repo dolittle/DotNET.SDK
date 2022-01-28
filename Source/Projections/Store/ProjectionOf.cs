@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections.Store;
 
@@ -25,21 +26,24 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     public ProjectionOf(IProjectionStore projectionStore, ScopedProjectionId scopedProjectionId)
     {
         _projectionStore = projectionStore;
-        Identifier = scopedProjectionId;
+        (Identifier, Scope) = scopedProjectionId;
     }
 
     /// <inheritdoc />
-    public ScopedProjectionId Identifier { get; }
+    public ProjectionId Identifier { get; }
+    
+    /// <inheritdoc />
+    public ScopeId Scope { get; }
 
     /// <inheritdoc />
     public Task<TReadModel> Get(Key key, CancellationToken cancellation = default)
-        => _projectionStore.Get<TReadModel>(key, Identifier.Identifier, Identifier.ScopeId, cancellation);
+        => _projectionStore.Get<TReadModel>(key, Identifier, Scope, cancellation);
 
     /// <inheritdoc />
     public Task<CurrentState<TReadModel>> GetState(Key key, CancellationToken cancellation = default)
-        => _projectionStore.GetState<TReadModel>(key, Identifier.Identifier, Identifier.ScopeId,cancellation);
+        => _projectionStore.GetState<TReadModel>(key, Identifier, Scope,cancellation);
 
     /// <inheritdoc />
     public Task<IEnumerable<TReadModel>> GetAll(CancellationToken cancellation = default)
-        => _projectionStore.GetAll<TReadModel>(Identifier.Identifier, Identifier.ScopeId,cancellation);
+        => _projectionStore.GetAll<TReadModel>(Identifier, Scope,cancellation);
 }

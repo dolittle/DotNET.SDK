@@ -16,5 +16,6 @@ public class and_everything_is_ok : given.all_dependencies
 
     It should_get_the_projection_of_a_decorated_projection_type = () => result.ShouldNotBeNull();
 
-    It should_have_the_correct_identifier = () => result.Identifier.ShouldEqual(read_model_types.GetFor<given.a_decorated_projection_type>());
+    It should_have_the_identifier_from_The_attribute = () => result.Identifier.ShouldEqual(read_model_types.GetFor<given.a_decorated_projection_type>().Identifier);
+    It should_have_the_scope_from_the_attribute = () => result.Scope.ShouldEqual(read_model_types.GetFor<given.a_decorated_projection_type>().ScopeId);
 }

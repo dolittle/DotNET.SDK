@@ -78,26 +78,20 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
             projectionConverter,
             loggerFactory.CreateLogger(processorType)) as EventProcessor<ProjectionId, ProjectionRegistrationRequest, ProjectionRequest, ProjectionResponse>;
     }
+
     void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection)
     {
         foreach (var projection in Values)
         {
-            var readModelType = projection.ProjectionType;
-            var projectionOfType = typeof(IProjectionOf<>).MakeGenericType(readModelType);
             serviceCollection.AddSingleton(
-                projectionOfType,
-                serviceProvider =>
-                {
-                    var projectionStore = serviceProvider.GetRequiredService<IProjectionStore>();
-                    var getProjectionOfMethod = GetOfMethodForReadModel(readModelType);
-                    return getProjectionOfMethod.Invoke(
-                        projectionStore,
-                        new object[]
-                        {
-                            projection.Identifier,
-                            projection.ScopeId
-                        });
-                });
+                typeof(IProjectionOf<>).MakeGenericType(projection.ProjectionType),
+                serviceProvider => GetOfMethodForReadModel(projection.ProjectionType).Invoke(
+                    serviceProvider.GetRequiredService<IProjectionStore>(),
+                    new object[]
+                    {
+                        projection.Identifier,
+                        projection.ScopeId
+                    }));
         }
     }
 

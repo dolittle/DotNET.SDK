@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections.Store;
 
@@ -16,10 +17,15 @@ public interface IProjectionOf<TReadModel>
     where TReadModel : class, new()
 {
     /// <summary>
-    /// Gets the <see cref="ScopedProjectionId"/> identifier.
+    /// Gets the <see cref="ProjectionId"/> identifier.
     /// </summary>
-    public ScopedProjectionId Identifier { get; }
-    
+    ProjectionId Identifier { get; }
+
+    /// <summary>
+    /// Gets the <see cref="ScopeId"/>.
+    /// </summary>
+    ScopeId Scope { get; }
+
     /// <summary>
     /// Gets the projection read model by key.
     /// </summary>
@@ -42,6 +48,4 @@ public interface IProjectionOf<TReadModel>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="IEnumerable{T}" /> of <typeparamref name="TReadModel" />.</returns>
     Task<IEnumerable<TReadModel>> GetAll(CancellationToken cancellation = default);
-    
-    
 }

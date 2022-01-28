@@ -70,19 +70,19 @@ public delegate ProjectionResult<TReadModel> SyncProjectionSignature<TReadModel,
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate Task TaskProjectionMethodSignature<TProjection>(TProjection instance, object @event, ProjectionContext projectionContext)
-    where TProjection : class, new();
+public delegate Task TaskProjectionMethodSignature<TReadModel>(TReadModel instance, object @event, ProjectionContext projectionContext)
+    where TReadModel : class, new();
 
 /// <summary>
 /// Represents the signature for a projection on-method.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
 /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate Task TaskProjectionMethodSignature<TProjection, TEvent>(TProjection instance, TEvent @event, ProjectionContext projectionContext)
-    where TProjection : class, new()
+public delegate Task TaskProjectionMethodSignature<TReadModel, TEvent>(TReadModel instance, TEvent @event, ProjectionContext projectionContext)
+    where TReadModel : class, new()
     where TEvent : class;
 
 /// <summary>
@@ -91,61 +91,61 @@ public delegate Task TaskProjectionMethodSignature<TProjection, TEvent>(TProject
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate Task<ProjectionResultType> TaskResultProjectionMethodSignature<TProjection>(TProjection instance, object @event, ProjectionContext projectionContext)
-    where TProjection : class, new();
+public delegate Task<ProjectionResultType> TaskResultProjectionMethodSignature<TReadModel>(TReadModel instance, object @event, ProjectionContext projectionContext)
+    where TReadModel : class, new();
 
 /// <summary>
 /// Represents the signature for a projection on-method.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
 /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate Task<ProjectionResultType> TaskResultProjectionMethodSignature<TProjection, TEvent>(TProjection instance, TEvent @event, ProjectionContext projectionContext)
-    where TProjection : class, new()
+public delegate Task<ProjectionResultType> TaskResultProjectionMethodSignature<TReadModel, TEvent>(TReadModel instance, TEvent @event, ProjectionContext projectionContext)
+    where TReadModel : class, new()
     where TEvent : class;
 
 /// <summary>
 /// Represents the signature for a projection on-method.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate void SyncProjectionMethodSignature<TProjection>(TProjection instance, object @event, ProjectionContext projectionContext)
-    where TProjection : class, new();
+public delegate void SyncProjectionMethodSignature<TReadModel>(TReadModel instance, object @event, ProjectionContext projectionContext)
+    where TReadModel : class, new();
 
 /// <summary>
 /// Represents the signature for a projection on-method.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
 /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate void SyncProjectionMethodSignature<TProjection, TEvent>(TProjection instance, TEvent @event, ProjectionContext projectionContext)
-    where TProjection : class, new()
+public delegate void SyncProjectionMethodSignature<TReadModel, TEvent>(TReadModel instance, TEvent @event, ProjectionContext projectionContext)
+    where TReadModel : class, new()
     where TEvent : class;
 
 /// <summary>
 /// Represents the signature for a projection on-method.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate ProjectionResultType SyncResultProjectionMethodSignature<TProjection>(TProjection instance, object @event, ProjectionContext projectionContext)
-    where TProjection : class, new();
+public delegate ProjectionResultType SyncResultProjectionMethodSignature<TReadModel>(TReadModel instance, object @event, ProjectionContext projectionContext)
+    where TReadModel : class, new();
 
 /// <summary>
 /// Represents the signature for a projection on-method.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
 /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
 /// <param name="instance">The instance of the projection to invoke the method on.</param>
 /// <param name="event">The event to handle.</param>
 /// <param name="projectionContext">The <see cref="ProjectionContext" />.</param>
-public delegate ProjectionResultType SyncResultProjectionMethodSignature<TProjection, TEvent>(TProjection instance, TEvent @event, ProjectionContext projectionContext)
-    where TProjection : class, new()
+public delegate ProjectionResultType SyncResultProjectionMethodSignature<TReadModel, TEvent>(TReadModel instance, TEvent @event, ProjectionContext projectionContext)
+    where TReadModel : class, new()
     where TEvent : class;

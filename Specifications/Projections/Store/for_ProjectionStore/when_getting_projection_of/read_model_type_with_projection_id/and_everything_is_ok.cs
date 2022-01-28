@@ -13,5 +13,6 @@ public class and_everything_is_ok : given.all_dependencies
     Because of = () => result = projection_store.Of<given.an_undecorated_projection_type>("21093C97-6EFC-4A4C-8B4E-28E108930F70");
 
     It should_get_the_projection_of_a_decorated_projection_type = () => result.ShouldNotBeNull();
-    It should_have_the_correct_identifier = () => result.Identifier.ShouldEqual(new ScopedProjectionId("21093C97-6EFC-4A4C-8B4E-28E108930F70", ScopeId.Default));
+    It should_have_the_provided_identifier = () => result.Identifier.ShouldEqual("21093C97-6EFC-4A4C-8B4E-28E108930F70");
+    It should_have_the_provided_scope = () => result.Scope.ShouldEqual(ScopeId.Default);
 }

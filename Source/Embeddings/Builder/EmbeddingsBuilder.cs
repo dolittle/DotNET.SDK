@@ -40,9 +40,9 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     }
 
     /// <inheritdoc />
-    public IEmbeddingsBuilder Register<TProjection>()
-        where TProjection : class, new()
-        => Register(typeof(TProjection));
+    public IEmbeddingsBuilder Register<TEmbedding>()
+        where TEmbedding : class, new()
+        => Register(typeof(TEmbedding));
 
     /// <inheritdoc />
     public IEmbeddingsBuilder Register(Type type)
