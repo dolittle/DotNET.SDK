@@ -15,10 +15,10 @@ namespace Dolittle.SDK.Projections.Store;
 public interface IProjectionStore
 {
     /// <summary>
-    /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TProjection"/> projection read model class.
+    /// Gets the <see cref="IProjectionOf{TProjection}"/> for the <typeparamref name="TProjection"/> projection read model class.
     /// </summary>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
-    /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TProjection"/> projection read model class.</returns>
+    /// <returns>The <see cref="IProjectionOf{TProjection}"/> for the <typeparamref name="TProjection"/> projection read model class.</returns>
     IProjectionOf<TProjection> Of<TProjection>()
         where TProjection : class, new();
 
