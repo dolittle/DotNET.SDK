@@ -10,7 +10,7 @@ public class has_copy_to_mongo_decorator : given.all_dependencies
 {
     static bool succeeded;
 
-    Because of = () => succeeded = copy_adder.CanAugment<given.projection_type_with_mongo_db_copy>();
+    Because of = () => succeeded = CopyDefinitionFromReadModelBuilder.CanBuildFrom<given.projection_type_with_mongo_db_copy>();
 
     It should_succeed = () => succeeded.ShouldBeTrue();
 }

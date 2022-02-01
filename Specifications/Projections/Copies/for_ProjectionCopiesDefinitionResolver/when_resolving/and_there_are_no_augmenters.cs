@@ -8,7 +8,7 @@ namespace Dolittle.SDK.Projections.Copies.for_ProjectionCopiesDefinitionResolver
 
 public class and_there_are_no_augmenters : given.all_dependencies
 {
-    Because of = () => succeeded = resolver.TryResolveFor<given.projection_type>(build_results, out copies_result);
+    Because of = () => succeeded = FromReadModelBuilder.TryResolveFor<given.projection_type>(build_results, out copies_result);
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_output_projection_copies = () => copies_result.ShouldNotBeNull();

@@ -20,13 +20,13 @@ public class but_collection_name_is_not_valid : given.all_dependencies
         conversions = new Dictionary<string, BsonType>();
         collection_name = nameof(projection_type_with_mongo_db_copy);
         conversions_resolver
-            .Setup(_ => _.TryResolve<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), out conversions))
+            .Setup(_ => _.TryGetFrom<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), out conversions))
             .Returns(true);
         collection_name_validator
             .Setup(_ => _.Validate(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<ProjectionMongoDBCopyCollectionName>()))
             .Returns(false);
     };
-    Because of = () => succeeded = copy_adder.TryAugment<projection_type_with_mongo_db_copy>(build_results, projection_copies, out augmented_result);
+    Because of = () => succeeded = CopyDefinitionFromReadModelBuilder.TryBuild<projection_type_with_mongo_db_copy>(build_results, projection_copies, out augmented_result);
 
     It should_not_succeed = () => succeeded.ShouldBeFalse();
     It should_not_output_augmented_result = () => augmented_result.ShouldBeNull();

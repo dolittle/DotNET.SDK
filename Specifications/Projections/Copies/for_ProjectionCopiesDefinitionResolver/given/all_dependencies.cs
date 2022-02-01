@@ -11,20 +11,20 @@ namespace Dolittle.SDK.Projections.Copies.for_ProjectionCopiesDefinitionResolver
 
 public class all_dependencies
 {
-    protected static ProjectionCopiesDefinitionResolver resolver;
+    protected static ProjectionCopiesFromReadModelBuilders FromReadModelBuilder;
     protected static ProjectionCopies copies_result;
     protected static bool succeeded;
     protected static IClientBuildResults build_results; 
-    protected static List<ICanAugmentProjectionCopy> augmenters;
+    protected static List<ICanBuildCopyDefinitionFromReadModel> augmenters;
     
     Establish context = () =>
     {
-        augmenters = new List<ICanAugmentProjectionCopy>();
+        augmenters = new List<ICanBuildCopyDefinitionFromReadModel>();
         build_results = new ClientBuildResults();
-        resolver = new ProjectionCopiesDefinitionResolver(augmenters);
+        FromReadModelBuilder = new ProjectionCopiesFromReadModelBuilders(augmenters);
     };
 
-    protected static void add_augmenter(params Mock<ICanAugmentProjectionCopy>[] augmenters_to_add)
+    protected static void add_augmenter(params Mock<ICanBuildCopyDefinitionFromReadModel>[] augmenters_to_add)
     {
         augmenters.AddRange(augmenters_to_add.Select(_ => _.Object));
     }

@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections.Builder.for_ProjectionCreator.given;
 
 public class all_dependencies
 {
-    protected static Mock<IResolveProjectionCopiesDefinition> projection_copies_resolver;
+    protected static Mock<IProjectionCopiesFromReadModelBuilders> projection_copies_resolver;
     protected static ProjectionId identifier;
     protected static ScopeId scope;
     protected static IDictionary<EventType, IProjectionMethod<given.projection_type>> on_methods;
@@ -23,7 +23,7 @@ public class all_dependencies
     
     Establish context = () =>
     {
-        projection_copies_resolver = new Mock<IResolveProjectionCopiesDefinition>();
+        projection_copies_resolver = new Mock<IProjectionCopiesFromReadModelBuilders>();
         identifier = "C9BB598E-8FF5-4916-922B-48B8C582D725";
         scope = "CCF8DF3E-D654-4A11-8BBD-840DFEC65CED";
         on_methods = new Dictionary<EventType, IProjectionMethod<projection_type>>();

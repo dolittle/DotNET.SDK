@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -20,7 +21,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     where TProjection : class, new()
 {
     readonly ProjectionAttribute _decorator;
-    readonly ICreateProjection _projectionCreator;
+    readonly IProjectionCopiesFromReadModelBuilders _projectionCopiesFromReadModelBuilder;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
 
@@ -28,11 +29,11 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// Initializes an instance of the <see cref="ConventionProjectionBuilder{TProjection}"/> class.
     /// </summary>
     /// <param name="decorator">The <see cref="ProjectionAttribute"/> decorator.</param>
-    /// <param name="projectionCreator">The <see cref="ICreateProjection"/>.</param>
-    public ConventionProjectionBuilder(ProjectionAttribute decorator, ICreateProjection projectionCreator)
+    /// <param name="projectionCopiesFromReadModelBuilder">The <see cref="IProjectionCopiesFromReadModelBuilders"/>.</param>
+    public ConventionProjectionBuilder(ProjectionAttribute decorator, IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilder)
     {
         _decorator = decorator;
-        _projectionCreator = projectionCreator;
+        _projectionCopiesFromReadModelBuilder = projectionCopiesFromReadModelBuilder;
     }
 
     /// <inheritdoc />
@@ -66,8 +67,12 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         }
 
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TProjection>>();
-        return TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults)
-            && _projectionCreator.TryCreate(_decorator.Identifier, _decorator.Scope, eventTypesToMethods, buildResults, out projection);
+        if (!TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults) || !_projectionCopiesFromReadModelBuilder.TryBuildFrom<TProjection>(buildResults, out var projectionCopies))
+        {
+            return false;
+        }
+        projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods, projectionCopies);
+        return true;
     }
     
     

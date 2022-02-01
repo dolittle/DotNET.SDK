@@ -8,10 +8,10 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
 /// <summary>
 /// Represents an implementation of <see cref="IValidateMongoDBCollectionName"/>.
+/// </summary>
 /// <remarks>
 /// Rules based on https://docs.mongodb.com/manual/reference/limits/
 /// </remarks>
-/// </summary>
 public class MongoDbCollectionNameValidator : IValidateMongoDBCollectionName
 {
     const string FailureBuildResultBeginning = "Projection MongoDB collection name cannot";

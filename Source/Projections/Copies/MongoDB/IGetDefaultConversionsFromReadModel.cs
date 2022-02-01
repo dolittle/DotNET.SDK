@@ -11,15 +11,15 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// <summary>
 /// Defines a system that can resolve the BSON conversions for an <see cref="IProjection{TReadModel}"/> for a projection read model <see cref="Type"/>.
 /// </summary>
-public interface IResolveConversions
+public interface IGetDefaultConversionsFromReadModel
 {
     /// <summary>
-    /// Resolves the BSON conversions for fields of the <typeparamref name="TProjection"/> projection read model <see cref="Type"/>.
+    /// Try to get the BSON conversions for fields of the <typeparamref name="TReadModel"/> projection read model <see cref="Type"/>.
     /// </summary>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="conversions">The resolved conversions per field.</param>
-    /// <typeparam name="TProjection">The <see cref="Type"/> of the projection read model.</typeparam>
-    /// <returns>True if resolved, false if not.</returns>
-    bool TryResolve<TProjection>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions)
-        where TProjection : class, new();
+    /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
+    /// <returns>True if successful, false if not.</returns>
+    bool TryGetFrom<TReadModel>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions)
+        where TReadModel : class, new();
 }

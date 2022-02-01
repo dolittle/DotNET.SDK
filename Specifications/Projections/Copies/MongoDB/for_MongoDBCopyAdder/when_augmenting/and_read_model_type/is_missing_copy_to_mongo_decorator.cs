@@ -8,7 +8,7 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB.for_MongoDBCopyAdder.when_augm
 
 public class is_missing_copy_to_mongo_decorator : given.all_dependencies
 {
-    Because of = () => succeeded = copy_adder.TryAugment<projection_type_without_mongo_db_copy>(build_results, projection_copies, out augmented_result);
+    Because of = () => succeeded = CopyDefinitionFromReadModelBuilder.TryBuild<projection_type_without_mongo_db_copy>(build_results, projection_copies, out augmented_result);
 
     It should_not_succeed = () => succeeded.ShouldBeFalse();
     It should_not_output_augmented_result = () => augmented_result.ShouldBeNull();

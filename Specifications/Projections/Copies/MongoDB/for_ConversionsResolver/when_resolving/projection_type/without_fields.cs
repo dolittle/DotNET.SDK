@@ -7,7 +7,7 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB.for_ConversionsResolver.when_r
 
 public class without_fields : given.a_resolver
 {
-    Because of = () => succeeded = resolver.TryResolve<given.projection_type_without_fields>(build_results, out conversions_result);
+    Because of = () => succeeded = resolver.TryGetFrom<given.projection_type_without_fields>(build_results, out conversions_result);
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_resolve_conversions = () => conversions_result.ShouldNotBeNull();

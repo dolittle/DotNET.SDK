@@ -10,16 +10,16 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB.for_MongoDBCopyAdder.given;
 public class all_dependencies
 {
     protected static ClientBuildResults build_results;
-    protected static Mock<IResolveConversions> conversions_resolver;
+    protected static Mock<IGetDefaultConversionsFromReadModel> conversions_resolver;
     protected static Mock<IValidateMongoDBCollectionName> collection_name_validator;
-    protected static MongoDBCopyAdder copy_adder;
+    protected static MongoDbCopyDefinitionFromReadModelBuilder CopyDefinitionFromReadModelBuilder;
     
 
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
-        conversions_resolver = new Mock<IResolveConversions>();
+        conversions_resolver = new Mock<IGetDefaultConversionsFromReadModel>();
         collection_name_validator = new Mock<IValidateMongoDBCollectionName>();
-        copy_adder = new MongoDBCopyAdder(conversions_resolver.Object, collection_name_validator.Object);
+        CopyDefinitionFromReadModelBuilder = new MongoDbCopyDefinitionFromReadModelBuilder(conversions_resolver.Object, collection_name_validator.Object);
     };
 }

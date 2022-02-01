@@ -9,14 +9,14 @@ using MongoDB.Bson;
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
 /// <summary>
-/// Represents an implementation of <see cref="IResolveConversions"/>.
+/// Represents an implementation of <see cref="IGetDefaultConversionsFromReadModel"/>.
 /// </summary>
-public class ConversionsResolver : IResolveConversions
+public class ConversionsResolver : IGetDefaultConversionsFromReadModel
 {
     /// <inheritdoc />
-    public bool TryResolve<TProjection>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions) where TProjection : class, new()
+    public bool TryGetFrom<TProjection>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions)
+        where TProjection : class, new()
     {
-        conversions = new Dictionary<string, BsonType>();
-        return true;
+        throw new NotImplementedException();
     }
 }

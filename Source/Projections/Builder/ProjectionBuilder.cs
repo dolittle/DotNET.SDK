@@ -4,6 +4,7 @@
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Copies;
 
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -15,7 +16,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
 {
     readonly ProjectionId _projectionId;
     readonly IModelBuilder _modelBuilder;
-    readonly ICreateProjection _projectionCreator;
+    readonly IProjectionCopiesFromReadModelBuilders _projectionCopiesFromReadModelBuilder;
     ICanTryBuildProjection _methodsBuilder;
 
     ScopeId _scopeId = ScopeId.Default;
@@ -25,12 +26,12 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     /// </summary>
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder" />.</param>
-    /// <param name="projectionCreator">The <see cref="ICreateProjection"/>.</param>
-    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder, ICreateProjection projectionCreator)
+    /// <param name="projectionCopiesFromReadModelBuilder">The <see cref="IProjectionCopiesFromReadModelBuilders"/>.</param>
+    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder, IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilder)
     {
         _projectionId = projectionId;
         _modelBuilder = modelBuilder;
-        _projectionCreator = projectionCreator;
+        _projectionCopiesFromReadModelBuilder = projectionCopiesFromReadModelBuilder;
     }
 
     /// <inheritdoc />
@@ -52,7 +53,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
             throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
         }
         
-        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, _projectionCreator, this);
+        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, this, _projectionCopiesFromReadModelBuilder);
         _methodsBuilder = builder;
         return builder;
     }

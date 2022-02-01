@@ -6,8 +6,16 @@ using PbProjectionCopies = Dolittle.Runtime.Events.Processing.Contracts.Projecti
 
 namespace Dolittle.SDK.Projections.Copies;
 
+/// <summary>
+/// Represents the projection copies definition.
+/// </summary>
+/// <param name="MongoDB">The <see cref="ProjectionCopyToMongoDB" />.</param>
 public record ProjectionCopies(ProjectionCopyToMongoDB MongoDB)
 {
+    /// <summary>
+    /// Converts the <see cref="ProjectionCopies"/> to <see cref="PbProjectionCopies"/>.
+    /// </summary>
+    /// <returns>The <see cref="PbProjectionCopies"/>.</returns>
     public PbProjectionCopies ToProtobuf()
     {
         var result = new PbProjectionCopies

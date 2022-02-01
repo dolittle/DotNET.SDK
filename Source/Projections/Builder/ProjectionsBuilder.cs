@@ -8,6 +8,7 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Store;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -18,7 +19,7 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionsBuilder : IProjectionsBuilder
 {
     readonly IModelBuilder _modelBuilder;
-    readonly ICreateProjection _projectionCreator;
+    readonly IProjectionCopiesFromReadModelBuilders _projectionCopiesFromReadModelBuilder;
     readonly DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId> _decoratedTypeBindings;
 
     /// <summary>
@@ -26,11 +27,10 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// </summary>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="projectionCreator">Thh <see cref="ICreateProjection"/>.</param>
-    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults, ICreateProjection projectionCreator)
+    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults, IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilder)
     {
         _modelBuilder = modelBuilder;
-        _projectionCreator = projectionCreator;
+        _projectionCopiesFromReadModelBuilder = projectionCopiesFromReadModelBuilder;
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId>("projection", modelBuilder, buildResults);
     }
 
@@ -38,7 +38,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <inheritdoc />
     public IProjectionBuilder Create(ProjectionId projectionId)
     {
-        var builder = new ProjectionBuilder(projectionId, _modelBuilder, _projectionCreator);
+        var builder = new ProjectionBuilder(projectionId, _modelBuilder, _projectionCopiesFromReadModelBuilder);
         return builder;
     }
 
@@ -75,12 +75,12 @@ public class ProjectionsBuilder : IProjectionsBuilder
         =>  _modelBuilder.BindIdentifierToProcessorBuilder(
             decorator.GetIdentifier(),
             CreateConventionProjectionBuilderFor(type, decorator));
-    
+
     ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type type, ProjectionAttribute decorator)
         => Activator.CreateInstance(
                 typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
                 decorator,
-                _projectionCreator)
+                _projectionCopiesFromReadModelBuilder)
             as ICanTryBuildProjection;
 
     /// <summary>

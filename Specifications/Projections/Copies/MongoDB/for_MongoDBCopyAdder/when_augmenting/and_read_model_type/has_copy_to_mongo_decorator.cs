@@ -20,16 +20,16 @@ public class has_copy_to_mongo_decorator : given.all_dependencies
         conversions = new Dictionary<string, BsonType>();
         collection_name = nameof(projection_type_with_mongo_db_copy);
         conversions_resolver
-            .Setup(_ => _.TryResolve<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), out conversions))
+            .Setup(_ => _.TryGetFrom<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), out conversions))
             .Returns(true);
         collection_name_validator
             .Setup(_ => _.Validate(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<ProjectionMongoDBCopyCollectionName>()))
             .Returns(true);
     };
-    Because of = () => succeeded = copy_adder.TryAugment<projection_type_with_mongo_db_copy>(build_results, projection_copies, out augmented_result);
+    Because of = () => succeeded = CopyDefinitionFromReadModelBuilder.TryBuild<projection_type_with_mongo_db_copy>(build_results, projection_copies, out augmented_result);
 
     It should_succeed = () => succeeded.ShouldBeTrue();
-    It should_call_resolve_conversions_once = () => conversions_resolver.Verify(_ => _.TryResolve<projection_type_with_mongo_db_copy>(build_results, out Moq.It.Ref<IDictionary<string, BsonType>>.IsAny), Times.Once);
+    It should_call_resolve_conversions_once = () => conversions_resolver.Verify(_ => _.TryGetFrom<projection_type_with_mongo_db_copy>(build_results, out Moq.It.Ref<IDictionary<string, BsonType>>.IsAny), Times.Once);
     It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(build_results, collection_name), Times.Once);
     It should_output_augmented_result = () => augmented_result.ShouldNotBeNull();
     It should_create_mongo_db_copy_definition = () => augmented_result.MongoDB.ShouldNotBeNull();

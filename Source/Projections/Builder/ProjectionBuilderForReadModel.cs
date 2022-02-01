@@ -8,6 +8,8 @@ using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Copies;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -22,8 +24,10 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     readonly ProjectionId _projectionId;
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
-    readonly ICreateProjection _projectionCreator;
     readonly ProjectionBuilder _parentBuilder;
+    readonly IProjectionCopyDefinitionBuilder<TReadModel> _projectionCopyDefinitionBuilder;
+
+    // readonly IProjectionCopyToMongoDBBuilder<> _mongoCopyBuilder;
 
     ProjectionModelId ModelId => new(_projectionId, _scopeId);
 
@@ -33,15 +37,21 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
-    /// <param name="projectionCreator">The <see cref="ICreateProjection"/>.</param>
     /// <param name="parentBuilder">The <see cref="ProjectionBuilder"/>.</param>
-    public ProjectionBuilderForReadModel(ProjectionId projectionId, ScopeId scopeId, IModelBuilder modelBuilder, ICreateProjection projectionCreator, ProjectionBuilder parentBuilder)
+    /// <param name="projectionCopiesFromReadModelBuilder">The <see cref="IProjectionCopiesFromReadModelBuilders"/>.</param>
+    public ProjectionBuilderForReadModel(
+        ProjectionId projectionId,
+        ScopeId scopeId,
+        IModelBuilder modelBuilder,
+        ProjectionBuilder parentBuilder,
+        IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilder)
     {
         _projectionId = projectionId;
         _scopeId = scopeId;
         _modelBuilder = modelBuilder;
-        _projectionCreator = projectionCreator;
         _parentBuilder = parentBuilder;
+        _projectionCopyDefinitionBuilder = projectionCopiesFromReadModelBuilder.GetFor<TReadModel>();
+        
         modelBuilder.BindIdentifierToType<ProjectionModelId, ProjectionId>(ModelId, typeof(TReadModel));
         modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
     }
@@ -104,7 +114,13 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
-    
+
+    /// <inheritdoc />
+    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback)
+    {
+        _projectionCopyDefinitionBuilder.CopyToMongoDB(callback);
+        return this;
+    }
 
     /// <inheritdoc />
     public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
@@ -119,7 +135,12 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 
         if (eventTypesToMethods.Any())
         {
-            return _projectionCreator.TryCreate(_projectionId, _scopeId, eventTypesToMethods, buildResults, out projection);
+            if (!_projectionCopiesFromReadModelBuilder.BuildFrom(buildResults, _projectionCopyDefinitionBuilder) || !_projectionCopyDefinitionBuilder.TryBuild(buildResults, out var projectionCopies))
+            {
+                return false;
+            }
+            projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods, projectionCopies);
+            return true;
         }
         buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");
         return false;
