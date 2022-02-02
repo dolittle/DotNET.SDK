@@ -15,7 +15,8 @@ using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Projections.Builder;
-using Dolittle.SDK.Projections.Copies;
+using Dolittle.SDK.Projections.Builder.Copies;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 using Microsoft.Extensions.Logging;
 
@@ -50,11 +51,12 @@ public class SetupBuilder : ISetupBuilder
         _eventHandlersBuilder = new EventHandlersBuilder(_modelBuilder, _buildResults);
         _embeddingsBuilder = new EmbeddingsBuilder(_modelBuilder, _buildResults);
 
-        var projectionCreator = new ProjectionCreator(new ProjectionCopiesFromReadModelBuilders(new[]
-        {
-            new MongoDbCopyDefinitionFromReadModelBuilder(new ConversionsResolver(), new MongoDbCollectionNameValidator())
-        }));
-        _projectionsBuilder = new ProjectionsBuilder(_modelBuilder, _buildResults, projectionCreator);
+        var copyDefinitionBuilderCreator = new CopiesDefinitionBuilderCreator(new MongoDbCollectionNameValidator(), new DefaultConversionsFromReadModelGetter());
+        var projectionCopiesBuilders = new ProjectionCopiesFromReadModelBuilders(new[]
+            {
+                new MongoDbCopyDefinitionFromReadModelBuilder()
+            }, copyDefinitionBuilderCreator);
+        _projectionsBuilder = new ProjectionsBuilder(_modelBuilder, _buildResults, projectionCopiesBuilders, copyDefinitionBuilderCreator);
     }
 
     /// <inheritdoc />
