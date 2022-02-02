@@ -9,7 +9,6 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;

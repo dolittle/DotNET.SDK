@@ -4,8 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Copies;
 
-namespace Dolittle.SDK.Projections.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies;
 
 /// <summary>
 /// Represents an implementation of <see cref="IProjectionCopiesFromReadModelBuilders"/>.
@@ -13,32 +14,27 @@ namespace Dolittle.SDK.Projections.Copies;
 public class ProjectionCopiesFromReadModelBuilders : IProjectionCopiesFromReadModelBuilders
 {
     readonly IEnumerable<ICanBuildCopyDefinitionFromReadModel> _augmenters;
-    readonly IProjectionCopyDefinitionBuilderFactory _builderFactory;
+    readonly ICreateCopiesDefinitionBuilder _builder;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IProjectionCopiesFromReadModelBuilders"/> class.
     /// </summary>
     /// <param name="augmenters">The <see cref="IEnumerable{T}"/> of <see cref="ICanBuildCopyDefinitionFromReadModel"/>.</param>
-    /// <param name="builderFactory">The <see cref="IProjectionCopyDefinitionBuilderFactory"/>.</param>
-    public ProjectionCopiesFromReadModelBuilders(IEnumerable<ICanBuildCopyDefinitionFromReadModel> augmenters, IProjectionCopyDefinitionBuilderFactory builderFactory)
+    /// <param name="builder">The <see cref="ICreateCopiesDefinitionBuilder"/>.</param>
+    public ProjectionCopiesFromReadModelBuilders(IEnumerable<ICanBuildCopyDefinitionFromReadModel> augmenters, ICreateCopiesDefinitionBuilder builder)
     {
         _augmenters = augmenters;
-        _builderFactory = builderFactory;
+        _builder = builder;
     }
 
     /// <inheritdoc />
     public bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, out ProjectionCopies projectionCopies)
         where TReadModel : class, new()
     {
-        var builder = GetFor<TReadModel>();
+        var builder = _builder.CreateFor<TReadModel>();
         projectionCopies = default;
         return BuildFrom(buildResults, builder) && builder.TryBuild(buildResults, out projectionCopies);
     }
-
-    /// <inheritdoc />
-    public IProjectionCopyDefinitionBuilder<TReadModel> GetFor<TReadModel>()
-        where TReadModel : class, new()
-        => _builderFactory.CreateFor<TReadModel>();
 
     bool BuildFrom<TReadModel>(IClientBuildResults buildResults, IProjectionCopyDefinitionBuilder<TReadModel> builder)
         where TReadModel : class, new()

@@ -8,7 +8,7 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies;
+using Dolittle.SDK.Projections.Builder.Copies;
 using Dolittle.SDK.Projections.Store;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -19,7 +19,8 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionsBuilder : IProjectionsBuilder
 {
     readonly IModelBuilder _modelBuilder;
-    readonly IProjectionCopiesFromReadModelBuilders _projectionCopiesFromReadModelBuilder;
+    readonly IProjectionCopiesFromReadModelBuilders _projectionCopiesFromReadModelBuilders;
+    readonly ICreateCopiesDefinitionBuilder _copyDefinitionBuilder;
     readonly DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId> _decoratedTypeBindings;
 
     /// <summary>
@@ -27,10 +28,17 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// </summary>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults, IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilder)
+    /// <param name="projectionCopiesFromReadModelBuilders">The <see cref="IProjectionCopiesFromReadModelBuilders"/>.</param>
+    /// <param name="copyDefinitionBuilder">The <see cref="ICreateCopiesDefinitionBuilder"/>.</param>
+    public ProjectionsBuilder(
+        IModelBuilder modelBuilder,
+        IClientBuildResults buildResults,
+        IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilders,
+        ICreateCopiesDefinitionBuilder copyDefinitionBuilder)
     {
         _modelBuilder = modelBuilder;
-        _projectionCopiesFromReadModelBuilder = projectionCopiesFromReadModelBuilder;
+        _projectionCopiesFromReadModelBuilders = projectionCopiesFromReadModelBuilders;
+        _copyDefinitionBuilder = copyDefinitionBuilder;
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId>("projection", modelBuilder, buildResults);
     }
 
@@ -38,7 +46,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <inheritdoc />
     public IProjectionBuilder Create(ProjectionId projectionId)
     {
-        var builder = new ProjectionBuilder(projectionId, _modelBuilder, _projectionCopiesFromReadModelBuilder);
+        var builder = new ProjectionBuilder(projectionId, _modelBuilder, _copyDefinitionBuilder);
         return builder;
     }
 
@@ -80,7 +88,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
         => Activator.CreateInstance(
                 typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
                 decorator,
-                _projectionCopiesFromReadModelBuilder)
+                _projectionCopiesFromReadModelBuilders)
             as ICanTryBuildProjection;
 
     /// <summary>

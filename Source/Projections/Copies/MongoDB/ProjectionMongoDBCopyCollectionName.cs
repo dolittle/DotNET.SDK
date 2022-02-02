@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Reflection;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Concepts;
 
@@ -25,7 +26,7 @@ public record ProjectionMongoDBCopyCollectionName(string Value) : ConceptAs<stri
     /// </summary>
     /// <param name="name">The <see cref="ProjectionMongoDBCopyCollectionName"/>.</param>
     /// <returns>The <see cref="string"/>.</returns>
-    public static implicit operator string(ProjectionMongoDBCopyCollectionName name) => name.Value;
+    public static implicit operator string(ProjectionMongoDBCopyCollectionName name) => name?.Value;
 
     /// <summary>
     /// Try get the <see cref="ProjectionMongoDBCopyCollectionName"/> from a <see cref="Type"/>.

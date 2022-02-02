@@ -3,9 +3,11 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
+using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
-namespace Dolittle.SDK.Projections.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies;
 
 /// <summary>
 /// Defines a system that can build <see cref="ProjectionCopies"/>.

@@ -4,7 +4,7 @@
 using System;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies.MongoDB;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder;
 

@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies;
+using Dolittle.SDK.Projections.Builder.Copies;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -67,8 +67,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         }
 
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TProjection>>();
-        if (!TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults) || !_projectionCopiesFromReadModelBuilder.TryBuildFrom<TProjection>(buildResults, out var projectionCopies))
+        if (!TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults))
         {
+            return false;
+        }
+        if (!_projectionCopiesFromReadModelBuilder.TryBuildFrom<TProjection>(buildResults, out var projectionCopies))
+        {
+            buildResults.AddFailure($"Failed to build projection copies definition for projection {_decorator.Identifier} using conventions from projection type {_projectionType}");
             return false;
         }
         projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods, projectionCopies);

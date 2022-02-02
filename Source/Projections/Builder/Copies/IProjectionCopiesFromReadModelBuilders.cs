@@ -3,8 +3,9 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Copies;
 
-namespace Dolittle.SDK.Projections.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies;
 
 /// <summary>
 /// Defines a system that can build <see cref="ProjectionCopies"/> from the given projection read model <see cref="Type"/>.
@@ -19,13 +20,5 @@ public interface IProjectionCopiesFromReadModelBuilders
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
     /// <returns>True if successfully resolved, false if not.</returns>
     bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, out ProjectionCopies projectionCopies)
-        where TReadModel : class, new();
-    
-    /// <summary>
-    /// Creates a <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.
-    /// </summary>
-    /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
-    /// <returns>The created <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.</returns>
-    IProjectionCopyDefinitionBuilder<TReadModel> GetFor<TReadModel>() 
         where TReadModel : class, new();
 }

@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using Dolittle.SDK.Common.ClientSetup;
-using MongoDB.Bson;
 
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
@@ -14,12 +12,10 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 public interface IGetDefaultConversionsFromReadModel
 {
     /// <summary>
-    /// Try to get the BSON conversions for fields of the <typeparamref name="TReadModel"/> projection read model <see cref="Type"/>.
+    /// Gets the conversions for fields of the <typeparamref name="TReadModel"/> projection read model <see cref="Type"/>.
     /// </summary>
-    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="conversions">The resolved conversions per field.</param>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
-    /// <returns>True if successful, false if not.</returns>
-    bool TryGetFrom<TReadModel>(IClientBuildResults buildResults, out IDictionary<string, BsonType> conversions)
+    /// <returns>The default conversions derived from the <typeparamref name="TReadModel"/>.</returns>
+    IDictionary<ProjectionField, Conversion> GetFrom<TReadModel>()
         where TReadModel : class, new();
 }

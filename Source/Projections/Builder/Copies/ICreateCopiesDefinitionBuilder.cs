@@ -3,12 +3,12 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies;
 
 /// <summary>
 /// Defines a factory for <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.
 /// </summary>
-public interface IProjectionCopyDefinitionBuilderFactory
+public interface ICreateCopiesDefinitionBuilder
 {
     /// <summary>
     /// Creates a <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.

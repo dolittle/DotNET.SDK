@@ -3,9 +3,11 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
+using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
-namespace Dolittle.SDK.Projections.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies;
 
 /// <summary>
 /// Represents an implementation of <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.
@@ -15,17 +17,22 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
     where TReadModel : class, new()
 {
     readonly ProjectionCopyToMongoDBBuilder<TReadModel> _mongoDbBuilder;
-    // readonly ProjectionCopyToMongoDBBuilder<TReadModel> _copyToMongoDbBuilder = new ();
     
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProjectionCopyDefinitionBuilder{TReadModel}"/> class.
+    /// </summary>
+    /// <param name="mongoDBCOllectionNameValidator">The <see cref="IValidateMongoDBCollectionName"/>.</param>
+    /// <param name="defaultBsonConversionGetter">The <see cref="IGetDefaultConversionsFromReadModel"/>.</param>
     public ProjectionCopyDefinitionBuilder(IValidateMongoDBCollectionName mongoDBCOllectionNameValidator, IGetDefaultConversionsFromReadModel defaultBsonConversionGetter)
     {
         _mongoDbBuilder = new ProjectionCopyToMongoDBBuilder<TReadModel>(mongoDBCOllectionNameValidator, defaultBsonConversionGetter);
     }
 
     /// <inheritdoc />
-    public IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> builder)
+    public IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback)
     {
-        throw new NotImplementedException();
+        callback(_mongoDbBuilder);
+        return this;
     }
 
     /// <inheritdoc />

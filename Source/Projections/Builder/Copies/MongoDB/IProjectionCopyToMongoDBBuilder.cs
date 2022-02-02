@@ -3,9 +3,11 @@
 
 using System;
 using System.Linq.Expressions;
+using Dolittle.SDK.Projections.Copies;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 using MongoDB.Bson;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 /// <summary>
 /// Defines a system for building <see cref="ProjectionCopyToMongoDB"/>.
@@ -25,17 +27,17 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel>
     /// Sets the conversion from a field to a <see cref="BsonType"/>.
     /// </summary>
     /// <param name="field">The name of the field.</param>
-    /// <param name="bsonType">The <see cref="BsonType" /> it should by stored as.</param>
+    /// <param name="conversion">The <see cref="Conversion" />.</param>
     /// <returns>The builder for continuation</returns>
-    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(string field, BsonType bsonType);
+    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(ProjectionField field, Conversion conversion);
     
     /// <summary>
     /// Sets the conversion from a field to a <see cref="BsonType"/>.
     /// </summary>
     /// <param name="fieldExpression">The <see cref="Expression{TDelegate}"/> for getting the name of the field.</param>
-    /// <param name="bsonType">The <see cref="BsonType" /> it should by stored as.</param>
+    /// <param name="conversion">The <see cref="Conversion" />.</param>
     /// <returns>The builder for continuation</returns>
-    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(Expression<Func<TReadModel, object>> fieldExpression, BsonType bsonType);
+    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(Expression<Func<TReadModel, object>> fieldExpression, Conversion conversion);
     
     /// <summary>
     /// Signifies to the builder that it should not use the default BsonClassMap for the conversions of the fields.

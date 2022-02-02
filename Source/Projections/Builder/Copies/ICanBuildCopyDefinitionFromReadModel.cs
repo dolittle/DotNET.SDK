@@ -3,8 +3,9 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Copies;
 
-namespace Dolittle.SDK.Projections.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies;
 
 /// <summary>
 /// Defines a system that can build a copy definition part of the <see cref="ProjectionCopies"/> from a projection read model <see cref="Type"/>. 

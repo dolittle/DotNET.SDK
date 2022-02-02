@@ -8,8 +8,8 @@ using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies;
-using Dolittle.SDK.Projections.Copies.MongoDB;
+using Dolittle.SDK.Projections.Builder.Copies;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -38,19 +38,19 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
     /// <param name="parentBuilder">The <see cref="ProjectionBuilder"/>.</param>
-    /// <param name="projectionCopiesFromReadModelBuilder">The <see cref="IProjectionCopiesFromReadModelBuilders"/>.</param>
+    /// <param name="copyDefinitionBuilder">The <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.</param>
     public ProjectionBuilderForReadModel(
         ProjectionId projectionId,
         ScopeId scopeId,
         IModelBuilder modelBuilder,
         ProjectionBuilder parentBuilder,
-        IProjectionCopiesFromReadModelBuilders projectionCopiesFromReadModelBuilder)
+        IProjectionCopyDefinitionBuilder<TReadModel> copyDefinitionBuilder)
     {
         _projectionId = projectionId;
         _scopeId = scopeId;
         _modelBuilder = modelBuilder;
         _parentBuilder = parentBuilder;
-        _projectionCopyDefinitionBuilder = projectionCopiesFromReadModelBuilder.GetFor<TReadModel>();
+        _projectionCopyDefinitionBuilder = copyDefinitionBuilder;
         
         modelBuilder.BindIdentifierToType<ProjectionModelId, ProjectionId>(ModelId, typeof(TReadModel));
         modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
@@ -135,8 +135,9 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 
         if (eventTypesToMethods.Any())
         {
-            if (!_projectionCopiesFromReadModelBuilder.BuildFrom(buildResults, _projectionCopyDefinitionBuilder) || !_projectionCopyDefinitionBuilder.TryBuild(buildResults, out var projectionCopies))
+            if (!_projectionCopyDefinitionBuilder.TryBuild(buildResults, out var projectionCopies))
             {
+                buildResults.AddFailure($"Failed to build projection copies definition for projection {_projectionId}");
                 return false;
             }
             projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods, projectionCopies);

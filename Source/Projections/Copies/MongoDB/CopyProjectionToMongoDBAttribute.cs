@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Common.Model;
-using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
@@ -16,8 +14,7 @@ public class CopyProjectionToMongoDBAttribute : Attribute
     /// <summary>
     /// Initializes a new instance of the <see cref="CopyProjectionToMongoDBAttribute"/> class.
     /// </summary>
-    /// <param name="collectionName">The unique identifier of the event handler.</param>
-    /// <param name="inScope">The scope that the event handler handles events in.</param>
+    /// <param name="collectionName">The optional collection name.</param>
     public CopyProjectionToMongoDBAttribute(string collectionName = "")
     {
         CollectionName = collectionName;
