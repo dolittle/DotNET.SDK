@@ -19,7 +19,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
 {
     readonly IValidateMongoDBCollectionName _collectionNameValidator;
     readonly IGetDefaultConversionsFromReadModel _conversionsResolver;
-    readonly Dictionary<string, Conversion> _conversions = new();
+    readonly Dictionary<ProjectionField, Conversion> _conversions = new();
     ProjectionMongoDBCopyCollectionName _collectionName;
     bool _withoutDefaultConversions;
 
@@ -53,7 +53,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
     {
         if (fieldExpression.Body is not MemberExpression member)
         {
-            throw new ArgumentException($"Expression {fieldExpression.Name} refers to a method, not a property");
+            throw new ArgumentException($"Expression {fieldExpression.Name} refers to a method, not a class member");
         }
         return WithConversion(member.Member.Name, conversion);
     }

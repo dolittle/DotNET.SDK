@@ -18,10 +18,11 @@ public record ProjectionCopies(ProjectionCopyToMongoDB MongoDB)
     /// <returns>The <see cref="PbProjectionCopies"/>.</returns>
     public PbProjectionCopies ToProtobuf()
     {
-        var result = new PbProjectionCopies
+        var result = new PbProjectionCopies();
+        if (MongoDB.ShouldCopy)
         {
-            MongoDB = MongoDB.ToProtobuf()
-        };
+            result.MongoDB = MongoDB.ToProtobuf();
+        }
         return result;
     }
 }

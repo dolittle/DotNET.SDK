@@ -12,8 +12,13 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// <param name="ShouldCopy">Whether the projection should be copied to MongoDB.</param>
 /// <param name="CollectionName">The <see cref="ProjectionMongoDBCopyCollectionName"/>.</param>
 /// <param name="Conversions">The BsonType per field conversions.</param>
-public record ProjectionCopyToMongoDB(bool ShouldCopy, ProjectionMongoDBCopyCollectionName CollectionName, IDictionary<string, Conversion> Conversions)
+public record ProjectionCopyToMongoDB(bool ShouldCopy, ProjectionMongoDBCopyCollectionName CollectionName, IDictionary<ProjectionField, Conversion> Conversions)
 {
+    /// <summary>
+    /// The default representation of <see cref="ProjectionCopyToMongoDB"/>.
+    /// </summary>
+    public static ProjectionCopyToMongoDB Default => new(false, "", new Dictionary<ProjectionField, Conversion>());
+    
     /// <summary>
     /// Creates a Protobuf representation of this <see cref="ProjectionCopyToMongoDB"/>.
     /// </summary>
@@ -22,12 +27,12 @@ public record ProjectionCopyToMongoDB(bool ShouldCopy, ProjectionMongoDBCopyColl
     {
         var result = new PbProjectionCopyToMongoDB
         {
-            Collection = CollectionName    
+            Collection = CollectionName
         };
         
-        foreach (var (fieldName, type) in Conversions)
+        foreach (var (field, type) in Conversions)
         {
-            result.Conversions.Add(fieldName, ToProtobuf(type));
+            result.Conversions.Add(field, ToProtobuf(type));
         }
         return result;
     }

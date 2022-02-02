@@ -17,7 +17,8 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
     where TReadModel : class, new()
 {
     readonly ProjectionCopyToMongoDBBuilder<TReadModel> _mongoDbBuilder;
-    
+    bool _copyToMongoDB;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionCopyDefinitionBuilder{TReadModel}"/> class.
     /// </summary>
@@ -31,6 +32,7 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
     /// <inheritdoc />
     public IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback)
     {
+        _copyToMongoDB = true;
         callback(_mongoDbBuilder);
         return this;
     }
@@ -40,7 +42,9 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
     {
         definition = default;
         var succeeded = true;
-        if (!_mongoDbBuilder.TryBuild(buildResults, out var mongoDBCopy))
+        var mongoDBCopy = ProjectionCopyToMongoDB.Default;
+        
+        if (_copyToMongoDB && !_mongoDbBuilder.TryBuild(buildResults, out mongoDBCopy))
         {
             buildResults.AddFailure($"Failed to build Copy To MongoDB Definition");
             succeeded = false;
