@@ -17,7 +17,7 @@ public class CopyProjectionToMongoDBAttribute : Attribute
     /// <param name="collectionName">The optional collection name.</param>
     public CopyProjectionToMongoDBAttribute(string collectionName = "")
     {
-        CollectionName = collectionName;
+        CollectionName = collectionName ?? "";
     }
 
     /// <summary>

@@ -27,7 +27,7 @@ public class MongoDbCopyDefinitionFromReadModelBuilder : ICanBuildCopyDefinition
         where TReadModel : class, new()
     {
         var succeeded = true;
-        if (!ProjectionMongoDBCopyCollectionName.TryGetFrom<TReadModel>(out var collectionName))
+        if (!CanBuildFrom<TReadModel>())
         {
             buildResults.AddFailure($"Could not get projection MongoDB Copy collection name from projection read model type {nameof(TReadModel)}");
             succeeded = false;
@@ -40,7 +40,7 @@ public class MongoDbCopyDefinitionFromReadModelBuilder : ICanBuildCopyDefinition
         
         builder.CopyToMongoDB(_ =>
         {
-            _.ToCollection(collectionName);
+            _.ToCollection(ProjectionMongoDBCopyCollectionName.GetFrom<TReadModel>());
             foreach (var (field, conversion) in GetExplicitConversions(ProjectionField.GetAllFrom<TReadModel>()))
             {
                 _.WithConversion(field, conversion);

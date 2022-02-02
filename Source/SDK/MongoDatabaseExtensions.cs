@@ -2,9 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 using MongoDB.Driver;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB;
+namespace Dolittle.SDK;
 
 /// <summary>
 /// Extensions for <see cref="IMongoDatabase"/> related to projection MongoDB copies.
@@ -21,11 +22,5 @@ public static class MongoDatabaseExtensions
     /// <exception cref="CannotGetProjectionMongoDBCopyCollectionNameFromType">Exception that is thrown when the <see cref="ProjectionMongoDBCopyCollectionName"/> cannot be retrieved from the <typeparamref name="TProjection"/> <see cref="Type"/>.</exception>
     public static IMongoCollection<TProjection> GetCollection<TProjection>(this IMongoDatabase database, MongoCollectionSettings settings = default)
         where TProjection : class, new()
-    {
-        if (!ProjectionMongoDBCopyCollectionName.TryGetFrom<TProjection>(out var collectionName))
-        {
-            throw new CannotGetProjectionMongoDBCopyCollectionNameFromType(typeof(TProjection));
-        }
-        return database.GetCollection<TProjection>(collectionName, settings);
-    }
+        => database.GetCollection<TProjection>(ProjectionMongoDBCopyCollectionName.GetFrom<TProjection>(), settings);
 }

@@ -101,8 +101,8 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <summary>
     /// Adds the copy to MongoDB definition.
     /// </summary>
-    /// <param name="callback">The callback for building the MongoDB copy definition.</param>
+    /// <param name="callback">The optonal callback for building the MongoDB copy definition.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback);
+    IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default);
 
 }

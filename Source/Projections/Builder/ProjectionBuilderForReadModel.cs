@@ -116,7 +116,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback)
+    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default)
     {
         _projectionCopyDefinitionBuilder.CopyToMongoDB(callback);
         return this;
@@ -133,13 +133,14 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
             return false;
         }
 
+        if (!_projectionCopyDefinitionBuilder.TryBuild(buildResults, out var projectionCopies))
+        {
+            buildResults.AddFailure($"Failed to build projection copies definition for projection {_projectionId}");
+            return false;
+        }
+
         if (eventTypesToMethods.Any())
         {
-            if (!_projectionCopyDefinitionBuilder.TryBuild(buildResults, out var projectionCopies))
-            {
-                buildResults.AddFailure($"Failed to build projection copies definition for projection {_projectionId}");
-                return false;
-            }
             projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods, projectionCopies);
             return true;
         }

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reflection;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Concepts;
 
@@ -31,27 +30,23 @@ public record ProjectionMongoDBCopyCollectionName(string Value) : ConceptAs<stri
     /// <summary>
     /// Try get the <see cref="ProjectionMongoDBCopyCollectionName"/> from a <see cref="Type"/>.
     /// </summary>
-    /// <param name="collectionName">The <see cref="ProjectionMongoDBCopyCollectionName"/> derived from the <see cref="CopyProjectionToMongoDBAttribute"/> or the <see cref="Type.Name"/>.</param>
     /// <typeparam name="TProjection">The <see cref="Type"/> of the projection.</typeparam>
-    /// <returns>A value indicating whether the <see cref="Type"/> is decorated with <see cref="CopyProjectionToMongoDBAttribute"/>.</returns>
-    public static bool TryGetFrom<TProjection>(out ProjectionMongoDBCopyCollectionName collectionName)
+    /// <returns>The <see cref="ProjectionMongoDBCopyCollectionName"/> derived from the <see cref="CopyProjectionToMongoDBAttribute"/> or the <see cref="Type.Name"/>.</returns>
+    public static ProjectionMongoDBCopyCollectionName GetFrom<TProjection>()
         where TProjection : class, new()
-        => TryGetFrom(typeof(TProjection), out collectionName);
+        => GetFrom(typeof(TProjection));
     
     /// <summary>
     /// Try get the <see cref="ProjectionMongoDBCopyCollectionName"/> from a <see cref="Type"/>.
     /// </summary>
     /// <param name="type">The <see cref="Type"/> to get the <see cref="ProjectionMongoDBCopyCollectionName"/> from.</param>
-    /// <param name="collectionName">The <see cref="ProjectionMongoDBCopyCollectionName"/> derived from the <see cref="CopyProjectionToMongoDBAttribute"/> or the <see cref="Type.Name"/>.</param>
-    /// <returns>A value indicating whether the <see cref="Type"/> is decorated with <see cref="CopyProjectionToMongoDBAttribute"/>.</returns>
-    public static bool TryGetFrom(Type type, out ProjectionMongoDBCopyCollectionName collectionName)
+    /// <returns>The <see cref="ProjectionMongoDBCopyCollectionName"/> derived from the <see cref="CopyProjectionToMongoDBAttribute"/> or the <see cref="Type.Name"/>.</returns>
+    public static ProjectionMongoDBCopyCollectionName GetFrom(Type type)
     {
-        collectionName = default;
-        if (!type.TryGetDecorator<CopyProjectionToMongoDBAttribute>(out var decorator))
+        if (!type.TryGetDecorator<CopyProjectionToMongoDBAttribute>(out var decorator) || string.IsNullOrEmpty(decorator.CollectionName))
         {
-            return false;
+            return type.Name;
         }
-        collectionName = string.IsNullOrEmpty(decorator.CollectionName) ? type.Name : decorator.CollectionName;
-        return true;
+        return decorator.CollectionName;
     }
 }

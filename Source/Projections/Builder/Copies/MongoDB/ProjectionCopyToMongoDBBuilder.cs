@@ -32,6 +32,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
     {
         _collectionNameValidator = collectionNameValidator;
         _conversionsResolver = conversionsResolver;
+        _collectionName = ProjectionMongoDBCopyCollectionName.GetFrom<TReadModel>();
     }
 
     /// <inheritdoc />
@@ -75,17 +76,12 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
     {
         copyDefinition = default;
         var succeeded = true;
-        if (_collectionName == default)
-        {
-            buildResults.AddFailure("MongoDB Copy collection name is not set");
-            succeeded = false;
-        }
-        if (_collectionName != default && !_collectionNameValidator.Validate(buildResults, _collectionName))
+        if (!_collectionNameValidator.Validate(buildResults, _collectionName))
         {
             buildResults.AddFailure($"MongoDB Copy collection name {_collectionName} is not valid");
             succeeded = false;
         }
-        if (_withoutDefaultConversions)
+        if (!_withoutDefaultConversions)
         {
             var defaultConversions = _conversionsResolver.GetFrom<TReadModel>();
             foreach (var (field, conversion) in defaultConversions)

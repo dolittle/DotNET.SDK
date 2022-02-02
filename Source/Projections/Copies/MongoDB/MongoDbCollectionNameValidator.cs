@@ -20,6 +20,11 @@ public class MongoDbCollectionNameValidator : IValidateMongoDBCollectionName
     public bool Validate(IClientBuildResults buildResult, ProjectionMongoDBCopyCollectionName collectionName)
     {
         var succeeded = true;
+        if (string.IsNullOrEmpty(collectionName))
+        {
+            buildResult.AddFailure($"{FailureBuildResultBeginning} be null or empty");
+            return false;
+        }
         if (collectionName.Value.StartsWith("system.", StringComparison.InvariantCulture))
         {
             buildResult.AddFailure($"{FailureBuildResultBeginning} start with system.");
@@ -40,12 +45,7 @@ public class MongoDbCollectionNameValidator : IValidateMongoDBCollectionName
             buildResult.AddFailure($"{FailureBuildResultBeginning} contain more than 63 characters");
             succeeded = false;
         }
-        if (!string.IsNullOrEmpty(collectionName.Value))
-        {
-            return succeeded;
-        }
         
-        buildResult.AddFailure($"{FailureBuildResultBeginning} be null or empty");
-        return false;
+        return succeeded;
     }
 }
