@@ -11,8 +11,4 @@
         <ProjectReference Include="../../Source/Projections/Projections.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Builder" />
-    </ItemGroup>
-
 </Project>
