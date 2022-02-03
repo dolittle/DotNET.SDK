@@ -49,7 +49,7 @@ public record ProjectionField(string Value) : ConceptAs<string>(Value)
         var members = type
             .GetFields(bindingFlags)
             .Cast<MemberInfo>()
-            .Concat(type.GetProperties(bindingFlags).Where(_ => _.CanRead && _.CanWrite));
+            .Concat(type.GetProperties(bindingFlags).Where(_ => _.CanRead));
         return members.ToDictionary(_ => new ProjectionField(_.Name), _ => _);
     }
 }
