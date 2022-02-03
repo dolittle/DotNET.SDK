@@ -11,6 +11,6 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 public class DefaultConversionsFromReadModelGetter : IGetDefaultConversionsFromReadModel
 {
     /// <inheritdoc />
-    public IDictionary<ProjectionField, Conversion> GetFrom<TReadModel>() where TReadModel : class, new()
-        => new Dictionary<ProjectionField, Conversion>();
+    public IEnumerable<PropertyConversion> GetFrom<TReadModel>() where TReadModel : class, new()
+        => new List<PropertyConversion>();
 }

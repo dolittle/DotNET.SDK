@@ -20,7 +20,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
 {
     readonly IValidateMongoDBCollectionName _collectionNameValidator;
     readonly IGetDefaultConversionsFromReadModel _conversionsResolver;
-    readonly Dictionary<ProjectionField, Conversion> _conversions = new();
+    readonly List<PropertyConversion> _conversions = new();
     ProjectionMongoDBCopyCollectionName _collectionName;
     bool _withoutDefaultConversions;
 

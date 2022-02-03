@@ -12,10 +12,10 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 public interface IGetDefaultConversionsFromReadModel
 {
     /// <summary>
-    /// Gets the conversions for fields of the <typeparamref name="TReadModel"/> projection read model <see cref="Type"/>.
+    /// Gets the conversions for properties of the <typeparamref name="TReadModel"/> projection read model <see cref="Type"/>.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
     /// <returns>The default conversions derived from the <typeparamref name="TReadModel"/>.</returns>
-    IDictionary<ProjectionField, Conversion> GetFrom<TReadModel>()
+    IEnumerable<PropertyConversion> GetFrom<TReadModel>()
         where TReadModel : class, new();
 }
