@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Projections.Copies;
@@ -50,7 +51,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
     }
 
     /// <inheritdoc />
-    public IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(Expression<Func<TReadModel, object>> fieldExpression, Conversion conversion)
+    public IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion<TProperty>(Expression<Func<TReadModel, TProperty>> fieldExpression, Conversion conversion)
     {
         if (fieldExpression.Body is not MemberExpression member)
         {
@@ -76,6 +77,13 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
     {
         copyDefinition = default;
         var succeeded = true;
+
+        var allFields = ProjectionField.GetAllFrom<TReadModel>();
+        if (_conversions.Keys.Any(_ => !allFields.ContainsKey(_)))
+        {
+            buildResults.AddFailure($"MongoDB Copy contains conversions for fields that does not exist");
+            succeeded = false;
+        }
         if (!_collectionNameValidator.Validate(buildResults, _collectionName))
         {
             buildResults.AddFailure($"MongoDB Copy collection name {_collectionName} is not valid");
