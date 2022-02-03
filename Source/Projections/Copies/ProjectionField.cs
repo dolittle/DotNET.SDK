@@ -20,14 +20,14 @@ public record ProjectionField(string Value) : ConceptAs<string>(Value)
     /// </summary>
     /// <param name="value">The <see cref="string"/>.</param>
     /// <returns>The <see cref="ProjectionField"/>.</returns>
-    public static implicit operator ProjectionField(string value) => new(value);
+    public static implicit operator ProjectionField(string value) => value != default ? new ProjectionField(value) : null;
     
     /// <summary>
     /// Implicitly converts the <see cref="ProjectionField"/> to <see cref="string"/>.
     /// </summary>
     /// <param name="field">The <see cref="ProjectionField"/>.</param>
     /// <returns>The <see cref="string"/>.</returns>
-    public static implicit operator string(ProjectionField field) => field.Value;
+    public static implicit operator string(ProjectionField field) => field?.Value;
 
     /// <summary>
     /// Try get all the <see cref="ProjectionField"/> to <see cref="PropertyInfo"/> mappings from a <see cref="Type"/>.
