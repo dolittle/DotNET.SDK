@@ -45,7 +45,7 @@ public record ProjectionField(string Value) : ConceptAs<string>(Value)
     /// <returns>A <see cref="IDictionary{TKey,TValue}"/> with <see cref="ProjectionField"/> to <see cref="PropertyInfo"/> mappings.</returns>
     public static IDictionary<ProjectionField, MemberInfo> GetAllFrom(Type type)
     {
-        const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance;
+        const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
         var members = type
             .GetFields(bindingFlags)
             .Cast<MemberInfo>()
