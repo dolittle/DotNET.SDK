@@ -37,7 +37,7 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel>
     /// <param name="fieldExpression">The <see cref="Expression{TDelegate}"/> for getting the name of the field.</param>
     /// <param name="conversion">The <see cref="Conversion" />.</param>
     /// <returns>The builder for continuation</returns>
-    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(Expression<Func<TReadModel, object>> fieldExpression, Conversion conversion);
+    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion<TProperty>(Expression<Func<TReadModel, TProperty>> fieldExpression, Conversion conversion);
     
     /// <summary>
     /// Signifies to the builder that it should not use the default BsonClassMap for the conversions of the fields.
