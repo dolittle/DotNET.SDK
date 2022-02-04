@@ -9,12 +9,12 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB.for_ConversionFromAttributeFro
 
 public class a_resolver
 {
-    protected static ConversionFromAttributeFromReadModelGetter FromAttributeFromReadModelGetter;
+    protected static ConversionsFromMongoDBConvertToAttributesBuilder FromAttributeFromReadModelGetter;
     protected static ClientBuildResults build_results;
     protected static IDictionary<ProjectionPropertyPath, Conversion> conversions_result;
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
-        FromAttributeFromReadModelGetter = new ConversionFromAttributeFromReadModelGetter();
+        FromAttributeFromReadModelGetter = new ConversionsFromMongoDBConvertToAttributesBuilder();
     };
 }

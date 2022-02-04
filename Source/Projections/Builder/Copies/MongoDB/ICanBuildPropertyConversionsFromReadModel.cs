@@ -15,7 +15,9 @@ public interface ICanBuildPropertyConversionsFromReadModel
     /// Builds the <see cref="PropertyConversion"/> conversions from the <typeparamref name="TReadModel"/> projection read model.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    /// <param name="conversions">The <see cref="PropertyConversions"/>.</param>
     /// <returns>The default conversions derived from the <typeparamref name="TReadModel"/>.</returns>
-    bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversionsBuilder conversionsBuilder)
+    bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, PropertyConversions conversions)
         where TReadModel : class, new();
 }

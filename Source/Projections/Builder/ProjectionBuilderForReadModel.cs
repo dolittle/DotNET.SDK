@@ -27,8 +27,6 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     readonly ProjectionBuilder _parentBuilder;
     readonly IProjectionCopyDefinitionBuilder<TReadModel> _projectionCopyDefinitionBuilder;
 
-    // readonly IProjectionCopyToMongoDBBuilder<> _mongoCopyBuilder;
-
     ProjectionModelId ModelId => new(_projectionId, _scopeId);
 
     /// <summary>

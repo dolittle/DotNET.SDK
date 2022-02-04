@@ -7,6 +7,4 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// Defines a <see cref="ICanBuildPropertyConversionsFromReadModel"/> that builds property conversions from Bson Class Map 
 /// </summary>
 public interface IBuildPropertyConversionsFromBsonClassMap : ICanBuildPropertyConversionsFromReadModel
-{
-    
-}
+{ }

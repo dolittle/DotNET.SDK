@@ -7,38 +7,50 @@ using System.Linq;
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
 /// <summary>
-/// Represents an implementation of <see cref="IPropertyConversionsBuilder"/>.
+/// Represents <see cref="PropertyConversion"/> as nodes in a tree-structure where the tree hierarchy is based off <see cref="ProjectionPropertyPathString"/>.
 /// </summary>
-public class PropertyConversionsBuilder : IPropertyConversionsBuilder
+public class PropertyConversions
 {
     class PropertyConversionNode
     {
-        public ProjectionPropertyName PropertyName { get; }
+        readonly ProjectionPropertyName _propertyName;
+
+        public PropertyConversionNode(ProjectionPropertyName propertyName)
+        {
+            _propertyName = propertyName;
+        }
+        
         public Conversion ConvertTo { get; set; } = Conversion.None;
         public ProjectionPropertyName RenameTo { get; set; }
         public Dictionary<ProjectionPropertyName, PropertyConversionNode> Children { get; } = new();
 
-        public PropertyConversionNode(ProjectionPropertyName propertyName)
-        {
-            PropertyName = propertyName;
-        }
-
         public PropertyConversion ToConversion()
-            => new(PropertyName, Conversion.Guid, Children.Values.Select(_ => _.ToConversion()), RenameTo);
+            => new(_propertyName, Conversion.Guid, Children.Values.Select(_ => _.ToConversion()), RenameTo);
     }
 
     readonly Dictionary<ProjectionPropertyName, PropertyConversionNode> _conversions = new();
-
-    /// <inheritdoc />
+    
+    /// <summary>
+    /// Adds a conversion.
+    /// </summary>
+    /// <param name="pathString">The <see cref="ProjectionPropertyPathString"/>.</param>
+    /// <param name="conversion">The <see cref="Conversion"/> of the <see cref="PropertyConversion"/>.</param>
     public void AddConversion(ProjectionPropertyPathString pathString, Conversion conversion)
         => GetNode(pathString).ConvertTo = conversion;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Adds a renaming.
+    /// </summary>
+    /// <param name="pathString">The <see cref="ProjectionPropertyPathString"/>.</param>
+    /// <param name="name">The <see cref="ProjectionPropertyName"/> to rename the <see cref="PropertyConversion"/> to.</param>
     public void AddRenaming(ProjectionPropertyPathString pathString, ProjectionPropertyName name)
         => GetNode(pathString).RenameTo = name;
-    
-    /// <inheritdoc />
-    public IEnumerable<PropertyConversion> Build()
+
+    /// <summary>
+    /// Gets an <see cref="IEnumerable{T}"/> of all the <see cref="PropertyConversion"/> trees.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="PropertyConversion"/>.</returns>
+    public IEnumerable<PropertyConversion> GetAll()
         => _conversions.Values.Select(_ => _.ToConversion());
 
     PropertyConversionNode GetNode(ProjectionPropertyPathString pathString)

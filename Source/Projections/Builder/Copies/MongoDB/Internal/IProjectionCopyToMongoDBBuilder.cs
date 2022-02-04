@@ -2,10 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Linq.Expressions;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Projections.Copies.MongoDB;
-using MongoDB.Bson;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 
@@ -17,9 +15,9 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel> : MongoDB.IProjecti
     where TReadModel : class, new()
 {
     /// <summary>
-    /// Gets the <see cref="IPropertyConversionsBuilder"/> used for building the <see cref="ProjectionCopyToMongoDB"/>.
+    /// Gets the <see cref="PropertyConversions"/>.
     /// </summary>
-    IPropertyConversionsBuilder ConversionsBuilder { get; }
+    PropertyConversions Conversions { get; }
 
     /// <summary>
     /// Builds the <see cref="ProjectionCopyToMongoDB"/>.

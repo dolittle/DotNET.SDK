@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections.Builder;

@@ -54,7 +54,12 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
             throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
         }
         
-        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, this, _copyToMongoDbBuilderFactory.CreateFor<TReadModel>());
+        var builder = new ProjectionBuilderForReadModel<TReadModel>(
+            _projectionId,
+            _scopeId,
+            _modelBuilder,
+            this,
+            new ProjectionCopyDefinitionBuilder<TReadModel>(_copyToMongoDbBuilderFactory.CreateFor<TReadModel>()));
         _methodsBuilder = builder;
         return builder;
     }

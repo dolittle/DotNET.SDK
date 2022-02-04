@@ -11,7 +11,6 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 public class ProjectionCopyToMongoDbBuilderFactory : IProjectionCopyToMongoDBBuilderFactory
 {
     readonly IValidateMongoDBCollectionName _collectionNameValidator;
-    readonly IPropertyConversionsBuilder _propertyConversionsBuilder;
     readonly IBuildPropertyConversionsFromBsonClassMap _conversionsFromBsonClassMapBuilder;
     readonly IBuildPropertyConversionsFromMongoDBConvertToAttributes _conversionsFromAttributesBuilder;
 
@@ -19,22 +18,19 @@ public class ProjectionCopyToMongoDbBuilderFactory : IProjectionCopyToMongoDBBui
     /// Initializes a new instance of the <see cref="ProjectionCopyToMongoDbBuilderFactory"/> class.
     /// </summary>
     /// <param name="collectionNameValidator"></param>
-    /// <param name="propertyConversionsBuilder"></param>
     /// <param name="conversionsFromBsonClassMapBuilder"></param>
     /// <param name="conversionsFromAttributesBuilder"></param>
     public ProjectionCopyToMongoDbBuilderFactory(
         IValidateMongoDBCollectionName collectionNameValidator,
-        IPropertyConversionsBuilder propertyConversionsBuilder,
         IBuildPropertyConversionsFromBsonClassMap conversionsFromBsonClassMapBuilder,
         IBuildPropertyConversionsFromMongoDBConvertToAttributes conversionsFromAttributesBuilder)
     {
         _collectionNameValidator = collectionNameValidator;
-        _propertyConversionsBuilder = propertyConversionsBuilder;
         _conversionsFromBsonClassMapBuilder = conversionsFromBsonClassMapBuilder;
         _conversionsFromAttributesBuilder = conversionsFromAttributesBuilder;
     }
     
     /// <inheritdoc />
     public IProjectionCopyToMongoDBBuilder<TReadModel> CreateFor<TReadModel>() where TReadModel : class, new()
-        => new ProjectionCopyToMongoDBBuilder<TReadModel>(_collectionNameValidator, _propertyConversionsBuilder, _conversionsFromBsonClassMapBuilder, new MongoDBCopyDefinitionFromReadModelBuilder(_conversionsFromAttributesBuilder));
+        => new ProjectionCopyToMongoDBBuilder<TReadModel>(_collectionNameValidator, _conversionsFromBsonClassMapBuilder, new MongoDBCopyDefinitionFromReadModelBuilder(_conversionsFromAttributesBuilder));
 }

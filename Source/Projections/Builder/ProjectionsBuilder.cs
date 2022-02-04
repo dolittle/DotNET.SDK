@@ -8,7 +8,6 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Builder.Copies;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Store;
 
@@ -81,13 +80,19 @@ public class ProjectionsBuilder : IProjectionsBuilder
             decorator.GetIdentifier(),
             CreateConventionProjectionBuilderFor(type, decorator));
 
-    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type type, ProjectionAttribute decorator)
+    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType, ProjectionAttribute decorator)
         => Activator.CreateInstance(
-                typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
+                typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType),
                 decorator,
-                _copyToMongoDbBuilderFactory.CreateFor<>())
+                CreateForMethodForReadModel(readModelType).Invoke(_copyToMongoDbBuilderFactory, new object[] {}))
             as ICanTryBuildProjection;
     
+    
+    static MethodInfo CreateForMethodForReadModel(Type readModelType)
+        => typeof(IProjectionCopyToMongoDBBuilderFactory).GetMethod(
+                nameof(IProjectionCopyToMongoDBBuilderFactory.CreateFor),
+                new Type[] {})
+            ?.MakeGenericMethod(readModelType);
     
 
     /// <summary>
