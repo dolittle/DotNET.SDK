@@ -4,18 +4,17 @@
 using System.Collections.Generic;
 using Dolittle.SDK.Common.ClientSetup;
 using Machine.Specifications;
-using MongoDB.Bson;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB.for_DefaultConversionsFromReadModelGetter.given;
+namespace Dolittle.SDK.Projections.Copies.MongoDB.for_ConversionFromAttributeFromReadModelGetter.given;
 
 public class a_resolver
 {
-    protected static DefaultConversionsFromReadModelGetter FromReadModelGetter;
+    protected static ConversionFromAttributeFromReadModelGetter FromAttributeFromReadModelGetter;
     protected static ClientBuildResults build_results;
-    protected static IDictionary<ProjectionField, Conversion> conversions_result;
+    protected static IDictionary<ProjectionPropertyPath, Conversion> conversions_result;
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
-        FromReadModelGetter = new DefaultConversionsFromReadModelGetter();
+        FromAttributeFromReadModelGetter = new ConversionFromAttributeFromReadModelGetter();
     };
 }

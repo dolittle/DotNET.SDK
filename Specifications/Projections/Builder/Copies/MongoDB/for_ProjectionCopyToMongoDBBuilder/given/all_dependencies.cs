@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ProjectionCopyToMo
 
 public class all_dependencies
 {
-    protected static Mock<IGetDefaultConversionsFromReadModel> conversions_from_read_model;
+    protected static Mock<ICanBuildPropertyConversionsFromReadModel> conversions_from_read_model;
     protected static Mock<IValidateMongoDBCollectionName> collection_name_validator;
     protected static ProjectionCopyToMongoDB copy_definition_result;
     protected static IClientBuildResults build_results;
@@ -21,14 +21,14 @@ public class all_dependencies
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
-        conversions_from_read_model = new Mock<IGetDefaultConversionsFromReadModel>();
+        conversions_from_read_model = new Mock<ICanBuildPropertyConversionsFromReadModel>();
         collection_name_validator = new Mock<IValidateMongoDBCollectionName>();
     };
 
     protected static ProjectionCopyToMongoDBBuilder<TReadModel> setup_for<TReadModel>()
         where TReadModel : class, new()
     {
-        conversions_from_read_model.Setup(_ => _.GetFrom<TReadModel>()).Returns(new Dictionary<ProjectionField, Conversion>());
+        conversions_from_read_model.Setup(_ => _.TryBuildFrom<TReadModel>()).Returns(new Dictionary<ProjectionPropertyPath, Conversion>());
         collection_name_validator.Setup(_ => _.Validate(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<ProjectionMongoDBCopyCollectionName>())).Returns(true);
         return new ProjectionCopyToMongoDBBuilder<TReadModel>(collection_name_validator.Object, conversions_from_read_model.Object);
     }

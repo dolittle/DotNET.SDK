@@ -27,6 +27,6 @@ public class and_setting_collection_name : given.all_dependencies
     It should_have_no_conversions = () => copy_definition_result.Conversions.ShouldBeEmpty();
     It should_copy_to_mongo = () => copy_definition_result.ShouldCopy.ShouldBeTrue();
     It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(build_results, collection_name), Times.Once);
-    It should_get_default_conversions = () => conversions_from_read_model.Verify(_ => _.GetFrom<given.read_model_type>(), Times.Once);
+    It should_get_default_conversions = () => conversions_from_read_model.Verify(_ => _.TryBuildFrom<given.read_model_type>(), Times.Once);
     It should_not_have_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

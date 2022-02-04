@@ -2,20 +2,20 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
+using Dolittle.SDK.Common.ClientSetup;
 
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
 /// <summary>
-/// Defines a system that can resolve the BSON conversions for an <see cref="IProjection{TReadModel}"/> for a projection read model <see cref="Type"/>.
+/// Defines a system that can build the property conversions for a projection read model <see cref="Type"/>.
 /// </summary>
-public interface IGetDefaultConversionsFromReadModel
+public interface ICanBuildPropertyConversionsFromReadModel
 {
     /// <summary>
-    /// Gets the conversions for properties of the <typeparamref name="TReadModel"/> projection read model <see cref="Type"/>.
+    /// Builds the <see cref="PropertyConversion"/> conversions from the <typeparamref name="TReadModel"/> projection read model.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
     /// <returns>The default conversions derived from the <typeparamref name="TReadModel"/>.</returns>
-    IEnumerable<PropertyConversion> GetFrom<TReadModel>()
+    bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversionsBuilder conversionsBuilder)
         where TReadModel : class, new();
 }

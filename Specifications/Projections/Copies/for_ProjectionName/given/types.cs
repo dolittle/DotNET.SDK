@@ -1,7 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Dolittle.SDK.Projections.Copies.for_ProjectionField.given;
+namespace Dolittle.SDK.Projections.Copies.for_ProjectionName.given;
 
 
 public class root_type

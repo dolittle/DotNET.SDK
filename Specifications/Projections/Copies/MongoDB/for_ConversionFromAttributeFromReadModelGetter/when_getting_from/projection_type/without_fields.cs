@@ -3,12 +3,12 @@
 
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB.for_DefaultConversionsFromReadModelGetter.when_getting_from.projection_type;
+namespace Dolittle.SDK.Projections.Copies.MongoDB.for_ConversionFromAttributeFromReadModelGetter.when_getting_from.projection_type;
 
 public class without_fields : given.a_resolver
 {
     
-    Because of = () => conversions_result = FromReadModelGetter.GetFrom<given.projection_type_without_fields>();
+    Because of = () => conversions_result = FromAttributeFromReadModelGetter.BuildFrom<given.projection_type_without_fields>();
     
     It should_have_no_conversions = () => conversions_result.ShouldBeEmpty();
 }

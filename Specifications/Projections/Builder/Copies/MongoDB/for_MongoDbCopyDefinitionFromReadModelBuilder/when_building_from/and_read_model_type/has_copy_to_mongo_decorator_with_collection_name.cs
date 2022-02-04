@@ -29,5 +29,5 @@ public class has_copy_to_mongo_decorator_with_collection_name : given.all_depend
     It should_not_result_in_failed_build_results = () => build_results.Failed.ShouldBeFalse();
     It should_call_copy_to_mongodb_once = () => definition_builder.Verify(_ => _.CopyToMongoDB(Moq.It.IsAny<Action<IProjectionCopyToMongoDBBuilder<projection_type_with_mongo_db_copy_and_collection_name>>>()), Times.Once);
     It should_add_the_collection_name = () => mongo_builder.Verify(_ => _.ToCollection(collection_name), Times.Once);
-    It should_not_add_any_conversions_ = () => mongo_builder.Verify(_ => _.WithConversion(Moq.It.IsAny<ProjectionField>(), Moq.It.IsAny<Conversion>()), Times.Never);
+    It should_not_add_any_conversions_ = () => mongo_builder.Verify(_ => _.WithConversion(Moq.It.IsAny<ProjectionPropertyPath>(), Moq.It.IsAny<Conversion>()), Times.Never);
 }

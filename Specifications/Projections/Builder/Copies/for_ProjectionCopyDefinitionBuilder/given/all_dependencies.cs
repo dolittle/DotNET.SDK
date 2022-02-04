@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.for_ProjectionCopyDefinitionBu
 public class all_dependencies
 {
     protected static Mock<IValidateMongoDBCollectionName> collection_name_validator;
-    protected static Mock<IGetDefaultConversionsFromReadModel> default_conversions_getter;
+    protected static Mock<ICanBuildPropertyConversionsFromReadModel> default_conversions_getter;
     protected static IClientBuildResults build_results;
     protected static ProjectionCopies result_copies;
     protected static bool succeeded;
@@ -20,7 +20,7 @@ public class all_dependencies
     Establish context = () =>
     {
         collection_name_validator = new Mock<IValidateMongoDBCollectionName>();
-        default_conversions_getter = new Mock<IGetDefaultConversionsFromReadModel>();
+        default_conversions_getter = new Mock<ICanBuildPropertyConversionsFromReadModel>();
         build_results = new ClientBuildResults();
     };
     

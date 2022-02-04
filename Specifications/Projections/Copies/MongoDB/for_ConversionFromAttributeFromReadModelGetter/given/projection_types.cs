@@ -4,7 +4,7 @@
 using System;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB.for_DefaultConversionsFromReadModelGetter.given;
+namespace Dolittle.SDK.Projections.Copies.MongoDB.for_ConversionFromAttributeFromReadModelGetter.given;
 
 public class projection_type_without_fields
 {

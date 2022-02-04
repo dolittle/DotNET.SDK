@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq.Expressions;
-using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 using MongoDB.Bson;
 
@@ -23,14 +22,6 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel>
     /// <returns>The builder for continuation</returns>
     IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(ProjectionMongoDBCopyCollectionName name);
 
-    /// <summary>
-    /// Sets the conversion from a field to a <see cref="BsonType"/>.
-    /// </summary>
-    /// <param name="field">The name of the field.</param>
-    /// <param name="conversion">The <see cref="Conversion" />.</param>
-    /// <returns>The builder for continuation</returns>
-    IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(ProjectionField field, Conversion conversion);
-    
     /// <summary>
     /// Sets the conversion from a field to a <see cref="BsonType"/>.
     /// </summary>

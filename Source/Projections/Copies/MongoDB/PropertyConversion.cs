@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// <param name="ConvertTo">The <see cref="Conversion"/> type of this projection property.</param>
 /// <param name="Children">The <see cref="IEnumerable{T}"/> of <see cref="PropertyConversion"/> child properties.</param>
 /// <param name="RenameTo">The new name this projection property should be renamed to.</param>
-public record PropertyConversion(ProjectionField PropertyName, Conversion ConvertTo, IEnumerable<PropertyConversion> Children, ProjectionField RenameTo = default)
+public record PropertyConversion(ProjectionPropertyName PropertyName, Conversion ConvertTo, IEnumerable<PropertyConversion> Children, ProjectionPropertyName RenameTo = default)
 {
     /// <summary>
     /// Converts to <see cref="Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.PropertyConversion"/>.
@@ -32,6 +32,7 @@ public record PropertyConversion(ProjectionField PropertyName, Conversion Conver
         
         return result;
     }
+
     static Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType ToProtobuf(Conversion type)
         => type switch
         {
@@ -41,3 +42,4 @@ public record PropertyConversion(ProjectionField PropertyName, Conversion Conver
             _ => throw new UnsupportedConversion(type)
         };
 }
+

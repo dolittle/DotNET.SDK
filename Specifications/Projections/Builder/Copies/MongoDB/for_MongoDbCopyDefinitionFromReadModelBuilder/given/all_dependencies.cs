@@ -11,12 +11,12 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_MongoDbCopyDefinit
 public class all_dependencies
 {
     protected static ClientBuildResults build_results;
-    protected static MongoDbCopyDefinitionFromReadModelBuilder CopyDefinitionFromReadModelBuilder;
+    protected static MongoDBCopyDefinitionFromReadModelBuilder<> CopyDefinitionFromReadModelBuilder;
 
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
-        CopyDefinitionFromReadModelBuilder = new MongoDbCopyDefinitionFromReadModelBuilder();
+        CopyDefinitionFromReadModelBuilder = new MongoDBCopyDefinitionFromReadModelBuilder<>();
     };
 
     protected static Mock<IProjectionCopyDefinitionBuilder<TReadModel>> get_builder_for<TReadModel>(IProjectionCopyToMongoDBBuilder<TReadModel> mongo_builder)

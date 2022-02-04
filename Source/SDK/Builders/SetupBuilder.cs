@@ -51,10 +51,10 @@ public class SetupBuilder : ISetupBuilder
         _eventHandlersBuilder = new EventHandlersBuilder(_modelBuilder, _buildResults);
         _embeddingsBuilder = new EmbeddingsBuilder(_modelBuilder, _buildResults);
 
-        var copyDefinitionBuilderCreator = new CopiesDefinitionBuilderCreator(new MongoDbCollectionNameValidator(), new DefaultConversionsFromReadModelGetter());
+        var copyDefinitionBuilderCreator = new CopiesDefinitionBuilderCreator(new MongoDbCollectionNameValidator(), new ConversionFromAttributeFromReadModelGetter());
         var projectionCopiesBuilders = new ProjectionCopiesFromReadModelBuilders(new[]
             {
-                new MongoDbCopyDefinitionFromReadModelBuilder()
+                new MongoDBCopyDefinitionFromReadModelBuilder<>()
             }, copyDefinitionBuilderCreator);
         _projectionsBuilder = new ProjectionsBuilder(_modelBuilder, _buildResults, projectionCopiesBuilders, copyDefinitionBuilderCreator);
     }

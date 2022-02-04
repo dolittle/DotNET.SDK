@@ -3,30 +3,26 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.Projections.Copies;
 
-namespace Dolittle.SDK.Projections.Builder.Copies;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 
 /// <summary>
-/// Defines a system that can build a copy definition part of the <see cref="ProjectionCopies"/> from a projection read model <see cref="Type"/>. 
+/// Defines a system that builds a <see cref="MongoDBCopyDefinitionFromReadModelBuilder{TReadModel}"/> from a projection read model <see cref="Type"/>. 
 /// </summary>
-public interface ICanBuildCopyDefinitionFromReadModel
+public interface IMongoDBCopyDefinitionFromReadModelBuilder
 {
     /// <summary>
-    /// Gets whether this can build a copy definition from the given <typeparamref namef="TReadModel"/>.
+    /// Checks whether a <see cref="Projections.Copies.MongoDB.ProjectionCopyToMongoDB"/> can be built from the <typeparamref name="TReadModel"/>.
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
-    /// <returns>True if the copy definition can be built from <typeparamref name="TReadModel"/>, false if not.</returns>
-    bool CanBuildFrom<TReadModel>()
+    /// <returns>True if can be built, false if not.</returns>
+    bool CanBuild<TReadModel>()
         where TReadModel : class, new();
-
     /// <summary>
     /// Builds the copy definition from the <typeparamref name="TReadModel"/> using the given <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.
     /// </summary>
-    /// The <see cref="IClientBuildResults"/>.
-    /// The <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
     /// <returns>True if successfully built copy definition, false if not.</returns>
-    bool BuildFrom<TReadModel>(IClientBuildResults buildResults, IProjectionCopyDefinitionBuilder<TReadModel> builder)
+    bool TryBuild<TReadModel>(IClientBuildResults buildResults, IProjectionCopyToMongoDBBuilder<TReadModel> copyToMongoDBBuilder)
         where TReadModel : class, new();
 }

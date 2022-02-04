@@ -14,16 +14,16 @@ public class and_adding_conversion_to_field_that_does_not_exist : given.all_depe
 {
     static ProjectionCopyToMongoDBBuilder<given.read_model_type> builder;
     static ProjectionMongoDBCopyCollectionName name_of_type;
-    static ProjectionField field;
+    static ProjectionPropertyPath _propertyPath;
     static Conversion conversion;
     
     Establish context = () =>
     {
         builder = setup_for<given.read_model_type>();
         name_of_type = nameof(given.read_model_type);
-        field = "SomeField";
+        _propertyPath = "SomeField";
         conversion = Conversion.Guid;
-        builder.WithConversion(field, conversion);
+        builder.WithConversion(_propertyPath, conversion);
     };
     
     Because of = () => succeeded = builder.TryBuild(build_results, out copy_definition_result);

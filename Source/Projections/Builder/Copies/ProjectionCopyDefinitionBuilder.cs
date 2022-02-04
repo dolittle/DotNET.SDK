@@ -16,24 +16,23 @@ namespace Dolittle.SDK.Projections.Builder.Copies;
 public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefinitionBuilder<TReadModel>
     where TReadModel : class, new()
 {
-    readonly ProjectionCopyToMongoDBBuilder<TReadModel> _mongoDbBuilder;
+    readonly MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TReadModel> _copyToMongoDBBuilder;
     bool _copyToMongoDB;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionCopyDefinitionBuilder{TReadModel}"/> class.
     /// </summary>
-    /// <param name="mongoDBCOllectionNameValidator">The <see cref="IValidateMongoDBCollectionName"/>.</param>
-    /// <param name="defaultBsonConversionGetter">The <see cref="IGetDefaultConversionsFromReadModel"/>.</param>
-    public ProjectionCopyDefinitionBuilder(IValidateMongoDBCollectionName mongoDBCOllectionNameValidator, IGetDefaultConversionsFromReadModel defaultBsonConversionGetter)
+    /// <param name="copyToMongoDBBuilder">The <see cref="MongoDB.Internal.IProjectionCopyToMongoDBBuilder{TReadModel}"/>.</param>
+    public ProjectionCopyDefinitionBuilder(MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TReadModel> copyToMongoDBBuilder)
     {
-        _mongoDbBuilder = new ProjectionCopyToMongoDBBuilder<TReadModel>(mongoDBCOllectionNameValidator, defaultBsonConversionGetter);
+        _copyToMongoDBBuilder = copyToMongoDBBuilder;
     }
 
     /// <inheritdoc />
     public IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default)
     {
         _copyToMongoDB = true;
-        callback?.Invoke(_mongoDbBuilder);
+        callback?.Invoke(_copyToMongoDBBuilder);
         return this;
     }
 
@@ -44,7 +43,7 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
         var succeeded = true;
         var mongoDBCopy = ProjectionCopyToMongoDB.Default;
         
-        if (_copyToMongoDB && !_mongoDbBuilder.TryBuild(buildResults, out mongoDBCopy))
+        if (_copyToMongoDB && !_copyToMongoDBBuilder.TryBuild(buildResults, out mongoDBCopy))
         {
             buildResults.AddFailure($"Failed to build Copy To MongoDB Definition");
             succeeded = false;
