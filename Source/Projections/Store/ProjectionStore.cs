@@ -53,6 +53,21 @@ public class ProjectionStore : IProjectionStore
         _logger = logger;
     }
 
+    /// <inheritdoc />
+    public IProjectionOf<TProjection> Of<TProjection>()
+        where TProjection : class, new()
+        => new ProjectionOf<TProjection>(this, _projectionAssociations.GetFor<TProjection>());
+
+    /// <inheritdoc />
+    public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
+        where TReadModel : class, new()
+        => new ProjectionOf<TReadModel>(this, new ScopedProjectionId(projectionId, ScopeId.Default));
+
+    /// <inheritdoc />
+    public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
+        where TReadModel : class, new()
+        => new ProjectionOf<TReadModel>(this, new ScopedProjectionId(projectionId, scopeId));
+
     /// <inheritdoc/>
     public Task<TProjection> Get<TProjection>(Key key, CancellationToken cancellation = default)
         where TProjection : class, new()
@@ -62,9 +77,9 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc/>
-    public Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
-        where TProjection : class, new()
-        => Get<TProjection>(key, projectionId, ScopeId.Default, cancellation);
+    public Task<TReadModel> Get<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
+        where TReadModel : class, new()
+        => Get<TReadModel>(key, projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
     public Task<object> Get(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
@@ -83,9 +98,9 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc />
-    public Task<CurrentState<TProjection>> GetState<TProjection>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
-        where TProjection : class, new()
-        => GetState<TProjection>(key, projectionId, ScopeId.Default, cancellation);
+    public Task<CurrentState<TReadModel>> GetState<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
+        where TReadModel : class, new()
+        => GetState<TReadModel>(key, projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc />
     public Task<CurrentState<object>> GetState(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
@@ -96,11 +111,11 @@ public class ProjectionStore : IProjectionStore
         => GetState<object>(key, projectionId, scopeId, cancellation);
 
     /// <inheritdoc />
-    public Task<CurrentState<TProjection>> GetState<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
-        where TProjection : class, new()
+    public Task<CurrentState<TReadModel>> GetState<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        where TReadModel : class, new()
     {
-        Log.GettingOneProjectionState(_logger, key, projectionId, typeof(TProjection), scopeId);
-        return GetStateInternal<TProjection>(
+        Log.GettingOneProjectionState(_logger, key, projectionId, typeof(TReadModel), scopeId);
+        return GetStateInternal<TReadModel>(
             key,
             projectionId,
             scopeId,
@@ -108,11 +123,11 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc/>
-    public Task<TProjection> Get<TProjection>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
-        where TProjection : class, new()
+    public Task<TReadModel> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        where TReadModel : class, new()
     {
-        Log.GettingOneProjection(_logger, key, projectionId, typeof(TProjection), scopeId);
-        return GetStateInternal<TProjection>(
+        Log.GettingOneProjection(_logger, key, projectionId, typeof(TReadModel), scopeId);
+        return GetStateInternal<TReadModel>(
             key,
             projectionId,
             scopeId,
@@ -128,9 +143,9 @@ public class ProjectionStore : IProjectionStore
     }
 
     /// <inheritdoc/>
-    public Task<IEnumerable<TProjection>> GetAll<TProjection>(ProjectionId projectionId, CancellationToken cancellation = default)
-        where TProjection : class, new()
-        => GetAll<TProjection>(projectionId, ScopeId.Default, cancellation);
+    public Task<IEnumerable<TReadModel>> GetAll<TReadModel>(ProjectionId projectionId, CancellationToken cancellation = default)
+        where TReadModel : class, new()
+        => GetAll<TReadModel>(projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>
     public Task<IEnumerable<object>> GetAll(ProjectionId projectionId, CancellationToken cancellation = default)
@@ -141,16 +156,16 @@ public class ProjectionStore : IProjectionStore
         => GetAll<object>(projectionId, scopeId, cancellation);
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<TProjection>> GetAll<TProjection>(ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
-        where TProjection : class, new()
+    public async Task<IEnumerable<TReadModel>> GetAll<TReadModel>(ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+        where TReadModel : class, new()
     {
         Log.GettingAllProjections(
             _logger,
             projectionId,
-            typeof(TProjection),
+            typeof(TReadModel),
             scopeId);
 
-        var result = new Dictionary<Key, CurrentState<TProjection>>();
+        var result = new Dictionary<Key, CurrentState<TReadModel>>();
         var batchNumber = 0;
         await foreach (var response in _caller.Call(
                            _getAllInBatchesMethod,
@@ -160,9 +175,9 @@ public class ProjectionStore : IProjectionStore
             response.Failure.ThrowIfFailureIsSet();
             Log.ProcessingProjectionsInBatch(_logger, ++batchNumber, response.States.Count);
 
-            if (!_toSDK.TryConvert<TProjection>(response.States, out var states, out var error))
+            if (!_toSDK.TryConvert<TReadModel>(response.States, out var states, out var error))
             {
-                Log.FailedToConvertProjectionStates(_logger, error, response.States.Select(_ => _.State), typeof(TProjection));
+                Log.FailedToConvertProjectionStates(_logger, error, response.States.Select(_ => _.State), typeof(TReadModel));
                 throw error;
             }
             foreach (var (key, value) in states.ToDictionary(_ => _.Key))
@@ -176,12 +191,12 @@ public class ProjectionStore : IProjectionStore
         return result.Values.Select(_ => _.State);
     }
     
-    async Task<CurrentState<TProjection>> GetStateInternal<TProjection>(
+    async Task<CurrentState<TReadModel>> GetStateInternal<TReadModel>(
         Key key,
         ProjectionId projectionId,
         ScopeId scopeId,
         CancellationToken cancellation = default)
-        where TProjection : class, new()
+        where TReadModel : class, new()
     {
         var response = await _caller.Call(
             _getOneMethod,
@@ -189,16 +204,16 @@ public class ProjectionStore : IProjectionStore
             cancellation).ConfigureAwait(false);
         response.Failure.ThrowIfFailureIsSet();
 
-        if (_toSDK.TryConvert<TProjection>(response.State, out var state, out var error))
+        if (_toSDK.TryConvert<TReadModel>(response.State, out var state, out var error))
         {
             ThrowIfIncorrectCurrentState(key, projectionId, state);
             return state;
         }
-        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TProjection));
+        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TReadModel));
         throw error;
     }
-    static void ThrowIfIncorrectCurrentState<TProjection>(Key key, ProjectionId projectionId, CurrentState<TProjection> state)
-        where TProjection : class, new()
+    static void ThrowIfIncorrectCurrentState<TReadModel>(Key key, ProjectionId projectionId, CurrentState<TReadModel> state)
+        where TReadModel : class, new()
     {
         if (!state.Key.Equals(key))
         {

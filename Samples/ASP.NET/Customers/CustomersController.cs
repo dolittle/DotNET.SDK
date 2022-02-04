@@ -10,18 +10,18 @@ namespace Customers;
 [Route("/api/customers")]
 public class CustomerController : ControllerBase
 {
-    readonly IProjectionStore _projections;
+    readonly IProjectionOf<DishesEaten> _dishesEaten;
 
-    public CustomerController(IProjectionStore projections)
+    public CustomerController(IProjectionOf<DishesEaten> dishesEaten)
     {
-        _projections = projections;
+        _dishesEaten = dishesEaten;
     }
 
     [HttpGet("{customer}")]
     public async Task<string[]> GetDishesEaten([FromRoute]string customer)
     {
-        var state = await _projections
-            .Get<DishesEaten>(customer, HttpContext.RequestAborted)
+        var state = await _dishesEaten
+            .Get(customer, HttpContext.RequestAborted)
             .ConfigureAwait(false);
 
         return state.Dishes;
