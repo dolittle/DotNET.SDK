@@ -20,7 +20,7 @@ public class and_building_conversions_from_attributes_failes : given.all_depende
         collection_name = nameof(projection_type_with_mongo_db_copy);
         mongo_builder = new Mock<IProjectionCopyToMongoDBBuilder<projection_type_with_mongo_db_copy>>();
         conversions_from_convert_to_attributes
-            .Setup(_ => _.TryBuildFrom<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<PropertyConversions>()))
+            .Setup(_ => _.TryBuildFrom<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()))
             .Returns(false);
     };
 
@@ -29,5 +29,5 @@ public class and_building_conversions_from_attributes_failes : given.all_depende
     It should_not_succeed = () => succeeded.ShouldBeFalse();
     It should_result_in_failed_build_results = () => build_results.Failed.ShouldBeTrue();
     It should_not_add_a_collection_name = () => mongo_builder.Verify(_ => _.ToCollection(Moq.It.IsAny<ProjectionMongoDBCopyCollectionName>()), Times.Never);
-    It should_build_conversions_from_attributes = () => conversions_from_convert_to_attributes.Verify(_ => _.TryBuildFrom<projection_type_with_mongo_db_copy>(build_results, Moq.It.IsAny<PropertyConversions>()), Times.Once);
+    It should_build_conversions_from_attributes = () => conversions_from_convert_to_attributes.Verify(_ => _.TryBuildFrom<projection_type_with_mongo_db_copy>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
 }

@@ -16,17 +16,6 @@ public class PropertyPathResolver : IResolvePropertyPath
     public PropertyPath FromExpression<TSchema, TProperty>(Expression<Func<TSchema, TProperty>> propertyExpression) where TSchema : class
     {
         var propertyNames = new List<PropertyName>();
-        // if (propertyExpression.Body is not MemberExpression member)
-        // {
-        //     throw new ArgumentException($"Expression {propertyExpression.Name} refers to a method, not a class member");
-        // }
-        //
-        // propertyNames.Add(member.Member.Name);
-        // while (member?.Expression is MemberExpression subExpression)
-        // {
-        //     member = subExpression;
-        //     propertyNames.Add(member.Member.Name);
-        // }
         var expressionToCheck = propertyExpression.Body;
         while (expressionToCheck is not null && expressionToCheck.NodeType != ExpressionType.Parameter)
         {

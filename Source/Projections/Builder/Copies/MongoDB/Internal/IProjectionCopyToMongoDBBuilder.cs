@@ -15,9 +15,9 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel> : MongoDB.IProjecti
     where TReadModel : class, new()
 {
     /// <summary>
-    /// Gets the <see cref="PropertyConversions"/>.
+    /// Gets the <see cref="IPropertyConversions"/>.
     /// </summary>
-    PropertyConversions Conversions { get; }
+    IPropertyConversions Conversions { get; }
 
     /// <summary>
     /// Builds the <see cref="ProjectionCopyToMongoDB"/>.

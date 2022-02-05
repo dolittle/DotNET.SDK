@@ -3,8 +3,9 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 /// <summary>
 /// Defines a system that can build the property conversions for a projection read model <see cref="Type"/>.
@@ -16,8 +17,8 @@ public interface ICanBuildPropertyConversionsFromReadModel
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="conversions">The <see cref="PropertyConversions"/>.</param>
+    /// <param name="conversions">The <see cref="IPropertyConversions"/>.</param>
     /// <returns>The default conversions derived from the <typeparamref name="TReadModel"/>.</returns>
-    bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, PropertyConversions conversions)
+    bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
         where TReadModel : class, new();
 }

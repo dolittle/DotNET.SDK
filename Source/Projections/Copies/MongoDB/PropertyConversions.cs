@@ -7,9 +7,9 @@ using System.Linq;
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
 /// <summary>
-/// Represents <see cref="PropertyConversion"/> as nodes in a tree-structure where the tree hierarchy is based off <see cref="PropertyPath"/>.
+/// Represents an implementation of <see cref="IPropertyConversions"/> using <see cref="PropertyConversion"/> as nodes in a tree-structure where the tree hierarchy is based off <see cref="PropertyPath"/>.
 /// </summary>
-public class PropertyConversions
+public class PropertyConversions : IPropertyConversions
 {
     class PropertyConversionNode
     {

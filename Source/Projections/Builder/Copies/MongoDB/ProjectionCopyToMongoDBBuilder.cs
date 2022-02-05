@@ -49,7 +49,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     }
 
     /// <inheritdoc />
-    public PropertyConversions Conversions { get; }
+    public IPropertyConversions Conversions { get; }
 
     /// <inheritdoc />
     public IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(ProjectionMongoDBCopyCollectionName name)
