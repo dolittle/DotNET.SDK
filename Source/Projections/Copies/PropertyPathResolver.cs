@@ -28,11 +28,15 @@ public class PropertyPathResolver : IResolvePropertyPath
         //     propertyNames.Add(member.Member.Name);
         // }
         var expressionToCheck = propertyExpression.Body;
-        while (expressionToCheck is not null)
+        while (expressionToCheck is not null && expressionToCheck.NodeType != ExpressionType.Parameter)
         {
-            switch (expressionToCheck)
+            switch (expressionToCheck.NodeType)
             {
-                case MemberExpression memberExpression:
+                case ExpressionType.MemberAccess:
+                    if (expressionToCheck is not MemberExpression memberExpression)
+                    {
+                        throw new ArgumentException($"Expression {propertyExpression.Name} must refer to a class member");
+                    }
                     propertyNames.Add(memberExpression.Member.Name);
                     expressionToCheck = memberExpression.Expression;
                     break;
@@ -40,7 +44,8 @@ public class PropertyPathResolver : IResolvePropertyPath
                     throw new ArgumentException($"Expression {propertyExpression.Name} must refer to a class member");
             }
         }
-
+        // The member names gets added to the list in reverse order
+        propertyNames.Reverse();
         return string.Join('.', propertyNames);
     }
 }
