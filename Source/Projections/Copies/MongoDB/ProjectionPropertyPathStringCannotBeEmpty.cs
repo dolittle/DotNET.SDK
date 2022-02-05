@@ -6,7 +6,7 @@ using System;
 namespace Dolittle.SDK.Projections.Copies.MongoDB;
 
 /// <summary>
-/// Exception that gets thrown if a <see cref="ProjectionPropertyPathString"/> is null or empty.
+/// Exception that gets thrown if a <see cref="PropertyPath"/> is null or empty.
 /// </summary>
 public class ProjectionPropertyPathStringCannotBeEmpty : Exception
 {

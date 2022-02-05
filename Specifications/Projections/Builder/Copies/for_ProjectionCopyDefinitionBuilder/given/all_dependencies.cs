@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 using Machine.Specifications;
@@ -11,21 +12,21 @@ namespace Dolittle.SDK.Projections.Builder.Copies.for_ProjectionCopyDefinitionBu
 
 public class all_dependencies
 {
-    protected static Mock<IValidateMongoDBCollectionName> collection_name_validator;
-    protected static Mock<ICanBuildPropertyConversionsFromReadModel> default_conversions_getter;
     protected static IClientBuildResults build_results;
     protected static ProjectionCopies result_copies;
     protected static bool succeeded;
-
+    
     Establish context = () =>
     {
-        collection_name_validator = new Mock<IValidateMongoDBCollectionName>();
-        default_conversions_getter = new Mock<ICanBuildPropertyConversionsFromReadModel>();
         build_results = new ClientBuildResults();
     };
     
-    protected static ProjectionCopyDefinitionBuilder<TReadModel> get_definition_builder_for<TReadModel>()
+    protected static ProjectionCopyDefinitionBuilder<TReadModel> get_definition_builder_with<TReadModel>(MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TReadModel> copy_to_mongo_DB_builder)
         where TReadModel : class, new()
-        => new(collection_name_validator.Object, default_conversions_getter.Object);
+        => new(copy_to_mongo_DB_builder);
+
+    protected static Mock<MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TReadModel>> get_mongo_db_builder_for<TReadModel>()
+        where TReadModel : class, new()
+        => new();
 
 }

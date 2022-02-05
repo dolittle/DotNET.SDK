@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// <param name="ConvertTo">The <see cref="Conversion"/> type of this projection property.</param>
 /// <param name="Children">The <see cref="IEnumerable{T}"/> of <see cref="PropertyConversion"/> child properties.</param>
 /// <param name="RenameTo">The new name this projection property should be renamed to.</param>
-public record PropertyConversion(ProjectionPropertyName PropertyName, Conversion ConvertTo, IEnumerable<PropertyConversion> Children, ProjectionPropertyName RenameTo = default)
+public record PropertyConversion(PropertyName PropertyName, Conversion ConvertTo, IEnumerable<PropertyConversion> Children, PropertyName RenameTo = default)
 {
     /// <summary>
     /// Converts to <see cref="Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.PropertyConversion"/>.

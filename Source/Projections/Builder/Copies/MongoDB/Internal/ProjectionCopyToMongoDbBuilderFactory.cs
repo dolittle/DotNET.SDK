@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
@@ -13,6 +14,7 @@ public class ProjectionCopyToMongoDbBuilderFactory : IProjectionCopyToMongoDBBui
     readonly IValidateMongoDBCollectionName _collectionNameValidator;
     readonly IBuildPropertyConversionsFromBsonClassMap _conversionsFromBsonClassMapBuilder;
     readonly IBuildPropertyConversionsFromMongoDBConvertToAttributes _conversionsFromAttributesBuilder;
+    readonly IResolvePropertyPath _propertyPathResolver;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionCopyToMongoDbBuilderFactory"/> class.
@@ -20,17 +22,20 @@ public class ProjectionCopyToMongoDbBuilderFactory : IProjectionCopyToMongoDBBui
     /// <param name="collectionNameValidator"></param>
     /// <param name="conversionsFromBsonClassMapBuilder"></param>
     /// <param name="conversionsFromAttributesBuilder"></param>
+    /// <param name="propertyPathResolver">The <see cref="IResolvePropertyPath"/>.</param>
     public ProjectionCopyToMongoDbBuilderFactory(
         IValidateMongoDBCollectionName collectionNameValidator,
         IBuildPropertyConversionsFromBsonClassMap conversionsFromBsonClassMapBuilder,
-        IBuildPropertyConversionsFromMongoDBConvertToAttributes conversionsFromAttributesBuilder)
+        IBuildPropertyConversionsFromMongoDBConvertToAttributes conversionsFromAttributesBuilder,
+        IResolvePropertyPath propertyPathResolver)
     {
         _collectionNameValidator = collectionNameValidator;
         _conversionsFromBsonClassMapBuilder = conversionsFromBsonClassMapBuilder;
         _conversionsFromAttributesBuilder = conversionsFromAttributesBuilder;
+        _propertyPathResolver = propertyPathResolver;
     }
     
     /// <inheritdoc />
     public IProjectionCopyToMongoDBBuilder<TReadModel> CreateFor<TReadModel>() where TReadModel : class, new()
-        => new ProjectionCopyToMongoDBBuilder<TReadModel>(_collectionNameValidator, _conversionsFromBsonClassMapBuilder, new MongoDBCopyDefinitionFromReadModelBuilder(_conversionsFromAttributesBuilder));
+        => new ProjectionCopyToMongoDBBuilder<TReadModel>(_collectionNameValidator, _conversionsFromBsonClassMapBuilder, new MongoDBCopyDefinitionFromReadModelBuilder(_conversionsFromAttributesBuilder), _propertyPathResolver);
 }

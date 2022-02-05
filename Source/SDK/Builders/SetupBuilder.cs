@@ -18,6 +18,7 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Builder.Copies;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
+using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 using Microsoft.Extensions.Logging;
 
@@ -59,7 +60,8 @@ public class SetupBuilder : ISetupBuilder
             new ProjectionCopyToMongoDbBuilderFactory(
                 new MongoDbCollectionNameValidator(),
                 new ConversionsFromBsonClassMapBuilder(),
-                new ConversionsFromMongoDBConvertToAttributesBuilder()));
+                new ConversionsFromMongoDBConvertToAttributesBuilder(),
+                new PropertyPathResolver()));
     }
 
     /// <inheritdoc />

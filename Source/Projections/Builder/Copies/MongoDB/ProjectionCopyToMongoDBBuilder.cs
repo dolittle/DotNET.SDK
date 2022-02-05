@@ -22,8 +22,10 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     readonly IValidateMongoDBCollectionName _collectionNameValidator;
     readonly IBuildPropertyConversionsFromBsonClassMap _conversionsFromBSONClassMap;
     readonly IMongoDBCopyDefinitionFromReadModelBuilder _mongoDbCopyFromReadModelBuilder;
+    readonly IResolvePropertyPath _propertyPathResolver;
     ProjectionMongoDBCopyCollectionName _collectionName;
     bool _withoutDefaultConversions;
+    Dictionary<PropertyPath, Conversion> _explicitConversions = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionCopyToMongoDBBuilder{TReadMOdel}"/> class.
@@ -31,15 +33,18 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     /// <param name="collectionNameValidator">The <see cref="IValidateMongoDBCollectionName"/>.</param>
     /// <param name="conversionsFromBSONClassMap">The <see cref="IBuildPropertyConversionsFromBsonClassMap"/>.</param>
     /// <param name="mongoDBCopyFromReadModelBuilder">The <see cref="IMongoDBCopyDefinitionFromReadModelBuilder"/>.</param>
+    /// <param name="propertyPathResolver">The <see cref="IResolvePropertyPath"/>.</param>
     public ProjectionCopyToMongoDBBuilder(
         IValidateMongoDBCollectionName collectionNameValidator,
         IBuildPropertyConversionsFromBsonClassMap conversionsFromBSONClassMap,
-        IMongoDBCopyDefinitionFromReadModelBuilder mongoDBCopyFromReadModelBuilder)
+        IMongoDBCopyDefinitionFromReadModelBuilder mongoDBCopyFromReadModelBuilder,
+        IResolvePropertyPath propertyPathResolver)
     {
         Conversions = new PropertyConversions();
         _collectionNameValidator = collectionNameValidator;
         _conversionsFromBSONClassMap = conversionsFromBSONClassMap;
         _mongoDbCopyFromReadModelBuilder = mongoDBCopyFromReadModelBuilder;
+        _propertyPathResolver = propertyPathResolver;
         _collectionName = ProjectionMongoDBCopyCollectionName.GetFrom<TReadModel>();
     }
 
@@ -56,7 +61,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     /// <inheritdoc />
     public IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion<TProperty>(Expression<Func<TReadModel, TProperty>> fieldExpression, Conversion conversion)
     {
-        Conversions.AddConversion(GetPathStringFromExpression(fieldExpression), conversion);
+        _explicitConversions[_propertyPathResolver.FromExpression(fieldExpression)] = conversion;
         return this;
     }
 
@@ -87,6 +92,10 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
         {
             return false;
         }
+        foreach (var (path, conversion) in _explicitConversions)
+        {
+            Conversions.AddConversion(path, conversion);
+        }
         copyDefinition = new ProjectionCopyToMongoDB(true, _collectionName, Conversions.GetAll());
         return true;
     }
@@ -101,23 +110,5 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
         }
         copyDefinition = ProjectionCopyToMongoDB.Default;
         return true;
-    }
-
-    static ProjectionPropertyPathString GetPathStringFromExpression<TProperty>(Expression<Func<TReadModel, TProperty>> fieldExpression)
-    {
-        var propertyNames = new List<ProjectionPropertyName>();
-        if (fieldExpression.Body is not MemberExpression member)
-        {
-            throw new ArgumentException($"Expression {fieldExpression.Name} refers to a method, not a class member");
-        }
-        propertyNames.Add(member.Member.Name);
-
-        while (member?.Expression is MemberExpression subExpression)
-        {
-            member = subExpression;
-            propertyNames.Add(member.Member.Name);
-        }
-        
-        return string.Join('.', propertyNames);
     }
 }

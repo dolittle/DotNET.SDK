@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Builder\Copies\MongoDB\Internal" />
       <Folder Include="Copies\MongoDB\for_PropertyConversionsBuilder" />
     </ItemGroup>
 
