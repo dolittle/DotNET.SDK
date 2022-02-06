@@ -27,35 +27,44 @@ public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyCo
         return true;
     }
 
-    Dictionary<PropertyPath, Conversion> GetConversionsFromType(Type type, HashSet<Type> checkedTypes)
+    static Dictionary<PropertyPath, Conversion> GetConversionsFromType(Type type, HashSet<Type> checkedTypes)
     {
         var conversions = new Dictionary<PropertyPath, Conversion>();
-        foreach (var property in type.GetProperties().Where(_ => !checkedTypes.Contains(_.PropertyType)))
+        foreach (var member in type.GetMembers())
         {
-            var attribute = property.GetCustomAttribute<MongoDBConvertToAttribute>();
-            if (attribute is null)
+            var attribute = member.GetCustomAttribute<MongoDBConvertToAttribute>();
+            if (attribute is null
+                || !TryGetMemberNameAndTypeToCheck(member, out var typeToCheck, out var propertyName)
+                || checkedTypes.Contains(typeToCheck))
             {
                 continue;
             }
-            conversions[property.Name] = attribute.Conversion;
-            foreach (var (childProperty, childConversion) in GetConversionsFromType(property.PropertyType, checkedTypes.Append(type).ToHashSet()))
+            conversions[propertyName.Value] = attribute.Conversion;
+            foreach (var (childProperty, childConversion) in GetConversionsFromType(typeToCheck, checkedTypes.Append(type).ToHashSet()))
             {
-                conversions[string.Join('.', property.Name, childProperty)] = childConversion;
+                conversions[string.Join('.', propertyName, childProperty)] = childConversion;
             }
         }
-        foreach (var field in type.GetFields().Where(_ => !checkedTypes.Contains(_.FieldType)))
-        {
-            var attribute = field.GetCustomAttribute<MongoDBConvertToAttribute>();
-            if (attribute is null)
-            {
-                continue;
-            }
-            conversions[field.Name] = attribute.Conversion;
-            foreach (var (childProperty, childConversion) in GetConversionsFromType(field.FieldType, checkedTypes.Append(type).ToHashSet()))
-            {
-                conversions[string.Join('.', field.Name, childProperty)] = childConversion;
-            }
-        }
+
         return conversions;
+    }
+
+    static bool TryGetMemberNameAndTypeToCheck(MemberInfo member, out Type typeToCheck, out PropertyName memberName)
+    {
+        typeToCheck = default;
+        memberName = default;
+        switch (member)
+        {
+            case PropertyInfo property:
+                typeToCheck = property.PropertyType;
+                memberName = property.Name;
+                return true;
+            case FieldInfo field:
+                typeToCheck = field.FieldType;
+                memberName = field.Name;
+                return true;
+            default:
+                return false;
+        }
     }
 }
