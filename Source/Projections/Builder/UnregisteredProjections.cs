@@ -17,6 +17,7 @@ using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -49,6 +50,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
+        RegisterProjectionsConventions();
         foreach (var projection in Values)
         {
             eventProcessors.Register(
@@ -60,6 +62,16 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                 new ProjectionsProtocol(),
                 cancellationToken);
         }
+    }
+
+    void RegisterProjectionsConventions()
+    {
+        var conventions = new ConventionPack();
+        conventions.AddClassMapConvention("Ignore extra projection properties", _ => _.SetIgnoreExtraElements(true));
+        ConventionRegistry.Register(
+            "Projections Conventions",
+            conventions,
+            _ => ReadModelTypes.HasFor(_));
     }
 
     /// <inheritdoc />
