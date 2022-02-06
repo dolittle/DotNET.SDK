@@ -4,6 +4,7 @@
 using System;
 using System.Reflection;
 using Dolittle.SDK.Projections.Copies.MongoDB;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Dolittle.SDK;
@@ -15,7 +16,7 @@ public static class MongoDatabaseExtensions
 {
     /// <summary>
     /// Gets the <see cref="IMongoCollection{TDocument}"/> for <typeparamref name="TSchema"/> where
-    /// either the <see cref="CopyProjectionToMongoDBAttribute.CollectionName"/> or the <see cref="Type.Name"/> will be used as the .
+    /// either the <see cref="CopyProjectionToMongoDBAttribute.CollectionName"/> or the <see cref="Type.Name"/> will be used as the collection name.
     /// </summary>
     /// <param name="database">The <see cref="IMongoDatabase"/>.</param>
     /// <param name="settings">The optional <see cref="MongoCollectionSettings"/> used when getting the <see cref="IMongoCollection{TDocument}"/>.</param>
@@ -24,4 +25,16 @@ public static class MongoDatabaseExtensions
     public static IMongoCollection<TSchema> GetCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings settings = default)
         where TSchema : class
         => database.GetCollection<TSchema>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+    
+    /// <summary>
+    /// Gets the <see cref="IMongoCollection{TDocument}"/> of <see cref="BsonDocument"/> for <typeparamref name="TSchema"/> where
+    /// either the <see cref="CopyProjectionToMongoDBAttribute.CollectionName"/> or the <see cref="Type.Name"/> will be used as the collection name.
+    /// </summary>
+    /// <param name="database">The <see cref="IMongoDatabase"/>.</param>
+    /// <param name="settings">The optional <see cref="MongoCollectionSettings"/> used when getting the <see cref="IMongoCollection{TDocument}"/>.</param>
+    /// <typeparam name="TSchema">The <see cref="Type"/> of the projection read model. </typeparam>
+    /// <returns>The <see cref="IMongoCollection{TDocument}"/> for <typeparamref name="TSchema"/>.</returns>
+    public static IMongoCollection<BsonDocument> GetDocumentCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings settings = default)
+        where TSchema : class
+        => database.GetCollection<BsonDocument>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
 }
