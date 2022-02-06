@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ProjectionCopyToMo
 public class and_turning_off_default_conversions : given.all_dependencies
 {
     static ProjectionCopyToMongoDBBuilder<given.read_model_type> builder;
-    static ProjectionMongoDBCopyCollectionName name_of_type;
+    static MongoDBCopyCollectionName name_of_type;
     
     Establish context = () =>
     {

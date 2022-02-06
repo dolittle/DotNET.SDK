@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ProjectionCopyToMo
 public class and_setting_collection_name : given.all_dependencies
 {
     static ProjectionCopyToMongoDBBuilder<given.read_model_type> builder;
-    static ProjectionMongoDBCopyCollectionName collection_name;
+    static MongoDBCopyCollectionName collection_name;
     Establish context = () =>
     {
         builder = setup_for<given.read_model_type>();

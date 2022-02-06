@@ -17,7 +17,7 @@ public class MongoDbCollectionNameValidator : IValidateMongoDBCollectionName
     const string FailureBuildResultBeginning = "Projection MongoDB collection name cannot";
 
     /// <inheritdoc />
-    public bool Validate(IClientBuildResults buildResult, ProjectionMongoDBCopyCollectionName collectionName)
+    public bool Validate(IClientBuildResults buildResult, MongoDBCopyCollectionName collectionName)
     {
         var succeeded = true;
         if (string.IsNullOrEmpty(collectionName))

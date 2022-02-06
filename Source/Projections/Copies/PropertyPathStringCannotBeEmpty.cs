@@ -3,17 +3,17 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections.Copies.MongoDB;
+namespace Dolittle.SDK.Projections.Copies;
 
 /// <summary>
 /// Exception that gets thrown if a <see cref="PropertyPath"/> is null or empty.
 /// </summary>
-public class ProjectionPropertyPathStringCannotBeEmpty : Exception
+public class PropertyPathStringCannotBeEmpty : Exception
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProjectionPropertyPathStringCannotBeEmpty"/>.
+    /// Initializes a new instance of the <see cref="PropertyPathStringCannotBeEmpty"/>.
     /// </summary>
-    public ProjectionPropertyPathStringCannotBeEmpty()
+    public PropertyPathStringCannotBeEmpty()
         : base($"A projection property path string cannot be null or empty")
     {
     }

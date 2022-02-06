@@ -23,5 +23,5 @@ public class CopyProjectionToMongoDBAttribute : Attribute
     /// <summary>
     /// Gets the unique identifier for this projection.
     /// </summary>
-    public ProjectionMongoDBCopyCollectionName CollectionName { get; }
+    public MongoDBCopyCollectionName CollectionName { get; }
 }

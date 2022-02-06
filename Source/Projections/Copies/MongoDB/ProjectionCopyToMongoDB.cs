@@ -11,9 +11,9 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// Represents the SDK version of <see cref="PbProjectionCopyToMongoDB"/>.
 /// </summary>
 /// <param name="ShouldCopy">Whether the projection should be copied to MongoDB.</param>
-/// <param name="CollectionName">The <see cref="ProjectionMongoDBCopyCollectionName"/>.</param>
+/// <param name="CollectionName">The <see cref="MongoDBCopyCollectionName"/>.</param>
 /// <param name="Conversions">The BsonType per field conversions.</param>
-public record ProjectionCopyToMongoDB(bool ShouldCopy, ProjectionMongoDBCopyCollectionName CollectionName, IEnumerable<PropertyConversion> Conversions)
+public record ProjectionCopyToMongoDB(bool ShouldCopy, MongoDBCopyCollectionName CollectionName, IEnumerable<PropertyConversion> Conversions)
 {
     /// <summary>
     /// The default representation of <see cref="ProjectionCopyToMongoDB"/>.

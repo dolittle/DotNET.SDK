@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ProjectionCopyToMo
 public class and_adding_conversion_by_expression : given.all_dependencies
 {
     static ProjectionCopyToMongoDBBuilder<given.read_model_type> builder;
-    static ProjectionMongoDBCopyCollectionName name_of_type;
+    static MongoDBCopyCollectionName name_of_type;
     static PropertyPath property_path;
     static Expression<Func<given.read_model_type, int>> expression;
     static Conversion conversion;

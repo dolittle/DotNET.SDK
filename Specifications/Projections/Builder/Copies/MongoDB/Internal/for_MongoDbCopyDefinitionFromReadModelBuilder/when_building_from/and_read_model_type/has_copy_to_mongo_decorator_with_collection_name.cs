@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal.for_MongoDbCo
 
 public class has_copy_to_mongo_decorator_with_collection_name : given.all_dependencies
 {
-    static ProjectionMongoDBCopyCollectionName collection_name;
+    static MongoDBCopyCollectionName collection_name;
     static Mock<IProjectionCopyToMongoDBBuilder<projection_type_with_mongo_db_copy_and_collection_name>> mongo_builder;
     Establish context = () =>
     {

@@ -23,7 +23,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     readonly IBuildPropertyConversionsFromBsonClassMap _conversionsFromBSONClassMap;
     readonly IMongoDBCopyDefinitionFromReadModelBuilder _mongoDbCopyFromReadModelBuilder;
     readonly IResolvePropertyPath _propertyPathResolver;
-    ProjectionMongoDBCopyCollectionName _collectionName;
+    MongoDBCopyCollectionName _collectionName;
     bool _withoutDefaultConversions;
     Dictionary<PropertyPath, Conversion> _explicitConversions = new();
 
@@ -45,14 +45,14 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
         _conversionsFromBSONClassMap = conversionsFromBSONClassMap;
         _mongoDbCopyFromReadModelBuilder = mongoDBCopyFromReadModelBuilder;
         _propertyPathResolver = propertyPathResolver;
-        _collectionName = ProjectionMongoDBCopyCollectionName.GetFrom<TReadModel>();
+        _collectionName = MongoDBCopyCollectionName.GetFrom<TReadModel>();
     }
 
     /// <inheritdoc />
     public IPropertyConversions Conversions { get; }
 
     /// <inheritdoc />
-    public IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(ProjectionMongoDBCopyCollectionName name)
+    public IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(MongoDBCopyCollectionName name)
     {
         _collectionName = name;
         return this;

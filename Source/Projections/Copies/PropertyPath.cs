@@ -17,13 +17,13 @@ public record PropertyPath : ConceptAs<string>
     /// Initializes a new instance of the <see cref="PropertyPath"/>.
     /// </summary>
     /// <param name="value">The property path string.</param>
-    /// <exception cref="ProjectionPropertyPathStringCannotBeEmpty">Thrown when given path is null or empty.</exception>
+    /// <exception cref="PropertyPathStringCannotBeEmpty">Thrown when given path is null or empty.</exception>
     public PropertyPath(string value)
         : base(value)
     {
         if (string.IsNullOrEmpty(value))
         {
-            throw new ProjectionPropertyPathStringCannotBeEmpty();
+            throw new PropertyPathStringCannotBeEmpty();
         }
     }
 

@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ProjectionCopyToMo
 public class and_there_is_a_default_conversion_overlapping_explicit_conversion : given.all_dependencies
 {
     static ProjectionCopyToMongoDBBuilder<given.read_model_type> builder;
-    static ProjectionMongoDBCopyCollectionName name_of_type;
+    static MongoDBCopyCollectionName name_of_type;
     static PropertyPath overlap_property_path;
     static Conversion default_conversion;
     static Conversion explicit_conversion;
