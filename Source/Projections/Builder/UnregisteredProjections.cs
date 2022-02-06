@@ -10,12 +10,14 @@ using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 using Dolittle.SDK.Projections.Internal;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -82,15 +84,28 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     {
         foreach (var projection in Values)
         {
+            var readModelType = projection.ProjectionType;
             serviceCollection.AddSingleton(
-                typeof(IProjectionOf<>).MakeGenericType(projection.ProjectionType),
-                serviceProvider => GetOfMethodForReadModel(projection.ProjectionType).Invoke(
+                typeof(IProjectionOf<>).MakeGenericType(readModelType),
+                serviceProvider => GetOfMethodForReadModel(readModelType).Invoke(
                     serviceProvider.GetRequiredService<IProjectionStore>(),
                     new object[]
                     {
                         projection.Identifier,
                         projection.ScopeId
                     }));
+            if (projection.Copies.MongoDB.ShouldCopy)
+            {
+                serviceCollection.AddSingleton(
+                    typeof(IMongoCollection<>).MakeGenericType(readModelType),
+                    serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
+                        serviceProvider.GetRequiredService<IMongoDatabase>(),
+                        new object[]
+                        {
+                            MongoDBCopyCollectionName.GetFrom(readModelType).Value,
+                            new MongoCollectionSettings()
+                        }));
+            }
         }
     }
 
@@ -101,6 +116,16 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
             {
                 typeof(ProjectionId),
                 typeof(ScopeId)
+            })
+            ?.MakeGenericMethod(readModelType);
+    
+    static MethodInfo GetCollectionMethodForReadModel(Type readModelType)
+        => typeof(IMongoDatabase).GetMethod(
+            nameof(IMongoDatabase.GetCollection),
+            new[]
+            {
+                typeof(string),
+                typeof(MongoCollectionSettings)
             })
             ?.MakeGenericMethod(readModelType);
 
