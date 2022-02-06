@@ -404,6 +404,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             .AddTenantServices(AddBuilderServices)
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
+            .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)
             .AddTenantServices(config.ConfigureTenantServices)
             .Build(config.ServiceProvider, _tenants.Select(_ => _.Id).ToHashSet());
     }

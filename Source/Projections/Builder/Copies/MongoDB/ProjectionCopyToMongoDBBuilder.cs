@@ -3,38 +3,53 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
+
 /// <summary>
 /// Represents an implementation of <see cref="IProjectionCopyToMongoDBBuilder{TReadModel}"/>.
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
-public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongoDBBuilder<TReadModel>
+public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCopyToMongoDBBuilder<TReadModel>
     where TReadModel : class, new()
 {
     readonly IValidateMongoDBCollectionName _collectionNameValidator;
-    readonly IGetDefaultConversionsFromReadModel _conversionsResolver;
-    readonly Dictionary<ProjectionField, Conversion> _conversions = new();
+    readonly IBuildPropertyConversionsFromBsonClassMap _conversionsFromBSONClassMap;
+    readonly IMongoDBCopyDefinitionFromReadModelBuilder _mongoDbCopyFromReadModelBuilder;
+    readonly IResolvePropertyPath _propertyPathResolver;
     ProjectionMongoDBCopyCollectionName _collectionName;
     bool _withoutDefaultConversions;
+    Dictionary<PropertyPath, Conversion> _explicitConversions = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionCopyToMongoDBBuilder{TReadMOdel}"/> class.
     /// </summary>
     /// <param name="collectionNameValidator">The <see cref="IValidateMongoDBCollectionName"/>.</param>
-    /// <param name="conversionsResolver">The <see cref="IGetDefaultConversionsFromReadModel"/>.</param>
-    public ProjectionCopyToMongoDBBuilder(IValidateMongoDBCollectionName collectionNameValidator, IGetDefaultConversionsFromReadModel conversionsResolver)
+    /// <param name="conversionsFromBSONClassMap">The <see cref="IBuildPropertyConversionsFromBsonClassMap"/>.</param>
+    /// <param name="mongoDBCopyFromReadModelBuilder">The <see cref="IMongoDBCopyDefinitionFromReadModelBuilder"/>.</param>
+    /// <param name="propertyPathResolver">The <see cref="IResolvePropertyPath"/>.</param>
+    public ProjectionCopyToMongoDBBuilder(
+        IValidateMongoDBCollectionName collectionNameValidator,
+        IBuildPropertyConversionsFromBsonClassMap conversionsFromBSONClassMap,
+        IMongoDBCopyDefinitionFromReadModelBuilder mongoDBCopyFromReadModelBuilder,
+        IResolvePropertyPath propertyPathResolver)
     {
+        Conversions = new PropertyConversions();
         _collectionNameValidator = collectionNameValidator;
-        _conversionsResolver = conversionsResolver;
+        _conversionsFromBSONClassMap = conversionsFromBSONClassMap;
+        _mongoDbCopyFromReadModelBuilder = mongoDBCopyFromReadModelBuilder;
+        _propertyPathResolver = propertyPathResolver;
         _collectionName = ProjectionMongoDBCopyCollectionName.GetFrom<TReadModel>();
     }
+
+    /// <inheritdoc />
+    public IPropertyConversions Conversions { get; }
 
     /// <inheritdoc />
     public IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(ProjectionMongoDBCopyCollectionName name)
@@ -44,20 +59,10 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
     }
 
     /// <inheritdoc />
-    public IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion(ProjectionField field, Conversion conversion)
-    {
-        _conversions[field] = conversion;
-        return this;
-    }
-
-    /// <inheritdoc />
     public IProjectionCopyToMongoDBBuilder<TReadModel> WithConversion<TProperty>(Expression<Func<TReadModel, TProperty>> fieldExpression, Conversion conversion)
     {
-        if (fieldExpression.Body is not MemberExpression member)
-        {
-            throw new ArgumentException($"Expression {fieldExpression.Name} refers to a method, not a class member");
-        }
-        return WithConversion(member.Member.Name, conversion);
+        _explicitConversions[_propertyPathResolver.FromExpression(fieldExpression)] = conversion;
+        return this;
     }
 
     /// <inheritdoc />
@@ -67,41 +72,43 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : IProjectionCopyToMongo
         return this;
     }
 
-    /// <summary>
-    /// Builds the <see cref="ProjectionCopyToMongoDB"/>.
-    /// </summary>
-    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    /// <param name="copyDefinition">The built <see cref="ProjectionCopyToMongoDB"/>.</param>
-    /// <returns>True if successfully built.</returns>
+    /// <inheritdoc />
     public bool TryBuild(IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition)
     {
         copyDefinition = default;
         var succeeded = true;
 
-        var allFields = ProjectionField.GetAllFrom<TReadModel>();
-        if (_conversions.Keys.Any(_ => !allFields.ContainsKey(_)))
-        {
-            buildResults.AddFailure($"MongoDB Copy contains conversions for fields that does not exist");
-            succeeded = false;
-        }
         if (!_collectionNameValidator.Validate(buildResults, _collectionName))
         {
             buildResults.AddFailure($"MongoDB Copy collection name {_collectionName} is not valid");
             succeeded = false;
         }
-        if (!_withoutDefaultConversions)
+        if (!_withoutDefaultConversions && !_conversionsFromBSONClassMap.TryBuildFrom<TReadModel>(buildResults, Conversions))
         {
-            var defaultConversions = _conversionsResolver.GetFrom<TReadModel>();
-            foreach (var (field, conversion) in defaultConversions)
-            {
-                _conversions.TryAdd(field, conversion);
-            }
+            buildResults.AddFailure($"MongoDB Copy failed getting default conversions based on BSON Class Map of the read model type");
+            succeeded = false;
         }
         if (!succeeded)
         {
             return false;
         }
-        copyDefinition = new ProjectionCopyToMongoDB(true, _collectionName, _conversions);
+        foreach (var (path, conversion) in _explicitConversions)
+        {
+            Conversions.AddConversion(path, conversion);
+        }
+        copyDefinition = new ProjectionCopyToMongoDB(true, _collectionName, Conversions.GetAll());
+        return true;
+    }
+
+    /// <inheritdoc />
+    public bool TryBuildFromReadModel(IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition)
+    {
+        copyDefinition = default;
+        if (_mongoDbCopyFromReadModelBuilder.CanBuild<TReadModel>())
+        {
+            return _mongoDbCopyFromReadModelBuilder.TryBuild(buildResults, this) && TryBuild(buildResults, out copyDefinition);
+        }
+        copyDefinition = ProjectionCopyToMongoDB.Default;
         return true;
     }
 }

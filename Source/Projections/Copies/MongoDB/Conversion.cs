@@ -9,6 +9,11 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 public enum Conversion
 {
     /// <summary>
+    /// Do not convert the field.
+    /// </summary>
+    None = 0,
+
+    /// <summary>
     /// Converts the field into a BSON DateTime.
     /// </summary>
     DateTime = 1,

@@ -4,19 +4,19 @@
 namespace Dolittle.SDK.Projections.Store;
 
 /// <summary>
-/// Represents the current projection state.
+/// Represents the current state of a projection read model.
 /// </summary>
-/// <typeparam name="TProjection">The <see cref="System.Type" /> of the projection.</typeparam>
-public class CurrentState<TProjection>
-    where TProjection : class, new()
+/// <typeparam name="TReadModel">The <see cref="System.Type" /> of the projection.</typeparam>
+public class CurrentState<TReadModel>
+    where TReadModel : class, new()
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="CurrentState{TProjection}"/> class.
+    /// Initializes a new instance of the <see cref="CurrentState{TReadModel}"/> class.
     /// </summary>
-    /// <param name="state">The current <typeparamref name="TProjection"/> state.</param>
+    /// <param name="state">The current <typeparamref name="TReadModel"/> state.</param>
     /// <param name="type">The <see cref="CurrentStateType" />.</param>
     /// <param name="key">The <see cref="Key" />.</param>
-    public CurrentState(TProjection state, CurrentStateType type, Key key)
+    public CurrentState(TReadModel state, CurrentStateType type, Key key)
     {
         State = state;
         WasCreatedFromInitialState = type switch
@@ -33,9 +33,9 @@ public class CurrentState<TProjection>
     public bool WasCreatedFromInitialState { get; }
 
     /// <summary>
-    /// Gets the state.
+    /// Gets the current state of the projection read model.
     /// </summary>
-    public TProjection State { get; }
+    public TReadModel State { get; }
 
     /// <summary>
     /// Gets the <see cref="Key" />.
@@ -43,8 +43,8 @@ public class CurrentState<TProjection>
     public Key Key { get; }
 
     /// <summary>
-    /// Implicitly converts a <see cref="CurrentState{TProjection}" /> to the underlying <typeparamref name="TProjection"/>.
+    /// Implicitly converts a <see cref="CurrentState{TReadModel}" /> to the underlying <typeparamref name="TReadModel"/>.
     /// </summary>
-    /// <param name="currentState">The <see cref="CurrentState{TProjection}" /> to convert.</param>
-    public static implicit operator TProjection(CurrentState<TProjection> currentState) => currentState.State;
+    /// <param name="currentState">The <see cref="CurrentState{TReadModel}" /> to convert.</param>
+    public static implicit operator TReadModel(CurrentState<TReadModel> currentState) => currentState.State;
 }

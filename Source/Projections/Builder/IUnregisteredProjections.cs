@@ -3,6 +3,7 @@
 
 using System.Threading;
 using Dolittle.SDK.Common;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
@@ -15,6 +16,12 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 public interface IUnregisteredProjections : IUniqueBindings<ProjectionModelId, IProjection>
 {
+    
+    /// <summary>
+    /// Gets the callback for configuring the <see cref="ITenantScopedProviders"/>.
+    /// </summary>
+    ConfigureTenantServices AddTenantScopedServices { get; }
+
     /// <summary>
     /// Registers projections.
     /// </summary>
