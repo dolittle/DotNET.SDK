@@ -11,7 +11,6 @@ using Dolittle.SDK.Projections.Copies.MongoDB;
 public class DishCounter
 {
     public int NumberOfTimesPrepared = 0;
-    [MongoDBConvertTo(Conversion.None)]
     public string Name = "";
 
     [KeyFromProperty("Dish")]
