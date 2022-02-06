@@ -7,10 +7,11 @@ using Dolittle.SDK.Projections;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
 [Projection("98f9db66-b6ca-4e5f-9fc3-638626c9ecfa")]
-[CopyProjectionToMongoDB("dish-counter")]
+[CopyProjectionToMongoDB]
 public class DishCounter
 {
     public int NumberOfTimesPrepared = 0;
+    [MongoDBConvertTo(Conversion.None)]
     public string Name = "";
 
     [KeyFromProperty("Dish")]

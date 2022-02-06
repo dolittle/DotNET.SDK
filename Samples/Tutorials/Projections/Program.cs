@@ -5,6 +5,7 @@
 using System;
 using System.Threading.Tasks;
 using Dolittle.SDK;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Hosting;
 
