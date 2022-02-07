@@ -33,14 +33,21 @@ public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyCo
         foreach (var member in type.GetMembers())
         {
             var attribute = member.GetCustomAttribute<MongoDBConvertToAttribute>();
-            if (attribute is null
-                || !TryGetMemberNameAndTypeToCheck(member, out var typeToCheck, out var propertyName)
-                || checkedTypes.Contains(typeToCheck))
+            var hasAttribute = attribute != default;
+            if (!TryGetMemberNameAndTypeToCheck(member, out var typeToCheck, out var propertyName) || checkedTypes.Contains(typeToCheck))
             {
                 continue;
             }
-            conversions[propertyName.Value] = attribute.Conversion;
-            foreach (var (childProperty, childConversion) in GetConversionsFromType(typeToCheck, checkedTypes.Append(type).ToHashSet()))
+            if (hasAttribute)
+            {
+                conversions[propertyName.Value] = attribute.Conversion;
+            }
+            var conversionsFromTypeToCheck = GetConversionsFromType(typeToCheck, checkedTypes.Append(type).ToHashSet());
+            if (conversionsFromTypeToCheck.Any() && !hasAttribute)
+            {
+                conversions[propertyName.Value] = Conversion.None;
+            }
+            foreach (var (childProperty, childConversion) in conversionsFromTypeToCheck)
             {
                 conversions[string.Join('.', propertyName, childProperty)] = childConversion;
             }
