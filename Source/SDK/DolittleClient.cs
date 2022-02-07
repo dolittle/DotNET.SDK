@@ -32,6 +32,7 @@ using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
@@ -223,7 +224,7 @@ public class DolittleClient : IDisposable, IDolittleClient
                 configuration.EventSerializerProvider,
                 loggerFactory,
                 executionContext);
-            ConfigureContainer(configuration);
+            await ConfigureContainer(configuration).ConfigureAwait(false);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
             
             Connected = true;
@@ -398,10 +399,16 @@ public class DolittleClient : IDisposable, IDolittleClient
         return service;
     }
 
-    void ConfigureContainer(DolittleClientConfiguration config)
+    async Task ConfigureContainer(DolittleClientConfiguration config)
     {
+        var mongoDatabasesPerTenant = new Dictionary<TenantId, IMongoDatabase>();
+        foreach (var tenant in _tenants)
+        {
+            mongoDatabasesPerTenant.Add(tenant.Id, await _resources.ForTenant(tenant.Id).MongoDB.GetDatabase().ConfigureAwait(false));
+        }
         Services = new TenantScopedProvidersBuilder()
             .AddTenantServices(AddBuilderServices)
+            .AddTenantServices((tenant, collection) => collection.AddSingleton(mongoDatabasesPerTenant[tenant]))
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
             .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)
