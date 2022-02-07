@@ -1,3 +1,16 @@
+# [14.1.0] - 2022-1-28 [PR: #124](https://github.com/dolittle/DotNET.SDK/pull/124)
+## Summary
+
+Adds the possibility to take upon a specific projection read model as a dependency and use that to get the projection states for that read model type.
+
+### Added
+
+- `IProjectionOf<TReadModel>` that acts as a minimal `IProjectionStore` for a particular projection type.
+- `IProjectionStore.Of<TReadModel>(...)` method with overloads for sending in `ProjectionId` and `ScopeId` to create instances of `IProjectionOf<TReadModel>`
+- `IProjectionOf<TReadModel` is registered in the tenant scoped service providers for all types with the `[Projection]` attribute, or projections created in the `.WithProjections(...)` builder. So they can be injected in controllers etc.
+-
+
+
 # [14.0.0] - 2022-1-25 [PR: #119](https://github.com/dolittle/DotNET.SDK/pull/119)
 ## Summary
 
