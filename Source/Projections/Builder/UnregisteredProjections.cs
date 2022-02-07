@@ -115,7 +115,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                         new object[]
                         {
                             MongoDBCopyCollectionName.GetFrom(readModelType).Value,
-                            new MongoCollectionSettings()
+                            null
                         }));
             }
         }
