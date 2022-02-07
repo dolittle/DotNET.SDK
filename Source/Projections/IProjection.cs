@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections;
 
@@ -28,6 +29,11 @@ public interface IProjection
     /// Gets the scope the projection is in.
     /// </summary>
     ScopeId ScopeId { get; }
+
+    /// <summary>
+    /// Gets the <see cref="ProjectionCopies"/>.
+    /// </summary>
+    ProjectionCopies Copies { get; }
 
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this event handler.

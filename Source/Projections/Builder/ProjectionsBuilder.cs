@@ -8,6 +8,7 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Store;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -18,6 +19,7 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionsBuilder : IProjectionsBuilder
 {
     readonly IModelBuilder _modelBuilder;
+    readonly IProjectionCopyToMongoDBBuilderFactory _copyToMongoDbBuilderFactory;
     readonly DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId> _decoratedTypeBindings;
 
     /// <summary>
@@ -25,9 +27,14 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// </summary>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public ProjectionsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
+    /// <param name="copyToMongoDbBuilderFactory">The <see cref="IProjectionCopyToMongoDBBuilderFactory"/>.</param>
+    public ProjectionsBuilder(
+        IModelBuilder modelBuilder,
+        IClientBuildResults buildResults,
+        IProjectionCopyToMongoDBBuilderFactory copyToMongoDbBuilderFactory)
     {
         _modelBuilder = modelBuilder;
+        _copyToMongoDbBuilderFactory = copyToMongoDbBuilderFactory;
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<ProjectionAttribute, ProjectionModelId, ProjectionId>("projection", modelBuilder, buildResults);
     }
 
@@ -35,7 +42,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <inheritdoc />
     public IProjectionBuilder Create(ProjectionId projectionId)
     {
-        var builder = new ProjectionBuilder(projectionId, _modelBuilder);
+        var builder = new ProjectionBuilder(projectionId, _modelBuilder, _copyToMongoDbBuilderFactory);
         return builder;
     }
 
@@ -72,12 +79,21 @@ public class ProjectionsBuilder : IProjectionsBuilder
         =>  _modelBuilder.BindIdentifierToProcessorBuilder(
             decorator.GetIdentifier(),
             CreateConventionProjectionBuilderFor(type, decorator));
-    
-    static ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type type, ProjectionAttribute decorator)
+
+    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType, ProjectionAttribute decorator)
         => Activator.CreateInstance(
-                typeof(ConventionProjectionBuilder<>).MakeGenericType(type),
-                decorator)
+                typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType),
+                decorator,
+                CreateForMethodForReadModel(readModelType).Invoke(_copyToMongoDbBuilderFactory, new object[] {}))
             as ICanTryBuildProjection;
+    
+    
+    static MethodInfo CreateForMethodForReadModel(Type readModelType)
+        => typeof(IProjectionCopyToMongoDBBuilderFactory).GetMethod(
+                nameof(IProjectionCopyToMongoDBBuilderFactory.CreateFor),
+                new Type[] {})
+            ?.MakeGenericMethod(readModelType);
+    
 
     /// <summary>
     /// Build projections.

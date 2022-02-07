@@ -8,6 +8,8 @@ using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Builder.Copies;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -23,6 +25,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
     readonly ProjectionBuilder _parentBuilder;
+    readonly IProjectionCopyDefinitionBuilder<TReadModel> _projectionCopyDefinitionBuilder;
 
     ProjectionModelId ModelId => new(_projectionId, _scopeId);
 
@@ -33,12 +36,20 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
     /// <param name="parentBuilder">The <see cref="ProjectionBuilder"/>.</param>
-    public ProjectionBuilderForReadModel(ProjectionId projectionId, ScopeId scopeId, IModelBuilder modelBuilder, ProjectionBuilder parentBuilder)
+    /// <param name="copyDefinitionBuilder">The <see cref="IProjectionCopyDefinitionBuilder{TReadModel}"/>.</param>
+    public ProjectionBuilderForReadModel(
+        ProjectionId projectionId,
+        ScopeId scopeId,
+        IModelBuilder modelBuilder,
+        ProjectionBuilder parentBuilder,
+        IProjectionCopyDefinitionBuilder<TReadModel> copyDefinitionBuilder)
     {
         _projectionId = projectionId;
         _scopeId = scopeId;
         _modelBuilder = modelBuilder;
         _parentBuilder = parentBuilder;
+        _projectionCopyDefinitionBuilder = copyDefinitionBuilder;
+        
         modelBuilder.BindIdentifierToType<ProjectionModelId, ProjectionId>(ModelId, typeof(TReadModel));
         modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
     }
@@ -102,6 +113,12 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
+    /// <inheritdoc />
+    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default)
+    {
+        _projectionCopyDefinitionBuilder.CopyToMongoDB(callback);
+        return this;
+    }
 
     /// <inheritdoc />
     public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
@@ -114,14 +131,19 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
             return false;
         }
 
-        if (!eventTypesToMethods.Any())
+        if (!_projectionCopyDefinitionBuilder.TryBuild(buildResults, out var projectionCopies))
         {
-            buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");
+            buildResults.AddFailure($"Failed to build projection copies definition for projection {_projectionId}");
             return false;
         }
 
-        projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods);
-        return true;
+        if (eventTypesToMethods.Any())
+        {
+            projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods, projectionCopies);
+            return true;
+        }
+        buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");
+        return false;
     }
     
     bool TryAddOnMethods(IEventTypes eventTypes, IDictionary<EventType, IProjectionMethod<TReadModel>> eventTypesToMethods, IClientBuildResults buildResults)

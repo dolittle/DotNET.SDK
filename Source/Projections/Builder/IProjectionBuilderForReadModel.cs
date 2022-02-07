@@ -4,6 +4,7 @@
 using System;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -38,7 +39,7 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="SyncProjectionSignature{T}" />.</param>
     /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
+    IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
         where TEvent : class;
 
     /// <summary>
@@ -48,7 +49,7 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
@@ -57,7 +58,7 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
@@ -66,7 +67,7 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
@@ -75,7 +76,7 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
@@ -85,7 +86,7 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
@@ -95,6 +96,13 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
     /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+
+    /// <summary>
+    /// Adds the copy to MongoDB definition.
+    /// </summary>
+    /// <param name="callback">The optonal callback for building the MongoDB copy definition.</param>
+    /// <returns>The builder for continuation.</returns>
+    IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default);
 
 }

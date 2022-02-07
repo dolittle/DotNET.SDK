@@ -11,4 +11,8 @@
         <ProjectReference Include="../../Source/Projections/Projections.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Builder\Copies\MongoDB\Internal" />
+    </ItemGroup>
+
 </Project>
