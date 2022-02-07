@@ -15,7 +15,7 @@ public class type_with_inner_attributed_type_without_attribute : given.all_depen
         public int AProperty { get; set; }
 
         public int AMethod() => 2;
-
+        
         public read_model_with_an_attribute RecursiveField;
     }
     public class read_model_with_an_attribute
@@ -31,6 +31,7 @@ public class type_with_inner_attributed_type_without_attribute : given.all_depen
     Because of = () => succeeded = builder.TryBuildFrom<read_model_with_inner_attributed_type_without_attribute>(build_results, conversions.Object);
 
     It should_succeed = () => succeeded.ShouldBeTrue();
-    It should_not_add_any_conversions = () => conversions.Verify(_ => _.AddConversion(Moq.It.IsAny<PropertyPath>(), Moq.It.IsAny<Conversion>()), Times.Never);
+    It should_add_conversion_for_inner_attributed_field = () => conversions.Verify(_ => _.AddConversion("RecursiveField.AField", Conversion.Guid), Times.Once);
+    It should_add_conversion_for_parent_field = () => conversions.Verify(_ => _.AddConversion("RecursiveField", Conversion.None), Times.Once);
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }
