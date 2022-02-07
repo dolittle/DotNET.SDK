@@ -21,6 +21,5 @@ public class with_complex_field_containing_type_that_needs_conversion : given.al
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_add_conversion_for_inner_field = () => conversions.Verify(_ => _.AddConversion("ComplexField.InnerGuidField", Conversion.Guid));
-    It should_add_none_conversion_parent_field = () => conversions.Verify(_ => _.AddConversion("ComplexField", Conversion.None));
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }

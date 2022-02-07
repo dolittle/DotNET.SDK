@@ -20,16 +20,12 @@ public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyCo
     public bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
         where TReadModel : class, new()
     {
-        foreach (var (path, conversion) in GetConversionsFromType(typeof(TReadModel), new HashSet<Type>()))
-        {
-            conversions.AddConversion(path, conversion);
-        }
+        AddConversionsFromType(typeof(TReadModel), new HashSet<Type>(), conversions);
         return true;
     }
 
-    static Dictionary<PropertyPath, Conversion> GetConversionsFromType(Type type, HashSet<Type> checkedTypes)
+    static void AddConversionsFromType(Type type, HashSet<Type> checkedTypes, IPropertyConversions conversions, PropertyPath parentPath = default)
     {
-        var conversions = new Dictionary<PropertyPath, Conversion>();
         foreach (var member in type.GetMembers())
         {
             var attribute = member.GetCustomAttribute<MongoDBConvertToAttribute>();
@@ -38,22 +34,13 @@ public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyCo
             {
                 continue;
             }
+            var path = parentPath != default ? parentPath.Add(propertyName) : new PropertyPath(propertyName);
             if (hasAttribute)
             {
-                conversions[propertyName.Value] = attribute.Conversion;
+                conversions.AddConversion(path, attribute.Conversion);
             }
-            var conversionsFromTypeToCheck = GetConversionsFromType(typeToCheck, checkedTypes.Append(type).ToHashSet());
-            if (conversionsFromTypeToCheck.Any() && !hasAttribute)
-            {
-                conversions[propertyName.Value] = Conversion.None;
-            }
-            foreach (var (childProperty, childConversion) in conversionsFromTypeToCheck)
-            {
-                conversions[string.Join('.', propertyName, childProperty)] = childConversion;
-            }
+            AddConversionsFromType(typeToCheck, checkedTypes.Append(type).ToHashSet(), conversions, path);
         }
-
-        return conversions;
     }
 
     static bool TryGetMemberNameAndTypeToCheck(MemberInfo member, out Type typeToCheck, out PropertyName memberName)

@@ -32,6 +32,5 @@ public class type_with_inner_attributed_type_without_attribute : given.all_depen
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_add_conversion_for_inner_attributed_field = () => conversions.Verify(_ => _.AddConversion("RecursiveField.AField", Conversion.Guid), Times.Once);
-    It should_add_conversion_for_parent_field = () => conversions.Verify(_ => _.AddConversion("RecursiveField", Conversion.None), Times.Once);
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }
