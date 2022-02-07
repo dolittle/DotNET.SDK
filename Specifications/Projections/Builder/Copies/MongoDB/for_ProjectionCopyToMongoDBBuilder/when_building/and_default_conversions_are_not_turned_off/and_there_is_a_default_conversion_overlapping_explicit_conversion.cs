@@ -25,7 +25,7 @@ public class and_there_is_a_default_conversion_overlapping_explicit_conversion :
     Establish context = () =>
     {
         default_conversion = Conversion.Guid;
-        explicit_conversion = Conversion.DateTime;
+        explicit_conversion = Conversion.Date;
         overlap_property_path = nameof(given.read_model_type.Field);
         builder = setup_for<given.read_model_type>();
         

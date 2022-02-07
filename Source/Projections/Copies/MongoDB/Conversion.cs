@@ -14,9 +14,9 @@ public enum Conversion
     None = 0,
 
     /// <summary>
-    /// Converts the field into a BSON DateTime.
+    /// Converts the field into a BSON Date.
     /// </summary>
-    DateTime = 1,
+    Date = 1,
 
     /// <summary>
     /// Converts the field into a Guid familiar to BSON.

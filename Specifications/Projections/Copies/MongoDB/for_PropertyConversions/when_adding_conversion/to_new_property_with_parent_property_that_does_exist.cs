@@ -17,7 +17,7 @@ public class to_new_property_with_parent_property_that_does_exist : given.all_de
     {
         parent = "Parent";
         property = "Property";
-        parent_conversion = Conversion.DateTime;
+        parent_conversion = Conversion.Date;
         conversion = Conversion.Guid;
         conversions.AddConversion(new PropertyPath(parent), parent_conversion);
         conversions.AddConversion(new PropertyPath(string.Join('.', parent, property)), conversion);

@@ -9,7 +9,7 @@ public class type_with_attributed_property_and_field : given.all_dependencies
 {
     public class read_model_with_attibuted_property_and_field
     {
-        [MongoDBConvertTo(Conversion.DateTime)]
+        [MongoDBConvertTo(Conversion.Date)]
         public int AField;
 
         [MongoDBConvertTo(Conversion.Guid)]
@@ -21,6 +21,6 @@ public class type_with_attributed_property_and_field : given.all_dependencies
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_add_the_conversion_for_property = () => conversions.Verify(_ => _.AddConversion(nameof(read_model_with_attibuted_property_and_field.AProperty), Conversion.Guid), Times.Once);
-    It should_add_the_conversion_for_field = () => conversions.Verify(_ => _.AddConversion(nameof(read_model_with_attibuted_property_and_field.AField), Conversion.DateTime), Times.Once);
+    It should_add_the_conversion_for_field = () => conversions.Verify(_ => _.AddConversion(nameof(read_model_with_attibuted_property_and_field.AField), Conversion.Date), Times.Once);
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }

@@ -12,7 +12,7 @@ public class to_existing_property_without_parent_properties : given.all_dependen
     {
         property = "Property";
         conversion = Conversion.Guid;
-        conversions.AddConversion(new PropertyPath(property), Conversion.DateTime);
+        conversions.AddConversion(new PropertyPath(property), Conversion.Date);
         conversions.AddConversion(new PropertyPath(property), conversion);
     };
     Because of = () => result = conversions.GetAll();

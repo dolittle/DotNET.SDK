@@ -25,7 +25,7 @@ public class and_there_is_a_default_conversion_not_overlapping_existing_conversi
     Establish context = () =>
     {
         existing_conversion = Conversion.Guid;
-        additional_conversion = Conversion.DateTime;
+        additional_conversion = Conversion.Date;
         existing_property_path = nameof(given.read_model_type.Field);
         additional_property_path = nameof(given.read_model_type.AProperty);
         builder = setup_for<given.read_model_type>();

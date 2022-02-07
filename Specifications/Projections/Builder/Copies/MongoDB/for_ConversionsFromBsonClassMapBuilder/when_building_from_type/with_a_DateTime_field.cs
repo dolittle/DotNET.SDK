@@ -15,6 +15,6 @@ public class with_a_DateTime_field : given.all_dependencies
     Because of = () => succeeded = builder.TryBuildFrom<read_model>(build_results, conversions.Object);
 
     It should_succeed = () => succeeded.ShouldBeTrue();
-    It should_add_conversion_to_date_time_for_date_time_field = () => conversions.Verify(_ => _.AddConversion("DateTimeField", Conversion.DateTime));
+    It should_add_conversion_to_date_time_for_date_time_field = () => conversions.Verify(_ => _.AddConversion("DateTimeField", Conversion.Date));
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }

@@ -38,7 +38,7 @@ public record PropertyConversion(PropertyName PropertyName, Conversion ConvertTo
         {
             Conversion.None => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.None,
             Conversion.Guid => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.Guid,
-            Conversion.DateTime => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.Date,
+            Conversion.Date => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.Date,
             _ => throw new UnsupportedConversion(type)
         };
 }
