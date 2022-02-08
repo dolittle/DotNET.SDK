@@ -15,7 +15,6 @@ using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
 using Dolittle.SDK.Events.Handling.Builder;
 using Dolittle.SDK.Projections.Builder;
-using Dolittle.SDK.Projections.Builder.Copies;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Copies;

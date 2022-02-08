@@ -8,6 +8,7 @@ using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
+using Dolittle.SDK.Resources.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
@@ -85,6 +86,7 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
         }
         if (!_withoutDefaultConversions)
         {
+            DolittleMongoConventions.EnsureConventionsAreRegistered();
             _conversionsFromBSONClassMap.BuildFrom<TReadModel>(buildResults, Conversions);
         }
         if (!succeeded)
