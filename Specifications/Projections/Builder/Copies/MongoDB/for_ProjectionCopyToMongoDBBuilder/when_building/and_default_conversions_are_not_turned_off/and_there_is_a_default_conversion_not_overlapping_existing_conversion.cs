@@ -33,9 +33,8 @@ public class and_there_is_a_default_conversion_not_overlapping_existing_conversi
         with_explicit_conversions(builder, (_ => _.Field, existing_property_path, existing_conversion));
         name_of_type = nameof(given.read_model_type);
         conversions_from_bson_class_map
-            .Setup(_ => _.TryBuildFrom<given.read_model_type>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()))
-            .Callback<IClientBuildResults, IPropertyConversions>((_, conversions) => conversions.AddConversion(additional_property_path, additional_conversion))
-            .Returns(true);
+            .Setup(_ => _.BuildFrom<given.read_model_type>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()))
+            .Callback<IClientBuildResults, IPropertyConversions>((_, conversions) => conversions.AddConversion(additional_property_path, additional_conversion));
     };
 
     Because of = () => succeeded = builder.TryBuild(build_results, out copy_definition_result);
@@ -48,6 +47,6 @@ public class and_there_is_a_default_conversion_not_overlapping_existing_conversi
         (additional_conversion, additional_property_path));
     It should_copy_to_mongo = () => copy_definition_result.ShouldCopy.ShouldBeTrue();
     It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(build_results, name_of_type), Times.Once);
-    It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.TryBuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
+    It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.BuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
     It should_not_have_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

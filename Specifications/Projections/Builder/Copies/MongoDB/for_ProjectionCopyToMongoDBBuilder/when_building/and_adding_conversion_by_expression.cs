@@ -37,6 +37,6 @@ public class and_adding_conversion_by_expression : given.all_dependencies
     It should_copy_to_mongo = () => copy_definition_result.ShouldCopy.ShouldBeTrue();
     It should_resolve_property_path_from_expression = () => property_path_resolver.Verify(_ => _.FromExpression(expression), Times.Once);
     It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(build_results, name_of_type), Times.Once);
-    It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.TryBuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
+    It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.BuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
     It should_not_have_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

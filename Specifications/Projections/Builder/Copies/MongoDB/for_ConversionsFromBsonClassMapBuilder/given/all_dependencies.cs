@@ -14,11 +14,12 @@ public class all_dependencies
     protected static bool succeeded;
     protected static ClientBuildResults build_results;
     protected static Mock<IPropertyConversions> conversions;
+    protected static Mock<IAddConversionsFromBsonClassMap> conversions_from_class_map_adder;
 
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
         conversions = new Mock<IPropertyConversions>();
-        builder = new ConversionsFromBsonClassMapBuilder();
+        builder = new ConversionsFromBsonClassMapBuilder(conversions_from_class_map_adder.Object);
     };
 }

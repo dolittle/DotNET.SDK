@@ -22,8 +22,7 @@ public class has_copy_to_mongo_decorator : given.all_dependencies
         collection_name = nameof(projection_type_with_mongo_db_copy);
         mongo_builder = new Mock<IProjectionCopyToMongoDBBuilder<projection_type_with_mongo_db_copy>>();
         conversions_from_convert_to_attributes
-            .Setup(_ => _.TryBuildFrom<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()))
-            .Returns(true);
+            .Setup(_ => _.BuildFrom<projection_type_with_mongo_db_copy>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()));
     };
 
     Because of = () => succeeded = builder.TryBuild(build_results, mongo_builder.Object);
@@ -31,5 +30,5 @@ public class has_copy_to_mongo_decorator : given.all_dependencies
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_not_result_in_failed_build_results = () => build_results.Failed.ShouldBeFalse();
     It should_add_the_collection_name = () => mongo_builder.Verify(_ => _.ToCollection(collection_name), Times.Once);
-    It should_build_conversions_from_attributes = () => conversions_from_convert_to_attributes.Verify(_ => _.TryBuildFrom<projection_type_with_mongo_db_copy>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
+    It should_build_conversions_from_attributes = () => conversions_from_convert_to_attributes.Verify(_ => _.BuildFrom<projection_type_with_mongo_db_copy>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
 }

@@ -37,7 +37,7 @@ public class all_dependencies
     protected static ProjectionCopyToMongoDBBuilder<TReadModel> setup_for<TReadModel>()
         where TReadModel : class, new()
     {
-        conversions_from_bson_class_map.Setup(_ => _.TryBuildFrom<TReadModel>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>())).Returns(true);
+        conversions_from_bson_class_map.Setup(_ => _.BuildFrom<TReadModel>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()));
         collection_name_validator.Setup(_ => _.Validate(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<MongoDBCopyCollectionName>())).Returns(true);
         return new ProjectionCopyToMongoDBBuilder<TReadModel>(collection_name_validator.Object, conversions_from_bson_class_map.Object, from_read_model_builder.Object, property_path_resolver.Object);
     }

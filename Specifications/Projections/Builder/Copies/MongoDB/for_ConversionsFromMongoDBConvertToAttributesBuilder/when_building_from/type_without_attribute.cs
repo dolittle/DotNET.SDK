@@ -19,9 +19,8 @@ public class type_without_attribute : given.all_dependencies
 
         public int AMethod() => 2;
     }
-    Because of = () => succeeded = builder.TryBuildFrom<read_model_with_no_attributes>(build_results, conversions.Object);
+    Because of = () => builder.BuildFrom<read_model_with_no_attributes>(build_results, conversions.Object);
 
-    It should_succeed = () => succeeded.ShouldBeTrue();
     It should_not_add_any_conversions = () => conversions.Verify(_ => _.AddConversion(Moq.It.IsAny<PropertyPath>(), Moq.It.IsAny<Conversion>()), Times.Never);
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }
