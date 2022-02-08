@@ -24,7 +24,7 @@ public class and_adding_conversion_by_expression : given.all_dependencies
         name_of_type = nameof(given.read_model_type);
         expression = property_path_expression_for<given.read_model_type, int>(_ => _.Field);
         property_path = nameof(given.read_model_type.Field);
-        conversion = Conversion.Guid;
+        conversion = Conversion.GuidAsStandardBinary;
         with_explicit_conversions(builder, (expression, property_path, conversion));
     };
 

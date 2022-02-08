@@ -20,7 +20,7 @@ public class type_with_inner_attributed_type_without_attribute : given.all_depen
     }
     public class read_model_with_an_attribute
     {
-        [MongoDBConvertTo(Conversion.Guid)]
+        [MongoDBConvertTo(Conversion.DateAsDocument)]
         public int AField;
 
         public int AProperty { get; set; }
@@ -30,6 +30,6 @@ public class type_with_inner_attributed_type_without_attribute : given.all_depen
 
     Because of = () => builder.BuildFrom<read_model_with_inner_attributed_type_without_attribute>(build_results, conversions.Object);
 
-    It should_add_conversion_for_inner_attributed_field = () => conversions.Verify(_ => _.AddConversion("RecursiveField.AField", Conversion.Guid), Times.Once);
+    It should_add_conversion_for_inner_attributed_field = () => conversions.Verify(_ => _.AddConversion("RecursiveField.AField", Conversion.DateAsDocument), Times.Once);
     It should_not_add_anything_else = () => conversions.VerifyNoOtherCalls();
 }

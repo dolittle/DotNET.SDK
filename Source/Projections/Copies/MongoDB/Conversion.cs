@@ -6,7 +6,7 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// <summary>
 /// Represents MongoDB read model field conversion
 /// </summary>
-public enum Conversion
+public enum Conversion : ushort
 {
     /// <summary>
     /// Do not convert the field.
@@ -14,14 +14,42 @@ public enum Conversion
     None = 0,
 
     /// <summary>
-    /// Converts the field into a BSON Date.
+    /// Converts the field into a BSON Date represented as array.
     /// </summary>
-    Date = 1,
+    DateAsArray,
+    
+    /// <summary>
+    /// Converts the field into a BSON Date represented as date.
+    /// </summary>
+    DateAsDate,
+    
+    /// <summary>
+    /// Converts the field into a BSON Date represented as document.
+    /// </summary>
+    DateAsDocument,
+    
+    /// <summary>
+    /// Converts the field into a BSON Date represented as int64.
+    /// </summary>
+    DateAsInt64,
+    
+    /// <summary>
+    /// Converts the field into a BSON Date represented as string.
+    /// </summary>
+    DateAsString,
 
     /// <summary>
-    /// Converts the field into a Guid familiar to BSON.
+    /// Converts the field into a GUID represented as string.
     /// </summary>
-#pragma warning disable CA1720
-    Guid = 2,
-#pragma warning restore CA1720
+    GuidAsString,
+    
+    /// <summary>
+    /// Converts the field into a GUID represented as standard binary.
+    /// </summary>
+    GuidAsStandardBinary,
+    
+    /// <summary>
+    /// Converts the field into a GUID represented as standard binary.
+    /// </summary>
+    GuidAsCSharpLegacyBinary,
 }

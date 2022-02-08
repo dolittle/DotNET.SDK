@@ -59,7 +59,7 @@ public class SetupBuilder : ISetupBuilder
             _buildResults,
             new ProjectionCopyToMongoDbBuilderFactory(
                 new MongoDbCollectionNameValidator(),
-                new ConversionsFromBsonClassMapBuilder(),
+                new ConversionsFromBsonClassMapBuilder(new ConversionsFromBsonClassMapAdder()),
                 new ConversionsFromMongoDBConvertToAttributesBuilder(),
                 new PropertyPathResolver()));
     }

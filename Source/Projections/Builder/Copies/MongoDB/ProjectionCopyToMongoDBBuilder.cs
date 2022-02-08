@@ -83,10 +83,9 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
             buildResults.AddFailure($"MongoDB Copy collection name {_collectionName} is not valid");
             succeeded = false;
         }
-        if (!_withoutDefaultConversions && !_conversionsFromBSONClassMap.TryBuildFrom<TReadModel>(buildResults, Conversions))
+        if (!_withoutDefaultConversions)
         {
-            buildResults.AddFailure($"MongoDB Copy failed getting default conversions based on BSON Class Map of the read model type");
-            succeeded = false;
+            _conversionsFromBSONClassMap.BuildFrom<TReadModel>(buildResults, Conversions);
         }
         if (!succeeded)
         {

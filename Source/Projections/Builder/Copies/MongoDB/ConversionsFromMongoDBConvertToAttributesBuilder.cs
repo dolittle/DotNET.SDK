@@ -17,12 +17,9 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyConversionsFromMongoDBConvertToAttributes
 {
     /// <inheritdoc />
-    public bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
+    public void BuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
         where TReadModel : class, new()
-    {
-        AddConversionsFromType(typeof(TReadModel), new HashSet<Type>(), conversions);
-        return true;
-    }
+        => AddConversionsFromType(typeof(TReadModel), new HashSet<Type>(), conversions);
 
     static void AddConversionsFromType(Type type, HashSet<Type> checkedTypes, IPropertyConversions conversions, PropertyPath parentPath = default)
     {

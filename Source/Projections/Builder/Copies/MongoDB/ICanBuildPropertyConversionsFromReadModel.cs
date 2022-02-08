@@ -19,6 +19,6 @@ public interface ICanBuildPropertyConversionsFromReadModel
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="conversions">The <see cref="IPropertyConversions"/>.</param>
     /// <returns>The default conversions derived from the <typeparamref name="TReadModel"/>.</returns>
-    bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
+    void BuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
         where TReadModel : class, new();
 }
