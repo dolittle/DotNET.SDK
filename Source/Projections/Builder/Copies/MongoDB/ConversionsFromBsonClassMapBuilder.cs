@@ -2,13 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
@@ -45,32 +43,38 @@ public class ConversionsFromBsonClassMapBuilder : IBuildPropertyConversionsFromB
     static void BuildFromMemberMap(BsonMemberMap memberMap, IPropertyConversions conversions, PropertyPath path)
     {
         var serializer = memberMap.GetSerializer();
-        if (typeof(BsonClassMapSerializer<>).MakeGenericType(memberMap.MemberType).IsInstanceOfType(serializer))
+        if (IsComplexType(memberMap.MemberType, serializer))
         {
             BuildFromAllMemberMaps(BsonClassMap.LookupClassMap(serializer.ValueType), conversions, path);
         }
-        var memberType = GetTypeOrElementType(memberMap.MemberType);
-        if (memberType == typeof(Guid))
+        else if (TryResolveConversionFromSerializer(serializer, out var conversion))
         {
-            conversions.AddConversion(path, Conversion.Guid);
+            conversions.AddConversion(path, conversion);
         }
-        else if (memberType == typeof(DateTime) || memberMap.MemberType == typeof(DateTimeOffset))
-        {
-            conversions.AddConversion(path, Conversion.Date);
-        }
-
     }
-    static Type GetTypeOrElementType(Type type)
+    static bool TryResolveConversionFromSerializer(IBsonSerializer serializer, out Conversion conversion)
     {
-        if (!typeof(IEnumerable).IsAssignableFrom(type))
+        conversion = Conversion.None;
+        if (serializer is IBsonArraySerializer arraySerializer)
         {
-            return type;
+            if (arraySerializer.TryGetItemSerializationInfo(out var info))
+            {
+                serializer = info.Serializer;
+            }
         }
-        var interfaces = type.GetInterfaces().Append(type);
-        var elementType = (from i in interfaces
-                            where i.IsGenericType && i.GetGenericTypeDefinition() == typeof (IEnumerable<>)
-                            select i.GetGenericArguments()[0]).FirstOrDefault();
-        
-        return elementType ?? type;
+        switch (serializer)
+        {
+            case GuidSerializer:
+                conversion = Conversion.Guid;
+                return true;
+            case DateTimeSerializer:
+            case DateTimeOffsetSerializer:
+                conversion = Conversion.Date;
+                return true;
+            default:
+                return false;
+        }
     }
+
+    static bool IsComplexType(Type nominalType, IBsonSerializer serializer) => typeof(BsonClassMapSerializer<>).MakeGenericType(nominalType).IsInstanceOfType(serializer);
 }
