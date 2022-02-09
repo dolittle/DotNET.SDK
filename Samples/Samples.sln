@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Projections", "Tutorials\Pr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Embeddings", "Tutorials\Embeddings\Embeddings.csproj", "{E8C07153-7F5E-4421-B891-DB82E59F974A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDBProjections", "MongoDBProjections\MongoDBProjections.csproj", "{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,18 @@ Global
 		{E8C07153-7F5E-4421-B891-DB82E59F974A}.Release|x64.Build.0 = Release|Any CPU
 		{E8C07153-7F5E-4421-B891-DB82E59F974A}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8C07153-7F5E-4421-B891-DB82E59F974A}.Release|x86.Build.0 = Release|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Debug|x64.Build.0 = Debug|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Debug|x86.Build.0 = Debug|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Release|x64.ActiveCfg = Release|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Release|x64.Build.0 = Release|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Release|x86.ActiveCfg = Release|Any CPU
+		{A5E29D1B-8684-49D1-9090-D1F2D346FCE1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{989ED966-4B49-4516-9065-F223F8A20E3B} = {EB34FD36-A38B-4256-AE0D-B82C3152398A}
