@@ -27,6 +27,7 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resources;
+using Dolittle.SDK.Resources.Internal;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
@@ -218,12 +219,8 @@ public class DolittleClient : IDisposable, IDolittleClient
             
             var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
             (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
-            
-            CreateDependencies(
-                methodCaller,
-                configuration.EventSerializerProvider,
-                loggerFactory,
-                executionContext);
+
+            await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext).ConfigureAwait(false);
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
             
@@ -283,7 +280,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         _disposed = true;
     }
 
-    void CreateDependencies(
+    async Task CreateDependencies(
         IPerformMethodCalls methodCaller,
         Func<JsonSerializerSettings> eventSerializerProvider,
         ILoggerFactory loggerFactory,
@@ -329,7 +326,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             _projectionConverter,
             executionContext,
             loggerFactory);
-        Resources = new ResourcesBuilder(methodCaller, executionContext, loggerFactory);
+        Resources = await new ResourcesFetcher().FetchResourcesFor(Tenants, _clientCancellationTokenSource.Token);
     }
 
     async Task RegisterAllUnregistered(IPerformMethodCalls methodCaller, TimeSpan pingInterval, ExecutionContext executionContext, ILoggerFactory loggerFactory)

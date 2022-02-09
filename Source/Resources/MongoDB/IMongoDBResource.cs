@@ -7,9 +7,9 @@ using MongoDB.Driver;
 namespace Dolittle.SDK.Resources.MongoDB;
 
 /// <summary>
-/// Defines the MongoDB <see cref="IResource"/>.
+/// Defines the MongoDB resource.
 /// </summary>
-public interface IMongoDBResource : IResource
+public interface IMongoDBResource
 {
     /// <summary>
     /// Gets the <see cref="IMongoDatabase"/> that is configured for this <see cref="IResource"/>.
