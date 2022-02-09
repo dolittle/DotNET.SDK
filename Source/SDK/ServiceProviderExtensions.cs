@@ -26,7 +26,7 @@ public static class ServiceProviderExtensions
     public static Task<IDolittleClient> GetDolittleClient(this IServiceProvider provider, ConfigureDolittleClient configureClient = default,  CancellationToken cancellationToken = default)
     {
         var client = provider.GetService<IDolittleClient>() ?? throw new DolittleClientNotSetup();
-        if (client.Connected)
+        if (client.IsConnected)
         {
             return Task.FromResult(client);
         }

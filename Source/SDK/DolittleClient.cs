@@ -57,6 +57,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
     readonly SemaphoreSlim _connectLock = new(1, 1);
+    readonly TaskCompletionSource<bool> _connectedCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
@@ -108,7 +109,10 @@ public class DolittleClient : IDisposable, IDolittleClient
     }
 
     /// <inheritdoc />
-    public bool Connected { get; private set; }
+    public bool IsConnected { get; private set; }
+
+    /// <inheritdoc />
+    public Task Connected => _connectedCompletionSource.Task;
 
     /// <inheritdoc />
     public IEventTypes EventTypes
@@ -200,7 +204,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <inheritdoc />
     public async Task<IDolittleClient> Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken = default)
     {
-        if (Connected)
+        if (IsConnected)
         {
             throw new CannotConnectDolittleClientMultipleTimes();
         }
@@ -208,7 +212,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         await _connectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (Connected)
+            if (IsConnected)
             {
                 throw new CannotConnectDolittleClientMultipleTimes();
             }
@@ -224,7 +228,8 @@ public class DolittleClient : IDisposable, IDolittleClient
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
             
-            Connected = true;
+            IsConnected = true;
+            _connectedCompletionSource.SetResult(true);
             return this;
         }
         finally
@@ -393,7 +398,7 @@ public class DolittleClient : IDisposable, IDolittleClient
 
     TRequiresStartService GetOrThrowIfNotConnected<TRequiresStartService>(TRequiresStartService service)
     {
-        if (!Connected)
+        if (!IsConnected)
         {
             throw new CannotUseUnconnectedDolittleClient();
         }

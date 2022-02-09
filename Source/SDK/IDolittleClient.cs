@@ -26,7 +26,12 @@ public interface IDolittleClient
     /// <summary>
     /// Gets a value indicating whether the Dolittle Client is connected.
     /// </summary>
-    bool Connected { get; }
+    bool IsConnected { get; }
+    
+    /// <summary>
+    /// Gets a <see cref="Task"/> that resolves when the Dolittle Client is connected.
+    /// </summary>
+    Task Connected { get; }
 
     /// <summary>
     /// Gets the <see cref="IEventTypes" />.
