@@ -6,7 +6,7 @@ using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromMongoDBConvertToAttributesBuilder.when_building_from;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromConvertToMongoDBAttributesBuilder.when_building_from;
 
 public class type_with_attributed_property : given.all_dependencies
 {
@@ -14,7 +14,7 @@ public class type_with_attributed_property : given.all_dependencies
     {
         public int AField;
 
-        [MongoDBConvertTo(Conversion.GuidAsString)]
+        [ConvertToMongoDB(Conversion.GuidAsString)]
         public int AProperty { get; set; }
 
         public int AMethod() => 2;

@@ -6,16 +6,16 @@ using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromMongoDBConvertToAttributesBuilder.when_building_from;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromConvertToMongoDBAttributesBuilder.when_building_from;
 
 public class type_with_attributed_property_and_field : given.all_dependencies
 {
     public class read_model_with_attibuted_property_and_field
     {
-        [MongoDBConvertTo(Conversion.DateAsArray)]
+        [ConvertToMongoDB(Conversion.DateAsArray)]
         public int AField;
 
-        [MongoDBConvertTo(Conversion.DateAsDate)]
+        [ConvertToMongoDB(Conversion.DateAsDate)]
         public int AProperty { get; set; }
 
         public int AMethod() => 2;

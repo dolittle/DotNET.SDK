@@ -9,13 +9,13 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB;
 /// Decorates a projection read model property to indicate that the projection read model property should be converted to a specific BsonType.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class MongoDBConvertToAttribute : Attribute
+public class ConvertToMongoDBAttribute : Attribute
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="MongoDBConvertToAttribute"/> class.
+    /// Initializes a new instance of the <see cref="ConvertToMongoDBAttribute"/> class.
     /// </summary>
     /// <param name="conversion">The <see cref="Copies.MongoDB.Conversion"/>.</param>
-    public MongoDBConvertToAttribute(Conversion conversion)
+    public ConvertToMongoDBAttribute(Conversion conversion)
     {
         Conversion = conversion;
     }

@@ -6,14 +6,14 @@ using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromMongoDBConvertToAttributesBuilder.when_building_from;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromConvertToMongoDBAttributesBuilder.when_building_from;
 
 public class type_with_attributed_field : given.all_dependencies
 {
     
     public class read_model_with_attibuted_field
     {
-        [MongoDBConvertTo(Conversion.GuidAsStandardBinary)]
+        [ConvertToMongoDB(Conversion.GuidAsStandardBinary)]
         public int AField;
 
         public int AProperty { get; set; }

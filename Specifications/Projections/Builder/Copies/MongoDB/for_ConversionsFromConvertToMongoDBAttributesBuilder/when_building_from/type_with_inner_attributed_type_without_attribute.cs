@@ -6,7 +6,7 @@ using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromMongoDBConvertToAttributesBuilder.when_building_from;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromConvertToMongoDBAttributesBuilder.when_building_from;
 
 public class type_with_inner_attributed_type_without_attribute : given.all_dependencies
 {
@@ -22,7 +22,7 @@ public class type_with_inner_attributed_type_without_attribute : given.all_depen
     }
     public class read_model_with_an_attribute
     {
-        [MongoDBConvertTo(Conversion.DateAsDocument)]
+        [ConvertToMongoDB(Conversion.DateAsDocument)]
         public int AField;
 
         public int AProperty { get; set; }
