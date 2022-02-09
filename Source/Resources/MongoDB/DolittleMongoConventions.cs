@@ -30,11 +30,8 @@ public static class DolittleMongoConventions
             }
             _isRegistered = true;
             var pack = new ConventionPack();
-            pack.AddClassMapConvention($"Ignore Extras", _ => _.SetIgnoreExtraElements(true));
-            ConventionRegistry.Register(
-                "pack",
-                pack,
-                _ => true);
+            pack.AddClassMapConvention("Ignore extra elements", _ => _.SetIgnoreExtraElements(true));
+            ConventionRegistry.Register("Dolittle Conventions", pack,  _ => true);
         }
     }
 }
