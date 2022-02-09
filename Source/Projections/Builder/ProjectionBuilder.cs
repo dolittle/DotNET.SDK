@@ -4,6 +4,8 @@
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Builder.Copies;
+using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -15,6 +17,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
 {
     readonly ProjectionId _projectionId;
     readonly IModelBuilder _modelBuilder;
+    readonly IProjectionCopyToMongoDBBuilderFactory _copyToMongoDbBuilderFactory;
     ICanTryBuildProjection _methodsBuilder;
 
     ScopeId _scopeId = ScopeId.Default;
@@ -24,10 +27,12 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     /// </summary>
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder" />.</param>
-    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder)
+    /// <param name="copyToMongoDBBuilderFactory">The <see cref="IProjectionCopyToMongoDBBuilderFactory"/>.</param>
+    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder, IProjectionCopyToMongoDBBuilderFactory copyToMongoDBBuilderFactory)
     {
         _projectionId = projectionId;
         _modelBuilder = modelBuilder;
+        _copyToMongoDbBuilderFactory = copyToMongoDBBuilderFactory;
     }
 
     /// <inheritdoc />
@@ -49,7 +54,12 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
             throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
         }
         
-        var builder = new ProjectionBuilderForReadModel<TReadModel>(_projectionId, _scopeId, _modelBuilder, this);
+        var builder = new ProjectionBuilderForReadModel<TReadModel>(
+            _projectionId,
+            _scopeId,
+            _modelBuilder,
+            this,
+            new ProjectionCopyDefinitionBuilder<TReadModel>(_copyToMongoDbBuilderFactory.CreateFor<TReadModel>()));
         _methodsBuilder = builder;
         return builder;
     }

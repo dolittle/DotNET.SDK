@@ -38,6 +38,7 @@ public class MongoDBResource : MongoDBBaseResource, IMongoDBResource
     /// <inheritdoc />
     public async Task<IMongoDatabase> GetDatabase(Action<MongoDatabaseSettings> databaseSettingsCallback = default, CancellationToken cancellationToken = default)
     {
+        DolittleMongoConventions.EnsureConventionsAreRegistered();
         var connectionString = await Get(_method, response => response.ConnectionString, cancellationToken).ConfigureAwait(false);
         var databaseSettings = new MongoDatabaseSettings();
         databaseSettingsCallback?.Invoke(databaseSettings);

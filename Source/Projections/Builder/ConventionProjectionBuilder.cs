@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -20,6 +21,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     where TProjection : class, new()
 {
     readonly ProjectionAttribute _decorator;
+    readonly Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> _copyToMongoDbBuilder;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
 
@@ -27,9 +29,11 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// Initializes an instance of the <see cref="ConventionProjectionBuilder{TProjection}"/> class.
     /// </summary>
     /// <param name="decorator">The <see cref="ProjectionAttribute"/> decorator.</param>
-    public ConventionProjectionBuilder(ProjectionAttribute decorator)
+    /// <param name="copyToMongoDbBuilder">The <see cref="Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder{TProjection}"/>.</param>
+    public ConventionProjectionBuilder(ProjectionAttribute decorator, Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
     {
         _decorator = decorator;
+        _copyToMongoDbBuilder = copyToMongoDbBuilder;
     }
 
     /// <inheritdoc />
@@ -67,8 +71,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         {
             return false;
         }
-
-        projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods);
+        if (!_copyToMongoDbBuilder.TryBuildFromReadModel(buildResults, out var copyToMongoDB))
+        {
+            buildResults.AddFailure($"Failed to build projection copies definition for projection {_decorator.Identifier} using conventions from projection type {_projectionType}");
+            return false;
+        }
+        
+        projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
         return true;
     }
     
