@@ -14,7 +14,7 @@ public class to_new_property_without_parent_properties : given.all_dependencies
     Establish context = () =>
     {
         property = "Property";
-        conversion = Conversion.Guid;
+        conversion = Conversion.GuidAsStandardBinary;
         conversions.AddConversion(new PropertyPath(property), conversion);
     };
     Because of = () => result = conversions.GetAll();

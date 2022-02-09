@@ -13,8 +13,7 @@ public class all_dependencies
     protected static ConversionsFromMongoDBConvertToAttributesBuilder builder;
     protected static ClientBuildResults build_results;
     protected static Mock<IPropertyConversions> conversions;
-    protected static bool succeeded;
-    
+
     Establish context = () =>
     {
         builder = new ConversionsFromMongoDBConvertToAttributesBuilder();

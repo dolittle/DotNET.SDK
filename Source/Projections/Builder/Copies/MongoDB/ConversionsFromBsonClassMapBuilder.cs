@@ -3,6 +3,7 @@
 
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Projections.Copies.MongoDB;
+using MongoDB.Bson.Serialization;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
@@ -11,8 +12,19 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 /// </summary>
 public class ConversionsFromBsonClassMapBuilder : IBuildPropertyConversionsFromBsonClassMap
 {
+    readonly IAddConversionsFromBsonClassMap _conversionsFromBsonClassMap;
+    
+    /// <summary>
+    /// Initializes a new instance of <see cref="ConversionsFromBsonClassMapBuilder"/> class.
+    /// </summary>
+    /// <param name="conversionsFromBsonClassMap">The <see cref="IAddConversionsFromBsonClassMap" />.</param>
+    public ConversionsFromBsonClassMapBuilder(IAddConversionsFromBsonClassMap conversionsFromBsonClassMap)
+    {
+        _conversionsFromBsonClassMap = conversionsFromBsonClassMap;
+    }
+    
     /// <inheritdoc />
-    public bool TryBuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
+    public void BuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
         where TReadModel : class, new()
-        => true;
+        => _conversionsFromBsonClassMap.AddFrom(BsonClassMap.LookupClassMap(typeof(TReadModel)), buildResults, conversions);
 }

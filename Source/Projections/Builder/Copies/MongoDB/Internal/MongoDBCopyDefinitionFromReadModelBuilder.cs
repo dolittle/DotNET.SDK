@@ -36,11 +36,7 @@ public class MongoDBCopyDefinitionFromReadModelBuilder : IMongoDBCopyDefinitionF
             buildResults.AddFailure($"Could not get projection MongoDB Copy collection name from projection read model type {nameof(TReadModel)}");
             return false;
         }
-        if (!_conversionsFromAttributesBuilder.TryBuildFrom<TReadModel>(buildResults, copyToMongoDbBuilder.Conversions))
-        {
-            buildResults.AddFailure($"Could not build MongoDB Copy property conversions from projection read model type {nameof(TReadModel)}");
-            return false;
-        }
+        _conversionsFromAttributesBuilder.BuildFrom<TReadModel>(buildResults, copyToMongoDbBuilder.Conversions);
         copyToMongoDbBuilder.ToCollection(MongoDBCopyCollectionName.GetFrom<TReadModel>());
 
         return true;

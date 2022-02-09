@@ -1,3 +1,6 @@
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Linq;
 using Machine.Specifications;
 
@@ -13,7 +16,7 @@ public class to_new_property_with_parent_property_that_does_not_exist : given.al
     {
         parent = "Parent";
         property = "Property";
-        conversion = Conversion.Guid;
+        conversion = Conversion.GuidAsString;
         conversions.AddConversion(new PropertyPath(string.Join('.', parent, property)), conversion);
     };
     Because of = () => result = conversions.GetAll();

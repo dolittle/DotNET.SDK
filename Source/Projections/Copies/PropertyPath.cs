@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dolittle.SDK.Concepts;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Copies;
 
@@ -26,6 +25,13 @@ public record PropertyPath : ConceptAs<string>
             throw new PropertyPathStringCannotBeEmpty();
         }
     }
+
+    /// <summary>
+    /// Creates a new <see cref="PropertyPath"/> by adding the <see cref="PropertyName"/> to the current <see cref="PropertyPath"/>.
+    /// </summary>
+    /// <param name="property">The <see cref="PropertyName"/>.</param>
+    /// <returns>The new <see cref="PropertyPath"/>.</returns>
+    public PropertyPath Add(PropertyName property) => new($"{Value}.{property}");
 
     /// <summary>
     /// Gets all <see cref="IEnumerable{T}"/> of <see cref="PropertyName"/> representing the parts of the path.

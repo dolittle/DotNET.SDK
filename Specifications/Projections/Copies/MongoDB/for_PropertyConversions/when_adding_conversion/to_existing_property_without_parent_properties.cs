@@ -1,3 +1,6 @@
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Linq;
 using Machine.Specifications;
 
@@ -11,8 +14,8 @@ public class to_existing_property_without_parent_properties : given.all_dependen
     Establish context = () =>
     {
         property = "Property";
-        conversion = Conversion.Guid;
-        conversions.AddConversion(new PropertyPath(property), Conversion.DateTime);
+        conversion = Conversion.GuidAsCSharpLegacyBinary;
+        conversions.AddConversion(new PropertyPath(property), Conversion.DateAsInt64);
         conversions.AddConversion(new PropertyPath(property), conversion);
     };
     Because of = () => result = conversions.GetAll();

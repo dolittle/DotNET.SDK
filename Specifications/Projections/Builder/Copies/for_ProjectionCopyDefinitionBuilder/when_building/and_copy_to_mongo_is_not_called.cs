@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Projections.Builder.Copies.for_ProjectionCopyDefinitionBuilder.given;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;

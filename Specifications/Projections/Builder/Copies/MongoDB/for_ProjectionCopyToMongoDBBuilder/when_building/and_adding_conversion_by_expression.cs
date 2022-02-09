@@ -1,6 +1,7 @@
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
@@ -24,7 +25,7 @@ public class and_adding_conversion_by_expression : given.all_dependencies
         name_of_type = nameof(given.read_model_type);
         expression = property_path_expression_for<given.read_model_type, int>(_ => _.Field);
         property_path = nameof(given.read_model_type.Field);
-        conversion = Conversion.Guid;
+        conversion = Conversion.GuidAsStandardBinary;
         with_explicit_conversions(builder, (expression, property_path, conversion));
     };
 
@@ -37,6 +38,6 @@ public class and_adding_conversion_by_expression : given.all_dependencies
     It should_copy_to_mongo = () => copy_definition_result.ShouldCopy.ShouldBeTrue();
     It should_resolve_property_path_from_expression = () => property_path_resolver.Verify(_ => _.FromExpression(expression), Times.Once);
     It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(build_results, name_of_type), Times.Once);
-    It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.TryBuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
+    It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.BuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
     It should_not_have_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

@@ -14,7 +14,7 @@ public class when_converting_to_protobuf
 
     Establish context = () =>
     {
-        sdk_conversion = new PropertyConversion("property", Conversion.Guid, Enumerable.Empty<PropertyConversion>(), "rename");
+        sdk_conversion = new PropertyConversion("property", Conversion.GuidAsString, Enumerable.Empty<PropertyConversion>(), "rename");
         sdk_instance = new ProjectionCopyToMongoDB(
             true,
             "name",
@@ -25,7 +25,7 @@ public class when_converting_to_protobuf
     It should_have_the_correct_collection_name = () => protobuf_instance.Collection.ShouldEqual(sdk_instance.CollectionName.Value);
     It should_have_one_conversion = () => protobuf_instance.Conversions.Count.ShouldEqual(1);
     It should_have_conversion_with_correct_property_name = () => protobuf_instance.Conversions.First().PropertyName.ShouldEqual(sdk_conversion.PropertyName.Value);
-    It should_have_conversion_with_correct_property_conversion = () => protobuf_instance.Conversions.First().ConvertTo.ShouldEqual(PbProjectionCopyToMongoDB.Types.BSONType.Guid);
+    It should_have_conversion_with_correct_property_conversion = () => protobuf_instance.Conversions.First().ConvertTo.ShouldEqual(PbProjectionCopyToMongoDB.Types.BSONType.GuidasString);
     It should_have_conversion_with_correct_property_renaming = () => protobuf_instance.Conversions.First().RenameTo.ShouldEqual(sdk_conversion.RenameTo.Value);
     It should_have_conversion_with_no_child_conversions = () => protobuf_instance.Conversions.First().Children.ShouldBeEmpty();
 }

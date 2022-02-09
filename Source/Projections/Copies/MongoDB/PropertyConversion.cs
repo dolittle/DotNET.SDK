@@ -37,8 +37,14 @@ public record PropertyConversion(PropertyName PropertyName, Conversion ConvertTo
         => type switch
         {
             Conversion.None => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.None,
-            Conversion.Guid => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.Guid,
-            Conversion.DateTime => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.Date,
+            Conversion.GuidAsString => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.GuidasString,
+            Conversion.GuidAsStandardBinary => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.GuidasStandardBinary,
+            Conversion.GuidAsCSharpLegacyBinary => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.GuidasCsharpLegacyBinary,
+            Conversion.DateAsArray => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.DateAsArray,
+            Conversion.DateAsDate => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.DateAsDate,
+            Conversion.DateAsDocument => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.DateAsDocument,
+            Conversion.DateAsInt64 => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.DateAsInt64,
+            Conversion.DateAsString => Runtime.Events.Processing.Contracts.ProjectionCopyToMongoDB.Types.BSONType.DateAsString,
             _ => throw new UnsupportedConversion(type)
         };
 }

@@ -2,8 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Reflection;
 using Dolittle.SDK.Projections.Copies.MongoDB;
+using Dolittle.SDK.Resources.MongoDB;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -24,7 +24,10 @@ public static class MongoDatabaseExtensions
     /// <returns>The <see cref="IMongoCollection{TDocument}"/> for <typeparamref name="TSchema"/>.</returns>
     public static IMongoCollection<TSchema> GetCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings settings = default)
         where TSchema : class
-        => database.GetCollection<TSchema>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+    {
+        DolittleMongoConventions.EnsureConventionsAreRegistered();
+        return database.GetCollection<TSchema>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+    }
     
     /// <summary>
     /// Gets the <see cref="IMongoCollection{TDocument}"/> of <see cref="BsonDocument"/> for <typeparamref name="TSchema"/> where
@@ -36,5 +39,8 @@ public static class MongoDatabaseExtensions
     /// <returns>The <see cref="IMongoCollection{TDocument}"/> for <typeparamref name="TSchema"/>.</returns>
     public static IMongoCollection<BsonDocument> GetDocumentCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings settings = default)
         where TSchema : class
-        => database.GetCollection<BsonDocument>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+    {
+        DolittleMongoConventions.EnsureConventionsAreRegistered();
+        return database.GetCollection<BsonDocument>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+    }
 }
