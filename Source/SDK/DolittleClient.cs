@@ -217,9 +217,10 @@ public class DolittleClient : IDisposable, IDolittleClient
             _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
             
             var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
-            (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            var (executionContext, tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            Tenants = tenants;
 
-            await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext).ConfigureAwait(false);
+            await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext, tenants).ConfigureAwait(false);
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
             
@@ -283,7 +284,8 @@ public class DolittleClient : IDisposable, IDolittleClient
         IPerformMethodCalls methodCaller,
         Func<JsonSerializerSettings> eventSerializerProvider,
         ILoggerFactory loggerFactory,
-        ExecutionContext executionContext)
+        ExecutionContext executionContext,
+        IEnumerable<Tenant> tenants)
     {
         _clientCancellationTokenSource = new CancellationTokenSource();
         var serializer = new EventContentSerializer(_unregisteredEventTypes, eventSerializerProvider);
@@ -329,7 +331,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             methodCaller,
             executionContext,
             loggerFactory
-        ).FetchResourcesFor(Tenants, _clientCancellationTokenSource.Token);
+        ).FetchResourcesFor(tenants, _clientCancellationTokenSource.Token).ConfigureAwait(false);
     }
 
     async Task RegisterAllUnregistered(IPerformMethodCalls methodCaller, TimeSpan pingInterval, ExecutionContext executionContext, ILoggerFactory loggerFactory)
