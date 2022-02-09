@@ -19,7 +19,6 @@ var host = Host.CreateDefaultBuilder()
                     if (!chef.Dishes.Contains(@event.Dish)) chef.Dishes.Add(@event.Dish);
                     return chef;
                 })
-                .CopyToMongoDB()
         )
     )
     .Build();
