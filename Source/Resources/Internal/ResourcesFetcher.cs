@@ -4,7 +4,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Resources.MongoDB.Internal;
+using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
+using Microsoft.Extensions.Logging;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Resources.Internal;
 
@@ -13,5 +17,34 @@ namespace Dolittle.SDK.Resources.Internal;
 /// </summary>
 public class ResourcesFetcher : IFetchResources
 {
-    public Task<IResourcesBuilder> FetchResourcesFor(IEnumerable<Tenant> tenants, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+    readonly MongoDBResourceCreator _mongoDB;
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResourcesFetcher"/> class.
+    /// </summary>
+    /// <param name="methodCaller">The method caller to make requests to the Runtime with.</param>
+    /// <param name="executionContext">The base execution context for the client.</param>
+    /// <param name="loggerFactory">The logger factory to use to create loggers.</param>
+    public ResourcesFetcher(IPerformMethodCalls methodCaller, ExecutionContext executionContext, ILoggerFactory loggerFactory)
+    {
+        _mongoDB = new MongoDBResourceCreator(methodCaller, executionContext, loggerFactory);
+    }
+
+    /// <inheritdoc />
+    public async Task<IResourcesBuilder> FetchResourcesFor(IEnumerable<Tenant> tenants, CancellationToken cancellationToken = default)
+    {
+        var resources = new Dictionary<TenantId, IResources>();
+        
+        foreach (var tenant in tenants)
+        {
+            resources.Add(
+                tenant.Id,
+                new Resources(
+                    await _mongoDB.CreateFor(tenant.Id, cancellationToken).ConfigureAwait(false)
+                )
+            );
+        }
+
+        return new ResourcesBuilder(resources);
+    }
 }

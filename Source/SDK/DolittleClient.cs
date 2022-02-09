@@ -33,7 +33,6 @@ using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
@@ -326,7 +325,11 @@ public class DolittleClient : IDisposable, IDolittleClient
             _projectionConverter,
             executionContext,
             loggerFactory);
-        Resources = await new ResourcesFetcher().FetchResourcesFor(Tenants, _clientCancellationTokenSource.Token);
+        Resources = await new ResourcesFetcher(
+            methodCaller,
+            executionContext,
+            loggerFactory
+        ).FetchResourcesFor(Tenants, _clientCancellationTokenSource.Token);
     }
 
     async Task RegisterAllUnregistered(IPerformMethodCalls methodCaller, TimeSpan pingInterval, ExecutionContext executionContext, ILoggerFactory loggerFactory)

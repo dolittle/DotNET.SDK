@@ -1,12 +1,8 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using Dolittle.SDK.Execution;
-using Dolittle.SDK.Resources.MongoDB.Internal;
-using Dolittle.SDK.Services;
+using System.Collections.Generic;
 using Dolittle.SDK.Tenancy;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Resources;
 
@@ -15,27 +11,25 @@ namespace Dolittle.SDK.Resources;
 /// </summary>
 public class ResourcesBuilder : IResourcesBuilder
 {
-    readonly IPerformMethodCalls _methodCaller;
-    readonly ExecutionContext _executionContext;
-    readonly ILoggerFactory _loggerFactory;
+    readonly IDictionary<TenantId, IResources> _tenantResources;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ResourcesBuilder"/> class.
     /// </summary>
-    /// <param name="methodCaller">The <see cref="IPerformMethodCalls"/>.</param>
-    /// <param name="executionContext">The <see cref="ExecutionContext"/>.</param>
-    /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-    public ResourcesBuilder(IPerformMethodCalls methodCaller, ExecutionContext executionContext, ILoggerFactory loggerFactory)
+    /// <param name="tenantResources">The fetched resources per tenant.</param>
+    public ResourcesBuilder(IDictionary<TenantId, IResources> tenantResources)
     {
-        _methodCaller = methodCaller;
-        _executionContext = executionContext;
-        _loggerFactory = loggerFactory;
+        _tenantResources = tenantResources;
     }
 
     /// <inheritdoc />
     public IResources ForTenant(TenantId tenant)
     {
-        var executionContext = _executionContext.ForTenant(tenant).ForCorrelation(Guid.NewGuid());
-        return new Resources(new MongoDBResource(tenant, _methodCaller, executionContext, _loggerFactory));
+        if (!_tenantResources.TryGetValue(tenant, out var resources))
+        {
+            throw new ResourcesNotFetchedForTenant(tenant);
+        }
+
+        return resources;
     }
 }
