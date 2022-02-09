@@ -4,7 +4,6 @@
 using System.Threading.Tasks;
 using Dolittle.SDK.Services.given;
 using Grpc.Core;
-using Machine.Specifications;
 using Status = Grpc.Core.Status;
 
 namespace Dolittle.SDK.Services.for_ServerStreamingEnumerable.given;

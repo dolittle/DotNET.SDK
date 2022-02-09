@@ -1,4 +1,6 @@
-using System;
+// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
@@ -34,7 +36,7 @@ public class ConversionsFromBsonClassMapAdder : IAddConversionsFromBsonClassMap
             conversions.AddRenaming(path, memberMap.ElementName);
         }
         var serializer = memberMap.GetSerializer();
-        if (IsComplexType(memberMap.MemberType, serializer))
+        if (IsComplexType(serializer))
         {
             BuildFromAllMemberMaps(BsonClassMap.LookupClassMap(serializer.ValueType), conversions, path);
         }
@@ -106,5 +108,6 @@ public class ConversionsFromBsonClassMapAdder : IAddConversionsFromBsonClassMap
                 return false;
         }
     }
-    static bool IsComplexType(Type nominalType, IBsonSerializer serializer) => typeof(BsonClassMapSerializer<>).MakeGenericType(nominalType).IsInstanceOfType(serializer);
+    static bool IsComplexType(IBsonSerializer serializer)
+        => serializer.GetType().IsGenericType && serializer.GetType().GetGenericTypeDefinition() == typeof(BsonClassMapSerializer<>);
 }

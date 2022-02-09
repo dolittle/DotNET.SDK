@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dolittle.SDK.Concepts;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Copies;
 

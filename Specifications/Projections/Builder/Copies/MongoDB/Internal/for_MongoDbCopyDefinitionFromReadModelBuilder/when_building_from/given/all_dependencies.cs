@@ -3,7 +3,6 @@
 
 using Dolittle.SDK.Projections.Copies;
 using Machine.Specifications;
-using Moq;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal.for_MongoDbCopyDefinitionFromReadModelBuilder.when_building_from.given;
 
