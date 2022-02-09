@@ -1,3 +1,24 @@
+# [14.2.0] - 2022-2-9 [PR: #125](https://github.com/dolittle/DotNET.SDK/pull/125)
+## Summary
+
+Introduces APIs to configure secondary storage for Projection read models for querying, as introduced in https://github.com/dolittle/Runtime/pull/614 (requires Runtime v7.6.0). These changes makes it easy to query Projection read models by specifying that you want copies stored in MongoDB, and then use an `IMongoCollection<>` for that Projection as any other MongoDB collection. The Projection still operates normally and can be fetched from the Projection Store. Modifications of documents in the copied collections will affect the original Projection processing, but should be avoided as it could cause unexpected behaviour. The collections are automatically created and dropped as needed by the Runtime when Projections are created or changed.
+
+There is currently no mechanism for detecting multiple projections copied to the same collection, so be aware of possible strange behaviour if you have multiple Projections with the same name.
+
+### Added
+
+- The `[CopyToMongoDB(...)]` attribute that enables read model copies for a Projection class to MongoDB. The default collection name is the same as the class name. The attribute accepts an argument to override the collection name.
+- The `[ConvertToMongoDB(conversion)]` attribute to specify a BSON conversion to apply when copying the Projection read model to a MongoDB collection. By default the same conversions as the MongoDB driver uses is applied.
+- A `.CopyToMongoDB(...)` method on the Projection builder for enabling read model copies for Projections created using the builder API. This method accepts a callback that you can use to set the collection name and conversions for the read model copies. You can also disable default MongoDB driver conversions.
+- Binding for `IMongoDatabase` in the tenant scoped DI containers.
+- Binding for `IMongoCollection<TReadModel>` in the tenant scoped DI containers for each Projection.
+- Extension method `IMongoDatabase.GetCollection<TReadModel>(settings = null)` to get a collection using the name of the read model or the collection specified in the `[CopyToMongoDB(collection)]` attribute.
+
+### Changed
+
+- To make deserialising work from a Projection read model copy collection, we have enabled `IgnoreExtraElements` for all types in the MongoDB driver when the Dolittle Client is used. This is not default behaviour for the MongoDB driver, but when using MongoDB for read model storage, this should not affect the application adversely.
+
+
 # [14.1.0] - 2022-1-28 [PR: #124](https://github.com/dolittle/DotNET.SDK/pull/124)
 ## Summary
 
