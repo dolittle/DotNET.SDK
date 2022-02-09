@@ -25,10 +25,9 @@ await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 
 var dishCounterCollection = client.Services.ForTenant(TenantId.Development).GetRequiredService<IMongoCollection<DishCounter>>();
 
-
 foreach (var dish in await dishCounterCollection.Find(FilterDefinition<DishCounter>.Empty).ToListAsync().ConfigureAwait(false))
 {
-    Console.WriteLine($"The kitchen has prepared {dish.Name} {dish.NumberOfTimesPrepared} times");
+    Console.WriteLine($"The kitchen has prepared {dish.Name} {dish.NumberOfTimesPrepared} times. The last time was {dish.LastPrepared.ToLocalTime()}");
 }
 
 var dishesPreparedToday = await dishCounterCollection.Find(_ => _.LastPrepared >= DateTime.Today && _.LastPrepared < DateTime.Today.AddDays(1)).ToListAsync();
