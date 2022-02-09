@@ -97,7 +97,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         foreach (var projection in Values)
         {
             var readModelType = projection.ProjectionType;
-            serviceCollection.AddSingleton(
+            serviceCollection.AddScoped(
                 typeof(IProjectionOf<>).MakeGenericType(readModelType),
                 serviceProvider => GetOfMethodForReadModel(readModelType).Invoke(
                     serviceProvider.GetRequiredService<IProjectionStore>(),
@@ -108,7 +108,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                     }));
             if (projection.Copies.MongoDB.ShouldCopy)
             {
-                serviceCollection.AddSingleton(
+                serviceCollection.AddScoped(
                     typeof(IMongoCollection<>).MakeGenericType(readModelType),
                     serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
                         serviceProvider.GetRequiredService<IMongoDatabase>(),

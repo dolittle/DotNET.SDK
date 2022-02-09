@@ -224,7 +224,7 @@ public class DolittleClient : IDisposable, IDolittleClient
                 configuration.EventSerializerProvider,
                 loggerFactory,
                 executionContext);
-            await ConfigureContainer(configuration).ConfigureAwait(false);
+            ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
             
             Connected = true;
@@ -399,16 +399,11 @@ public class DolittleClient : IDisposable, IDolittleClient
         return service;
     }
 
-    async Task ConfigureContainer(DolittleClientConfiguration config)
+    void ConfigureContainer(DolittleClientConfiguration config)
     {
-        var mongoDatabasesPerTenant = new Dictionary<TenantId, IMongoDatabase>();
-        foreach (var tenant in _tenants)
-        {
-            mongoDatabasesPerTenant.Add(tenant.Id, await _resources.ForTenant(tenant.Id).MongoDB.GetDatabase().ConfigureAwait(false));
-        }
         Services = new TenantScopedProvidersBuilder()
             .AddTenantServices(AddBuilderServices)
-            .AddTenantServices((tenant, collection) => collection.AddSingleton(mongoDatabasesPerTenant[tenant]))
+            .AddTenantServices((_, collection) => collection.AddScoped(services => services.GetRequiredService<IResources>().MongoDB.GetDatabase()))
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
             .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)
