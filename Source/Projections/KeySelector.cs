@@ -16,10 +16,37 @@ public class KeySelector
         OccurredFormat = occurredFormat;
     }
 
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.PartitionId"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
     public static KeySelector Partition() => new(KeySelectorType.PartitionId, "", "", "");
+    
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.EventSourceId"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
     public static KeySelector EventSource() => new(KeySelectorType.EventSourceId, "", "", "");
+    
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <param name="expression">The <see cref="KeySelectorExpression"/>.</param>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
     public static KeySelector Property(KeySelectorExpression expression) => new(KeySelectorType.Property, expression, "", "");
+    
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <param name="key">The static <see cref="Key"/>.</param>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
     public static KeySelector Static(Key key) => new(KeySelectorType.Static, "", key, "");
+    
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <param name="occurredFormat">The <see cref="OccurredFormat"/>.</param>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
     public static KeySelector Occurred(OccurredFormat occurredFormat) => new(KeySelectorType.Occurred, "", "", occurredFormat);
 
     /// <summary>
