@@ -1,7 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Resources.MongoDB.Internal;
@@ -33,18 +35,18 @@ public class ResourcesFetcher : IFetchResources
     /// <inheritdoc />
     public async Task<IResourcesBuilder> FetchResourcesFor(IEnumerable<Tenant> tenants, CancellationToken cancellationToken = default)
     {
-        var resources = new Dictionary<TenantId, IResources>();
-        
-        foreach (var tenant in tenants)
+        var resources = new ConcurrentDictionary<TenantId, IResources>();
+
+        await Task.WhenAll(tenants.Select(async tenant =>
         {
-            resources.Add(
+            resources.TryAdd(
                 tenant.Id,
                 new Resources(
                     await _mongoDB.CreateFor(tenant.Id, cancellationToken).ConfigureAwait(false)
                 )
             );
-        }
-
+        })).ConfigureAwait(false);
+            
         return new ResourcesBuilder(resources);
     }
 }
