@@ -33,7 +33,8 @@ public static class ServiceProviderExtensions
 
         try
         {
-            var clientConfig = provider.GetService<IOptions<DolittleClientConfiguration>>()?.Value ?? new DolittleClientConfiguration();
+            var config = provider.GetService<IOptions<Configurations.Dolittle>>()?.Value;
+            var clientConfig = config != default ? DolittleClientConfiguration.FromConfiguration(config) : new DolittleClientConfiguration();
             configureClient?.Invoke(clientConfig);
 
             return await client.Connect(clientConfig, cancellationToken).ConfigureAwait(false);
