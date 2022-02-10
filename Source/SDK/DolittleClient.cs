@@ -27,12 +27,12 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resources;
+using Dolittle.SDK.Resources.Internal;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
@@ -57,6 +57,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
     readonly SemaphoreSlim _connectLock = new(1, 1);
+    readonly TaskCompletionSource<bool> _connectedCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
@@ -108,7 +109,10 @@ public class DolittleClient : IDisposable, IDolittleClient
     }
 
     /// <inheritdoc />
-    public bool Connected { get; private set; }
+    public bool IsConnected { get; private set; }
+
+    /// <inheritdoc />
+    public Task Connected => _connectedCompletionSource.Task;
 
     /// <inheritdoc />
     public IEventTypes EventTypes
@@ -200,7 +204,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <inheritdoc />
     public async Task<IDolittleClient> Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken = default)
     {
-        if (Connected)
+        if (IsConnected)
         {
             throw new CannotConnectDolittleClientMultipleTimes();
         }
@@ -208,7 +212,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         await _connectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (Connected)
+            if (IsConnected)
             {
                 throw new CannotConnectDolittleClientMultipleTimes();
             }
@@ -217,17 +221,15 @@ public class DolittleClient : IDisposable, IDolittleClient
             _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
             
             var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
-            (var executionContext, Tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
-            
-            CreateDependencies(
-                methodCaller,
-                configuration.EventSerializerProvider,
-                loggerFactory,
-                executionContext);
-            await ConfigureContainer(configuration).ConfigureAwait(false);
+            var (executionContext, tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            Tenants = tenants;
+
+            await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext, tenants).ConfigureAwait(false);
+            ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
             
-            Connected = true;
+            IsConnected = true;
+            _connectedCompletionSource.SetResult(true);
             return this;
         }
         finally
@@ -283,11 +285,12 @@ public class DolittleClient : IDisposable, IDolittleClient
         _disposed = true;
     }
 
-    void CreateDependencies(
+    async Task CreateDependencies(
         IPerformMethodCalls methodCaller,
         Func<JsonSerializerSettings> eventSerializerProvider,
         ILoggerFactory loggerFactory,
-        ExecutionContext executionContext)
+        ExecutionContext executionContext,
+        IEnumerable<Tenant> tenants)
     {
         _clientCancellationTokenSource = new CancellationTokenSource();
         var serializer = new EventContentSerializer(_unregisteredEventTypes, eventSerializerProvider);
@@ -329,7 +332,11 @@ public class DolittleClient : IDisposable, IDolittleClient
             _projectionConverter,
             executionContext,
             loggerFactory);
-        Resources = new ResourcesBuilder(methodCaller, executionContext, loggerFactory);
+        Resources = await new ResourcesFetcher(
+            methodCaller,
+            executionContext,
+            loggerFactory
+        ).FetchResourcesFor(tenants, _clientCancellationTokenSource.Token).ConfigureAwait(false);
     }
 
     async Task RegisterAllUnregistered(IPerformMethodCalls methodCaller, TimeSpan pingInterval, ExecutionContext executionContext, ILoggerFactory loggerFactory)
@@ -391,7 +398,7 @@ public class DolittleClient : IDisposable, IDolittleClient
 
     TRequiresStartService GetOrThrowIfNotConnected<TRequiresStartService>(TRequiresStartService service)
     {
-        if (!Connected)
+        if (!IsConnected)
         {
             throw new CannotUseUnconnectedDolittleClient();
         }
@@ -399,16 +406,11 @@ public class DolittleClient : IDisposable, IDolittleClient
         return service;
     }
 
-    async Task ConfigureContainer(DolittleClientConfiguration config)
+    void ConfigureContainer(DolittleClientConfiguration config)
     {
-        var mongoDatabasesPerTenant = new Dictionary<TenantId, IMongoDatabase>();
-        foreach (var tenant in _tenants)
-        {
-            mongoDatabasesPerTenant.Add(tenant.Id, await _resources.ForTenant(tenant.Id).MongoDB.GetDatabase().ConfigureAwait(false));
-        }
         Services = new TenantScopedProvidersBuilder()
             .AddTenantServices(AddBuilderServices)
-            .AddTenantServices((tenant, collection) => collection.AddSingleton(mongoDatabasesPerTenant[tenant]))
+            .AddTenantServices((_, collection) => collection.AddScoped(services => services.GetRequiredService<IResources>().MongoDB.GetDatabase()))
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
             .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)

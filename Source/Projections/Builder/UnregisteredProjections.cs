@@ -50,7 +50,6 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
-        RegisterProjectionsConventions();
         foreach (var projection in Values)
         {
             eventProcessors.Register(
@@ -62,16 +61,6 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                 new ProjectionsProtocol(),
                 cancellationToken);
         }
-    }
-
-    void RegisterProjectionsConventions()
-    {
-        var conventions = new ConventionPack();
-        conventions.AddClassMapConvention("Ignore extra projection properties", _ => _.SetIgnoreExtraElements(true));
-        ConventionRegistry.Register(
-            "Projections Conventions",
-            conventions,
-            _ => ReadModelTypes.HasFor(_));
     }
 
     /// <inheritdoc />
@@ -97,7 +86,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         foreach (var projection in Values)
         {
             var readModelType = projection.ProjectionType;
-            serviceCollection.AddSingleton(
+            serviceCollection.AddScoped(
                 typeof(IProjectionOf<>).MakeGenericType(readModelType),
                 serviceProvider => GetOfMethodForReadModel(readModelType).Invoke(
                     serviceProvider.GetRequiredService<IProjectionStore>(),
@@ -108,13 +97,13 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                     }));
             if (projection.Copies.MongoDB.ShouldCopy)
             {
-                serviceCollection.AddSingleton(
+                serviceCollection.AddScoped(
                     typeof(IMongoCollection<>).MakeGenericType(readModelType),
                     serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
                         serviceProvider.GetRequiredService<IMongoDatabase>(),
                         new object[]
                         {
-                            MongoDBCopyCollectionName.GetFrom(readModelType).Value,
+                            projection.Copies.MongoDB.CollectionName.Value,
                             null
                         }));
             }

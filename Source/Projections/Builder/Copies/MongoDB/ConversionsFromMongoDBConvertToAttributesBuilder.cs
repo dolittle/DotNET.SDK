@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 /// <summary>
 /// Represents an implementation of <see cref="ICanBuildPropertyConversionsFromReadModel"/>.
 /// </summary>
-public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyConversionsFromMongoDBConvertToAttributes
+public class ConversionsFromConvertToMongoDBAttributesBuilder : IBuildPropertyConversionsFromMongoDBConvertToAttributes
 {
     /// <inheritdoc />
     public void BuildFrom<TReadModel>(IClientBuildResults buildResults, IPropertyConversions conversions)
@@ -25,7 +25,7 @@ public class ConversionsFromMongoDBConvertToAttributesBuilder : IBuildPropertyCo
     {
         foreach (var member in type.GetMembers())
         {
-            var attribute = member.GetCustomAttribute<MongoDBConvertToAttribute>();
+            var attribute = member.GetCustomAttribute<ConvertToMongoDBAttribute>();
             var hasAttribute = attribute != default;
             if (!TryGetMemberNameAndTypeToCheck(member, out var typeToCheck, out var propertyName) || checkedTypes.Contains(typeToCheck))
             {

@@ -23,16 +23,24 @@ public static class ServiceProviderExtensions
     /// <param name="configureClient">The optional <see cref="ConfigureDolittleClient"/> callback.</param>
     /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> used if the <see cref="IDolittleClient"/> needs to connect.</param>
     /// <returns>A <see cref="Task{TResult}"/> that, when resolved, returns the connected <see cref="IDolittleClient"/>.</returns>
-    public static Task<IDolittleClient> GetDolittleClient(this IServiceProvider provider, ConfigureDolittleClient configureClient = default,  CancellationToken cancellationToken = default)
+    public static async Task<IDolittleClient> GetDolittleClient(this IServiceProvider provider, ConfigureDolittleClient configureClient = default,  CancellationToken cancellationToken = default)
     {
         var client = provider.GetService<IDolittleClient>() ?? throw new DolittleClientNotSetup();
-        if (client.Connected)
+        if (client.IsConnected)
         {
-            return Task.FromResult(client);
+            return client;
         }
 
-        var clientConfig = provider.GetService<IOptions<DolittleClientConfiguration>>()?.Value ?? new DolittleClientConfiguration();
-        configureClient?.Invoke(clientConfig);
-        return client.Connect(clientConfig, cancellationToken);
+        try
+        {
+            var clientConfig = provider.GetService<IOptions<DolittleClientConfiguration>>()?.Value ?? new DolittleClientConfiguration();
+            configureClient?.Invoke(clientConfig);
+
+            return await client.Connect(clientConfig, cancellationToken).ConfigureAwait(false);
+        }
+        catch (CannotConnectDolittleClientMultipleTimes)
+        {
+            return client;
+        }
     }
 }

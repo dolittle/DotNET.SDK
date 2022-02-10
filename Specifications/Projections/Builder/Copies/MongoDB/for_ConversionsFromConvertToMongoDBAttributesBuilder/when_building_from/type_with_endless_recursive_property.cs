@@ -6,7 +6,7 @@ using Machine.Specifications;
 using Moq;
 using It = Machine.Specifications.It;
 
-namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromMongoDBConvertToAttributesBuilder.when_building_from;
+namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.for_ConversionsFromConvertToMongoDBAttributesBuilder.when_building_from;
 
 public class type_with_endless_recursive_property : given.all_dependencies
 {
@@ -18,7 +18,7 @@ public class type_with_endless_recursive_property : given.all_dependencies
 
         public int AMethod() => 2;
 
-        [MongoDBConvertTo(Conversion.None)]
+        [ConvertToMongoDB(Conversion.None)]
         public read_model_with_inner_none_attributed_type_with_attribute RecursiveField;
     }
 
