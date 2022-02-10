@@ -1,3 +1,14 @@
+# [15.0.1] - 2022-2-10 [PR: #131](https://github.com/dolittle/DotNET.SDK/pull/131)
+## Summary
+
+Do not throw exception when using dolittle middleware and it's not connected before a request is received, and fixes a configuration bug when getting a Dolittle Client directly from the service provider.
+
+### Fixed
+
+- In the `TenantScopedServiceProviderMiddleware` we check if the Dolittle Client is connected and log a message if it's not
+- Using the `IServiceProvider.GetDolittleClient()` got the wrong configuration object.
+
+
 # [15.0.0] - 2022-2-10 [PR: #130](https://github.com/dolittle/DotNET.SDK/pull/130)
 ## Summary
 
