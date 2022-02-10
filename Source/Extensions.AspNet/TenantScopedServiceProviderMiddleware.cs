@@ -46,7 +46,7 @@ public partial class TenantScopedServiceProviderMiddleware
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task InvokeAsync(HttpContext context)
     {
-        if (_client == null)
+        if (_client is not { IsConnected: true })
         {
             DolittleClientNotReady();
             await _next(context).ConfigureAwait(false);
