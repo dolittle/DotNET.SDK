@@ -1,3 +1,23 @@
+# [15.0.0] - 2022-2-10 [PR: #130](https://github.com/dolittle/DotNET.SDK/pull/130)
+## Summary
+
+The Dolittle Client now fetches resources while establishing the initial connection so that we could make the resources interfaces synchronous, simplifying the usage and allowing us to more simply bind them in the DI container. The `.Connected` property on the client has been changed to a `Task` so you can await the connection asynchronously. The old boolean property has been moved to `.IsConnected`. 
+
+### Added
+
+- A new property `IDolittleClient.Connected` that returns a `Task` that is resolved when the client is successfully connected to a Runtime.
+
+### Changed
+
+- The `IMongoDBResource.GetDatabase()` returns an `IMongoDatabase` instead of a `Task<IMongoDatabase>` since the configuration is retrieved while connecting to the Runtime.
+- The `IDolittleClient.Connected` boolean property has been renamed to `.IsConnected`.
+- The `[MongoDBConvertTo(...)]` attribute was renamed to `[ConvertToMongoDB(...)]` as it was intended in the last release.
+
+### Fixed
+
+- Calling `IServiceProvider.GetDolittleClient()` could throw an exception if called while the client was in the process of connecting.
+
+
 # [14.2.0] - 2022-2-9 [PR: #125](https://github.com/dolittle/DotNET.SDK/pull/125)
 ## Summary
 
