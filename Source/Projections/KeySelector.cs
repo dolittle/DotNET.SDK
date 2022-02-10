@@ -8,25 +8,19 @@ namespace Dolittle.SDK.Projections;
 /// </summary>
 public class KeySelector
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="KeySelector"/> class.
-    /// </summary>
-    /// <param name="type">The <see cref="KeySelectorType"/>.</param>
-    public KeySelector(KeySelectorType type)
-    {
-        Type = type;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="KeySelector"/> class.
-    /// </summary>
-    /// <param name="type">The <see cref="KeySelectorType"/>.</param>
-    /// <param name="expression">The <see cref="KeySelectorExpression"/>.</param>
-    public KeySelector(KeySelectorType type, KeySelectorExpression expression)
+    KeySelector(KeySelectorType type, KeySelectorExpression expression, Key staticKey, OccurredFormat occurredFormat)
     {
         Type = type;
         Expression = expression;
+        StaticKey = staticKey;
+        OccurredFormat = occurredFormat;
     }
+
+    public static KeySelector Partition() => new(KeySelectorType.PartitionId, "", "", "");
+    public static KeySelector EventSource() => new(KeySelectorType.EventSourceId, "", "", "");
+    public static KeySelector Property(KeySelectorExpression expression) => new(KeySelectorType.Property, expression, "", "");
+    public static KeySelector Static(Key key) => new(KeySelectorType.Static, "", key, "");
+    public static KeySelector Occurred(OccurredFormat occurredFormat) => new(KeySelectorType.Occurred, "", "", occurredFormat);
 
     /// <summary>
     /// Gets the <see cref="KeySelectorType" />.
@@ -37,4 +31,14 @@ public class KeySelector
     /// Gets the <see cref="KeySelectorExpression" />.
     /// </summary>
     public KeySelectorExpression Expression { get; }
+    
+    /// <summary>
+    /// Gets the static <see cref="Key" />.
+    /// </summary>
+    public Key StaticKey { get; }
+    
+    /// <summary>
+    /// Gets the <see cref="OccurredFormat" />.
+    /// </summary>
+    public OccurredFormat OccurredFormat { get; }
 }

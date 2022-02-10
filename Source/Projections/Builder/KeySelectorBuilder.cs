@@ -15,20 +15,37 @@ public class KeySelectorBuilder
     /// </summary>
     /// <returns>A <see cref="KeySelector"/>.</returns>
     public static KeySelector KeyFromEventSource()
-        => new(KeySelectorType.EventSourceId);
+        => KeySelector.EventSource();
 
     /// <summary>
     /// Select projection key from the <see cref="PartitionId"/>.
     /// </summary>
     /// <returns>A <see cref="KeySelector"/>.</returns>
     public static KeySelector KeyFromPartitionId()
-        => new(KeySelectorType.PartitionId);
+        => KeySelector.Partition();
 
     /// <summary>
     /// Select projection key from a property of the event.
     /// </summary>
-    /// <param name="property">The property on the event.</param>
+    /// <param name="selectorExpression">The property on the event.</param>
     /// <returns>A <see cref="KeySelector"/>.</returns>
-    public static KeySelector KeyFromProperty(string property)
-        => new(KeySelectorType.Property, property);
+    public static KeySelector KeyFromProperty(KeySelectorExpression selectorExpression)
+        => KeySelector.Property(selectorExpression);
+    
+    /// <summary>
+    /// Select projection key from a static key.
+    /// </summary>
+    /// <param name="staticKey">The static projection key.</param>
+    /// <returns>A <see cref="KeySelector"/>.</returns>
+    public static KeySelector StaticKey(Key staticKey)
+        => KeySelector.Static(staticKey);
+    
+    
+    /// <summary>
+    /// Select projection key from when an event occurred.
+    /// </summary>
+    /// <param name="occurredFormat">The date time format.</param>
+    /// <returns>A <see cref="KeySelector"/>.</returns>
+    public static KeySelector KeyFromEventOccurred(OccurredFormat occurredFormat)
+        => KeySelector.Occurred(occurredFormat);
 }

@@ -117,6 +117,8 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
             KeySelectorType.EventSourceId => WithEventType(eventSelector, _ => _.EventSourceKeySelector = new EventSourceIdKeySelector()),
             KeySelectorType.PartitionId => WithEventType(eventSelector, _ => _.PartitionKeySelector = new PartitionIdKeySelector()),
             KeySelectorType.Property => WithEventType(eventSelector, _ => _.EventPropertyKeySelector = new EventPropertyKeySelector { PropertyName = eventSelector.KeySelector.Expression ?? string.Empty }),
+            KeySelectorType.Static => WithEventType(eventSelector, _ => _.StaticKeySelector = new StaticKeySelector{StaticKey = eventSelector.KeySelector.StaticKey ?? string.Empty}),
+            KeySelectorType.Occurred => WithEventType(eventSelector, _ => _.EventOccurredKeySelector = new EventOccurredKeySelector { Format = eventSelector.KeySelector.OccurredFormat ?? string.Empty}),
             _ => throw new UnknownKeySelectorType(eventSelector.KeySelector.Type)
         };
     }
