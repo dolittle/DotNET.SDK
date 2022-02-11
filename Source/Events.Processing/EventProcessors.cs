@@ -90,6 +90,12 @@ public class EventProcessors : IEventProcessors
 
                 _logger.LogInformation("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
                 await client.Handle(eventProcessor, cancellationToken).ConfigureAwait(false);
+                
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogWarning("{Kind} {Identifier} has stopped processing, retrying in 1s", eventProcessor.Kind, eventProcessor.Identifier);
+                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                }
             }
             catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
             {
