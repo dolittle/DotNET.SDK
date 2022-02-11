@@ -1,3 +1,13 @@
+# [15.1.1] - 2022-2-11 [PR: #133](https://github.com/dolittle/DotNET.SDK/pull/133)
+## Summary
+
+Fixes an issue where an event processor would be re-registered immediately if reverse call client was cancelled by the server.
+
+### Fixed
+
+- Waits a second and logs a warning message when handling of events was cancelled by the server
+
+
 # [15.1.0] - 2022-2-11 [PR: #132](https://github.com/dolittle/DotNET.SDK/pull/132)
 ## Summary
 
