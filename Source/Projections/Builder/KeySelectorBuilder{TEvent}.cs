@@ -24,7 +24,7 @@ public class KeySelectorBuilder<TEvent> : KeySelectorBuilder
     {
         if (propertyExpression.Body is MemberExpression memberExpression)
         {
-            return new KeySelector(KeySelectorType.Property, memberExpression.Member.Name);
+            return KeySelector.Property(memberExpression.Member.Name);
         }
 
         throw new KeySelectorExpressionWasNotAMemberExpression();

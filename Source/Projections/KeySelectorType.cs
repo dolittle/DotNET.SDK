@@ -16,10 +16,20 @@ public enum KeySelectorType
     /// <summary>
     /// Gets the key from the partition id metadata.
     /// </summary>
-    PartitionId = 1,
+    PartitionId,
 
     /// <summary>
     /// Gets the key from a named property on the event content.
     /// </summary>
-    Property = 2
+    Property,
+    
+    /// <summary>
+    /// Gets the from a static key.
+    /// </summary>
+    Static,
+    
+    /// <summary>
+    /// Gets the key the event occurred metadata.
+    /// </summary>
+    EventOccurred,
 }

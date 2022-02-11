@@ -325,7 +325,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
 
         if (!attributes.Any())
         {
-            buildResults.AddFailure($"Method {method} on projection {_projectionType} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}] or [{nameof(KeyFromEventSourceAttribute)}],");
+            buildResults.AddFailure($"Method {method} on projection {_projectionType} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}], [{nameof(KeyFromEventSourceAttribute)}], [{nameof(StaticKeyAttribute)}] or [{nameof(KeyFromEventOccurredAttribute)}]");
             return false;
         }
 
