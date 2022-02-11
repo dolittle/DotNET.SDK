@@ -4,7 +4,7 @@ using Dolittle.SDK.Projections.Builder;
 namespace Dolittle.SDK.Projections;
 
 /// <summary>
-/// Decorates a projection method with the <see cref="KeySelectorType.Occurred" />.
+/// Decorates a projection method with the <see cref="KeySelectorType.EventOccurred" />.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 public class KeyFromEventOccurredAttribute : Attribute, IKeySelectorAttribute

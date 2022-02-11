@@ -47,7 +47,7 @@ public class KeySelector
     /// </summary>
     /// <param name="occurredFormat">The <see cref="OccurredFormat"/>.</param>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector Occurred(OccurredFormat occurredFormat) => new(KeySelectorType.Occurred, "", "", occurredFormat);
+    public static KeySelector Occurred(OccurredFormat occurredFormat) => new(KeySelectorType.EventOccurred, "", "", occurredFormat);
 
     /// <summary>
     /// Gets the <see cref="KeySelectorType" />.

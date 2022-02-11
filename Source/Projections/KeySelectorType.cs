@@ -31,5 +31,5 @@ public enum KeySelectorType
     /// <summary>
     /// Gets the key the event occurred metadata.
     /// </summary>
-    Occurred,
+    EventOccurred,
 }
