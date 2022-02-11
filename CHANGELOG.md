@@ -1,3 +1,25 @@
+# [15.1.0] - 2022-2-11 [PR: #132](https://github.com/dolittle/DotNET.SDK/pull/132)
+## Summary
+
+Adds two new event key selectors to projections, `StaticKey` and `KeyFromEventOccurred`
+
+### Added
+
+- `[StaticKey]` event key selector attribute for projection On-methods that sets a constant, static, key as the key of the read model
+- `[KeyFromEventOccurred]` event key selector for projection On-methods that uses the event occurred metadata as the key for the projection read models formatted as the string given to the attribute. We currently support these formats:
+    - yyyy-MM-dd
+    - yyyy-MM
+    - yyyy
+    - HH:mm:ss
+    - hh:mm:ss
+    - HH:mm
+    - hh:mm
+    - HH
+    - hh
+    - yyyy-MM-dd HH:mm:ss
+    - And the above in different orderings
+
+
 # [15.0.1] - 2022-2-10 [PR: #131](https://github.com/dolittle/DotNET.SDK/pull/131)
 ## Summary
 
