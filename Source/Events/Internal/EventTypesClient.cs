@@ -70,29 +70,18 @@ public class EventTypesClient
 
     async Task Register(EventTypeRegistrationRequest request, CancellationToken cancellationToken)
     {
-        _logger.LogDebug(
-            "Registering Event Type {EventType} with Alias {Alias}",
-            request.EventType.Id.ToGuid(),
-            request.Alias);
+        _logger.Registering(request.EventType.Id.ToGuid(), request.Alias);
         try
         {
             var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
             if (response.Failure != null)
             {
-                _logger.LogWarning(
-                    "An error occurred while registering Event Type {EventType} with Alias {Alias} because {Reason}",
-                    request.EventType.Id.ToGuid(),
-                    request.Alias,
-                    response.Failure.Reason);
+                _logger.FailedToRegister(request.EventType.Id.ToGuid(), request.Alias, response.Failure.Reason);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(
-                ex,
-                "An error occurred while registering Event Type {EventType} with Alias {Alias}",
-                request.EventType.Id.ToGuid(),
-                request.Alias);
+            _logger.ErrorWhileRegistering(request.EventType.Id.ToGuid(), request.Alias, ex);
         }
     }
 }
