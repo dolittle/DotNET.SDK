@@ -126,8 +126,7 @@ public class EventHorizons : IEventHorizons, IDisposable
         {
             try
             {
-                _logger.LogDebug(
-                    "Subscribing to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope}",
+                _logger.SubscribingTo(
                     subscription.ProducerMicroservice,
                     subscription.ProducerTenant,
                     subscription.ProducerStream,
@@ -140,8 +139,7 @@ public class EventHorizons : IEventHorizons, IDisposable
 
                 if (response.Failed)
                 {
-                    _logger.LogWarning(
-                        "Failed to subscribe to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope} because {Reason}",
+                    _logger.FailedToSubscribeTo(
                         subscription.ProducerMicroservice,
                         subscription.ProducerTenant,
                         subscription.ProducerStream,
@@ -152,8 +150,7 @@ public class EventHorizons : IEventHorizons, IDisposable
                 }
                 else
                 {
-                    _logger.LogDebug(
-                        "Successfully subscribed to events from {ProducerMicroservice} in {ProducerTenant} in {ProducerStream} in {ProducerPartition} for {ConsumerTenant} into {ConsumerScope} with {Consent}",
+                    _logger.SuccessfullySubscribedTo(
                         subscription.ProducerMicroservice,
                         subscription.ProducerTenant,
                         subscription.ProducerStream,
@@ -167,7 +164,7 @@ public class EventHorizons : IEventHorizons, IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "An exception was thrown while registering an event horizon subscription.");
+                _logger.ErrorWhileRegisteringSubscription(ex);
             }
 
             return false;
