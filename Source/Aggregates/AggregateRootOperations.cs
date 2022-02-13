@@ -65,11 +65,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         var aggregateRootId = aggregateRoot.GetAggregateRootId();
         await ReApplyEvents(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
 
-        _logger.LogDebug(
-            "Performing operation on {AggregateRoot} with aggregate root id {AggregateRootId} applying events to event source {EventSource}",
-            aggregateRoot.GetType(),
-            aggregateRootId,
-            aggregateRoot.EventSourceId);
+        _logger.PerformingOn(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.EventSourceId);
         await method(aggregateRoot).ConfigureAwait(false);
 
         if (aggregateRoot.AppliedEvents.Any())
@@ -89,32 +85,23 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     async Task ReApplyEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
     {
         var eventSourceId = aggregateRoot.EventSourceId;
-        _logger.LogDebug(
-            "Re-applying events for {AggregateRoot} with aggregate root id {AggregateRootId} with event source id {EventSourceId}",
-            typeof(TAggregate),
-            aggregateRootId,
-            eventSourceId);
+        _logger.ReApplyingEventsFor(typeof(TAggregate), aggregateRootId, eventSourceId);
 
         var committedEvents = await _eventStore.FetchForAggregate(aggregateRootId, eventSourceId, cancellationToken).ConfigureAwait(false);
         if (committedEvents.HasEvents)
         {
-            _logger.LogTrace("Re-applying {NumberOfEvents} events", committedEvents.Count);
+            _logger.ReApplying(committedEvents.Count);
             aggregateRoot.ReApply(committedEvents);
         }
         else
         {
-            _logger.LogTrace("No events to re-apply");
+            _logger.NoEventsToReApply();
         }
     }
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)
     {
-        _logger.LogDebug(
-            "{AggregateRoot} with aggregate root id {AggregateRootId} is committing {NumberOfEvents} events to event source {EventSource}",
-            aggregateRoot.GetType(),
-            aggregateRootId,
-            aggregateRoot.AppliedEvents.Count(),
-            aggregateRoot.EventSourceId);
+        _logger.CommittingEvents(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.AppliedEvents.Count(), aggregateRoot.EventSourceId);
         return _eventStore
             .ForAggregate(aggregateRootId)
             .WithEventSource(aggregateRoot.EventSourceId)

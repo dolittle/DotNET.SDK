@@ -68,29 +68,18 @@ public class AggregateRootsClient
 
     async Task Register(AggregateRootAliasRegistrationRequest request, CancellationToken cancellationToken)
     {
-        _logger.LogDebug(
-            "Registering Aggregate Root {AggregateRoot} with Alias {Alias}",
-            request.AggregateRoot.Id.ToGuid(),
-            request.Alias);
+        _logger.Registering(request.AggregateRoot.Id.ToGuid(), request.Alias);
         try
         {
             var response = await _caller.Call(_aliasMethod, request, cancellationToken).ConfigureAwait(false);
             if (response.Failure != null)
             {
-                _logger.LogWarning(
-                    "An error occurred while registering Aggregate Root {AggregateRoot} with Alias {Alias} because {Reason}",
-                    request.AggregateRoot.Id.ToGuid(),
-                    request.Alias,
-                    response.Failure.Reason);
+                _logger.FailedToRegister(request.AggregateRoot.Id.ToGuid(), request.Alias, response.Failure.Reason);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(
-                ex,
-                "An error occurred while registering Aggregate Root {AggregateRoot} with Alias {Alias}",
-                request.AggregateRoot.Id.ToGuid(),
-                request.Alias);
+            _logger.ErrorDuringRegister(request.AggregateRoot.Id.ToGuid(), request.Alias, ex);
         }
     }
 }
