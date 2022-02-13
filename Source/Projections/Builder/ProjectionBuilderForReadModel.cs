@@ -22,6 +22,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 {
     readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
     readonly ProjectionId _projectionId;
+    ProjectionAlias _alias;
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
     readonly ProjectionBuilder _parentBuilder;
@@ -45,6 +46,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         IProjectionCopyDefinitionBuilder<TReadModel> copyDefinitionBuilder)
     {
         _projectionId = projectionId;
+        _alias = typeof(TReadModel).Name;
         _scopeId = scopeId;
         _modelBuilder = modelBuilder;
         _parentBuilder = parentBuilder;
@@ -114,6 +116,13 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
     /// <inheritdoc />
+    public IProjectionBuilderForReadModel<TReadModel> WithAlias(ProjectionAlias alias)
+    {
+        _alias = alias;
+        return this;
+    }
+
+    /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default)
     {
         _projectionCopyDefinitionBuilder.CopyToMongoDB(callback);
@@ -139,7 +148,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 
         if (eventTypesToMethods.Any())
         {
-            projection = new Projection<TReadModel>(_projectionId, _scopeId, eventTypesToMethods, projectionCopies);
+            projection = new Projection<TReadModel>(_projectionId, _alias, _scopeId, eventTypesToMethods, projectionCopies);
             return true;
         }
         buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");

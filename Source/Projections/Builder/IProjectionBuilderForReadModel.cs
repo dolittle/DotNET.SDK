@@ -99,10 +99,16 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
 
     /// <summary>
+    /// Defines the projection to have a specific <see cref="ProjectionAlias" />.
+    /// </summary>
+    /// <param name="alias">The <see cref="ProjectionAlias" />.</param>
+    /// <returns>The builder for continuation.</returns>
+    IProjectionBuilderForReadModel<TReadModel> WithAlias(ProjectionAlias alias);
+    
+    /// <summary>
     /// Adds the copy to MongoDB definition.
     /// </summary>
     /// <param name="callback">The optonal callback for building the MongoDB copy definition.</param>
     /// <returns>The builder for continuation.</returns>
     IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default);
-
 }
