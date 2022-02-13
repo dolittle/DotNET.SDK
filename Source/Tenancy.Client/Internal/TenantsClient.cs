@@ -38,7 +38,7 @@ public class TenantsClient : ITenants
     /// <inheritdoc />
     public async Task<IEnumerable<Tenant>> GetAll(ExecutionContext executionContext, CancellationToken cancellationToken = default)
     {
-        Log.GettingAllTenants(_logger);
+        _logger.GettingAllTenants();
         try
         {
             var request = new GetAllRequest { CallContext = new CallRequestContext { ExecutionContext = executionContext.ToProtobuf() } };
@@ -48,12 +48,12 @@ public class TenantsClient : ITenants
                 return response.Tenants.Select(CreateTenant);
             }
 
-            Log.FailedGettingAllTenants(_logger, response.Failure.Reason, response.Failure.Id.ToGuid());
+            _logger.FailedGettingAllTenants(response.Failure.Reason, response.Failure.Id.ToGuid());
             throw new FailedToGetAllTenants(response.Failure.Reason);
         }
         catch (Exception ex)
         {
-            Log.ErrorGettingTenants(_logger, ex);
+            _logger.ErrorGettingTenants(ex);
             throw;
         }
     }

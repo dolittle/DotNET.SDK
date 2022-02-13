@@ -73,11 +73,7 @@ public class EmbeddingStore : IEmbeddingStore
     public async Task<CurrentState<TEmbedding>> Get<TEmbedding>(Key key, EmbeddingId embeddingId, CancellationToken cancellation = default)
         where TEmbedding : class, new()
     {
-        _logger.LogDebug(
-            "Getting current embedding state with key {Key} for embedding of {EmbeddingType} with id {EmbeddingId}",
-            key,
-            typeof(TEmbedding),
-            embeddingId);
+        _logger.Get(key, typeof(TEmbedding), embeddingId);
 
         var request = new GetOneRequest
         {
@@ -93,7 +89,8 @@ public class EmbeddingStore : IEmbeddingStore
         {
             return state;
         }
-        _logger.LogError(error, "The Runtime returned the embedding state '{State}'. But it could not be converted to {EmbeddingType}.", response.State, typeof(TEmbedding));
+        
+        _logger.FailedToConvertState(response.State.State, typeof(TEmbedding), error);
         throw error;
 
     }
@@ -114,10 +111,7 @@ public class EmbeddingStore : IEmbeddingStore
     public async Task<IDictionary<Key, CurrentState<TEmbedding>>> GetAll<TEmbedding>(EmbeddingId embeddingId, CancellationToken cancellation = default)
         where TEmbedding : class, new()
     {
-        _logger.LogDebug(
-            "Getting all current embedding states for embedding of {EmbeddingType} with id {EmbeddingId}",
-            typeof(TEmbedding),
-            embeddingId);
+        _logger.GetAll(typeof(TEmbedding), embeddingId);
 
         var request = new GetAllRequest
         {
@@ -132,7 +126,8 @@ public class EmbeddingStore : IEmbeddingStore
         {
             return states.ToDictionary(_ => _.Key);
         }
-        _logger.LogError(error, "The Runtime returned the embedding states '{States}'. But it could not be converted to {EmbeddingType}.", response.States, typeof(TEmbedding));
+        
+        _logger.FailedToConvertStates(response.States.Select(_ => _.State), typeof(TEmbedding), error);
         throw error;
 
     }
@@ -153,10 +148,7 @@ public class EmbeddingStore : IEmbeddingStore
     public async Task<IEnumerable<Key>> GetKeys<TEmbedding>(EmbeddingId embeddingId, CancellationToken cancellation = default)
         where TEmbedding : class, new()
     {
-        _logger.LogDebug(
-            "Getting all keys for embedding of type {EmbeddingType} with id {EmbeddingId}",
-            typeof(TEmbedding),
-            embeddingId);
+        _logger.GetKeys(typeof(TEmbedding), embeddingId);
 
         var request = new GetKeysRequest
         {

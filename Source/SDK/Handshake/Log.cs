@@ -6,11 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Handshake;
 
+/// <summary>
+/// Log messages for <see cref="Dolittle.SDK.Handshake"/>.
+/// </summary>
 static partial class Log
 {
     [LoggerMessage(0, LogLevel.Debug, "Connecting to Dolittle Runtime")]
-    internal static partial void ConnectingToDolittleRuntime(ILogger logger);
+    internal static partial void ConnectingToDolittleRuntime(this ILogger logger);
 
     [LoggerMessage(0, LogLevel.Debug, "Failed connecting to Dolittle Runtime. Retrying in {RetryTime}. {FailureReason}")]
-    internal static partial void RetryConnect(ILogger logger, TimeSpan retryTime, string failureReason);
+    internal static partial void RetryConnect(this ILogger logger, TimeSpan retryTime, string failureReason);
 }

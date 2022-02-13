@@ -84,7 +84,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
         {
             try
             {
-                Log.ConnectingToDolittleRuntime(_logger);
+                _logger.ConnectingToDolittleRuntime();
                 var handshakeResult = await _handshakePerformer.Perform(attempts++, DateTimeOffset.Now - startTime, _headVersion, cancellationToken).ConfigureAwait(false);
                 return CreateExecutionContextFromHandshake(handshakeResult);
             }
@@ -94,7 +94,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
             }
             catch (Exception ex) when (ex is not DolittleRuntimeFailedHandshake)
             {
-                Log.RetryConnect(_logger, currentWaitTime, ex.Message);
+                _logger.RetryConnect(currentWaitTime, ex.Message);
                 await Task.Delay(currentWaitTime, cancellationToken).ConfigureAwait(false);
                 currentWaitTime = GetTimeToWait(currentWaitTime * 2);
             }

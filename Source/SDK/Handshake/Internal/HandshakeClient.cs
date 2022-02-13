@@ -41,7 +41,7 @@ public class HandshakeClient : IPerformHandshake
         {
             var contractsVersion = Contracts.VersionInfo.CurrentVersion.ToVersion();
             var sdkVersion = VersionInfo.CurrentVersion;
-            Log.PerformHandshake(_logger, headVersion, sdkVersion, contractsVersion);
+            _logger.PerformHandshake(headVersion, sdkVersion, contractsVersion);
             var request = new HandshakeRequest
             {
                 SdkIdentifier = "DotNET",
@@ -56,16 +56,16 @@ public class HandshakeClient : IPerformHandshake
             if (response.Failure != null)
             {
                 var failure = new Failure(response.Failure.Id.ToGuid(), response.Failure.Reason);
-                Log.HandshakeFailedResponse(_logger, failure.Reason, failure.Id);
+                _logger.HandshakeFailedResponse(failure.Reason, failure.Id);
                 throw new DolittleRuntimeFailedHandshake(failure);
             }
 
-            Log.SuccessfullyPerformedHandshake(_logger, headVersion, sdkVersion, contractsVersion, response.RuntimeVersion.ToVersion(), response.ContractsVersion.ToVersion());
+            _logger.SuccessfullyPerformedHandshake(headVersion, sdkVersion, contractsVersion, response.RuntimeVersion.ToVersion(), response.ContractsVersion.ToVersion());
             return new HandshakeResult(response.MicroserviceId.ToGuid(), response.EnvironmentName);
         }
         catch (Exception ex)
         {
-            Log.ErrorPerformingHandshake(_logger, ex);
+            _logger.ErrorPerformingHandshake(ex);
             throw;
         }
     }

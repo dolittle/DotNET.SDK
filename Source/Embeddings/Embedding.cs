@@ -69,10 +69,7 @@ public class Embedding : EmbeddingStore, IEmbedding
     /// <inheritdoc/>
     public async Task Delete(Key key, EmbeddingId embeddingId, CancellationToken cancellation = default)
     {
-        _logger.LogDebug(
-            "Deleting embedding with key {Key} and id {EmbeddingId}",
-            key,
-            embeddingId);
+        _logger.Delete(key, embeddingId);
 
         var request = new DeleteRequest
         {
@@ -101,11 +98,7 @@ public class Embedding : EmbeddingStore, IEmbedding
     public async Task<CurrentState<TEmbedding>> Update<TEmbedding>(Key key, EmbeddingId embeddingId, TEmbedding state, CancellationToken cancellation = default)
         where TEmbedding : class, new()
     {
-        _logger.LogDebug(
-            "Updating embedding state with key {Key} for embedding of {EmbeddingType} with id {EmbeddingId}",
-            key,
-            typeof(TEmbedding),
-            embeddingId);
+        _logger.Update(key, typeof(TEmbedding), embeddingId);
 
         var request = new UpdateRequest
         {
@@ -120,7 +113,7 @@ public class Embedding : EmbeddingStore, IEmbedding
 
         if (!_toSDK.TryConvert<TEmbedding>(response.State, out var retrieveState, out var error))
         {
-            _logger.LogError(error, "The Runtime returned the embedding state '{State}'. But it could not be converted to {EmbeddingType}.", response.State, typeof(TEmbedding));
+            _logger.FailedToConvertState(response.State.State, typeof(TEmbedding), error);
             throw error;
         }
 
