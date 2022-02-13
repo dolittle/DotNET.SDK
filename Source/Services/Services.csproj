@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Services</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Services</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
