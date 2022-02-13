@@ -3,11 +3,12 @@
 
 using System;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 
 /// <summary>
-/// Defines a system that builds a <see cref="MongoDBCopyDefinitionFromReadModelBuilder{TReadModel}"/> from a projection read model <see cref="Type"/>. 
+/// Defines a system that builds a <see cref="ProjectionCopyToMongoDB"/> from a projection read model <see cref="Type"/>. 
 /// </summary>
 public interface IMongoDBCopyDefinitionFromReadModelBuilder
 {

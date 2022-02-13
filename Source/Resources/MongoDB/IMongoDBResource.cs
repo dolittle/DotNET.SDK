@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Resources.MongoDB;
 public interface IMongoDBResource
 {
     /// <summary>
-    /// Gets the <see cref="IMongoDatabase"/> that is configured for this <see cref="IResource"/>.
+    /// Gets the <see cref="IMongoDatabase"/> that is configured for this <see cref="IMongoDBResource"/>.
     /// </summary>
     /// <param name="databaseSettingsCallback">The <see cref="Action{T}"/> callback for creating <see cref="MongoDatabaseSettings"/> used to create the <see cref="IMongoDatabase"/>.</param>
     /// <returns>An <see cref="IMongoDatabase"/>.</returns>
