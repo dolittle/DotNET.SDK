@@ -75,35 +75,35 @@ public class EventProcessors : IEventProcessors
                 var connected = await client.Connect(eventProcessor.RegistrationRequest, cancellationToken).ConfigureAwait(false);
                 if (!connected)
                 {
-                    _logger.LogWarning("{Kind} {Identifier} failed to connect to the Runtime, retrying in 1s.", eventProcessor.Kind, eventProcessor.Identifier);
-                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                    _logger.FailedToConnectToRuntime(eventProcessor.Kind, eventProcessor.Identifier);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
                 var connectFailure = protocol.GetFailureFromConnectResponse(client.ConnectResponse);
                 if (connectFailure != null)
                 {
-                    _logger.LogWarning("{Kind} {Identifier} received a failure from the Runtime, retrying in 1s. {FailureReason}", eventProcessor.Kind, eventProcessor.Identifier, connectFailure.Reason);
-                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                    _logger.ReceivedFailureFromRuntime(eventProcessor.Kind, eventProcessor.Identifier, connectFailure.Reason);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
-                _logger.LogInformation("{Kind} {Identifier} registered with the Runtime, start handling requests", eventProcessor.Kind, eventProcessor.Identifier);
+                _logger.Registered(eventProcessor.Kind, eventProcessor.Identifier);
                 await client.Handle(eventProcessor, cancellationToken).ConfigureAwait(false);
                 
                 if (!cancellationToken.IsCancellationRequested)
                 {
-                    _logger.LogWarning("{Kind} {Identifier} has stopped processing, retrying in 1s", eventProcessor.Kind, eventProcessor.Identifier);
-                    await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                    _logger.StoppedDuringProcessing(eventProcessor.Kind, eventProcessor.Identifier);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
             {
-                _logger.LogWarning(exception, "{Kind} {Identifier} registration failed with exception, retrying in 1s", eventProcessor.Kind, eventProcessor.Identifier);
-                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                _logger.RegistrationFailed(eventProcessor.Kind, eventProcessor.Identifier, exception);
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
             }
         }
 
-        _logger.LogDebug("{Kind} {identifier} handling of requests stopped.", eventProcessor.Kind, eventProcessor.Identifier);
+        _logger.ProcessingCompleted(eventProcessor.Kind, eventProcessor.Identifier);
     }
 }
