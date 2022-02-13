@@ -90,7 +90,7 @@ public class EmbeddingStore : IEmbeddingStore
             return state;
         }
         
-        _logger.FailedToConvertState(response.State.State, typeof(TEmbedding), error);
+        _logger.FailedToConvertState(typeof(TEmbedding), error);
         throw error;
 
     }
@@ -127,7 +127,7 @@ public class EmbeddingStore : IEmbeddingStore
             return states.ToDictionary(_ => _.Key);
         }
         
-        _logger.FailedToConvertStates(response.States.Select(_ => _.State), typeof(TEmbedding), error);
+        _logger.FailedToConvertState(typeof(TEmbedding), error);
         throw error;
 
     }

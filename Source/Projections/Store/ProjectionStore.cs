@@ -175,7 +175,7 @@ public class ProjectionStore : IProjectionStore
 
             if (!_toSDK.TryConvert<TReadModel>(response.States, out var states, out var error))
             {
-                _logger.FailedToConvertProjectionStates(error, response.States.Select(_ => _.State), typeof(TReadModel));
+                _logger.FailedToConvertProjectionState(typeof(TReadModel), error);
                 throw error;
             }
             foreach (var (key, value) in states.ToDictionary(_ => _.Key))
@@ -207,7 +207,7 @@ public class ProjectionStore : IProjectionStore
             ThrowIfIncorrectCurrentState(key, projectionId, state);
             return state;
         }
-        _logger.FailedToConvertProjectionState(error, response.State.State, typeof(TReadModel));
+        _logger.FailedToConvertProjectionState(typeof(TReadModel), error);
         throw error;
     }
     static void ThrowIfIncorrectCurrentState<TReadModel>(Key key, ProjectionId projectionId, CurrentState<TReadModel> state)
