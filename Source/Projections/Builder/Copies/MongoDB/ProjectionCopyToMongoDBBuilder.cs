@@ -24,9 +24,9 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     readonly IBuildPropertyConversionsFromBsonClassMap _conversionsFromBSONClassMap;
     readonly IMongoDBCopyDefinitionFromReadModelBuilder _mongoDbCopyFromReadModelBuilder;
     readonly IResolvePropertyPath _propertyPathResolver;
+    readonly Dictionary<PropertyPath, Conversion> _explicitConversions = new();
     MongoDBCopyCollectionName _collectionName;
     bool _withoutDefaultConversions;
-    Dictionary<PropertyPath, Conversion> _explicitConversions = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionCopyToMongoDBBuilder{TReadMOdel}"/> class.

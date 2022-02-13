@@ -92,7 +92,16 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     }
     
     /// <inheritdoc />
-    public bool Equals(EventHandlerBuilder other) => ReferenceEquals(this, other);
+    public bool Equals(EventHandlerBuilder other)
+        => ReferenceEquals(this, other);
+
+    /// <inheritdoc />
+    public override bool Equals(object other)
+        => Equals(other as EventHandlerBuilder);
+
+    /// <inheritdoc />
+    public override int GetHashCode() =>
+        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _hasAlias, _partitioned, _scopeId);
 
     void Bind()
     {

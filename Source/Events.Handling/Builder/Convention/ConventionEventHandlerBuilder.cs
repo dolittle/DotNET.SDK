@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention;
 /// <summary>
 /// Methods for building <see cref="IEventHandler"/> instances by convention from an instantiated event handler class.
 /// </summary>
-public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
+public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, IEquatable<ICanTryBuildEventHandler>
 {
     const string MethodName = "Handle";
     
@@ -54,8 +55,13 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler
         }
 
         return other is ConventionEventHandlerBuilder otherBuilder
-            && EventHandlerType == otherBuilder.EventHandlerType && _eventHandlerInstance.Equals(otherBuilder._eventHandlerInstance);
+            && EventHandlerType == otherBuilder.EventHandlerType
+            && _eventHandlerInstance.Equals(otherBuilder._eventHandlerInstance);
     }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+        => HashCode.Combine(_decorator, _eventHandlerInstance, EventHandlerType);
     
     /// <summary>
     /// Builds event handler.
