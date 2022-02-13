@@ -59,6 +59,11 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
                 InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None),
                 Copies = _projection.Copies.ToProtobuf()
             };
+            if (_projection.HasAlias)
+            {
+                registrationRequest.Alias = _projection.Alias.Value;
+            }
+            
             registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());
 
             return registrationRequest;
