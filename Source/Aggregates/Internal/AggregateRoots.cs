@@ -30,10 +30,7 @@ public class AggregateRoots : IAggregateRoots
     public Try<TAggregate> TryGet<TAggregate>(EventSourceId eventSourceId)
         where TAggregate : AggregateRoot
     {
-        _logger.LogDebug(
-            "Getting aggregate root {AggregateRoot} with event source id {EventSource}",
-            typeof(TAggregate),
-            eventSourceId);
+        _logger.Get(typeof(TAggregate), eventSourceId);
         if (InvalidConstructor(typeof(TAggregate), out var constructor, out var exception))
         {
             return exception;

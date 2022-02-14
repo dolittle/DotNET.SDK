@@ -52,11 +52,11 @@ public class EventCommitter : ICommitEvents
     /// <inheritdoc/>
     public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default)
     {
-        Log.CommittingEvents(_logger, uncommittedEvents.Count);
+        _logger.CommittingEvents(uncommittedEvents.Count);
 
         if (!_toProtobuf.TryConvert(uncommittedEvents, out var protobufEvents, out var error))
         {
-            Log.UncommittedEventsCouldNotBeConverted(_logger, error);
+            _logger.UncommittedEventsCouldNotBeConverted(error);
             throw error;
         }
 
@@ -73,7 +73,7 @@ public class EventCommitter : ICommitEvents
         {
             return committedEvents;
         }
-        Log.CommittedEventsCouldNotBeConverted(_logger, error);
+        _logger.CommittedEventsCouldNotBeConverted(error);
         throw error;
     }
 }

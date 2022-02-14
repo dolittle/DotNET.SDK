@@ -93,8 +93,7 @@ public class EventStoreBuilder : IEventStoreBuilder
                 _callContextResolver,
                 executionContext,
                 _loggerFactory.CreateLogger<Internal.AggregateEventCommitter>()),
-            _eventTypes,
-            _loggerFactory.CreateLogger<AggregateEventCommitter>());
+            _eventTypes);
 
     IFetchEventsForAggregate CreateEventsForAggregateFetcher(ExecutionContext executionContext)
         => new Internal.EventsForAggregateFetcher(

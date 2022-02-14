@@ -6,7 +6,7 @@ using Dolittle.SDK.Projections.Copies.MongoDB;
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB;
 
 /// <summary>
-/// Defines a <see cref="ICanBuildPropertyConversionsFromReadModel"/> that builds property conversions from projection properties marked with <see cref="MongoDBConvertToAttribute"/>. 
+/// Defines a <see cref="ICanBuildPropertyConversionsFromReadModel"/> that builds property conversions from projection properties marked with <see cref="ConvertToMongoDBAttribute"/>. 
 /// </summary>
 public interface IBuildPropertyConversionsFromMongoDBConvertToAttributes : ICanBuildPropertyConversionsFromReadModel
 {

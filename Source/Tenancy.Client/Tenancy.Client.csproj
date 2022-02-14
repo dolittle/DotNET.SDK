@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Tenancy.Client</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Tenancy.Client</RootNamespace>
   </PropertyGroup>
 
     <ItemGroup>

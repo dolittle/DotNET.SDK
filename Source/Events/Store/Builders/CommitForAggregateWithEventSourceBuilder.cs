@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Events.Builders;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Store.Builders;
 
@@ -13,7 +12,6 @@ public class CommitForAggregateWithEventSourceBuilder
 {
     readonly AggregateRootId _aggregateRootId;
     readonly EventSourceId _eventSourceId;
-    readonly ILogger _logger;
     readonly Internal.ICommitAggregateEvents _aggregateEvents;
     readonly IEventTypes _eventTypes;
     CommitForAggregateWithEventSourceAndExpectedVersionBuilder _builder;
@@ -25,19 +23,16 @@ public class CommitForAggregateWithEventSourceBuilder
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="aggregateRootId">The <see cref="AggregateRootId" />.</param>
     /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-    /// <param name="logger">The <see cref="ILogger" />.</param>
     public CommitForAggregateWithEventSourceBuilder(
         Internal.ICommitAggregateEvents aggregateEvents,
         IEventTypes eventTypes,
         AggregateRootId aggregateRootId,
-        EventSourceId eventSourceId,
-        ILogger logger)
+        EventSourceId eventSourceId)
     {
         _aggregateEvents = aggregateEvents;
         _eventTypes = eventTypes;
         _aggregateRootId = aggregateRootId;
         _eventSourceId = eventSourceId;
-        _logger = logger;
     }
 
     /// <summary>
@@ -53,8 +48,7 @@ public class CommitForAggregateWithEventSourceBuilder
             _eventTypes,
             _aggregateRootId,
             _eventSourceId,
-            expectedVersion,
-            _logger);
+            expectedVersion);
         return _builder;
     }
 }

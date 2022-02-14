@@ -52,16 +52,14 @@ public class AggregateEventCommitter : ICommitAggregateEvents
     /// <inheritdoc/>
     public async Task<CommittedAggregateEvents> CommitForAggregate(UncommittedAggregateEvents uncommittedAggregateEvents, CancellationToken cancellationToken = default)
     {
-        Log.CommittingAggregateEvents(
-            _logger,
-            uncommittedAggregateEvents.Count,
+        _logger.CommittingAggregateEvents(uncommittedAggregateEvents.Count,
             uncommittedAggregateEvents.AggregateRoot,
             uncommittedAggregateEvents.EventSource,
             uncommittedAggregateEvents.ExpectedAggregateRootVersion);
 
         if (!_toProtobuf.TryConvert(uncommittedAggregateEvents, out var protobufEvents, out var error))
         {
-            Log.UncommittedAggregateEventsCouldNotBeConverted(_logger, error);
+            _logger.UncommittedAggregateEventsCouldNotBeConverted(error);
             throw error;
         }
 
@@ -77,7 +75,7 @@ public class AggregateEventCommitter : ICommitAggregateEvents
         {
             return committedAggregateEvents;
         }
-        Log.CommittedAggregateEventsCouldNotBeConverted(_logger, error);
+        _logger.CommittedAggregateEventsCouldNotBeConverted(error);
         throw error;
 
     }

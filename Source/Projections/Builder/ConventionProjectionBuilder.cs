@@ -77,7 +77,10 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             return false;
         }
         
-        projection = new Projection<TProjection>(_decorator.Identifier, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
+        projection = _decorator.HasAlias
+            ? new Projection<TProjection>(_decorator.Identifier, _decorator.Alias, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB))
+            : new Projection<TProjection>(_decorator.Identifier, _projectionType.Name, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
+        
         return true;
     }
     

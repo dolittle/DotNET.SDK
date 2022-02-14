@@ -152,8 +152,7 @@ public class SetupBuilder : ISetupBuilder
         {
             retryCount++;
             var timeout = TimeSpan.FromSeconds(5);
-            Log.RetryEventHorizonSubscription(
-                logger,
+            logger.RetryEventHorizonSubscription(
                 retryCount,
                 timeout,
                 subscription.ProducerMicroservice,

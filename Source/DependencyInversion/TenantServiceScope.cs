@@ -36,5 +36,6 @@ public class TenantServiceScope : IServiceScope
     {
         _rootScope?.Dispose();
         _tenantScope?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

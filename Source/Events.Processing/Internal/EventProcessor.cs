@@ -77,7 +77,7 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
                 RetryTimeout = retryTimeout
             };
 
-            _logger.LogWarning(ex, "Processing in {Kind} {Identifier} failed. Will retry in {RetrySeconds}", Kind, Identifier, retrySeconds);
+            _logger.ProcessingFailed(Kind, Identifier, retrySeconds, ex);
 
             return CreateResponseFromFailure(failure);
         }

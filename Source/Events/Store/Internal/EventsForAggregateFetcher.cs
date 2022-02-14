@@ -52,7 +52,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         EventSourceId eventSourceId,
         CancellationToken cancellationToken = default)
     {
-        Log.FetchingEventsForAggregate(_logger, aggregateRootId, eventSourceId);
+        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId);
         var request = new Runtime.Events.Contracts.FetchForAggregateRequest
         {
             CallContext = _callContextResolver.ResolveFrom(_executionContext),
@@ -70,7 +70,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         {
             return committedAggregateEvents;
         }
-        Log.FetchedEventsForAggregateCouldNotBeConverted(_logger, error);
+        _logger.FetchedEventsForAggregateCouldNotBeConverted(error);
         throw error;
 
     }

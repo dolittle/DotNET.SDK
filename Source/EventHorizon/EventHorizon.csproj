@@ -4,6 +4,7 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.EventHorizon</AssemblyName>
+        <RootNamespace>Dolittle.SDK.EventHorizon</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

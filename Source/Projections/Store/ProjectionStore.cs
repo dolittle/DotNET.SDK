@@ -114,7 +114,7 @@ public class ProjectionStore : IProjectionStore
     public Task<CurrentState<TReadModel>> GetState<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         where TReadModel : class, new()
     {
-        Log.GettingOneProjectionState(_logger, key, projectionId, typeof(TReadModel), scopeId);
+        _logger.GettingOneProjectionState(key, projectionId, typeof(TReadModel), scopeId);
         return GetStateInternal<TReadModel>(
             key,
             projectionId,
@@ -126,7 +126,7 @@ public class ProjectionStore : IProjectionStore
     public Task<TReadModel> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         where TReadModel : class, new()
     {
-        Log.GettingOneProjection(_logger, key, projectionId, typeof(TReadModel), scopeId);
+        _logger.GettingOneProjection(key, projectionId, typeof(TReadModel), scopeId);
         return GetStateInternal<TReadModel>(
             key,
             projectionId,
@@ -159,9 +159,7 @@ public class ProjectionStore : IProjectionStore
     public async Task<IEnumerable<TReadModel>> GetAll<TReadModel>(ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         where TReadModel : class, new()
     {
-        Log.GettingAllProjections(
-            _logger,
-            projectionId,
+        _logger.GettingAllProjections(projectionId,
             typeof(TReadModel),
             scopeId);
 
@@ -173,11 +171,11 @@ public class ProjectionStore : IProjectionStore
                            cancellation))
         {
             response.Failure.ThrowIfFailureIsSet();
-            Log.ProcessingProjectionsInBatch(_logger, ++batchNumber, response.States.Count);
+            _logger.ProcessingProjectionsInBatch(++batchNumber, response.States.Count);
 
             if (!_toSDK.TryConvert<TReadModel>(response.States, out var states, out var error))
             {
-                Log.FailedToConvertProjectionStates(_logger, error, response.States.Select(_ => _.State), typeof(TReadModel));
+                _logger.FailedToConvertProjectionState(typeof(TReadModel), error);
                 throw error;
             }
             foreach (var (key, value) in states.ToDictionary(_ => _.Key))
@@ -209,7 +207,7 @@ public class ProjectionStore : IProjectionStore
             ThrowIfIncorrectCurrentState(key, projectionId, state);
             return state;
         }
-        Log.FailedToConvertProjectionState(_logger, error, response.State.State, typeof(TReadModel));
+        _logger.FailedToConvertProjectionState(typeof(TReadModel), error);
         throw error;
     }
     static void ThrowIfIncorrectCurrentState<TReadModel>(Key key, ProjectionId projectionId, CurrentState<TReadModel> state)

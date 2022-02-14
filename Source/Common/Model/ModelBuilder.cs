@@ -76,10 +76,10 @@ public class ModelBuilder : IModelBuilder
             (type, identifiers) =>
             {
                 var sb = new StringBuilder();
-                sb.Append($"Type {type} is bound to multiple identifiers:");
+                sb.Append(FormattableString.Invariant($"Type {type} is bound to multiple identifiers:"));
                 foreach (var identifier in identifiers)
                 {
-                    sb.Append($"\n\t{identifier}. This binding will be ignored");
+                    sb.Append(FormattableString.Invariant($"\n\t{identifier}. This binding will be ignored"));
                 }
                 buildResults.AddFailure(sb.ToString());
             });
@@ -88,10 +88,10 @@ public class ModelBuilder : IModelBuilder
             (processorBuilder, identifiers) =>
             {
                 var sb = new StringBuilder();
-                sb.Append($"Processor Builder {processorBuilder} is bound to multiple identifiers:");
+                sb.Append(FormattableString.Invariant($"Processor Builder {processorBuilder} is bound to multiple identifiers:"));
                 foreach (var identifier in identifiers)
                 {
-                    sb.Append($"\n\t{identifier}. This binding will be ignored");
+                    sb.Append(FormattableString.Invariant($"\n\t{identifier}. This binding will be ignored"));
                 }
                 buildResults.AddFailure(sb.ToString());
             });
@@ -137,28 +137,28 @@ public class ModelBuilder : IModelBuilder
             conflicts.Add("processors");
         }
         var sb = new StringBuilder();
-        sb.Append($"The identifier {id} was bound to conflicting {string.Join(" and ", conflicts)}:");
+        sb.Append(FormattableString.Invariant($"The identifier {id} was bound to conflicting {string.Join(" and ", conflicts)}:"));
         foreach (var (binding, type)  in conflictingTypes)
         {
-            sb.Append($"\n\t{binding.Identifier} was bound to type {type.Name}. This binding will be ignored");
+            sb.Append(FormattableString.Invariant($"\n\t{binding.Identifier} was bound to type {type.Name}. This binding will be ignored"));
         }
         foreach (var (binding, processorBuilder) in conflictingProcessorBuilders)
         {
-            sb.Append($"\n\t{binding.Identifier} was bound to processor builder {processorBuilder}. This binding will be ignored");
+            sb.Append(FormattableString.Invariant($"\n\t{binding.Identifier} was bound to processor builder {processorBuilder}. This binding will be ignored"));
         }
         buildResults.AddFailure(sb.ToString());
     }
     static void AddFailedBuildResultsForCoexistentBindings(Guid id, IEnumerable<IdentifierMapBinding<Type>> coexistentTypes, IEnumerable<IdentifierMapBinding<object>> coexistentProcessorBuilders, IClientBuildResults buildResults)
     {
         var sb = new StringBuilder();
-        sb.Append($"The identifier {id} was also bound to:");
+        sb.Append(FormattableString.Invariant($"The identifier {id} was also bound to:"));
         foreach (var (binding, type) in coexistentTypes)
         {
-            sb.Append($"\n\t{binding.Identifier} binding to type {type.Name}. This binding will be ignored");
+            sb.Append(FormattableString.Invariant($"\n\t{binding.Identifier} binding to type {type.Name}. This binding will be ignored"));
         }
         foreach (var (binding, processorBuilder) in coexistentProcessorBuilders)
         {
-            sb.Append($"\n\t{binding.Identifier} binding to processor builder {processorBuilder}. This binding will be ignored");
+            sb.Append(FormattableString.Invariant($"\n\t{binding.Identifier} binding to processor builder {processorBuilder}. This binding will be ignored"));
         }
         buildResults.AddFailure(sb.ToString());
     }

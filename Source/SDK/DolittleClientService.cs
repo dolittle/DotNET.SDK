@@ -34,14 +34,14 @@ public class DolittleClientService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger = _clientConfiguration.LoggerFactory.CreateLogger<DolittleClientService>();
-        Log.ConnectingDolittleClient(_logger);
+        _logger.ConnectingDolittleClient();
         try
         {
             await _dolittleClient.Connect(_clientConfiguration, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Log.ErrorWhileConnectingDolittleClient(_logger, ex);
+            _logger.ErrorWhileConnectingDolittleClient(ex);
             throw;
         }
     }
@@ -49,7 +49,7 @@ public class DolittleClientService : IHostedService
     /// <inheritdoc />
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        Log.DisconnectingDolittleClient(_logger);
+        _logger.DisconnectingDolittleClient();
         return _dolittleClient.Disconnect(cancellationToken);
     }
 }

@@ -10,14 +10,12 @@ using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 using Dolittle.SDK.Projections.Internal;
 using Dolittle.SDK.Projections.Store;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
 namespace Dolittle.SDK.Projections.Builder;

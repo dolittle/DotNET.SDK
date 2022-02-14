@@ -84,14 +84,14 @@ public class ProjectionsBuilder : IProjectionsBuilder
         => Activator.CreateInstance(
                 typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType),
                 decorator,
-                CreateForMethodForReadModel(readModelType).Invoke(_copyToMongoDbBuilderFactory, new object[] {}))
+                CreateForMethodForReadModel(readModelType).Invoke(_copyToMongoDbBuilderFactory, Array.Empty<object>()))
             as ICanTryBuildProjection;
     
     
     static MethodInfo CreateForMethodForReadModel(Type readModelType)
         => typeof(IProjectionCopyToMongoDBBuilderFactory).GetMethod(
                 nameof(IProjectionCopyToMongoDBBuilderFactory.CreateFor),
-                new Type[] {})
+                Array.Empty<Type>())
             ?.MakeGenericMethod(readModelType);
     
 

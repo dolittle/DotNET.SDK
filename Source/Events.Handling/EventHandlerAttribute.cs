@@ -24,12 +24,11 @@ public class EventHandlerAttribute : Attribute, IDecoratedTypeDecorator<EventHan
         Identifier = Guid.Parse(eventHandlerId);
         Partitioned = partitioned;
         Scope = inScope ?? ScopeId.Default;
-        if (alias == default)
+        if (alias != default)
         {
-            return;
+            Alias = alias;
+            HasAlias = true;
         }
-        Alias = alias;
-        HasAlias = true;
     }
 
     /// <summary>

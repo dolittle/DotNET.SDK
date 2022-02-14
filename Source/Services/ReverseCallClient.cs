@@ -110,25 +110,25 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                 var response = _protocol.GetConnectResponseFrom(message);
                 if (ping != null)
                 {
-                    _logger.LogTrace("Received ping");
+                    _logger.ReceivedPing();
                     await WritePong(cancellationToken).ConfigureAwait(false);
                 }
                 else if (response != null)
                 {
-                    _logger.LogTrace("Received connect response");
+                    _logger.ReceivedConnectResponse();
                     ConnectResponse = response;
                     _connectionEstablished = true;
                     return true;
                 }
                 else
                 {
-                    _logger.LogWarning("Received a message from Reverse Call Dispatcher while connecting, but it was not a registration response or a ping");
+                    _logger.ReceivedNonPingOrResponseDuringConnect();
                 }
 
                 linkedCts.CancelAfter(_pingInterval.Multiply(3));
             }
 
-            _logger.LogWarning("No messages received from the server, connection timed out.");
+            _logger.TimedOutDuringConnect();
             await _clientToServer.CompleteAsync().ConfigureAwait(false);
             return false;
         }
@@ -136,11 +136,11 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug("Reverse Call Client was cancelled by client while connecting");
+                _logger.CancelledByClientDuringConnect();
             }
             else
             {
-                _logger.LogWarning("Reverse Call Client was cancelled by server while connecting");
+                _logger.CancelledByServerDuringConnect();
             }
 
             return false;
@@ -169,7 +169,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                 var request = _protocol.GetRequestFrom(message);
                 if (ping != null)
                 {
-                    _logger.LogTrace("Received ping");
+                    _logger.ReceivedPing();
                     await WritePong(cancellationToken).ConfigureAwait(false);
                 }
                 else if (request != null)
@@ -178,7 +178,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                 }
                 else
                 {
-                    _logger.LogWarning("Received message from Reverse Call Dispatcher while handling, but it was not a request or a ping");
+                    _logger.ReceivedNonPingOrRequestDuringHandling();
                 }
 
                 linkedCts.CancelAfter(_pingInterval.Multiply(3));
@@ -188,7 +188,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug("Reverse Call Client was cancelled by client while handling requests");
+                _logger.CancelledByClientDuringHandling();
                 return;
             }
 
@@ -196,7 +196,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
             {
                 throw new PingTimedOut(_pingInterval);
             }
-            _logger.LogWarning("Reverse Call Client was cancelled by server while handling requests");
+            _logger.CancelledByServerDuringHandling();
         }
     }
 
@@ -213,15 +213,17 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
     /// <param name="disposing">Whether to dispose.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                _writeResponseSemaphore.Dispose();
-            }
-
-            _disposed = true;
+            return;
         }
+        
+        if (disposing)
+        {
+            _writeResponseSemaphore.Dispose();
+        }
+
+        _disposed = true;
     }
 
     ReverseCallArgumentsContext CreateReverseCallArgumentsContext()
@@ -239,13 +241,13 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug("Reverse Call Client was cancelled before it could respond with pong");
+                _logger.CancelledBeforePongCouldBeSent();
                 return;
             }
 
             var message = _protocol.CreateMessageFrom(new Pong());
 
-            _logger.LogTrace("Writing pong");
+            _logger.WritingPong();
             await _clientToServer.WriteAsync(message).ConfigureAwait(false);
         }
         finally
@@ -264,7 +266,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
             TResponse response;
             try
             {
-                _logger.LogTrace("Handling request with call '{CallId}'", callId);
+                _logger.HandlingRequest(callId);
 
                 var executionContext = _executionContext
                     .ForTenant(requestContext.ExecutionContext.TenantId.To<TenantId>())
@@ -274,7 +276,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error while invoking handler for call '{CallId}'", callId);
+                _logger.ErrorWhileInvokingHandlerFor(callId, ex);
                 return;
             }
 
@@ -285,7 +287,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error while writing response for call '{CallId}'", callId);
+                _logger.ErrorWhileWritingResponseFor(callId, ex);
             }
             finally
             {
@@ -294,7 +296,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "An error occurred while handling received request");
+            _logger.ErrorWhileHandlingRequest(ex);
         }
     }
 
@@ -305,11 +307,11 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         var message = _protocol.CreateMessageFrom(response);
         if (!cancellationToken.IsCancellationRequested)
         {
-            _logger.LogTrace("Writing response for call '{CallId}'", callId);
+            _logger.WritingResponseFor(callId);
             return _clientToServer.WriteAsync(message);
         }
 
-        _logger.LogTrace("Client was cancelled while writing response for call '{CallId}'", callId);
+        _logger.CancelledWhileWritingResponseFor(callId);
 
         return Task.CompletedTask;
     }

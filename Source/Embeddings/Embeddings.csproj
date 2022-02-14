@@ -4,6 +4,7 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Embeddings</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Embeddings</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

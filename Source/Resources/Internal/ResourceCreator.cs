@@ -56,7 +56,7 @@ public abstract class ResourceCreator<TResource, TRequest, TResponse>
     {
         try
         {
-            _logger.LogDebug("Getting {ResourceName} resource for tenant {Tenant}", _resource, tenant);
+            _logger.GettingResource(_resource, tenant);
             
             var executionContext = _executionContext.ForTenant(tenant);
             var callContext = new CallRequestContext {ExecutionContext = executionContext.ToProtobuf()};
@@ -66,7 +66,7 @@ public abstract class ResourceCreator<TResource, TRequest, TResponse>
 
             if (RequestFailed(response, out var failure))
             {
-                _logger.LogWarning("Failed getting {ResourceName} resource for tenant {Tenant} because {Reason}", _resource, tenant, failure.Reason);
+                _logger.FailedToGetResource(_resource, tenant, failure.Reason);
                 throw new FailedToGetResourceForTenant(_resource, tenant, failure.Reason);
             }
 
@@ -74,7 +74,7 @@ public abstract class ResourceCreator<TResource, TRequest, TResponse>
         }
         catch (Exception ex) when (ex is not FailedToGetResourceForTenant)
         {
-            _logger.LogWarning(ex, "Failed getting {ResourceName} resource for tenant {Tenant} because {Reason}", _resource, tenant);
+            _logger.ErrorWhileGettingResource(_resource, tenant, ex);
             throw new FailedToGetResourceForTenant(_resource, tenant, ex.Message);
         }
     }

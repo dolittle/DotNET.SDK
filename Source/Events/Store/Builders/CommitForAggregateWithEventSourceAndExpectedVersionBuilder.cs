@@ -5,7 +5,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Builders;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Events.Store.Builders;
 
@@ -19,7 +18,6 @@ public class CommitForAggregateWithEventSourceAndExpectedVersionBuilder
     readonly AggregateRootId _aggregateRootId;
     readonly EventSourceId _eventSourceId;
     readonly AggregateRootVersion _expectedVersion;
-    readonly ILogger _logger;
     UncommittedAggregateEventsBuilder _builder;
 
     /// <summary>
@@ -30,21 +28,18 @@ public class CommitForAggregateWithEventSourceAndExpectedVersionBuilder
     /// <param name="aggregateRootId">The <see cref="AggregateRootId" />.</param>
     /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
     /// <param name="expectedVersion">The expected <see cref="AggregateRootVersion" />.</param>
-    /// <param name="logger">The <see cref="ILogger" />.</param>
     public CommitForAggregateWithEventSourceAndExpectedVersionBuilder(
         Internal.ICommitAggregateEvents aggregateEvents,
         IEventTypes eventTypes,
         AggregateRootId aggregateRootId,
         EventSourceId eventSourceId,
-        AggregateRootVersion expectedVersion,
-        ILogger logger)
+        AggregateRootVersion expectedVersion)
     {
         _aggregateEvents = aggregateEvents;
         _eventTypes = eventTypes;
         _aggregateRootId = aggregateRootId;
         _eventSourceId = eventSourceId;
         _expectedVersion = expectedVersion;
-        _logger = logger;
     }
 
     /// <summary>
