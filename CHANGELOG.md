@@ -1,3 +1,13 @@
+# [15.1.2] - 2022-3-1 [PR: #135](https://github.com/dolittle/DotNET.SDK/pull/135)
+## Summary
+
+Fixes a bug introduced in the previous release where building Event Handlers would cause a stack overflow because an `Equals(...)` method called itself recursively.
+
+### Fixed
+
+- A bug caused clients that was using Event Handlers to crash with a stack overflow when while setting up the Dolittle Client, because of a recursive call to `Equals(...)` in event handler builders while checking the model.
+
+
 # [15.1.1] - 2022-2-11 [PR: #133](https://github.com/dolittle/DotNET.SDK/pull/133)
 ## Summary
 
