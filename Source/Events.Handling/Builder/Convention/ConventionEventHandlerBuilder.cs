@@ -49,6 +49,11 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
     /// <inheritdoc />
     public bool Equals(ICanTryBuildEventHandler other)
     {
+        if (other == null)
+        {
+            return false;
+        }
+        
         if (ReferenceEquals(this, other))
         {
             return true;
