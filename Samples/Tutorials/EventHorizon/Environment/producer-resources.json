@@ -5,6 +5,25 @@
                 "mongo"
             ],
             "database": "producer_event_store"
+        },
+        "projections": {
+            "servers": [
+                "mongo"
+            ],
+            "database": "producer_projections",
+            "maxConnectionPoolSize": 1000
+        },
+        "embeddings": {
+            "servers": [
+                "mongo"
+            ],
+            "database": "producer_embeddings",
+            "maxConnectionPoolSize": 1000
+        },
+        "readModels": {
+            "host": "mongodb://localhost:27017",
+            "database": "producer_readmodels",
+            "useSSL": false
         }
     }
 }
