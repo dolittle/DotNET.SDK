@@ -4,6 +4,7 @@
 using Dolittle.Runtime.Aggregates.Contracts;
 using Dolittle.SDK.Services;
 using Grpc.Core;
+using Grpc.Net.Client;
 
 namespace Dolittle.SDK.Aggregates.Internal;
 
@@ -13,7 +14,7 @@ namespace Dolittle.SDK.Aggregates.Internal;
 public class AggregateRootsRegisterAliasMethod : ICanCallAUnaryMethod<AggregateRootAliasRegistrationRequest, AggregateRootAliasRegistrationResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<AggregateRootAliasRegistrationResponse> Call(AggregateRootAliasRegistrationRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<AggregateRootAliasRegistrationResponse> Call(AggregateRootAliasRegistrationRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new Dolittle.Runtime.Aggregates.Contracts.AggregateRoots.AggregateRootsClient(channel);
         return client.RegisterAliasAsync(message, callOptions);

@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Projections.Store;
 public class ProjectionsGetAll : ICanCallAUnaryMethod<GetAllRequest, GetAllResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<GetAllResponse> Call(GetAllRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<GetAllResponse> Call(GetAllRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new ProjectionsClient(channel);
         return client.GetAllAsync(message, callOptions);

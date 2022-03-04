@@ -13,27 +13,21 @@ namespace Dolittle.SDK.Services;
 /// </summary>
 public class MethodCaller : IPerformMethodCalls
 {
+    readonly ChannelBase _channel;
     readonly string _host;
     readonly ushort _port;
-    readonly ChannelOption[] _channelOptions;
-    readonly ChannelCredentials _channelCredentials;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MethodCaller"/> class.
     /// </summary>
     /// <param name="host">The host to connect to for performing method calls.</param>
     /// <param name="port">The port to connect to for performing method calls.</param>
-    public MethodCaller(string host, ushort port)
+    /// <param name="channel">The underlying channel.</param>
+    public MethodCaller(ChannelBase channel, string host, ushort port)
     {
+        _channel = channel;
         _host = host;
         _port = port;
-        _channelOptions = new[]
-        {
-            new ChannelOption("grpc.keepalive_time", 1000),
-            new ChannelOption("grpc.keepalive_timeout_ms", 500),
-            new ChannelOption("grpc.keepalive_permit_without_calls", 1),
-        };
-        _channelCredentials = ChannelCredentials.Insecure;
     }
 
     /// <inheritdoc/>
@@ -43,7 +37,7 @@ public class MethodCaller : IPerformMethodCalls
     {
         try
         {
-            var originalStream = method.Call(CreateChannel(), CreateCallOptions(token));
+            var originalStream = method.Call(_channel, CreateCallOptions(token));
             return new AsyncDuplexStreamingCall<TClientMessage, TServerMessage>(
                 new CatchingClientStreamWriter<TClientMessage>(_host, _port, originalStream.RequestStream),
                 new CatchingAsyncStreamReader<TServerMessage>(_host, _port, originalStream.ResponseStream),
@@ -65,7 +59,7 @@ public class MethodCaller : IPerformMethodCalls
     {
         try
         {
-            var originalStream = method.Call(request, CreateChannel(), CreateCallOptions(token));
+            var originalStream = method.Call(request, _channel, CreateCallOptions(token));
             return new ServerStreamingEnumerable<TServerMessage>(
                 new AsyncServerStreamingCall<TServerMessage>(
                     new CatchingAsyncStreamReader<TServerMessage>(_host, _port, originalStream.ResponseStream),
@@ -87,15 +81,13 @@ public class MethodCaller : IPerformMethodCalls
     {
         try
         {
-            return await method.Call(request, CreateChannel(), CreateCallOptions(token)).ResponseAsync.ConfigureAwait(false);
+            return await method.Call(request, _channel, CreateCallOptions(token)).ResponseAsync.ConfigureAwait(false);
         }
         catch (RpcException exception) when (exception.StatusCode == StatusCode.Unavailable)
         {
             throw new CouldNotConnectToRuntime(_host, _port);
         }
     }
-
-    Channel CreateChannel() => new(_host, _port, _channelCredentials, _channelOptions);
 
     static CallOptions CreateCallOptions(CancellationToken token) => new(cancellationToken: token);
 }

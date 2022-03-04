@@ -3,6 +3,7 @@
 
 using Google.Protobuf;
 using Grpc.Core;
+using Grpc.Net.Client;
 
 namespace Dolittle.SDK.Services;
 
@@ -22,5 +23,5 @@ public interface ICanCallAUnaryMethod<TClientMessage, TServerMessage>
     /// <param name="channel">The <see cref="Channel"/> to use to connect to the server.</param>
     /// <param name="callOptions">The <see cref="CallOptions"/> to use for the call.</param>
     /// <returns>A <see cref="AsyncUnaryCall{TResult}"/> representing the result of the async unary call.</returns>
-    AsyncUnaryCall<TServerMessage> Call(TClientMessage message, Channel channel, CallOptions callOptions);
+    AsyncUnaryCall<TServerMessage> Call(TClientMessage message, ChannelBase channel, CallOptions callOptions);
 }

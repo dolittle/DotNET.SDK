@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Embeddings.Store;
 public class EmbeddingsGetKeys : ICanCallAUnaryMethod<GetKeysRequest, GetKeysResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<GetKeysResponse> Call(GetKeysRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<GetKeysResponse> Call(GetKeysRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EmbeddingStoreClient(channel);
         return client.GetKeysAsync(message, callOptions);

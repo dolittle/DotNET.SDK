@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store;
 public class EventStoreFetchForAggregateMethod : ICanCallAUnaryMethod<FetchForAggregateRequest, FetchForAggregateResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<FetchForAggregateResponse> Call(FetchForAggregateRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<FetchForAggregateResponse> Call(FetchForAggregateRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EventStoreClient(channel);
         return client.FetchForAggregateAsync(message, callOptions);

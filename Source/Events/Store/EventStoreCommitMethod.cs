@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store;
 public class EventStoreCommitMethod : ICanCallAUnaryMethod<CommitEventsRequest, CommitEventsResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<CommitEventsResponse> Call(CommitEventsRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<CommitEventsResponse> Call(CommitEventsRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EventStoreClient(channel);
         return client.CommitAsync(message, callOptions);

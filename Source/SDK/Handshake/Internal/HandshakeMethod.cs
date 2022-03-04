@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Handshake.Internal;
 public class HandshakeMethod : ICanCallAUnaryMethod<HandshakeRequest, HandshakeResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<HandshakeResponse> Call(HandshakeRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<HandshakeResponse> Call(HandshakeRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new Dolittle.Runtime.Handshake.Contracts.Handshake.HandshakeClient(channel);
         return client.HandshakeAsync(message, callOptions);

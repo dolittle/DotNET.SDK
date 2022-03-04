@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Embeddings;
 public class EmbeddingsUpdate : ICanCallAUnaryMethod<UpdateRequest, UpdateResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<UpdateResponse> Call(UpdateRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<UpdateResponse> Call(UpdateRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EmbeddingsClient(channel);
         return client.UpdateAsync(message, callOptions);

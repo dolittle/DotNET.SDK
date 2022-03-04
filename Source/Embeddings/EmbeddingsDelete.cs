@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Embeddings;
 public class EmbeddingsDelete : ICanCallAUnaryMethod<DeleteRequest, DeleteResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<DeleteResponse> Call(DeleteRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<DeleteResponse> Call(DeleteRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EmbeddingsClient(channel);
         return client.DeleteAsync(message, callOptions);

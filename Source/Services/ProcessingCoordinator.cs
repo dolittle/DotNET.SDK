@@ -13,13 +13,6 @@ public class ProcessingCoordinator : ICoordinateProcessing
 {
     readonly List<Task> _processors = new();
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ProcessingCoordinator"/> class.
-    /// </summary>
-    public ProcessingCoordinator()
-    {
-    }
-
     /// <inheritdoc/>
     public Task Completion => Task.WhenAll(_processors);
 

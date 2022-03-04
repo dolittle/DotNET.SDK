@@ -22,5 +22,5 @@ public interface ICanCallAServerStreamingMethod<in TClientMessage, TServerMessag
     /// <param name="channel">The <see cref="Channel"/> to use to connect to the server.</param>
     /// <param name="callOptions">The <see cref="CallOptions"/> to use for the call.</param>
     /// <returns>The <see cref="AsyncDuplexStreamingCall{TRequest, TResponse}"/> representing the method call.</returns>
-    AsyncServerStreamingCall<TServerMessage> Call(TClientMessage message, Channel channel, CallOptions callOptions);
+    AsyncServerStreamingCall<TServerMessage> Call(TClientMessage message, ChannelBase channel, CallOptions callOptions);
 }

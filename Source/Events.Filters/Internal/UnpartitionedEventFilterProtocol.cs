@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Events.Filters.Internal;
 public class UnpartitionedEventFilterProtocol : IAmAFilterProtocol<FilterClientToRuntimeMessage, FilterRegistrationRequest, FilterResponse>
 {
     /// <inheritdoc/>
-    public AsyncDuplexStreamingCall<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
+    public AsyncDuplexStreamingCall<FilterClientToRuntimeMessage, FilterRuntimeToClientMessage> Call(ChannelBase channel, CallOptions callOptions)
         => new FiltersClient(channel).Connect(callOptions);
 
     /// <inheritdoc/>

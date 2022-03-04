@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Tenancy.Client.Internal;
 public class TenantsGetAllMethod : ICanCallAUnaryMethod<GetAllRequest, GetAllResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<GetAllResponse> Call(GetAllRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<GetAllResponse> Call(GetAllRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new Dolittle.Runtime.Tenancy.Contracts.Tenants.TenantsClient(channel);
         return client.GetAllAsync(message, callOptions);
