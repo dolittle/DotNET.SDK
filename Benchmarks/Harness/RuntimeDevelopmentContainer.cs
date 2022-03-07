@@ -31,7 +31,7 @@ public class RuntimeDevelopmentContainer : Container, IRuntimeWithMongo
     }
 
     protected override Task WaitUntilContainerStarted()
-        => Task.Delay(TimeSpan.FromSeconds(5));
+        => Task.Delay(TimeSpan.FromSeconds(1));
 
     public RuntimeEndpoints Endpoints { get; }
     

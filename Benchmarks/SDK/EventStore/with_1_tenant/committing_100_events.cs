@@ -15,8 +15,7 @@ public class committing_100_events : SingleRuntimeSetup
     public override void IterationSetup()
     {
         base.IterationSetup();
-        var client = GetClientBuilder().Build();
-        client.Start();
+        var client = GetConnectedClient();
         _eventStore = client.EventStore.ForTenant(TenantId.Development);
     }
 

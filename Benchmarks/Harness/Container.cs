@@ -58,7 +58,7 @@ public abstract class Container : IContainer
             HostConfig = new HostConfig
             {
                 PortBindings = portBindings
-            }
+            },
         };
         ModifyCreateContainerParameters(createContainerParameters);
         ContainerId = (await Client.Containers.CreateContainerAsync(createContainerParameters).ConfigureAwait(false)).ID;
@@ -76,6 +76,7 @@ public abstract class Container : IContainer
         _logger.WriteLine(LogKind.Info, $"Stopping {this}");
         // await Client.Containers.StopContainerAsync(ContainerId, new ContainerStopParameters()).ConfigureAwait(false);
         await Client.Containers.KillContainerAsync(ContainerId, new ContainerKillParameters()).ConfigureAwait(false);
+        await Client.Containers.RemoveContainerAsync(ContainerId, new ContainerRemoveParameters{Force = true, RemoveLinks = false, RemoveVolumes = true}).ConfigureAwait(false);
         _started = false;
     }
 

@@ -1,13 +1,12 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Loggers;
 using Dolittle.SDK;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Dolittle.Benchmarks.SDK;
 
@@ -46,9 +45,12 @@ public class SingleRuntimeSetup
             await _singleRuntime.DisposeAsync().ConfigureAwait(false);
         }
     }
+
+    public IDolittleClient GetConnectedClient(bool withDiscovery = false)
+    {
+        var host = Host.CreateDefaultBuilder().UseDolittle(withDiscovery ? _ => _.WithoutDiscovery() : null).Build();
+        return host.GetDolittleClient(_ => _.WithRuntimeOn("localhost", (ushort)_singleRuntime.Endpoints.Private).WithServiceProvider(new ServiceCollection().BuildServiceProvider())).GetAwaiter().GetResult();
+    }
     
-    public DolittleClientBuilder GetClientBuilder() => DolittleClient
-        .ForMicroservice("7e5981aa-8ffb-44de-8a32-c35581cf1dcd")
-        .WithRuntimeOn("localhost", (ushort)_singleRuntime.Endpoints.Private);
 
 }

@@ -15,8 +15,7 @@ public class committing_100_events_with_warmup : SingleRuntimeSetup
     public override void IterationSetup()
     {
         base.IterationSetup();
-        var client = GetClientBuilder().Build();
-        client.Start();
+        var client = GetConnectedClient();
         _eventStore = client.EventStore.ForTenant(TenantId.Development);
         _eventStore.Commit(_ => _.CreateEvent(new some_event())
             .FromEventSource("source")

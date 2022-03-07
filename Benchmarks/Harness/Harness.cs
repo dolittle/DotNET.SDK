@@ -9,19 +9,15 @@ namespace Dolittle.Benchmarks.Harness;
 
 public class Harness : IDisposable
 {
-    readonly ILogger _logger;
     static Harness Instance;
 
     readonly DockerClient _dockerClient;
-    readonly OpenPortPool _portPool = new();
     readonly RuntimeWithMongoFactory _runtimeWithMongoFactory;
 
     Harness(ILogger logger)
     {
-        _logger = logger;
         _dockerClient = new DockerClientConfiguration().CreateClient();
-        _runtimeWithMongoFactory = new RuntimeWithMongoFactory(new OpenPortPool(), _logger);
-
+        _runtimeWithMongoFactory = new RuntimeWithMongoFactory(new OpenPortPool(), logger);
     }
 
     public static Harness Setup(ILogger logger)
