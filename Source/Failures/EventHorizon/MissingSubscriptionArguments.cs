@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.EventHorizon
+namespace Dolittle.SDK.Failures.EventHorizon;
+
+/// <summary>
+/// Exception that gets thrown when the consumer runtime does not send subscription arguments.
+/// </summary>
+public class MissingSubscriptionArguments : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when the consumer runtime does not send subscription arguments.
+    /// Initializes a new instance of the <see cref="MissingSubscriptionArguments"/> class.
     /// </summary>
-    public class MissingSubscriptionArguments : Exception
+    /// <param name="reason">The failure reason.</param>
+    public MissingSubscriptionArguments(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MissingSubscriptionArguments"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public MissingSubscriptionArguments(string reason)
-            : base(reason)
-        {
-        }
     }
 }

@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Aggregates
+namespace Dolittle.SDK.Aggregates;
+
+/// <summary>
+/// Exception that gets thrown when an aggregate root instance could not be created.
+/// </summary>
+public class CouldNotCreateAggregateRootInstance : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when an aggregate root instance could not be created.
+    /// Initializes a new instance of the <see cref="CouldNotCreateAggregateRootInstance"/> class.
     /// </summary>
-    public class CouldNotCreateAggregateRootInstance : Exception
+    /// <param name="type">The <see cref="Type" /> of the aggregate root that could not be instantiated.</param>
+    public CouldNotCreateAggregateRootInstance(Type type)
+        : base($"Could not create an instance of aggregate root {type}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CouldNotCreateAggregateRootInstance"/> class.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> of the aggregate root that could not be instantiated.</param>
-        public CouldNotCreateAggregateRootInstance(Type type)
-            : base($"Could not create an instance of aggregate root {type}")
-        {
-        }
     }
 }

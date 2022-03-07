@@ -4,11 +4,13 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Projections</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Projections</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Dolittle.Runtime.Contracts" Version="$(ContractsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="MongoDB.Driver" Version="$(MongoDBDriverVersion)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,6 +19,7 @@
         <ProjectReference Include="../Events/Events.csproj" />
         <ProjectReference Include="../Events.Processing/Events.Processing.csproj" />
         <ProjectReference Include="../Protobuf/Protobuf.csproj" />
+        <ProjectReference Include="../Resources/Resources.csproj" />
     </ItemGroup>
     
 </Project>

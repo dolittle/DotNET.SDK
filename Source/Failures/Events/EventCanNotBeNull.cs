@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when an event is null.
+/// </summary>
+public class EventCanNotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when an event is null.
+    /// Initializes a new instance of the <see cref="EventCanNotBeNull"/> class.
     /// </summary>
-    public class EventCanNotBeNull : Exception
+    /// <param name="reason">The failure reason.</param>
+    public EventCanNotBeNull(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventCanNotBeNull"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public EventCanNotBeNull(string reason)
-            : base(reason)
-        {
-        }
     }
 }

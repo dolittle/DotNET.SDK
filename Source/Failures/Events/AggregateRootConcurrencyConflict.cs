@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when there is a concurrency conflict in an Aggregate Root for a specific Event Source.
+/// </summary>
+public class AggregateRootConcurrencyConflict : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when there is a concurrency conflict in an Aggregate Root for a specific Event Source.
+    /// Initializes a new instance of the <see cref="AggregateRootConcurrencyConflict"/> class.
     /// </summary>
-    public class AggregateRootConcurrencyConflict : Exception
+    /// <param name="reason">The failure reason.</param>
+    public AggregateRootConcurrencyConflict(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateRootConcurrencyConflict"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public AggregateRootConcurrencyConflict(string reason)
-            : base(reason)
-        {
-        }
     }
 }

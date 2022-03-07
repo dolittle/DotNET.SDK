@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Tenancy.Client</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Tenancy.Client</RootNamespace>
   </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +15,7 @@
     <ProjectReference Include="../Concepts/Concepts.csproj" />
     <ProjectReference Include="../Services/Services.csproj" />
     <ProjectReference Include="../Tenancy/Tenancy.csproj" />
+    <ProjectReference Include="..\Failures\Failures.csproj" />
   </ItemGroup>
 
 </Project>

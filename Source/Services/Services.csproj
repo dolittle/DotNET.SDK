@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Services</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Services</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,10 +13,12 @@
     <PackageReference Include="Grpc" Version="$(GrpcVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
+    <PackageReference Include="Contrib.Grpc.Core.M1" Version="$(GrpcVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="../DependencyInversion/DependencyInversion.csproj" />
     <ProjectReference Include="../Execution/Execution.csproj" />
     <ProjectReference Include="../Protobuf/Protobuf.csproj" />
   </ItemGroup>

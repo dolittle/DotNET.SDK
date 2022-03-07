@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Store
+namespace Dolittle.SDK.Embeddings.Store;
+
+/// <summary>
+/// Exception that gets thrown when a type has no embedding associated with it.
+/// </summary>
+public class NoEmbeddingAssociatedWithType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a type has no embedding associated with it.
+    /// Initializes a new instance of the <see cref="NoEmbeddingAssociatedWithType"/> class.
     /// </summary>
-    public class NoEmbeddingAssociatedWithType : Exception
+    /// <param name="type">The type without a embedding.</param>
+    public NoEmbeddingAssociatedWithType(Type type)
+        : base($"No embedding associated with type {type}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NoEmbeddingAssociatedWithType"/> class.
-        /// </summary>
-        /// <param name="type">The type without a embedding.</param>
-        public NoEmbeddingAssociatedWithType(Type type)
-            : base($"No embedding associated with type {type}")
-        {
-        }
     }
 }

@@ -4,23 +4,22 @@
 using System;
 using Dolittle.Runtime.Projections.Contracts;
 
-namespace Dolittle.SDK.Projections.Store.Converters
+namespace Dolittle.SDK.Projections.Store.Converters;
+
+/// <summary>
+/// Exception that gets thrown when projection could not be deserialized.
+/// </summary>
+public class CouldNotDeserializeProjection : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when projection could not be deserialized.
+    /// Initializes a new instance of the <see cref="CouldNotDeserializeProjection"/> class.
     /// </summary>
-    public class CouldNotDeserializeProjection : Exception
+    /// <param name="state">The current projection state.</param>
+    /// <param name="type">The <see cref="ProjectionCurrentStateType" />.</param>
+    /// <param name="key">The <see cref="Key" />.</param>
+    /// <param name="innerException">The inner deserialization <see cref="Exception" />.</param>
+    public CouldNotDeserializeProjection(string state, ProjectionCurrentStateType type, Key key, Exception innerException)
+        : base($"Could not deserialize projection with key {key}, type {type} and state '{state}'", innerException)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CouldNotDeserializeProjection"/> class.
-        /// </summary>
-        /// <param name="state">The current projection state.</param>
-        /// <param name="type">The <see cref="ProjectionCurrentStateType" />.</param>
-        /// <param name="key">The <see cref="Key" />.</param>
-        /// <param name="innerException">The inner deserialization <see cref="Exception" />.</param>
-        public CouldNotDeserializeProjection(string state, ProjectionCurrentStateType type, Key key, Exception innerException)
-            : base($"Could not deserialize projection with key {key}, type {type} and state '{state}'", innerException)
-        {
-        }
     }
 }

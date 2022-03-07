@@ -6,76 +6,75 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.EventHorizon
+namespace Dolittle.SDK.EventHorizon;
+
+/// <summary>
+/// Represents a builder for building an event horizon subscription with consumer tenant, producer microservice and producer tenant already defined.
+/// </summary>
+public class SubscriptionBuilderForProducerTenant
 {
+    readonly TenantId _consumerTenantId;
+    readonly MicroserviceId _producerMicroserviceId;
+    readonly TenantId _producerTenantId;
+    SubscriptionBuilderForProducerStream _builder;
+
     /// <summary>
-    /// Represents a builder for building an event horizon subscription with consumer tenant, producer microservice and producer tenant already defined.
+    /// Initializes a new instance of the <see cref="SubscriptionBuilderForProducerTenant"/> class.
     /// </summary>
-    public class SubscriptionBuilderForProducerTenant
+    /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
+    /// <param name="producerMicroserviceId">The producer <see cref="MicroserviceId"/> of the subscription.</param>
+    /// <param name="producerTenantId">The producer <see cref="TenantId"/> of the subscription.</param>
+    public SubscriptionBuilderForProducerTenant(
+        TenantId consumerTenantId,
+        MicroserviceId producerMicroserviceId,
+        TenantId producerTenantId)
     {
-        readonly TenantId _consumerTenantId;
-        readonly MicroserviceId _producerMicroserviceId;
-        readonly TenantId _producerTenantId;
-        SubscriptionBuilderForProducerStream _builder;
+        _consumerTenantId = consumerTenantId;
+        _producerMicroserviceId = producerMicroserviceId;
+        _producerTenantId = producerTenantId;
+        _builder = null;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SubscriptionBuilderForProducerTenant"/> class.
-        /// </summary>
-        /// <param name="consumerTenantId">The consumer <see cref="TenantId"/> of the subscription.</param>
-        /// <param name="producerMicroserviceId">The producer <see cref="MicroserviceId"/> of the subscription.</param>
-        /// <param name="producerTenantId">The producer <see cref="TenantId"/> of the subscription.</param>
-        public SubscriptionBuilderForProducerTenant(
-            TenantId consumerTenantId,
-            MicroserviceId producerMicroserviceId,
-            TenantId producerTenantId)
+    /// <summary>
+    /// Sets the producer stream to subscribe to events from.
+    /// </summary>
+    /// <param name="streamId">The <see cref="StreamId"/> to subscribe to events from.</param>
+    /// <returns>A <see cref="SubscriptionBuilderForProducerStream"/> to continue building.</returns>
+    public SubscriptionBuilderForProducerStream FromProducerStream(StreamId streamId)
+    {
+        ThrowIfProducerStreamIsAlreadyDefined();
+        _builder = new SubscriptionBuilderForProducerStream(
+            _consumerTenantId,
+            _producerMicroserviceId,
+            _producerTenantId,
+            streamId);
+        return _builder;
+    }
+
+    /// <summary>
+    /// Builds and registers the event horizon subscriptions.
+    /// </summary>
+    /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
+    /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+    public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
+    {
+        ThrowIfProducerStreamIsNotDefined();
+        _builder.BuildAndSubscribe(eventHorizons, cancellationToken);
+    }
+
+    void ThrowIfProducerStreamIsAlreadyDefined()
+    {
+        if (_builder != null)
         {
-            _consumerTenantId = consumerTenantId;
-            _producerMicroserviceId = producerMicroserviceId;
-            _producerTenantId = producerTenantId;
-            _builder = null;
+            throw new SubscriptionBuilderMethodAlreadyCalled("FromProducerStream()");
         }
+    }
 
-        /// <summary>
-        /// Sets the producer stream to subscribe to events from.
-        /// </summary>
-        /// <param name="streamId">The <see cref="StreamId"/> to subscribe to events from.</param>
-        /// <returns>A <see cref="SubscriptionBuilderForProducerStream"/> to continue building.</returns>
-        public SubscriptionBuilderForProducerStream FromProducerStream(StreamId streamId)
+    void ThrowIfProducerStreamIsNotDefined()
+    {
+        if (_builder == null)
         {
-            ThrowIfProducerStreamIsAlreadyDefined();
-            _builder = new SubscriptionBuilderForProducerStream(
-                _consumerTenantId,
-                _producerMicroserviceId,
-                _producerTenantId,
-                streamId);
-            return _builder;
-        }
-
-        /// <summary>
-        /// Builds and registers the event horizon subscriptions.
-        /// </summary>
-        /// <param name="eventHorizons">The <see cref="IEventHorizons"/> to use for subscribing.</param>
-        /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
-        public void BuildAndSubscribe(IEventHorizons eventHorizons, CancellationToken cancellationToken)
-        {
-            ThrowIfProducerStreamIsNotDefined();
-            _builder.BuildAndSubscribe(eventHorizons, cancellationToken);
-        }
-
-        void ThrowIfProducerStreamIsAlreadyDefined()
-        {
-            if (_builder != null)
-            {
-                throw new SubscriptionBuilderMethodAlreadyCalled("FromProducerStream()");
-            }
-        }
-
-        void ThrowIfProducerStreamIsNotDefined()
-        {
-            if (_builder == null)
-            {
-                throw new SubscriptionDefinitionIncomplete("Stream", "Call FromProducerStream()");
-            }
+            throw new SubscriptionDefinitionIncomplete("Stream", "Call FromProducerStream()");
         }
     }
 }

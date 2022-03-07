@@ -4,14 +4,19 @@
 
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK</AssemblyName>
+    <RootNamespace>Dolittle.SDK</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BaselineTypeDiscovery" Version="$(BaselineTypeDiscoveryVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
   </ItemGroup>
-  
-  <ItemGroup>
+
+    <ItemGroup>
     <ProjectReference Include="../**/*.csproj" Exclude="../Extensions.*/*.csproj;../SDK/SDK.csproj" />
   </ItemGroup>
 

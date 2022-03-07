@@ -8,60 +8,78 @@ using Newtonsoft.Json;
 using PbCurrentState = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentState;
 using PbCurrentStateType = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentStateType;
 
-namespace Dolittle.SDK.Projections.Store.Converters
+namespace Dolittle.SDK.Projections.Store.Converters;
+
+/// <summary>
+/// Represents an implementation of <see cref="IConvertProjectionsToSDK" />.
+/// </summary>
+public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
 {
-    /// <summary>
-    /// Represents an implementation of <see cref="IConvertProjectionsToSDK" />.
-    /// </summary>
-    public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
+    /// <inheritdoc/>
+    public bool TryConvert<TProjection>(PbCurrentState source, out CurrentState<TProjection> state, out Exception error)
+        where TProjection : class, new()
+        => TryDeserializeWithSettings(source, out state, out error);
+
+    /// <inheritdoc/>
+    public bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
+        where TProjection : class, new()
     {
-        /// <inheritdoc/>
-        public bool TryConvert<TProjection>(PbCurrentState source, out CurrentState<TProjection> state, out Exception error)
-            where TProjection : class, new()
-            => TryDeserializeWithSettings(source, out state, out error);
-
-        /// <inheritdoc/>
-        public bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
-            where TProjection : class, new()
+        error = null;
+        states = null;
+        var currentStates = new List<CurrentState<TProjection>>();
+        foreach (var protobufState in source)
         {
-            error = null;
-            states = null;
-            var currentStates = new List<CurrentState<TProjection>>();
-            foreach (var protobufState in source)
+            if (!TryDeserializeWithSettings<TProjection>(protobufState, out var state, out error))
             {
-                if (!TryDeserializeWithSettings<TProjection>(protobufState, out var state, out error)) return false;
-                currentStates.Add(state);
+                return false;
             }
-
-            states = currentStates;
-            return true;
+            currentStates.Add(state);
         }
 
-        bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
-            where TProjection : class, new()
+        states = currentStates;
+        return true;
+    }
+
+    static bool TryDeserializeWithSettings<TProjection>(PbCurrentState currentState, out CurrentState<TProjection> projectionState, out Exception deserializationError)
+        where TProjection : class, new()
+    {
+        projectionState = default;
+        var exceptionCatcher = new JsonSerializerExceptionCatcher();
+        var serializerSettings = new JsonSerializerSettings { Error = exceptionCatcher.OnError };
+        if (!TryGetCurrentStateType(currentState.Type, out var stateType, out deserializationError))
         {
-            projectionState = null;
-            var exceptionCatcher = new JsonSerializerExceptionCatcher();
-            var serializerSettings = new JsonSerializerSettings { Error = exceptionCatcher.OnError };
-            var stateType = GetCurrentStateType(currentState.Type);
-            var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
-
-            if (exceptionCatcher.Failed)
-                deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error);
-            else
-                deserializationError = null;
-
-            projectionState = new CurrentState<TProjection>(state, stateType, currentState.Key);
-
-            return !exceptionCatcher.Failed;
+            return false;
         }
+        var state = JsonConvert.DeserializeObject<TProjection>(currentState.State, serializerSettings);
 
-        CurrentStateType GetCurrentStateType(PbCurrentStateType type)
-            => type switch
-            {
-                PbCurrentStateType.CreatedFromInitialState => CurrentStateType.CreatedFromInitialState,
-                PbCurrentStateType.Persisted => CurrentStateType.Persisted,
-                _ => throw new InvalidCurrentStateType(type)
-            };
+        if (exceptionCatcher.Failed)
+        {
+            deserializationError = new CouldNotDeserializeProjection(currentState.State, currentState.Type, currentState.Key, exceptionCatcher.Error);
+            return false;
+        }
+        
+        projectionState = new CurrentState<TProjection>(state, stateType, currentState.Key);
+        return true;
+    }
+
+    static bool TryGetCurrentStateType(PbCurrentStateType pbType, out CurrentStateType type, out Exception error)
+    {
+        switch (pbType)
+        {
+            case PbCurrentStateType.CreatedFromInitialState:
+                type = CurrentStateType.CreatedFromInitialState;
+                error = default;
+                return true;
+            case PbCurrentStateType.Persisted:
+                type = CurrentStateType.Persisted;
+                error = default;
+                return true;
+            
+            default:
+                error = new InvalidCurrentStateType(pbType);
+                type = default;
+                return false;
+
+        }
     }
 }

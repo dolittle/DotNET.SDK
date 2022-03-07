@@ -1,3 +1,163 @@
+# [15.1.2] - 2022-3-1 [PR: #135](https://github.com/dolittle/DotNET.SDK/pull/135)
+## Summary
+
+Fixes a bug introduced in the previous release where building Event Handlers would cause a stack overflow because an `Equals(...)` method called itself recursively.
+
+### Fixed
+
+- A bug caused clients that was using Event Handlers to crash with a stack overflow when while setting up the Dolittle Client, because of a recursive call to `Equals(...)` in event handler builders while checking the model.
+
+
+# [15.1.1] - 2022-2-11 [PR: #133](https://github.com/dolittle/DotNET.SDK/pull/133)
+## Summary
+
+Fixes an issue where an event processor would be re-registered immediately if reverse call client was cancelled by the server.
+
+### Fixed
+
+- Waits a second and logs a warning message when handling of events was cancelled by the server
+
+
+# [15.1.0] - 2022-2-11 [PR: #132](https://github.com/dolittle/DotNET.SDK/pull/132)
+## Summary
+
+Adds two new event key selectors to projections, `StaticKey` and `KeyFromEventOccurred`
+
+### Added
+
+- `[StaticKey]` event key selector attribute for projection On-methods that sets a constant, static, key as the key of the read model
+- `[KeyFromEventOccurred]` event key selector for projection On-methods that uses the event occurred metadata as the key for the projection read models formatted as the string given to the attribute. We currently support these formats:
+    - yyyy-MM-dd
+    - yyyy-MM
+    - yyyy
+    - HH:mm:ss
+    - hh:mm:ss
+    - HH:mm
+    - hh:mm
+    - HH
+    - hh
+    - yyyy-MM-dd HH:mm:ss
+    - And the above in different orderings
+
+
+# [15.0.1] - 2022-2-10 [PR: #131](https://github.com/dolittle/DotNET.SDK/pull/131)
+## Summary
+
+Do not throw exception when using dolittle middleware and it's not connected before a request is received, and fixes a configuration bug when getting a Dolittle Client directly from the service provider.
+
+### Fixed
+
+- In the `TenantScopedServiceProviderMiddleware` we check if the Dolittle Client is connected and log a message if it's not
+- Using the `IServiceProvider.GetDolittleClient()` got the wrong configuration object.
+
+
+# [15.0.0] - 2022-2-10 [PR: #130](https://github.com/dolittle/DotNET.SDK/pull/130)
+## Summary
+
+The Dolittle Client now fetches resources while establishing the initial connection so that we could make the resources interfaces synchronous, simplifying the usage and allowing us to more simply bind them in the DI container. The `.Connected` property on the client has been changed to a `Task` so you can await the connection asynchronously. The old boolean property has been moved to `.IsConnected`. 
+
+### Added
+
+- A new property `IDolittleClient.Connected` that returns a `Task` that is resolved when the client is successfully connected to a Runtime.
+
+### Changed
+
+- The `IMongoDBResource.GetDatabase()` returns an `IMongoDatabase` instead of a `Task<IMongoDatabase>` since the configuration is retrieved while connecting to the Runtime.
+- The `IDolittleClient.Connected` boolean property has been renamed to `.IsConnected`.
+- The `[MongoDBConvertTo(...)]` attribute was renamed to `[ConvertToMongoDB(...)]` as it was intended in the last release.
+
+### Fixed
+
+- Calling `IServiceProvider.GetDolittleClient()` could throw an exception if called while the client was in the process of connecting.
+
+
+# [14.2.0] - 2022-2-9 [PR: #125](https://github.com/dolittle/DotNET.SDK/pull/125)
+## Summary
+
+Introduces APIs to configure secondary storage for Projection read models for querying, as introduced in https://github.com/dolittle/Runtime/pull/614 (requires Runtime v7.6.0). These changes makes it easy to query Projection read models by specifying that you want copies stored in MongoDB, and then use an `IMongoCollection<>` for that Projection as any other MongoDB collection. The Projection still operates normally and can be fetched from the Projection Store. Modifications of documents in the copied collections will affect the original Projection processing, but should be avoided as it could cause unexpected behaviour. The collections are automatically created and dropped as needed by the Runtime when Projections are created or changed.
+
+There is currently no mechanism for detecting multiple projections copied to the same collection, so be aware of possible strange behaviour if you have multiple Projections with the same name.
+
+### Added
+
+- The `[CopyToMongoDB(...)]` attribute that enables read model copies for a Projection class to MongoDB. The default collection name is the same as the class name. The attribute accepts an argument to override the collection name.
+- The `[ConvertToMongoDB(conversion)]` attribute to specify a BSON conversion to apply when copying the Projection read model to a MongoDB collection. By default the same conversions as the MongoDB driver uses is applied.
+- A `.CopyToMongoDB(...)` method on the Projection builder for enabling read model copies for Projections created using the builder API. This method accepts a callback that you can use to set the collection name and conversions for the read model copies. You can also disable default MongoDB driver conversions.
+- Binding for `IMongoDatabase` in the tenant scoped DI containers.
+- Binding for `IMongoCollection<TReadModel>` in the tenant scoped DI containers for each Projection.
+- Extension method `IMongoDatabase.GetCollection<TReadModel>(settings = null)` to get a collection using the name of the read model or the collection specified in the `[CopyToMongoDB(collection)]` attribute.
+
+### Changed
+
+- To make deserialising work from a Projection read model copy collection, we have enabled `IgnoreExtraElements` for all types in the MongoDB driver when the Dolittle Client is used. This is not default behaviour for the MongoDB driver, but when using MongoDB for read model storage, this should not affect the application adversely.
+
+
+# [14.1.0] - 2022-1-28 [PR: #124](https://github.com/dolittle/DotNET.SDK/pull/124)
+## Summary
+
+Adds the possibility to take upon a specific projection read model as a dependency and use that to get the projection states for that read model type.
+
+### Added
+
+- `IProjectionOf<TReadModel>` that acts as a minimal `IProjectionStore` for a particular projection type.
+- `IProjectionStore.Of<TReadModel>(...)` method with overloads for sending in `ProjectionId` and `ScopeId` to create instances of `IProjectionOf<TReadModel>`
+- `IProjectionOf<TReadModel` is registered in the tenant scoped service providers for all types with the `[Projection]` attribute, or projections created in the `.WithProjections(...)` builder. So they can be injected in controllers etc.
+-
+
+
+# [14.0.0] - 2022-1-25 [PR: #119](https://github.com/dolittle/DotNET.SDK/pull/119)
+## Summary
+
+Simplifies the `IProjectionStore` apis by removing the `CurrentState<>` wrapper around the returned types from `Get(...)` and `GetAll(...)` methods, and returns an `IEnumerable<>` instead of an `IDicationary<,>` when getting multiple read models. And introduces a new `GetState(...)` method that has the wrapped types for when it is interesting.
+
+### Added
+
+- `IProjectionStore.GetState(...)` method that keeps the syntax of the previous `.Get(...)` method.
+
+### Changed
+
+- `IProjectionStore.Get(...)` returns the specified type or `object` instead of wrapping with `CurrentState<>`
+- `IProjectionStore.GetAll(...)` returns an `IEnumerable<>` of the specified type or `object` instead of an `Dictionary<,>` of keys to `CurrentState<>`.
+
+
+# [13.0.1] - 2022-1-24 [PR: #116](https://github.com/dolittle/DotNET.SDK/pull/116)
+## Summary
+
+Uses the new batch streaming method to get all Projection states from the Runtime. This fixes an issue where a large amount of Projection states caused the gRPC client in the SDK to throw an exception because the response message was too big.
+
+### Fixed
+
+- The `IProjectionStore.GetAll` method now uses the new gRPC method that streams results back in batches to fix the issue of too large gRPC messages when a large amount of projection read models have been created.
+
+
+# [13.0.0] - 2022-1-20 [PR: #103](https://github.com/dolittle/DotNET.SDK/pull/103)
+## Summary
+
+Major improvements to the Dolittle Client, in how it connects to the Runtime, configuration, setup and integrations with ASP.Net Core. Combined these changes aim to make the SDK easier to setup and configure, and to make it easier to detect when incompatible versions are used.
+
+### Added
+
+- Support for Dependency Injection using Microsoft Dependency Injection internally, also supporting tenant-specific bindings.
+- The DolittleClient and tenant specific resources (IEventStore, IAggregates, IProjections, ...) are bound in the service provider used and exposed by the client. They can be used in e.g. Event Handlers, or with the AspNetCore integration in Controllers.
+- AspNetCore integration by adding `.UseDolittle()` on both the host and application builder that uses the Microsoft Configuration system, starts the DolittleClient as a hosted service, and a middleware that sets the Request service provider based on the `Tenant-ID` header (provided by the platform). See the AspNetCore sample.
+- When starting up a DolittleClient, it now performs an initial handshake with the configured Runtime to determine that the versions of the SDK and the Runtime are compatible, and retrieves the MicroserviceId to configure its execution context (provided by the platform).
+
+### Changed
+
+- Building a DolittleClient has been split into two steps, namely `.Setup()` and `.Connect()`, to make integrations easier.
+- The automatic discovery of types and processors is now enabled by default.
+- The configured Tenants are retrieved during the first connection to the Runtime, so the `.Tenants` on the DolittleClient is no longer an asynchronous call.
+- The builder APIs exposed in the `.Setup(...)` call have been changed so they are all called `.Register(...)` or `.Create(...)`.
+- The `AggregateOf` methods on the client have been changed to an `Aggregates` property that behaves more like the other tenant specific resources.
+
+### Fixed
+
+- The SDK de-duplicates registered types and processors (Event Handlers, ...) so that you can use both automatic discovery and manual registration.
+
+### Removed
+ - The builders exposed in the `.Setup(...)` call have been changed to interfaces that don't expose the internal `.Build(...)` method.
+
+
 # [12.0.0] - 2021-11-18 [PR: #100](https://github.com/dolittle/DotNET.SDK/pull/100)
 ## Summary
 

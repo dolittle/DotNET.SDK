@@ -6,18 +6,17 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Embeddings.Contracts.Embeddings;
 
-namespace Dolittle.SDK.Embeddings
+namespace Dolittle.SDK.Embeddings;
+
+/// <summary>
+/// Represents a wrapper for gRPC Embeddings.Delete.
+/// </summary>
+public class EmbeddingsDelete : ICanCallAUnaryMethod<DeleteRequest, DeleteResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC Embeddings.Delete.
-    /// </summary>
-    public class EmbeddingsDelete : ICanCallAUnaryMethod<DeleteRequest, DeleteResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<DeleteResponse> Call(DeleteRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<DeleteResponse> Call(DeleteRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new EmbeddingsClient(channel);
-            return client.DeleteAsync(message, callOptions);
-        }
+        var client = new EmbeddingsClient(channel);
+        return client.DeleteAsync(message, callOptions);
     }
 }

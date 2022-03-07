@@ -5,46 +5,45 @@ using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Async;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// An implementation of <see cref="IDeleteMethod{TReadModel}" />.
+/// </summary>
+/// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
+public class DeleteMethod<TReadModel> : IDeleteMethod<TReadModel>
+    where TReadModel : class, new()
 {
+    readonly DeleteEnumerableReturnSignature<TReadModel> _method;
+
     /// <summary>
-    /// An implementation of <see cref="IDeleteMethod{TReadModel}" />.
+    /// Initializes a new instance of the <see cref="DeleteMethod{TReadModel}"/> class.
     /// </summary>
-    /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
-    public class DeleteMethod<TReadModel> : IDeleteMethod<TReadModel>
-        where TReadModel : class, new()
+    /// <param name="method">The <see cref="DeleteEnumerableReturnSignature{TReadModel}" />.</param>
+    public DeleteMethod(DeleteEnumerableReturnSignature<TReadModel> method)
     {
-        readonly DeleteEnumerableReturnSignature<TReadModel> _method;
+        _method = method;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeleteMethod{TReadModel}"/> class.
-        /// </summary>
-        /// <param name="method">The <see cref="DeleteEnumerableReturnSignature{TReadModel}" />.</param>
-        public DeleteMethod(DeleteEnumerableReturnSignature<TReadModel> method)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteMethod{TReadModel}"/> class.
+    /// </summary>
+    /// <param name="method">The <see cref="SyncOnSignature{TReadModel}" />.</param>
+    public DeleteMethod(DeleteSignature<TReadModel> method)
+        : this((currentState, context) => new[] { method(currentState, context) })
+    {
+    }
+
+    /// <inheritdoc/>
+    public Try<IEnumerable<object>> TryDelete(TReadModel currentState, EmbeddingContext context)
+    {
+        try
         {
-            _method = method;
+            return new Try<IEnumerable<object>>(_method(currentState, context));
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeleteMethod{TReadModel}"/> class.
-        /// </summary>
-        /// <param name="method">The <see cref="SyncOnSignature{TReadModel}" />.</param>
-        public DeleteMethod(DeleteSignature<TReadModel> method)
-            : this((currentState, context) => new[] { method(currentState, context) })
+        catch (Exception ex)
         {
-        }
-
-        /// <inheritdoc/>
-        public Try<IEnumerable<object>> TryDelete(TReadModel currentState, EmbeddingContext context)
-        {
-            try
-            {
-                return new Try<IEnumerable<object>>(_method(currentState, context));
-            }
-            catch (Exception ex)
-            {
-                return ex;
-            }
+            return ex;
         }
     }
 }

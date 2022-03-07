@@ -8,52 +8,51 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Events.Filters.Internal
+namespace Dolittle.SDK.Events.Filters.Internal;
+
+/// <summary>
+/// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter non-partitioned private events.
+/// </summary>
+public class UnpartitionedEventFilterProcessor : FilterEventProcessor<FilterRegistrationRequest, FilterResponse>
 {
+    readonly FilterEventCallback _filterEventCallback;
+    readonly FilterId _filterId;
+    readonly ScopeId _scopeId;
+
     /// <summary>
-    /// Represents a <see cref="FilterEventProcessor{TRegisterArguments, TResponse}" /> that can filter non-partitioned private events.
+    /// Initializes a new instance of the <see cref="UnpartitionedEventFilterProcessor"/> class.
     /// </summary>
-    public class UnpartitionedEventFilterProcessor : FilterEventProcessor<FilterRegistrationRequest, FilterResponse>
+    /// <param name="filterId">The <see cref="FilterId" />.</param>
+    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
+    /// <param name="filterEventCallback">The <see cref="FilterEventCallback" />.</param>
+    /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
+    /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
+    public UnpartitionedEventFilterProcessor(
+        FilterId filterId,
+        ScopeId scopeId,
+        FilterEventCallback filterEventCallback,
+        IEventProcessingConverter converter,
+        ILoggerFactory loggerFactory)
+        : base("Unpartitioned Filter", filterId, converter, loggerFactory)
     {
-        readonly FilterEventCallback _filterEventCallback;
-        readonly FilterId _filterId;
-        readonly ScopeId _scopeId;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnpartitionedEventFilterProcessor"/> class.
-        /// </summary>
-        /// <param name="filterId">The <see cref="FilterId" />.</param>
-        /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-        /// <param name="filterEventCallback">The <see cref="FilterEventCallback" />.</param>
-        /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        public UnpartitionedEventFilterProcessor(
-            FilterId filterId,
-            ScopeId scopeId,
-            FilterEventCallback filterEventCallback,
-            IEventProcessingConverter converter,
-            ILoggerFactory loggerFactory)
-            : base("Unpartitioned Filter", filterId, converter, loggerFactory)
-        {
-            _filterId = filterId;
-            _scopeId = scopeId;
-            _filterEventCallback = filterEventCallback;
-        }
-
-        /// <inheritdoc/>
-        public override FilterRegistrationRequest RegistrationRequest
-            => new FilterRegistrationRequest
-                {
-                    FilterId = _filterId.ToProtobuf(),
-                    ScopeId = _scopeId.ToProtobuf(),
-                };
-
-        /// <inheritdoc/>
-        protected override FilterResponse CreateResponseFromFailure(ProcessorFailure failure)
-            => new FilterResponse { Failure = failure };
-
-        /// <inheritdoc/>
-        protected override async Task<FilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
-            => new FilterResponse { IsIncluded = await _filterEventCallback(@event, context).ConfigureAwait(false) };
+        _filterId = filterId;
+        _scopeId = scopeId;
+        _filterEventCallback = filterEventCallback;
     }
+
+    /// <inheritdoc/>
+    public override FilterRegistrationRequest RegistrationRequest
+        => new()
+        {
+            FilterId = _filterId.ToProtobuf(),
+            ScopeId = _scopeId.ToProtobuf(),
+        };
+
+    /// <inheritdoc/>
+    protected override FilterResponse CreateResponseFromFailure(ProcessorFailure failure)
+        => new() { Failure = failure };
+
+    /// <inheritdoc/>
+    protected override async Task<FilterResponse> Filter(object @event, EventContext context, CancellationToken cancellation)
+        => new() { IsIncluded = await _filterEventCallback(@event, context).ConfigureAwait(false) };
 }

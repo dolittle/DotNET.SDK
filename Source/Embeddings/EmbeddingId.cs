@@ -4,25 +4,24 @@
 using System;
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Embeddings
+namespace Dolittle.SDK.Embeddings;
+
+/// <summary>
+/// Represents the concept of a unique identifier for an embedding.
+/// </summary>
+public record EmbeddingId(Guid Value) : ConceptAs<Guid>(Value)
 {
     /// <summary>
-    /// Represents the concept of a unique identifier for an embedding.
+    /// Implicitly converts from a <see cref="Guid"/> to an <see cref="EmbeddingId"/>.
     /// </summary>
-    public class EmbeddingId : ConceptAs<Guid>
-    {
-        /// <summary>
-        /// Implicitly converts from a <see cref="Guid"/> to an <see cref="EmbeddingId"/>.
-        /// </summary>
-        /// <param name="projection">The <see cref="Guid"/> representation.</param>
-        /// <returns>The converted <see cref="EmbeddingId"/>.</returns>
-        public static implicit operator EmbeddingId(Guid projection) => new EmbeddingId { Value = projection };
+    /// <param name="projection">The <see cref="Guid"/> representation.</param>
+    /// <returns>The converted <see cref="EmbeddingId"/>.</returns>
+    public static implicit operator EmbeddingId(Guid projection) => new(projection);
 
-        /// <summary>
-        /// Implicitly converts from a <see cref="string"/> to an <see cref="EmbeddingId"/>.
-        /// </summary>
-        /// <param name="projection">The <see cref="string"/> representation.</param>
-        /// <returns>The converted <see cref="EmbeddingId"/>.</returns>
-        public static implicit operator EmbeddingId(string projection) => new EmbeddingId { Value = Guid.Parse(projection) };
-    }
+    /// <summary>
+    /// Implicitly converts from a <see cref="string"/> to an <see cref="EmbeddingId"/>.
+    /// </summary>
+    /// <param name="projection">The <see cref="string"/> representation.</param>
+    /// <returns>The converted <see cref="EmbeddingId"/>.</returns>
+    public static implicit operator EmbeddingId(string projection) => new(Guid.Parse(projection));
 }

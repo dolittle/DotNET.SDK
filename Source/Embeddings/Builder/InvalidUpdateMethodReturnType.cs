@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Exception that gets thrown when an update method has an invalid return type.
+/// </summary>
+public class InvalidUpdateMethodReturnType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when an update method has an invalid return type.
+    /// Initializes a new instance of the <see cref="InvalidUpdateMethodReturnType"/> class.
     /// </summary>
-    public class InvalidUpdateMethodReturnType : Exception
+    /// <param name="returnType">The return <see cref="Type" /> of the update method.</param>
+    public InvalidUpdateMethodReturnType(Type returnType)
+        : base($"{returnType} is not a valid update method return type.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidUpdateMethodReturnType"/> class.
-        /// </summary>
-        /// <param name="returnType">The return <see cref="Type" /> of the update method.</param>
-        public InvalidUpdateMethodReturnType(Type returnType)
-            : base($"{returnType} is not a valid update method return type.")
-        {
-        }
     }
 }

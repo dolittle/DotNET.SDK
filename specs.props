@@ -2,15 +2,18 @@
     <Import Project="versions.props"/>
     
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <IsTestProject>true</IsTestProject>
         <NoWarn>IDE0044;IDE0051;IDE0052;IDE0060</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Coverlet.MsBuild" Version="2.9.0"/>
-        <PackageReference Include="Dolittle.Common.Specs" Version="2.*"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-        <PackageReference Include="Machine.Specifications.Runner.VisualStudio" Version="2.9.0" />
+<!--        <PackageReference Include="Coverlet.MsBuild" Version="2.9.0"/>-->
+        <PackageReference Include="Machine.Specifications" Version="1.0.0" />
+        <PackageReference Include="Machine.Specifications.Should" Version="1.0.0" />
+        <PackageReference Include="moq" Version="4.13.*" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftDotNetTestVersion)" />
+        <PackageReference Include="Machine.Specifications.Runner.VisualStudio" Version="$(MachineSpecificationsRunnerVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
     </ItemGroup>
 </Project>

@@ -3,18 +3,17 @@
 
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Events.Processing
+namespace Dolittle.SDK.Events.Processing;
+
+/// <summary>
+/// Represents the concept of a event processor kind.
+/// </summary>
+public record EventProcessorKind(string Value) : ConceptAs<string>(Value)
 {
     /// <summary>
-    /// Represents the concept of a event processor kind.
+    /// Implicitly convert from <see cref="string"/> to <see cref="EventProcessorKind"/>.
     /// </summary>
-    public class EventProcessorKind : ConceptAs<string>
-    {
-        /// <summary>
-        /// Implicitly convert from <see cref="string"/> to <see cref="EventProcessorKind"/>.
-        /// </summary>
-        /// <param name="kind">The event processor kind string.</param>
-        public static implicit operator EventProcessorKind(string kind)
-            => new EventProcessorKind { Value = kind };
-    }
+    /// <param name="kind">The event processor kind string.</param>
+    public static implicit operator EventProcessorKind(string kind)
+        => new(kind);
 }

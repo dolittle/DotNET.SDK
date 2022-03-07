@@ -4,16 +4,15 @@
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Events.Processing.Internal;
 
-namespace Dolittle.SDK.Events.Filters.Internal
+namespace Dolittle.SDK.Events.Filters.Internal;
+
+/// <summary>
+/// Defines a filter processor.
+/// </summary>
+/// <typeparam name="TRegisterRequest">The <see cref="System.Type" /> of the registration arguments.</typeparam>
+/// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
+public interface IFilterProcessor<TRegisterRequest, TResponse> : IEventProcessor<FilterId, TRegisterRequest, FilterEventRequest, TResponse>
+    where TRegisterRequest : class
+    where TResponse : class
 {
-    /// <summary>
-    /// Defines a filter processor.
-    /// </summary>
-    /// <typeparam name="TRegisterRequest">The <see cref="System.Type" /> of the registration arguments.</typeparam>
-    /// <typeparam name="TResponse">The <see cref="System.Type" /> of the response.</typeparam>
-    public interface IFilterProcessor<TRegisterRequest, TResponse> : IEventProcessor<FilterId, TRegisterRequest, FilterEventRequest, TResponse>
-        where TRegisterRequest : class
-        where TResponse : class
-    {
-    }
 }

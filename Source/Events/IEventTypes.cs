@@ -3,12 +3,11 @@
 
 using Dolittle.SDK.Artifacts;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events;
+
+/// <summary>
+/// Defines a system that knows about <see cref="EventType" />.
+/// </summary>
+public interface IEventTypes : IArtifacts<EventType, EventTypeId>
 {
-    /// <summary>
-    /// Defines a system that knows about <see cref="EventType" />.
-    /// </summary>
-    public interface IEventTypes : IArtifacts<EventType, EventTypeId>
-    {
-    }
 }

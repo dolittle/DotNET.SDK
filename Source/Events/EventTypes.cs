@@ -3,38 +3,28 @@
 
 using System;
 using Dolittle.SDK.Artifacts;
-using Microsoft.Extensions.Logging;
+using Dolittle.SDK.Common;
 
-namespace Dolittle.SDK.Events
+namespace Dolittle.SDK.Events;
+
+/// <summary>
+/// Represents an implementation of <see cref="IEventTypes" />.
+/// </summary>
+public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
 {
     /// <summary>
-    /// Represents an implementation of <see cref="IEventTypes" />.
+    /// Initializes an instance of the <see cref="EventTypes"/> class.
     /// </summary>
-    public class EventTypes : Artifacts<EventType, EventTypeId>, IEventTypes
+    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for "/><see cref="EventType"/> to <see cref="Type"/>.</param>
+    public EventTypes(IUniqueBindings<EventType, Type> bindings)
+        : base(bindings)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventTypes"/> class.
-        /// </summary>
-        /// <param name="logger">The <see cref="ILogger" />.</param>
-        public EventTypes(ILogger logger)
-            : base(logger)
-        {
-        }
+    }
 
-        /// <inheritdoc/>
-        protected override Exception CreateNoArtifactAssociatedWithType(Type type)
-            => new NoEventTypeAssociatedWithType(type);
-
-        /// <inheritdoc/>
-        protected override Exception CreateNoTypeAssociatedWithArtifact(EventType artifact)
-            => new NoTypeAssociatedWithEventType(artifact);
-
-        /// <inheritdoc/>
-        protected override Exception CreateCannotAssociateMultipleArtifactsWithType(Type type, EventType artifact, EventType existing)
-            => new CannotAssociateMultipleEventTypesWithType(type, artifact, existing);
-
-        /// <inheritdoc/>
-        protected override Exception CreateCannotAssociateMultipleTypesWithArtifact(EventType artifact, Type type, Type existing)
-            => new CannotAssociateMultipleTypesWithEventType(artifact, type, existing);
+    /// <summary>
+    /// Initializes an instance of the <see cref="EventTypes"/> class.w
+    /// </summary>
+    public EventTypes()
+    {
     }
 }

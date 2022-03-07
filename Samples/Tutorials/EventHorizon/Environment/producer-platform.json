@@ -1,0 +1,9 @@
+{
+    "applicationName": "EventHorizon Tutorial",
+    "applicationID": "5bd8762f-6c39-4ba2-a141-d041c8668894",
+    "microserviceName": "Producer",
+    "microserviceID": "f39b1f61-d360-4675-b859-53c05c87c0e6",
+    "customerName": "Dolittle Tacos",
+    "customerID": "c2d49e3e-9bd4-4e54-9e13-3ea4e04d8230",
+    "environment": "Tutorial"
+}

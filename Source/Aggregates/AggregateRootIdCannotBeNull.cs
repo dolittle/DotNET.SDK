@@ -4,19 +4,18 @@
 using System;
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Aggregates
+namespace Dolittle.SDK.Aggregates;
+
+/// <summary>
+/// Exception that gets thrown when trying to construct an <see cref="AggregateRootType"/> without an <see cref="AggregateRootId"/>.
+/// </summary>
+public class AggregateRootIdCannotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct an <see cref="AggregateRootType"/> without an <see cref="AggregateRootId"/>.
+    /// Initializes a new instance of the <see cref="AggregateRootIdCannotBeNull"/> class.
     /// </summary>
-    public class AggregateRootIdCannotBeNull : Exception
+    public AggregateRootIdCannotBeNull()
+        : base($"The {nameof(AggregateRootId)} of an {nameof(AggregateRootType)} cannot be null")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateRootIdCannotBeNull"/> class.
-        /// </summary>
-        public AggregateRootIdCannotBeNull()
-            : base($"The {nameof(AggregateRootId)} of an {nameof(AggregateRootType)} cannot be null")
-        {
-        }
     }
 }

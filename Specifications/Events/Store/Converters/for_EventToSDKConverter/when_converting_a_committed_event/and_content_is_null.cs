@@ -7,32 +7,31 @@ using Google.Protobuf.WellKnownTypes;
 using Machine.Specifications;
 using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 
-namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.when_converting_a_committed_event
+namespace Dolittle.SDK.Events.Store.Converters.for_EventToSDKConverter.when_converting_a_committed_event;
+
+public class and_content_is_null : given.a_committed_event_and_a_converter
 {
-    public class and_content_is_null : given.a_committed_event_and_a_converter
+    static bool try_result;
+    static CommittedEvent converted_event;
+    static Exception exception;
+
+    Establish context = () =>
     {
-        static bool try_result;
-        static CommittedEvent converted_event;
-        static Exception exception;
-
-        Establish context = () =>
+        committed_event = new PbCommittedEvent
         {
-            committed_event = new PbCommittedEvent
-            {
-                External = false,
-                Public = is_public,
-                EventType = event_type.ToProtobuf(),
-                ExecutionContext = execution_context,
-                EventSourceId = event_source.Value,
-                Occurred = Timestamp.FromDateTimeOffset(occured),
-                EventLogSequenceNumber = event_log_sequence_number,
-            };
+            External = false,
+            Public = is_public,
+            EventType = event_type.ToProtobuf(),
+            ExecutionContext = execution_context,
+            EventSourceId = event_source.Value,
+            Occurred = Timestamp.FromDateTimeOffset(occured),
+            EventLogSequenceNumber = event_log_sequence_number,
         };
+    };
 
-        Because of = () => try_result = converter.TryConvert(committed_event, out converted_event, out exception);
+    Because of = () => try_result = converter.TryConvert(committed_event, out converted_event, out exception);
 
-        It should_return_false = () => try_result.ShouldBeFalse();
-        It should_out_default_event = () => converted_event.ShouldEqual(default);
-        It should_out_missing_committed_event_information = () => exception.ShouldBeOfExactType<MissingCommittedEventInformation>();
-    }
+    It should_return_false = () => try_result.ShouldBeFalse();
+    It should_out_default_event = () => converted_event.ShouldEqual(default);
+    It should_out_missing_committed_event_information = () => exception.ShouldBeOfExactType<MissingCommittedEventInformation>();
 }

@@ -4,18 +4,15 @@
 
 using Dolittle.SDK.Events;
 
-namespace Kitchen
+[EventType("1844473f-d714-4327-8b7f-5b3c2bdfc26a")]
+public class DishPrepared
 {
-    [EventType("1844473f-d714-4327-8b7f-5b3c2bdfc26a")]
-    public class DishPrepared
+    public DishPrepared (string dish, string chef)
     {
-        public DishPrepared (string dish, string chef)
-        {
-            Dish = dish;
-            Chef = chef;
-        }
-
-        public string Dish { get; }
-        public string Chef { get; }
+        Dish = dish;
+        Chef = chef;
     }
+
+    public string Dish { get; }
+    public string Chef { get; }
 }

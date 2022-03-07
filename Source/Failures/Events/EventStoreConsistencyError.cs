@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Failures.Events
+namespace Dolittle.SDK.Failures.Events;
+
+/// <summary>
+/// Exception that gets thrown when an inconsistency is detected in the event store at runtime.
+/// </summary>
+public class EventStoreConsistencyError : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when an inconsistency is detected in the event store at runtime.
+    /// Initializes a new instance of the <see cref="EventStoreConsistencyError"/> class.
     /// </summary>
-    public class EventStoreConsistencyError : Exception
+    /// <param name="reason">The failure reason.</param>
+    public EventStoreConsistencyError(string reason)
+        : base(reason)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventStoreConsistencyError"/> class.
-        /// </summary>
-        /// <param name="reason">The failure reason.</param>
-        public EventStoreConsistencyError(string reason)
-            : base(reason)
-        {
-        }
     }
 }

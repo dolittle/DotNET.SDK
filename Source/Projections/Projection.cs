@@ -1,60 +1,103 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Builder;
+using Dolittle.SDK.Projections.Copies;
 
-namespace Dolittle.SDK.Projections
+namespace Dolittle.SDK.Projections;
+
+/// <summary>
+/// An implementation of <see cref="IProjection{TReadModel}" />.
+/// </summary>
+/// <typeparam name="TReadModel">The type of the read model.</typeparam>
+public class Projection<TReadModel> : IProjection<TReadModel>
+    where TReadModel : class, new()
 {
+    readonly IDictionary<EventType, IProjectionMethod<TReadModel>> _onMethods;
+
     /// <summary>
-    /// An implementation of <see cref="IProjection{TReadModel}" />.
+    /// Initializes a new instance of the <see cref="Projection{TReadModel}"/> class.
     /// </summary>
-    /// <typeparam name="TReadModel">The type of the read model.</typeparam>
-    public class Projection<TReadModel> : IProjection<TReadModel>
-        where TReadModel : class, new()
+    /// <param name="identifier">The <see cref="ProjectionId" />.</param>
+    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
+    /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
+    /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
+    public Projection(
+        ProjectionId identifier,
+        ScopeId scopeId,
+        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
+        ProjectionCopies copies)
     {
-        readonly IDictionary<EventType, IProjectionMethod<TReadModel>> _onMethods;
+        _onMethods = onMethods;
+        Identifier = identifier;
+        ScopeId = scopeId;
+        Events = onMethods.Select(_ => new EventSelector(_.Key, _.Value.KeySelector)).ToList();
+        ProjectionType = typeof(TReadModel);
+        Copies = copies;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Projection{TReadModel}"/> class.
-        /// </summary>
-        /// <param name="identifier">The <see cref="ProjectionId" />.</param>
-        /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-        /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
-        public Projection(
-            ProjectionId identifier,
-            ScopeId scopeId,
-            IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Projection{TReadModel}"/> class.
+    /// </summary>
+    /// <param name="identifier">The <see cref="ProjectionId" />.</param>
+    /// <param name="alias">The <see cref="ProjectionAlias" />.</param>
+    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
+    /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
+    /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
+    public Projection(
+        ProjectionId identifier,
+        ProjectionAlias alias,
+        ScopeId scopeId,
+        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
+        ProjectionCopies copies)
+        :this(identifier, scopeId, onMethods, copies)
+    {
+        Alias = alias;
+        HasAlias = true;
+    }
+
+    /// <inheritdoc />
+    public Type ProjectionType { get; }
+
+    /// <inheritdoc/>
+    public ProjectionId Identifier { get; }
+
+    /// <inheritdoc/>
+    public ScopeId ScopeId { get; }
+
+    /// <inheritdoc/>
+    public TReadModel InitialState { get; } = new();
+
+    /// <inheritdoc/>
+    public IEnumerable<EventSelector> Events { get; }
+
+    /// <inheritdoc />
+    public ProjectionCopies Copies { get; }
+
+    /// <inheritdoc />
+    public ProjectionAlias Alias { get; }
+
+    /// <inheritdoc />
+    public bool HasAlias { get; }
+
+    /// <inheritdoc/>
+    public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context, CancellationToken cancellation)
+    {
+        if (!_onMethods.TryGetValue(eventType, out var method))
         {
-            _onMethods = onMethods;
-            Identifier = identifier;
-            ScopeId = scopeId;
-            Events = onMethods.Select(_ => new EventSelector(_.Key, _.Value.KeySelector)).ToList();
+            throw new MissingOnMethodForEventType(eventType);
         }
-
-        /// <inheritdoc/>
-        public ProjectionId Identifier { get; }
-
-        /// <inheritdoc/>
-        public ScopeId ScopeId { get; }
-
-        /// <inheritdoc/>
-        public TReadModel InitialState { get; } = new TReadModel();
-
-        /// <inheritdoc/>
-        public IEnumerable<EventSelector> Events { get; }
-
-        /// <inheritdoc/>
-        public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context, CancellationToken cancellation)
+        var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
+        if (tryOn.Exception != default)
         {
-            if (!_onMethods.TryGetValue(eventType, out var method)) throw new MissingOnMethodForEventType(eventType);
-            var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
-            if (tryOn.Exception != default) throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
-            return tryOn.Result;
+            throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
         }
+        return tryOn.Result;
     }
 }

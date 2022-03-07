@@ -6,18 +6,17 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Embeddings.Contracts.EmbeddingStore;
 
-namespace Dolittle.SDK.Embeddings.Store
+namespace Dolittle.SDK.Embeddings.Store;
+
+/// <summary>
+/// Represents a wrapper for gRPC EmbeddingStore.GetAll.
+/// </summary>
+public class EmbeddingsGetKeys : ICanCallAUnaryMethod<GetKeysRequest, GetKeysResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC EmbeddingStore.GetAll.
-    /// </summary>
-    public class EmbeddingsGetKeys : ICanCallAUnaryMethod<GetKeysRequest, GetKeysResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<GetKeysResponse> Call(GetKeysRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<GetKeysResponse> Call(GetKeysRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new EmbeddingStoreClient(channel);
-            return client.GetKeysAsync(message, callOptions);
-        }
+        var client = new EmbeddingStoreClient(channel);
+        return client.GetKeysAsync(message, callOptions);
     }
 }

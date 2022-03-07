@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Projections
+namespace Dolittle.SDK.Projections;
+
+/// <summary>
+/// Exception that gets thrown when trying to convert a <see cref="KeySelectorType"/> that does not have a known Contracts representation.
+/// </summary>
+public class UnknownKeySelectorType : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to convert a <see cref="KeySelectorType"/> that does not have a known Contracts representation.
+    /// Initializes a new instance of the <see cref="UnknownKeySelectorType"/> class.
     /// </summary>
-    public class UnknownKeySelectorType : Exception
+    /// <param name="keySelectorType">The <see cref="KeySelectorType"/> to be converted.</param>
+    public UnknownKeySelectorType(KeySelectorType keySelectorType)
+        : base($"The key selector type '{keySelectorType}' is unknown.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnknownKeySelectorType"/> class.
-        /// </summary>
-        /// <param name="keySelectorType">The <see cref="KeySelectorType"/> to be converted.</param>
-        public UnknownKeySelectorType(KeySelectorType keySelectorType)
-            : base($"The key selector type '{keySelectorType}' is unknown.")
-        {
-        }
     }
 }

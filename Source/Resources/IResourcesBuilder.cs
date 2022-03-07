@@ -3,18 +3,17 @@
 
 using Dolittle.SDK.Tenancy;
 
-namespace Dolittle.SDK.Resources
+namespace Dolittle.SDK.Resources;
+
+/// <summary>
+/// Defines a system that knows about the Resources provided by the Runtime.
+/// </summary>
+public interface IResourcesBuilder
 {
     /// <summary>
-    /// Defines a system that knows about the Resources provided by the Runtime.
+    /// Gets the <see cref="IResources"/> for a specific tenant.
     /// </summary>
-    public interface IResourcesBuilder
-    {
-        /// <summary>
-        /// Gets the <see cref="IResources"/> for a specific tenant.
-        /// </summary>
-        /// <param name="tenant">The Tenant to get the <see cref="IResources"/> for.</param>
-        /// <returns>The <see cref="IResources"/>.</returns>
-        IResources ForTenant(TenantId tenant);
-    }
+    /// <param name="tenant">The Tenant to get the <see cref="IResources"/> for.</param>
+    /// <returns>The <see cref="IResources"/>.</returns>
+    IResources ForTenant(TenantId tenant);
 }

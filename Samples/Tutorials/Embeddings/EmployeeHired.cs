@@ -3,13 +3,10 @@
 
 using Dolittle.SDK.Events;
 
-namespace Kitchen
+[EventType("8fdf45bc-f484-4348-bcb0-4d6f134aaf6c")]
+public class EmployeeHired
 {
-    [EventType("8fdf45bc-f484-4348-bcb0-4d6f134aaf6c")]
-    public class EmployeeHired
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public EmployeeHired(string name) => Name = name;
-    }
+    public EmployeeHired(string name) => Name = name;
 }

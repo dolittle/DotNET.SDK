@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Services
+namespace Dolittle.SDK.Services;
+
+/// <summary>
+/// Exception that gets thrown when the server does not send a connect response message as the first message while performing a reverse call.
+/// </summary>
+public class DidNotReceiveConnectResponse : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when the server does not send a connect response message as the first message while performing a reverse call.
+    /// Initializes a new instance of the <see cref="DidNotReceiveConnectResponse"/> class.
     /// </summary>
-    public class DidNotReceiveConnectResponse : Exception
+    public DidNotReceiveConnectResponse()
+        : base("The server did not respond with a connect response message as the first message.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DidNotReceiveConnectResponse"/> class.
-        /// </summary>
-        public DidNotReceiveConnectResponse()
-            : base("The server did not respond with a connect response message as the first message.")
-        {
-        }
     }
 }

@@ -4,12 +4,11 @@
 using Dolittle.SDK.Events.Store.Converters.given;
 using Machine.Specifications;
 
-namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.given
-{
-    public class a_converter_and_a_protobuf_execution_context : a_content_serializer_and_an_execution_context
-    {
-        protected static IConvertAggregateEventsToSDK converter;
+namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.given;
 
-        Establish context = () => converter = new AggregateEventToSDKConverter(serializer.Object);
-    }
+public class a_converter_and_a_protobuf_execution_context : a_content_serializer_and_an_execution_context
+{
+    protected static IConvertAggregateEventsToSDK converter;
+
+    Establish context = () => converter = new AggregateEventToSDKConverter(serializer.Object);
 }

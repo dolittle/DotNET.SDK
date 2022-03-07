@@ -4,105 +4,104 @@
 using System;
 using Dolittle.SDK.Execution;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represent an Event that is committed to the Event Store.
+/// </summary>
+public class CommittedEvent
 {
     /// <summary>
-    /// Represent an Event that is committed to the Event Store.
+    /// Initializes a new instance of the <see cref="CommittedEvent"/> class.
     /// </summary>
-    public class CommittedEvent
+    /// <param name="eventLogSequenceNumber">The event log sequence number of the Event.</param>
+    /// <param name="occurred">The <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.</param>
+    /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the Event.</param>
+    /// <param name="executionContext">The <see cref="ExecutionContext"/> in which the Event was committed.</param>
+    /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
+    /// <param name="content">The content of the Event.</param>
+    /// <param name="isPublic">Whether the event is public or not.</param>
+    public CommittedEvent(
+        EventLogSequenceNumber eventLogSequenceNumber,
+        DateTimeOffset occurred,
+        EventSourceId eventSourceId,
+        ExecutionContext executionContext,
+        EventType eventType,
+        object content,
+        bool isPublic)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommittedEvent"/> class.
-        /// </summary>
-        /// <param name="eventLogSequenceNumber">The event log sequence number of the Event.</param>
-        /// <param name="occurred">The <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.</param>
-        /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the Event.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext"/> in which the Event was committed.</param>
-        /// <param name="eventType">The <see cref="EventType"/> the Event is associated with.</param>
-        /// <param name="content">The content of the Event.</param>
-        /// <param name="isPublic">Whether the event is public or not.</param>
-        public CommittedEvent(
-            EventLogSequenceNumber eventLogSequenceNumber,
-            DateTimeOffset occurred,
-            EventSourceId eventSourceId,
-            ExecutionContext executionContext,
-            EventType eventType,
-            object content,
-            bool isPublic)
-        {
-            ThrowIfEventLogSequenceNumberIsNull(eventLogSequenceNumber);
-            ThrowIfEventSourceIdIsNull(eventSourceId);
-            ThrowIfExecutionContextIsNull(executionContext);
-            ThrowIfEventTypeIsNull(eventType);
-            ThrowIfContentIsNull(content);
+        ThrowIfEventLogSequenceNumberIsNull(eventLogSequenceNumber);
+        ThrowIfEventSourceIdIsNull(eventSourceId);
+        ThrowIfExecutionContextIsNull(executionContext);
+        ThrowIfEventTypeIsNull(eventType);
+        ThrowIfContentIsNull(content);
 
-            EventLogSequenceNumber = eventLogSequenceNumber;
-            Occurred = occurred;
-            EventSource = eventSourceId;
-            ExecutionContext = executionContext;
-            EventType = eventType;
-            Content = content;
-            IsPublic = isPublic;
-        }
+        EventLogSequenceNumber = eventLogSequenceNumber;
+        Occurred = occurred;
+        EventSource = eventSourceId;
+        ExecutionContext = executionContext;
+        EventType = eventType;
+        Content = content;
+        IsPublic = isPublic;
+    }
 
-        /// <summary>
-        /// Gets the event log sequence number of the Event.
-        /// </summary>
-        public EventLogSequenceNumber EventLogSequenceNumber { get; }
+    /// <summary>
+    /// Gets the event log sequence number of the Event.
+    /// </summary>
+    public EventLogSequenceNumber EventLogSequenceNumber { get; }
 
-        /// <summary>
-        /// Gets the <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.
-        /// </summary>
-        public DateTimeOffset Occurred { get; }
+    /// <summary>
+    /// Gets the <see cref="DateTimeOffset" /> when the Event was committed to the Event Store.
+    /// </summary>
+    public DateTimeOffset Occurred { get; }
 
-        /// <summary>
-        /// Gets the Event Source that this Event was applied to.
-        /// </summary>
-        public EventSourceId EventSource { get; }
+    /// <summary>
+    /// Gets the Event Source that this Event was applied to.
+    /// </summary>
+    public EventSourceId EventSource { get; }
 
-        /// <summary>
-        /// Gets the <see cref="ExecutionContext"/> in which the Event was committed.
-        /// </summary>
-        public ExecutionContext ExecutionContext { get; }
+    /// <summary>
+    /// Gets the <see cref="ExecutionContext"/> in which the Event was committed.
+    /// </summary>
+    public ExecutionContext ExecutionContext { get; }
 
-        /// <summary>
-        /// Gets the <see cref="EventType"/> in which the Event is associated with.
-        /// </summary>
-        public EventType EventType { get; }
+    /// <summary>
+    /// Gets the <see cref="EventType"/> in which the Event is associated with.
+    /// </summary>
+    public EventType EventType { get; }
 
-        /// <summary>
-        /// Gets the content of the Event.
-        /// </summary>
-        public object Content { get; }
+    /// <summary>
+    /// Gets the content of the Event.
+    /// </summary>
+    public object Content { get; }
 
-        /// <summary>
-        /// Gets a value indicating whether the Event is public or not.
-        /// </summary>
-        public bool IsPublic { get; }
+    /// <summary>
+    /// Gets a value indicating whether the Event is public or not.
+    /// </summary>
+    public bool IsPublic { get; }
 
-        void ThrowIfEventLogSequenceNumberIsNull(EventLogSequenceNumber eventLogSequenceNumber)
-        {
-            if (eventLogSequenceNumber == null) throw new EventLogSequenceNumberCannotBeNull();
-        }
+    void ThrowIfEventLogSequenceNumberIsNull(EventLogSequenceNumber eventLogSequenceNumber)
+    {
+        if (eventLogSequenceNumber == null) throw new EventLogSequenceNumberCannotBeNull();
+    }
 
-        void ThrowIfEventSourceIdIsNull(EventSourceId eventSourceId)
-        {
-            if (eventSourceId == null) throw new EventSourceIdCannotBeNull();
-        }
+    void ThrowIfEventSourceIdIsNull(EventSourceId eventSourceId)
+    {
+        if (eventSourceId == null) throw new EventSourceIdCannotBeNull();
+    }
 
-        void ThrowIfExecutionContextIsNull(ExecutionContext executionContext)
-        {
-            if (executionContext == null) throw new ExecutionContextCannotBeNull();
-        }
+    void ThrowIfExecutionContextIsNull(ExecutionContext executionContext)
+    {
+        if (executionContext == null) throw new ExecutionContextCannotBeNull();
+    }
 
-        void ThrowIfEventTypeIsNull(EventType eventType)
-        {
-            if (eventType == null) throw new EventTypeCannotBeNull();
-        }
+    void ThrowIfEventTypeIsNull(EventType eventType)
+    {
+        if (eventType == null) throw new EventTypeCannotBeNull();
+    }
 
-        void ThrowIfContentIsNull(object content)
-        {
-            if (content == null) throw new EventContentCannotBeNull();
-        }
+    void ThrowIfContentIsNull(object content)
+    {
+        if (content == null) throw new EventContentCannotBeNull();
     }
 }

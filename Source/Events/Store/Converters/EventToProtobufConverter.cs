@@ -5,73 +5,75 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Dolittle.SDK.Protobuf;
-using Contracts = Dolittle.Runtime.Events.Contracts;
 
-namespace Dolittle.SDK.Events.Store.Converters
+namespace Dolittle.SDK.Events.Store.Converters;
+
+/// <summary>
+/// Represents an implementation of <see cref="IConvertEventsToProtobuf"/>.
+/// </summary>
+public class EventToProtobufConverter : IConvertEventsToProtobuf
 {
+    readonly ISerializeEventContent _serializer;
+
     /// <summary>
-    /// Reperesents an implementation of <see cref="IConvertEventsToProtobuf"/>.
+    /// Initializes a new instance of the <see cref="EventToProtobufConverter"/> class.
     /// </summary>
-    public class EventToProtobufConverter : IConvertEventsToProtobuf
+    /// <param name="serializer">The <see cref="ISerializeEventContent"/> serializer.</param>
+    public EventToProtobufConverter(ISerializeEventContent serializer)
     {
-        readonly ISerializeEventContent _serializer;
+        _serializer = serializer;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventToProtobufConverter"/> class.
-        /// </summary>
-        /// <param name="serializer">The <see cref="ISerializeEventContent"/> serializer.</param>
-        public EventToProtobufConverter(ISerializeEventContent serializer)
+    /// <inheritdoc/>
+    public bool TryConvert(UncommittedEvents source, out IReadOnlyList<Runtime.Events.Contracts.UncommittedEvent> events, out Exception error)
+    {
+        events = default;
+
+        if (source == null)
         {
-            _serializer = serializer;
+            error = new ArgumentNullException(nameof(source));
+            return false;
         }
 
-        /// <inheritdoc/>
-        public bool TryConvert(UncommittedEvents source, out IReadOnlyList<Contracts.UncommittedEvent> events, out Exception error)
+        var list = ImmutableList<Runtime.Events.Contracts.UncommittedEvent>.Empty.ToBuilder();
+        foreach (var sourceEvent in source)
         {
-            events = default;
-
-            if (source == null)
+            if (!TryConvert(sourceEvent, out var @event, out error))
             {
-                error = new ArgumentNullException(nameof(source));
                 return false;
             }
 
-            var list = ImmutableList<Contracts.UncommittedEvent>.Empty.ToBuilder();
-            foreach (var sourceEvent in source)
-            {
-                if (!TryConvert(sourceEvent, out var @event, out error))
-                    return false;
-
-                list.Add(@event);
-            }
-
-            error = null;
-            events = list.ToImmutable();
-            return true;
+            list.Add(@event);
         }
 
-        bool TryConvert(UncommittedEvent source, out Contracts.UncommittedEvent @event, out Exception error)
+        error = null;
+        events = list.ToImmutable();
+        return true;
+    }
+
+    bool TryConvert(UncommittedEvent source, out Runtime.Events.Contracts.UncommittedEvent @event, out Exception error)
+    {
+        @event = default;
+
+        if (source == null)
         {
-            @event = default;
-
-            if (source == null)
-            {
-                error = new ArgumentNullException(nameof(source));
-                return false;
-            }
-
-            if (!_serializer.TrySerialize(source.Content, out var content, out error))
-                return false;
-
-            error = null;
-            @event = new Contracts.UncommittedEvent
-            {
-                EventType = source.EventType.ToProtobuf(),
-                EventSourceId = source.EventSource.Value,
-                Public = source.IsPublic,
-                Content = content,
-            };
-            return true;
+            error = new ArgumentNullException(nameof(source));
+            return false;
         }
+
+        if (!_serializer.TrySerialize(source.Content, out var content, out error))
+        {
+            return false;
+        }
+
+        error = null;
+        @event = new Runtime.Events.Contracts.UncommittedEvent
+        {
+            EventType = source.EventType.ToProtobuf(),
+            EventSourceId = source.EventSource.Value,
+            Public = source.IsPublic,
+            Content = content,
+        };
+        return true;
     }
 }

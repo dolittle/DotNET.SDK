@@ -4,82 +4,81 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represents a sequence of <see cref="UncommittedEvent"/>s that have not been committed to the Event Store.
+/// </summary>
+public class UncommittedEvents : IList<UncommittedEvent>
 {
+    readonly List<UncommittedEvent> _events = new();
+
     /// <summary>
-    /// Represents a sequence of <see cref="UncommittedEvent"/>s that have not been committed to the Event Store.
+    /// Gets a value indicating whether or not there are any events in the committed sequence.
     /// </summary>
-    public class UncommittedEvents : IList<UncommittedEvent>
+    public bool HasEvents => Count > 0;
+
+    /// <inheritdoc/>
+    public int Count => _events.Count;
+
+    /// <inheritdoc/>
+    public bool IsReadOnly => false;
+
+    /// <inheritdoc/>
+    public UncommittedEvent this[int index]
     {
-        readonly List<UncommittedEvent> _events = new List<UncommittedEvent>();
+        get => _events[index];
+        set => Insert(index, value);
+    }
 
-        /// <summary>
-        /// Gets a value indicating whether or not there are any events in the committed sequence.
-        /// </summary>
-        public bool HasEvents => Count > 0;
+    /// <inheritdoc/>
+    public IEnumerator<UncommittedEvent> GetEnumerator() => _events.GetEnumerator();
 
-        /// <inheritdoc/>
-        public int Count => _events.Count;
+    /// <inheritdoc/>
+    IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
 
-        /// <inheritdoc/>
-        public bool IsReadOnly => false;
+    /// <inheritdoc/>
+    public int IndexOf(UncommittedEvent item) => _events.IndexOf(item);
 
-        /// <inheritdoc/>
-        public UncommittedEvent this[int index]
-        {
-            get => _events[index];
-            set => Insert(index, value);
-        }
+    /// <inheritdoc/>
+    public void Insert(int index, UncommittedEvent item)
+    {
+        ThrowIfEventIsNull(item);
+        _events.Insert(index, item);
+    }
 
-        /// <inheritdoc/>
-        public IEnumerator<UncommittedEvent> GetEnumerator() => _events.GetEnumerator();
+    /// <inheritdoc/>
+    public void RemoveAt(int index) => _events.RemoveAt(index);
 
-        /// <inheritdoc/>
-        IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
+    /// <inheritdoc/>
+    public void Add(UncommittedEvent item)
+    {
+        ThrowIfEventIsNull(item);
+        _events.Add(item);
+    }
 
-        /// <inheritdoc/>
-        public int IndexOf(UncommittedEvent item) => _events.IndexOf(item);
+    /// <inheritdoc/>
+    public void Clear() => _events.Clear();
 
-        /// <inheritdoc/>
-        public void Insert(int index, UncommittedEvent item)
+    /// <inheritdoc/>
+    public bool Contains(UncommittedEvent item) => _events.Contains(item);
+
+    /// <inheritdoc/>
+    public void CopyTo(UncommittedEvent[] array, int arrayIndex)
+    {
+        foreach (var item in array)
         {
             ThrowIfEventIsNull(item);
-            _events.Insert(index, item);
         }
 
-        /// <inheritdoc/>
-        public void RemoveAt(int index) => _events.RemoveAt(index);
+        _events.CopyTo(array, arrayIndex);
+    }
 
-        /// <inheritdoc/>
-        public void Add(UncommittedEvent item)
-        {
-            ThrowIfEventIsNull(item);
-            _events.Add(item);
-        }
+    /// <inheritdoc/>
+    public bool Remove(UncommittedEvent item) => _events.Remove(item);
 
-        /// <inheritdoc/>
-        public void Clear() => _events.Clear();
-
-        /// <inheritdoc/>
-        public bool Contains(UncommittedEvent item) => _events.Contains(item);
-
-        /// <inheritdoc/>
-        public void CopyTo(UncommittedEvent[] array, int arrayIndex)
-        {
-            foreach (var item in array)
-            {
-                ThrowIfEventIsNull(item);
-            }
-
-            _events.CopyTo(array, arrayIndex);
-        }
-
-        /// <inheritdoc/>
-        public bool Remove(UncommittedEvent item) => _events.Remove(item);
-
-        void ThrowIfEventIsNull(UncommittedEvent @event)
-        {
-            if (@event == null) throw new EventCannotBeNull();
-        }
+    void ThrowIfEventIsNull(UncommittedEvent @event)
+    {
+        if (@event == null) throw new EventCannotBeNull();
     }
 }

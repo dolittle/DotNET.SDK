@@ -1,13 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <Import Project="../../specs.props"/>
+    <Import Project="../../specs.props" />
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Services.Specs</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Services</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Reactive.Testing" Version="$(RxVersion)" />
+        <PackageReference Include="System.Linq.Async" Version="$(SystemLinqAsyncVersion)" />
+        
     </ItemGroup>
 
     <ItemGroup>

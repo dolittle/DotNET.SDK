@@ -4,19 +4,18 @@
 using System;
 using Dolittle.SDK.Artifacts;
 
-namespace Dolittle.SDK.Aggregates
+namespace Dolittle.SDK.Aggregates;
+
+/// <summary>
+/// Exception that gets thrown when trying to construct an <see cref="AggregateRootType"/> with a <see cref="Generation"/> that is null.
+/// </summary>
+public class AggregateRootTypeGenerationCannotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct an <see cref="AggregateRootType"/> with a <see cref="Generation"/> that is null.
+    /// Initializes a new instance of the <see cref="AggregateRootTypeGenerationCannotBeNull"/> class.
     /// </summary>
-    public class AggregateRootTypeGenerationCannotBeNull : Exception
+    public AggregateRootTypeGenerationCannotBeNull()
+        : base($"The {nameof(Generation)} of an {nameof(AggregateRootType)} cannot be null")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateRootTypeGenerationCannotBeNull"/> class.
-        /// </summary>
-        public AggregateRootTypeGenerationCannotBeNull()
-            : base($"The {nameof(Generation)} of an {nameof(AggregateRootType)} cannot be null")
-        {
-        }
     }
 }

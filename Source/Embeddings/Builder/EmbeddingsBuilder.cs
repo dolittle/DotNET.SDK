@@ -2,111 +2,103 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
+using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Embeddings.Store;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Processing;
-using Dolittle.SDK.Events.Store.Converters;
-using Dolittle.SDK.Projections.Store.Converters;
-using Microsoft.Extensions.Logging;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Represents the builder for configuring embeddings.
+/// </summary>
+public class EmbeddingsBuilder : IEmbeddingsBuilder
 {
+    readonly IModelBuilder _modelBuilder;
+    readonly DecoratedTypeBindingsToModelAdder<EmbeddingAttribute, EmbeddingModelId, EmbeddingId> _decoratedTypeBindings;
+
     /// <summary>
-    /// Represents the builder for configuring embeddings.
+    /// Initializes a new instance of the <see cref="EmbeddingsBuilder"/> class.
     /// </summary>
-    public class EmbeddingsBuilder
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
+    public EmbeddingsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
     {
-        readonly IList<ICanBuildAndRegisterAnEmbedding> _builders = new List<ICanBuildAndRegisterAnEmbedding>();
-        readonly IEmbeddingReadModelTypeAssociations _embeddingAssociations;
+        _modelBuilder = modelBuilder;
+        _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<EmbeddingAttribute, EmbeddingModelId, EmbeddingId>("embeddings", modelBuilder, buildResults);
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EmbeddingsBuilder"/> class.
-        /// </summary>
-        /// <param name="embeddingAssociations">The <see cref="IEmbeddingReadModelTypeAssociations"/>.</param>
-        public EmbeddingsBuilder(IEmbeddingReadModelTypeAssociations embeddingAssociations)
+    /// <inheritdoc />
+    public IEmbeddingBuilder Create(EmbeddingId embeddingId)
+    {
+        var builder = new EmbeddingBuilder(embeddingId, _modelBuilder);
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding>(new EmbeddingModelId(embeddingId), builder);
+        return builder;
+    }
+
+    /// <inheritdoc />
+    public IEmbeddingsBuilder Register<TEmbedding>()
+        where TEmbedding : class, new()
+        => Register(typeof(TEmbedding));
+
+    /// <inheritdoc />
+    public IEmbeddingsBuilder Register(Type type)
+    {
+        if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
         {
-            _embeddingAssociations = embeddingAssociations;
-        }
-
-        /// <summary>
-        /// Start building an embedding.
-        /// </summary>
-        /// <param name="projectionId">The <see cref="EmbeddingId" />.</param>
-        /// <returns>The <see cref="EmbeddingBuilder" /> for continuation.</returns>
-        public EmbeddingBuilder CreateEmbedding(EmbeddingId projectionId)
-        {
-            var builder = new EmbeddingBuilder(projectionId, _embeddingAssociations);
-            _builders.Add(builder);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as an embedding class.
-        /// </summary>
-        /// <typeparam name="TProjection">The <see cref="Type" /> of the embedding class.</typeparam>
-        /// <returns>The <see cref="EmbeddingsBuilder" /> for continuation.</returns>
-        public EmbeddingsBuilder RegisterEmbedding<TProjection>()
-            where TProjection : class, new()
-            => RegisterEmbedding(typeof(TProjection));
-
-        /// <summary>
-        /// Registers a <see cref="Type" /> as an embedding class.
-        /// </summary>
-        /// <param name="type">The <see cref="Type" /> of the embedding.</param>
-        /// <returns>The <see cref="EmbeddingsBuilder" /> for continuation.</returns>
-        public EmbeddingsBuilder RegisterEmbedding(Type type)
-        {
-            var builder = Activator.CreateInstance(
-                    typeof(ConventionEmbeddingBuilder<>).MakeGenericType(type))
-                    as ICanBuildAndRegisterAnEmbedding;
-            _builders.Add(builder);
-            _embeddingAssociations.Associate(type);
             return this;
         }
+        BindBuilder(type, decorator);
+        return this;
+    }
 
-        /// <summary>
-        /// Registers all embedding classes from an <see cref="Assembly" />.
-        /// </summary>
-        /// <param name="assembly">The <see cref="Assembly" /> to register the embedding classes from.</param>
-        /// <returns>The <see cref="EmbeddingsBuilder" /> for continuation.</returns>
-        public EmbeddingsBuilder RegisterAllFrom(Assembly assembly)
+    /// <inheritdoc />
+    public IEmbeddingsBuilder RegisterAllFrom(Assembly assembly)
+    {
+        var addedEmbeddingBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
+        foreach (var (type, decorator) in addedEmbeddingBindings)
         {
-            foreach (var type in assembly.ExportedTypes.Where(IsEmbedding))
-            {
-                RegisterEmbedding(type);
-            }
-
-            return this;
+            BindBuilder(type, decorator);
         }
 
-        /// <summary>
-        /// Build and registers projections.
-        /// </summary>
-        /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
-        /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-        /// <param name="eventsToProtobufConverter">The <see cref="IConvertEventsToProtobuf" />.</param>
-        /// <param name="projectionConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-        /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-        public void BuildAndRegister(
-            IEventProcessors eventProcessors,
-            IEventTypes eventTypes,
-            IConvertEventsToProtobuf eventsToProtobufConverter,
-            IConvertProjectionsToSDK projectionConverter,
-            ILoggerFactory loggerFactory,
-            CancellationToken cancellation)
+        return this;
+    }
+    void BindBuilder(Type type, EmbeddingAttribute decorator)
+        =>  _modelBuilder.BindIdentifierToProcessorBuilder(
+            decorator.GetIdentifier(),
+            CreateConventionEmbeddingBuilderFor(type, decorator));
+    
+    static ICanTryBuildEmbedding CreateConventionEmbeddingBuilderFor(Type type, EmbeddingAttribute decorator)
+        => Activator.CreateInstance(
+                typeof(ConventionEmbeddingBuilder<>).MakeGenericType(type),
+                decorator)
+            as ICanTryBuildEmbedding;
+
+    /// <summary>
+    /// Build embeddings.
+    /// </summary>
+    /// <param name="model">The <see cref="IModel"/>.</param>
+    /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
+    public static IUnregisteredEmbeddings Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
+    {
+        var embeddings = new UniqueBindings<EmbeddingModelId, Internal.IEmbedding>();
+        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildEmbedding>().Select(_ => _.ProcessorBuilder))
         {
-            foreach (var builder in _builders)
+            if (builder.TryBuild(eventTypes, buildResults, out var embedding))
             {
-                builder.BuildAndRegister(eventProcessors, eventTypes, eventsToProtobufConverter, projectionConverter, loggerFactory, cancellation);
+                embeddings.Add(new EmbeddingModelId(embedding.Identifier), embedding);
             }
         }
-
-        bool IsEmbedding(Type type)
-            => (type.GetCustomAttributes(typeof(EmbeddingAttribute), true).FirstOrDefault() as EmbeddingAttribute) != default;
+        var identifiers = model.GetTypeBindings<EmbeddingModelId, EmbeddingId>();
+        var readModelTypes = new EmbeddingReadModelTypes();
+        foreach (var (identifier, type) in identifiers)
+        {
+            readModelTypes.Add(identifier.Id, type);
+        }
+        return new UnregisteredEmbeddings(embeddings, readModelTypes);
     }
 }

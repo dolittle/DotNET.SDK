@@ -3,19 +3,18 @@
 
 using System;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Exception that gets thrown when trying to construct an <see cref="CommittedAggregateEvent"/> without an <see cref="AggregateRootVersion"/>.
+/// </summary>
+public class AggregateRootVersionCannotBeNull : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to construct an <see cref="CommittedAggregateEvent"/> without an <see cref="AggregateRootVersion"/>.
+    /// Initializes a new instance of the <see cref="AggregateRootVersionCannotBeNull"/> class.
     /// </summary>
-    public class AggregateRootVersionCannotBeNull : Exception
+    public AggregateRootVersionCannotBeNull()
+        : base($"The {nameof(AggregateRootVersion)} of an {nameof(CommittedAggregateEvent)} cannot be null")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateRootVersionCannotBeNull"/> class.
-        /// </summary>
-        public AggregateRootVersionCannotBeNull()
-            : base($"The {nameof(AggregateRootVersion)} of an {nameof(CommittedAggregateEvent)} cannot be null")
-        {
-        }
     }
 }

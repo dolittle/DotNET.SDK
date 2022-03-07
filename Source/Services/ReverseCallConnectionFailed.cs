@@ -4,20 +4,19 @@
 using System;
 using Dolittle.Protobuf.Contracts;
 
-namespace Dolittle.SDK.Services
+namespace Dolittle.SDK.Services;
+
+/// <summary>
+/// Exception that gets thrown when a failure occurs during the connect stage of a reverse call.
+/// </summary>
+public class ReverseCallConnectionFailed : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when a failure occurs during the connect stage of a reverse call.
+    /// Initializes a new instance of the <see cref="ReverseCallConnectionFailed"/> class.
     /// </summary>
-    public class ReverseCallConnectionFailed : Exception
+    /// <param name="failure">The <see cref="Failure" /> that occured.</param>
+    public ReverseCallConnectionFailed(Failure failure)
+        : base($"Failure occurred while connecting a reverse call. ${failure.Reason}")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReverseCallConnectionFailed"/> class.
-        /// </summary>
-        /// <param name="failure">The <see cref="Failure" /> that occured.</param>
-        public ReverseCallConnectionFailed(Failure failure)
-            : base($"Failure occurred while connecting a reverse call. ${failure.Reason}")
-        {
-        }
     }
 }

@@ -3,17 +3,16 @@
 
 using Dolittle.SDK.Concepts;
 
-namespace Dolittle.SDK.Resources
+namespace Dolittle.SDK.Resources;
+
+/// <summary>
+/// Represents the name of a resource.
+/// </summary>
+public record ResourceName(string Value) : ConceptAs<string>(Value)
 {
     /// <summary>
-    /// Represents the name of an <see cref="IResource" />.
+    /// Implicitly convert from a <see cref="string"/> to a <see cref="ResourceName"/>.
     /// </summary>
-    public class ResourceName : ConceptAs<string>
-    {
-        /// <summary>
-        /// Implicitly convert from a <see cref="string"/> to a <see cref="ResourceName"/>.
-        /// </summary>
-        /// <param name="name">ResourceName as <see cref="string"/>.</param>
-        public static implicit operator ResourceName(string name) => new ResourceName { Value = name };
-    }
+    /// <param name="name">Resource name as <see cref="string"/>.</param>
+    public static implicit operator ResourceName(string name) => new(name);
 }

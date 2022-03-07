@@ -6,18 +6,17 @@ using Dolittle.SDK.Services;
 using Grpc.Core;
 using static Dolittle.Runtime.Events.Contracts.EventStore;
 
-namespace Dolittle.SDK.Events.Store
+namespace Dolittle.SDK.Events.Store;
+
+/// <summary>
+/// Represents a wrapper for gRPC EventStore.CommitForAggregate.
+/// </summary>
+public class EventStoreCommitForAggregateMethod : ICanCallAUnaryMethod<CommitAggregateEventsRequest, CommitAggregateEventsResponse>
 {
-    /// <summary>
-    /// Represents a wrapper for gRPC EventStore.CommitForAggregate.
-    /// </summary>
-    public class EventStoreCommitForAggregateMethod : ICanCallAUnaryMethod<CommitAggregateEventsRequest, CommitAggregateEventsResponse>
+    /// <inheritdoc/>
+    public AsyncUnaryCall<CommitAggregateEventsResponse> Call(CommitAggregateEventsRequest message, Channel channel, CallOptions callOptions)
     {
-        /// <inheritdoc/>
-        public AsyncUnaryCall<CommitAggregateEventsResponse> Call(CommitAggregateEventsRequest message, Channel channel, CallOptions callOptions)
-        {
-            var client = new EventStoreClient(channel);
-            return client.CommitForAggregateAsync(message, callOptions);
-        }
+        var client = new EventStoreClient(channel);
+        return client.CommitForAggregateAsync(message, callOptions);
     }
 }

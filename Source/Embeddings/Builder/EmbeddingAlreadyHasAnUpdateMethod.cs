@@ -3,20 +3,19 @@
 
 using System;
 
-namespace Dolittle.SDK.Embeddings.Builder
+namespace Dolittle.SDK.Embeddings.Builder;
+
+/// <summary>
+/// Exception that gets thrown when trying to define another update method for an embedding.
+/// </summary>
+public class EmbeddingAlreadyHasAnUpdateMethod : Exception
 {
     /// <summary>
-    /// Exception that gets thrown when trying to define another update method for an embedding.
+    /// Initializes a new instance of the <see cref="EmbeddingAlreadyHasAnUpdateMethod"/> class.
     /// </summary>
-    public class EmbeddingAlreadyHasAnUpdateMethod : Exception
+    /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
+    public EmbeddingAlreadyHasAnUpdateMethod(EmbeddingId embeddingId)
+        : base($"Embedding {embeddingId} already has an update method defined for it.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EmbeddingAlreadyHasAnUpdateMethod"/> class.
-        /// </summary>
-        /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
-        public EmbeddingAlreadyHasAnUpdateMethod(EmbeddingId embeddingId)
-            : base($"Embedding {embeddingId} already has an update method defined for it.")
-        {
-        }
     }
 }
