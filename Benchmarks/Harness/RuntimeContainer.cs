@@ -33,6 +33,6 @@ public class RuntimeContainer : Container
     public RuntimeEndpoints Endpoints { get; }
 
     protected override Task WaitUntilContainerStarted()
-        => Task.Delay(TimeSpan.FromSeconds(5));
+        => Task.Delay(TimeSpan.FromSeconds(2));
 
 }

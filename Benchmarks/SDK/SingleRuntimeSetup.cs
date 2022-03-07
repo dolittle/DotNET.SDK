@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Loggers;
 using Dolittle.SDK;
+using Dolittle.SDK.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Dolittle.Benchmarks.SDK;
 
@@ -47,10 +49,10 @@ public class SingleRuntimeSetup
     }
 
     public IDolittleClient GetConnectedClient(bool withDiscovery = false)
-    {
-        var host = Host.CreateDefaultBuilder().UseDolittle(withDiscovery ? _ => _.WithoutDiscovery() : null).Build();
-        return host.GetDolittleClient(_ => _.WithRuntimeOn("localhost", (ushort)_singleRuntime.Endpoints.Private).WithServiceProvider(new ServiceCollection().BuildServiceProvider())).GetAwaiter().GetResult();
-    }
-    
-
+        => GetConnectedClient(_ => _.WithoutDiscovery());
+    public IDolittleClient GetConnectedClient(SetupDolittleClient setup)
+        => Host.CreateDefaultBuilder().UseDolittle(setup).Build().GetDolittleClient(_ => _
+            .WithRuntimeOn("localhost", (ushort)_singleRuntime.Endpoints.Private)
+            .WithServiceProvider(new ServiceCollection().BuildServiceProvider())
+            .WithLogging(new NullLoggerFactory())).GetAwaiter().GetResult();
 }

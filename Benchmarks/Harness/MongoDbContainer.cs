@@ -27,5 +27,5 @@ public class MongoDbContainer : Container
     }
     
     protected override Task WaitUntilContainerStarted()
-        => Task.Delay(TimeSpan.FromSeconds(3));
+        => Task.Delay(TimeSpan.FromSeconds(2));
 }
