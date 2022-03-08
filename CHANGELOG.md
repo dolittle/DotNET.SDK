@@ -1,3 +1,13 @@
+# [15.1.3] - 2022-3-8 [PR: #138](https://github.com/dolittle/DotNET.SDK/pull/138)
+## Summary
+
+Fixes a bug that resulted in wrong retry timings when processing of events failed.
+
+### Fixed
+
+- The event processing retry time should now increment in the correct interval
+
+
 # [15.1.2] - 2022-3-1 [PR: #135](https://github.com/dolittle/DotNET.SDK/pull/135)
 ## Summary
 
