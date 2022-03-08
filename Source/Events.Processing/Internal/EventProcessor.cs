@@ -64,8 +64,7 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
         }
         catch (Exception ex)
         {
-            var retryAttempt = retryProcessingState?.RetryCount ?? 1;
-            var retrySeconds = Math.Min(5 * retryAttempt, 60);
+            var retrySeconds = retryProcessingState == default ? 5 : Math.Min(5 * (retryProcessingState.RetryCount + 2), 60);
             var retryTimeout = new Duration
             {
                 Seconds = retrySeconds
