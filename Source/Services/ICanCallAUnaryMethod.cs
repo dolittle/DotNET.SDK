@@ -3,7 +3,6 @@
 
 using Google.Protobuf;
 using Grpc.Core;
-using Grpc.Net.Client;
 
 namespace Dolittle.SDK.Services;
 
