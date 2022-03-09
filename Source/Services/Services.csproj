@@ -13,7 +13,6 @@
     <PackageReference Include="Grpc" Version="$(GrpcVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
-    <PackageReference Include="Contrib.Grpc.Core.M1" Version="$(GrpcVersion)" />
   </ItemGroup>
 
   <ItemGroup>
