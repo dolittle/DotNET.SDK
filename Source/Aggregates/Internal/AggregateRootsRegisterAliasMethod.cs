@@ -4,7 +4,6 @@
 using Dolittle.Runtime.Aggregates.Contracts;
 using Dolittle.SDK.Services;
 using Grpc.Core;
-using Grpc.Net.Client;
 
 namespace Dolittle.SDK.Aggregates.Internal;
 
