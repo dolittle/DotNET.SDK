@@ -14,8 +14,6 @@ services:
       - ./consumer-platform.json:/app/.dolittle/platform.json
       - ./consumer-resources.json:/app/.dolittle/resources.json
       - ./consumer-microservices.json:/app/.dolittle/microservices.json
-    environment:
-      - Logging__Console__FormatterName=""
     ports:
       - 50054:50052
       - 50055:50053
@@ -26,8 +24,6 @@ services:
       - ./producer-platform.json:/app/.dolittle/platform.json
       - ./producer-resources.json:/app/.dolittle/resources.json
       - ./producer-event-horizon-consents.json:/app/.dolittle/event-horizon-consents.json
-    environment:
-      - Logging__Console__FormatterName=""
     ports:
       - 50052:50052
       - 50053:50053
