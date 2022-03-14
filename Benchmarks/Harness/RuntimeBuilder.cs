@@ -23,6 +23,6 @@ public class RuntimeBuilder
     public IRuntimeWithMongo Build(string runtimeTag = "latest", string mongoDbTag = "latest")
         => _runtimeWithMongoFactory.Create(_dockerClient, runtimeTag, mongoDbTag);
 
-    public IRuntimeWithMongo BuildDevelopment(string tag = "latest")
+    public IRuntimeWithMongo BuildDevelopment(string tag = "7.8.1-peregrin.14")
         => _runtimeWithMongoFactory.CreateDevelopment(_dockerClient, tag);
 }

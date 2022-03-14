@@ -20,7 +20,7 @@ public static class BenchmarkConfig
     {
         var job = Job.Default
             .WithWarmupCount(0)
-            .WithIterationCount(1)
+            .WithIterationCount(10)
             .WithUnrollFactor(1)
             .WithInvocationCount(1)
             .WithStrategy(RunStrategy.ColdStart)

@@ -18,7 +18,7 @@ public class Kitchen : AggregateRoot
 
     public void PrepareDish(string dish, string chef)
     {
-        if (_ingredients <= 0) throw new Exception("We have run out of ingredients, sorry!");
+        // if (_ingredients <= 0) throw new Exception("We have run out of ingredients, sorry!");
         Apply(new DishPrepared(dish, chef));
         Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
     }
