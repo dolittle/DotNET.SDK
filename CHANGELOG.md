@@ -1,3 +1,19 @@
+# [16.0.0] - 2022-3-14 [PR: #136](https://github.com/dolittle/DotNET.SDK/pull/136)
+## Summary
+
+Updates grpc packages and uses a single grpc channel for all connections
+
+### Changed
+
+- Updated grpc version to 2.43.0
+- Updated contracts version
+- Uses one GrpcChannel for all gRPC connections. This is a potential breaking change for netcoreapp 3.1 since it does not allow multiple concurrent http2 connections for one GrpcChannel meaning that if there are 100 or more event processors in a netcoreapp 3.1 application it will start hanging. 
+
+### Removed
+
+- Removed the Contrib.M1 Grpc native executable for arm64. This is no longer needed with the new .NET Grpc packages
+
+
 # [15.1.3] - 2022-3-8 [PR: #138](https://github.com/dolittle/DotNET.SDK/pull/138)
 ## Summary
 
