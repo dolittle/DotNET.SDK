@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Events.Store;
 public class EventStoreCommitForAggregateMethod : ICanCallAUnaryMethod<CommitAggregateEventsRequest, CommitAggregateEventsResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<CommitAggregateEventsResponse> Call(CommitAggregateEventsRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<CommitAggregateEventsResponse> Call(CommitAggregateEventsRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EventStoreClient(channel);
         return client.CommitForAggregateAsync(message, callOptions);

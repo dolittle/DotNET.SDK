@@ -18,8 +18,8 @@ public interface ICanCallADuplexStreamingMethod<TClientMessage, TServerMessage>
     /// <summary>
     /// Performs the duplex streaming method call on the server using the provided channel and call options.
     /// </summary>
-    /// <param name="channel">The <see cref="Channel"/> to use to connect to the server.</param>
+    /// <param name="channel">The <see cref="ChannelBase"/> to use to connect to the server.</param>
     /// <param name="callOptions">The <see cref="CallOptions"/> to use for the call.</param>
     /// <returns>The <see cref="AsyncDuplexStreamingCall{TRequest, TResponse}"/> representing the method call.</returns>
-    AsyncDuplexStreamingCall<TClientMessage, TServerMessage> Call(Channel channel, CallOptions callOptions);
+    AsyncDuplexStreamingCall<TClientMessage, TServerMessage> Call(ChannelBase channel, CallOptions callOptions);
 }

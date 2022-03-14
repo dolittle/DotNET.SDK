@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Embeddings.Internal;
 public class EmbeddingsProtocol : IAmAReverseCallProtocol<EmbeddingClientToRuntimeMessage, EmbeddingRuntimeToClientMessage, EmbeddingRegistrationRequest, EmbeddingRegistrationResponse, EmbeddingRequest, EmbeddingResponse>
 {
     /// <inheritdoc/>
-    public AsyncDuplexStreamingCall<EmbeddingClientToRuntimeMessage, EmbeddingRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
+    public AsyncDuplexStreamingCall<EmbeddingClientToRuntimeMessage, EmbeddingRuntimeToClientMessage> Call(ChannelBase channel, CallOptions callOptions)
         => new EmbeddingsClient(channel).Connect(callOptions);
 
     /// <inheritdoc/>

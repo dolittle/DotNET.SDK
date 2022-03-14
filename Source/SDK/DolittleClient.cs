@@ -4,6 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NET5_0_OR_GREATER
+using System.Net.Http;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
@@ -31,6 +34,8 @@ using Dolittle.SDK.Resources.Internal;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
+using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -73,6 +78,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     IAggregatesBuilder _aggregates;
     CancellationTokenSource _clientCancellationTokenSource;
     EventToSDKConverter _eventToSDKConverter;
+    GrpcChannel _grpcChannel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClient"/> class.
@@ -219,8 +225,19 @@ public class DolittleClient : IDisposable, IDolittleClient
             
             var loggerFactory = configuration.LoggerFactory;
             _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
-            
-            var methodCaller = new MethodCaller(configuration.RuntimeHost, configuration.RuntimePort);
+            _grpcChannel = GrpcChannel.ForAddress(
+                $"http://{configuration.RuntimeHost}:{configuration.RuntimePort}",
+                new GrpcChannelOptions
+                {
+                    Credentials = ChannelCredentials.Insecure,
+#if NET5_0_OR_GREATER
+                    HttpHandler = new SocketsHttpHandler
+                    {
+                        EnableMultipleHttp2Connections = true
+                    }
+#endif
+                });
+            var methodCaller = new MethodCaller(_grpcChannel, configuration.RuntimeHost, configuration.RuntimePort);
             var (executionContext, tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
             Tenants = tenants;
 
@@ -280,6 +297,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         {
             _clientCancellationTokenSource?.Dispose();
             _eventHorizons?.Dispose();
+            _grpcChannel?.Dispose();
         }
 
         _disposed = true;

@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Projections.Store;
 public class ProjectionsGetAllInBatches : ICanCallAServerStreamingMethod<GetAllRequest, GetAllResponse>
 {
     /// <inheritdoc/>
-    public AsyncServerStreamingCall<GetAllResponse> Call(GetAllRequest message, Channel channel, CallOptions callOptions)
+    public AsyncServerStreamingCall<GetAllResponse> Call(GetAllRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new Runtime.Projections.Contracts.Projections.ProjectionsClient(channel);
         return client.GetAllInBatches(message, callOptions);

@@ -10,10 +10,9 @@
   <ItemGroup>
     <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
     <PackageReference Include="Google.Protobuf" Version="$(ProtobufVersion)" />
-    <PackageReference Include="Grpc" Version="$(GrpcVersion)" />
+    <PackageReference Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
-    <PackageReference Include="Contrib.Grpc.Core.M1" Version="$(GrpcVersion)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,7 +15,7 @@ namespace Dolittle.SDK.EventHorizon.Internal;
 public class SubscriptionsSubscribeMethod : ICanCallAUnaryMethod<SubscriptionRequest, SubscriptionResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<SubscriptionResponse> Call(SubscriptionRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<SubscriptionResponse> Call(SubscriptionRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new SubscriptionsClient(channel);
         return client.SubscribeAsync(message, callOptions);

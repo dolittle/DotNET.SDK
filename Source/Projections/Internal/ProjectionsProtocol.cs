@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Projections.Internal;
 public class ProjectionsProtocol : IAmAReverseCallProtocol<ProjectionClientToRuntimeMessage, ProjectionRuntimeToClientMessage, ProjectionRegistrationRequest, ProjectionRegistrationResponse, ProjectionRequest, ProjectionResponse>
 {
     /// <inheritdoc/>
-    public AsyncDuplexStreamingCall<ProjectionClientToRuntimeMessage, ProjectionRuntimeToClientMessage> Call(Channel channel, CallOptions callOptions)
+    public AsyncDuplexStreamingCall<ProjectionClientToRuntimeMessage, ProjectionRuntimeToClientMessage> Call(ChannelBase channel, CallOptions callOptions)
         => new ProjectionsClient(channel).Connect(callOptions);
 
     /// <inheritdoc/>

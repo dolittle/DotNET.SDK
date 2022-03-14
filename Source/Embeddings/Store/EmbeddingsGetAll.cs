@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Embeddings.Store;
 public class EmbeddingsGetAll : ICanCallAUnaryMethod<GetAllRequest, GetAllResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<GetAllResponse> Call(GetAllRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<GetAllResponse> Call(GetAllRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new EmbeddingStoreClient(channel);
         return client.GetAllAsync(message, callOptions);

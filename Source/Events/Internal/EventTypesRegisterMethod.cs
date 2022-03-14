@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Events.Internal;
 public class EventTypesRegisterMethod : ICanCallAUnaryMethod<EventTypeRegistrationRequest, EventTypeRegistrationResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<EventTypeRegistrationResponse> Call(EventTypeRegistrationRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<EventTypeRegistrationResponse> Call(EventTypeRegistrationRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new Dolittle.Runtime.Events.Contracts.EventTypes.EventTypesClient(channel);
         return client.RegisterAsync(message, callOptions);

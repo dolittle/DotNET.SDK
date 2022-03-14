@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Resources.MongoDB.Internal;
 public class ResourcesGetMongoDBMethod : ICanCallAUnaryMethod<GetRequest, GetMongoDBResponse>
 {
     /// <inheritdoc/>
-    public AsyncUnaryCall<GetMongoDBResponse> Call(GetRequest message, Channel channel, CallOptions callOptions)
+    public AsyncUnaryCall<GetMongoDBResponse> Call(GetRequest message, ChannelBase channel, CallOptions callOptions)
     {
         var client = new Dolittle.Runtime.Resources.Contracts.Resources.ResourcesClient(channel);
         return client.GetMongoDBAsync(message, callOptions);
