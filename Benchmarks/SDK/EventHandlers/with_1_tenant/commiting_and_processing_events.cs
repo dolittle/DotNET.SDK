@@ -16,20 +16,11 @@ public class commiting_and_processing_events : SingleRuntimeSetup
     AnEvent anEvent = new();
     LastEvent lastEvent = new();
 
-    [EventType("bb81d73a-9d6e-47c3-9de9-f5c637aa1b8c")]
-    public class AnEvent
-    {
-    }
-    [EventType("8ac7658d-26bf-4a66-8f12-d41b6bac8945")]
-    public class LastEvent
-    {
-    }
-
     public override void IterationSetup()
     {
         base.IterationSetup();
         var client = GetConnectedClient(_ => _
-            .WithEventTypes(_ => _.Register<AnEvent>())
+            .WithEventTypes(_ => _.Register<AnEvent>().Register<LastEvent>())
             .WithEventHandlers(_ => _
                 .Create("63c974e5-1381-4757-a5de-04ef9d729d16")
                 .Partitioned()
