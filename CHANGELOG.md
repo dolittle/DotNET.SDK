@@ -1,3 +1,14 @@
+# [16.0.1] - 2022-3-22 [PR: #142](https://github.com/dolittle/DotNET.SDK/pull/142)
+## Summary
+
+Fixes an issue where event handlers with wrong signatures were not picked up early so that the developer was met with a confusing error message.
+
+
+### Changed
+
+- Significantly improves the error messages logged when having event handlers with wrong signatures.
+
+
 # [16.0.0] - 2022-3-14 [PR: #136](https://github.com/dolittle/DotNET.SDK/pull/136)
 ## Summary
 
