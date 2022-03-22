@@ -92,6 +92,10 @@ public class EventHandlersBuilder : IEventHandlersBuilder
             {
                 eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
             }
+            else
+            {
+                buildResults.AddFailure($"Failed to build Event Handler for '{builder.EventHandlerType}'. It will not be registered");
+            }
         }
         foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
         {
@@ -99,12 +103,21 @@ public class EventHandlersBuilder : IEventHandlersBuilder
             {
                 eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
             }
+            else
+            {
+                buildResults.AddFailure($"Failed to build Event Handler for instance of '{builder.EventHandlerType}'. It will not be registered");
+            }
         }
         foreach (var (_, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
         {
             if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
             {
                 eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
+            }
+            
+            else
+            {
+                buildResults.AddFailure($"Failed to build Event Handler '{builder.ModelId.Id}' in Scope '{builder.ModelId.Scope}'. It will not be registered");
             }
         }
         return new UnregisteredEventHandlers(

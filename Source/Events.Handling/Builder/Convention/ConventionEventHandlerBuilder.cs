@@ -254,35 +254,28 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
 
     bool ParametersAreOkay(MethodInfo method, IClientBuildResults buildResults)
     {
+        var hasErrors = false;
         if (!SecondMethodParameterIsEventContext(method))
         {
             buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to have two parameters where the second parameter is {nameof(EventContext)}");
+            hasErrors = true;
         }
 
         if (!MethodHasNoExtraParameters(method))
         {
             buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to only have two parameters where the first is the event to handle and the second is {nameof(EventContext)}");
+            hasErrors = true;
         }
 
-        if (!MethodReturnsAsyncVoid(method) && (MethodReturnsVoid(method) || MethodReturnsTask(method)))
+        if (MethodReturnsAsyncVoid(method) || (!MethodReturnsVoid(method) && !MethodReturnsTask(method)))
         {
-            return true;
+            buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to return either {typeof(void)} or {typeof(Task)}");
+            hasErrors = true;
         }
-        buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to return either {typeof(void)} or {typeof(Task)}");
-        return false;
-    }
 
-    bool TryGetAttribute(out EventHandlerAttribute attribute)
-    {
-        attribute = default;
-        if (EventHandlerType.GetCustomAttributes(typeof(EventHandlerAttribute), true).First() is not EventHandlerAttribute eventHandlerAttribute)
-        {
-            return false;
-        }
-        attribute = eventHandlerAttribute;
-        return true;
+        return !hasErrors;
     }
-
+    
     static bool TryGetFirstMethodParameterType(MethodInfo method, out System.Type type)
     {
         type = default;
