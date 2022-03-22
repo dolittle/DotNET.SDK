@@ -16,7 +16,7 @@ public class DishHandler
         _logger = logger;
     }
 
-    public void Handle(DishPrepared @event, EventContext eventContext)
+    public void Handle(DishPrepared @event)
     {
         _logger.LogInformation("{Chef} has prepared {Dish}. Yummm!", @event.Chef, @event.Dish);
     }
