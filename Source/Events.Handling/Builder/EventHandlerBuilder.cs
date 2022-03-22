@@ -22,7 +22,6 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     bool _hasAlias;
     bool _partitioned = true;
     ScopeId _scopeId = ScopeId.Default;
-    EventHandlerModelId ModelId => new(_eventHandlerId, _scopeId);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
@@ -36,7 +35,12 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
         Bind();
     }
-
+    
+    /// <summary>
+    /// Gets the <see cref="EventHandlerModelId"/>.
+    /// </summary>
+    public EventHandlerModelId ModelId => new(_eventHandlerId, _scopeId);
+    
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
     {
