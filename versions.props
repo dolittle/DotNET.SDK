@@ -3,7 +3,7 @@
         <AutofacVersion>6.3.0</AutofacVersion>
         <AutofacExtensionsDependencyInjectionVersion>7.2.0</AutofacExtensionsDependencyInjectionVersion>
         <BaselineTypeDiscoveryVersion>1.1.2</BaselineTypeDiscoveryVersion>
-        <ContractsVersion>6.8.2</ContractsVersion>
+        <ContractsVersion>7.0.0</ContractsVersion>
         <MachineSpecificationsRunnerVersion>2.9.0</MachineSpecificationsRunnerVersion>
         <MachineSpecificationsVersion>1.0.0</MachineSpecificationsVersion>
         <MicrosoftExtensionsVersion>6.0.0</MicrosoftExtensionsVersion>
