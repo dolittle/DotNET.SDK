@@ -1,3 +1,13 @@
+# [17.0.0] - 2022-3-25 [PR: #144](https://github.com/dolittle/DotNET.SDK/pull/144)
+## Summary
+
+Use the newest major version of the Dolittle Grpc Contracts to be compatible with version 8 of the Runtime
+
+### Changed
+
+- Use the newest major version 7 of the Dolittle Grpc Contracts
+
+
 # [16.0.1] - 2022-3-22 [PR: #142](https://github.com/dolittle/DotNET.SDK/pull/142)
 ## Summary
 
