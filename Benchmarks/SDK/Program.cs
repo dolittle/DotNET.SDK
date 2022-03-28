@@ -20,7 +20,7 @@ class Program
         //     .FromAssembly(typeof(Program).Assembly)
         //     .Run(argsList.ToArray(), config)
         //     .ToExitCode();
-        return new[] {BenchmarkRunner.Run<applying_events_with_nothing_to_replay_for_ten_aggregate_roots>(config, args)}.ToExitCode();
+        return new[] {BenchmarkRunner.Run<committing_100_events_with_warmup>(config, args)}.ToExitCode();
     }
 
 }

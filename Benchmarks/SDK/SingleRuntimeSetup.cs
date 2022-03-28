@@ -4,8 +4,11 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Loggers;
+using Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 using Dolittle.SDK;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -16,6 +19,7 @@ public class SingleRuntimeSetup
 {
     Harness.Harness _harness; 
     Harness.IRuntimeWithMongo _singleRuntime;
+    protected IEventStore _eventStore;
     
     [GlobalSetup]
     public void GlobalSetup()
@@ -24,18 +28,26 @@ public class SingleRuntimeSetup
         logger.WriteLine(LogKind.Info, "Setting up harness");
         _harness = Harness.Harness.Setup(logger);
         _singleRuntime = _harness.SetupRuntime().BuildDevelopment();
+
+        _singleRuntime.Start().Wait();
+        var client = GetConnectedClient();
+        _eventStore = client.EventStore.ForTenant(TenantId.Development);
+        _eventStore.Commit(_ => _.CreateEvent(new some_event())
+            .FromEventSource("source")
+            .WithEventType("3065740c-f2e3-4ef4-9738-fe2b1a104399")).Wait();
+        
     }
     
     [IterationSetup]
     public virtual void IterationSetup()
     {
-        _singleRuntime.Start().Wait();
+        // _singleRuntime.Start().Wait();
     }
 
     [IterationCleanup]
     public virtual void IterationCleanup()
     {
-        _singleRuntime.Stop().Wait();
+        // _singleRuntime.Stop().Wait();
     }
 
     [GlobalCleanup]
