@@ -32,7 +32,7 @@ public static class DockerClientExtensions
             }
         }
 
-        throw new Exception("Could not find container");
+        throw new CouldNotFindDockerContainer(id);
     }
     
     /// <summary>
@@ -54,7 +54,7 @@ public static class DockerClientExtensions
         
         if (!await client.Containers.StartContainerAsync(id, new ContainerStartParameters(), cancellationToken).ConfigureAwait(false))
         {
-            throw new Exception("Could not start container");
+            throw new CouldNotStartDockerContainer("The Docker client returned false");
         }
 
         foreach (var container in await client.Containers.ListContainersAsync(ListContainerById(id), cancellationToken).ConfigureAwait(false))
@@ -65,7 +65,7 @@ public static class DockerClientExtensions
             }
         }
 
-        throw new Exception("Could not start container");
+        throw new CouldNotStartDockerContainer("The container was started, but ended up not in a running state");
     }
 
     /// <summary>

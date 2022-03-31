@@ -1,9 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
@@ -23,10 +21,6 @@ public class MongoDB
     const string MongoImage = "dolittle/mongodb:4.2.2";
     static readonly Command<BsonDocument> _pingCommand = new BsonDocument("ping", 1);
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MongoDB"/> class.
-    /// </summary>
-    /// <param name="status">The status of the running MongoDB server container.</param>
     MongoDB(ContainerListResponse status)
     {
         Client = new MongoClient($"mongodb://localhost:{GetExposedMongoPort(status)}");
@@ -43,21 +37,16 @@ public class MongoDB
     /// </summary>
     public string DockerHost { get; }
 
-    int GetExposedMongoPort(ContainerListResponse status)
-    {
-        if (status.TryGetPublishedPort(MongoPort, out var publicPort))
-        {
-            return publicPort;
-        }
-
-        throw new Exception("Port not exposed on the Mongo");
-    }
-
     async Task Initialize(CancellationToken cancellationToken)
     {
         await Client.GetDatabase("admin").RunCommandAsync(_pingCommand, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Drops the databases specified by name.
+    /// </summary>
+    /// <param name="databases">The list of database names to drop.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to use to cancel the operation.</param>
     public async Task DropDatabases(IEnumerable<string> databases, CancellationToken cancellationToken = default)
     {
         foreach (var database in databases)
@@ -71,6 +60,7 @@ public class MongoDB
     /// </summary>
     /// <param name="containerName">The container name to find or start.</param>
     /// <param name="docker">The <see cref="IDockerClient"/> to use to find or create the container.</param>
+    /// <param name="logger">The logger to use for logging.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to use to cancel the operation.</param>
     /// <returns>A <see cref="Task{TResult}"/> that, when resolved, returns the <see cref="MongoDB"/> representing the MongoDB server container.</returns>
     public static async Task<MongoDB> StartOrReuseExistingContainer(string containerName, IDockerClient docker, ILogger logger, CancellationToken cancellationToken = default)
@@ -84,12 +74,12 @@ public class MongoDB
 
             if (container.Image != MongoImage)
             {
-                throw new Exception($"Found MongoDB container named {containerName}, but it is running the wrong image. Expected {MongoImage} but was {container.Image}");
+                throw new FailedToStartMongoDB($"Found MongoDB container named {containerName}, but it is running the wrong image. Expected {MongoImage} but was {container.Image}");
             }
 
             if (!container.TryGetPublishedPort(MongoPort, out _))
             {
-                throw new Exception($"Found MongoDB container named {containerName}, but it not exposing port {MongoPort}");
+                throw new FailedToStartMongoDB($"Found MongoDB container named {containerName}, but it not exposing port {MongoPort}");
             }
 
             logger.WriteLineInfo("Found existing MongoDB container, ensuring it is ready...");
@@ -123,4 +113,13 @@ public class MongoDB
         return newMongo;
     }
 
+    static int GetExposedMongoPort(ContainerListResponse status)
+    {
+        if (status.TryGetPublishedPort(MongoPort, out var publicPort))
+        {
+            return publicPort;
+        }
+
+        throw new FailedToStartMongoDB($"The port {MongoPort} is not published");
+    }
 }
