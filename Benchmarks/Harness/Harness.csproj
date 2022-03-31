@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>Dolittle.SDK.Benchmarks.Harness</RootNamespace>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="../../Source/SDK/SDK.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
       <PackageReference Include="Docker.DotNet" Version="3.125.5" />
     </ItemGroup>
-
 </Project>
