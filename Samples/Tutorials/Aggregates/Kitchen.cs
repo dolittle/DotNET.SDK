@@ -9,7 +9,7 @@ using Dolittle.SDK.Events;
 [AggregateRoot("01ad9a9f-711f-47a8-8549-43320f782a1e")]
 public class Kitchen : AggregateRoot
 {
-    int _ingredients = 2;
+    int _ingredients = int.MaxValue;
 
     public Kitchen(EventSourceId eventSource)
         : base(eventSource)
@@ -20,10 +20,9 @@ public class Kitchen : AggregateRoot
     {
         if (_ingredients <= 0) throw new Exception("We have run out of ingredients, sorry!");
         Apply(new DishPrepared(dish, chef));
-        Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
+        // Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
     }
 
-    void On(DishPrepared @event)
-        => _ingredients--;
+    void On(DishPrepared @event) => _ingredients--;
 }
 
