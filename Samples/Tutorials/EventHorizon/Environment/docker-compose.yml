@@ -10,6 +10,9 @@ services:
   
   consumer-runtime:
     image: dolittle/runtime:latest
+    environment:
+      - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
+      - "DOLITTLE__RUNTIME__PROCESSING__EVENTHANDLERS__FAST=TRUE"
     volumes:
       - ./consumer-platform.json:/app/.dolittle/platform.json
       - ./consumer-resources.json:/app/.dolittle/resources.json
@@ -20,6 +23,9 @@ services:
 
   producer-runtime:
     image: dolittle/runtime:latest
+    environment:
+      - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
+      - "DOLITTLE__RUNTIME__PROCESSING__EVENTHANDLERS__FAST=TRUE"
     volumes:
       - ./producer-platform.json:/app/.dolittle/platform.json
       - ./producer-resources.json:/app/.dolittle/resources.json
