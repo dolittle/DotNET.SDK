@@ -3,9 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Diagnostics;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
+using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Events.Handling;
 
@@ -76,15 +79,29 @@ public class EventHandler : IEventHandler
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
-        if (!_eventHandlerMethods.TryGetValue(eventType, out var method))
-        {
-            throw new MissingEventHandlerForEventType(eventType);
-        }
+        using var activity = Tracing.ActivitySource.StartActivity()?
+            .SetTag(Tags.EventType, eventType.Id.Value)
+            .SetTag(Tags.EventTypeAlias, eventType.Alias.Value);
 
-        Exception exception = await method.TryHandle(@event, context, serviceProvider).ConfigureAwait(false);
-        if (exception != default)
+        try
         {
-            throw new EventHandlerMethodFailed(Identifier, eventType, @event, exception);
+            if (!_eventHandlerMethods.TryGetValue(eventType, out var method))
+            {
+                throw new MissingEventHandlerForEventType(eventType);
+            }
+
+            Exception exception = await method.TryHandle(@event, context, serviceProvider).ConfigureAwait(false);
+            if (exception != default)
+            {
+                throw new EventHandlerMethodFailed(Identifier, eventType, @event, exception);
+            }
+        }
+        catch (Exception e)
+        {
+            activity?
+                .SetStatus(ActivityStatusCode.Error)
+                .RecordException(e);
+            throw;
         }
     }
 }
