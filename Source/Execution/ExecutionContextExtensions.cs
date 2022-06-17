@@ -25,7 +25,8 @@ public static class ExecutionContextExtensions
             current.Environment,
             current.CorrelationId,
             current.Claims,
-            current.Culture);
+            current.Culture,
+            current.SpanId);
 
     /// <summary>
     /// Creates a new execution context based on the current with a new <see cref="CorrelationId"/>.
@@ -41,7 +42,8 @@ public static class ExecutionContextExtensions
             current.Environment,
             correlation,
             current.Claims,
-            current.Culture);
+            current.Culture,
+            current.SpanId);
 
     /// <summary>
     /// Creates a new execution context based on the current with new <see cref="Claims"/>.
@@ -57,5 +59,6 @@ public static class ExecutionContextExtensions
             current.Environment,
             current.CorrelationId,
             claims,
-            current.Culture);
+            current.Culture,
+            current.SpanId);
 }

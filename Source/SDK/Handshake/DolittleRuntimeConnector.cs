@@ -73,7 +73,8 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
             result.Environment,
             CorrelationId.System,
             Claims.Empty,
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture,
+            null);
 
     async Task<ExecutionContext> TryPerformHandshakeForever(CancellationToken cancellationToken)
     {

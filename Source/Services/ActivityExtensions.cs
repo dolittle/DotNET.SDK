@@ -2,15 +2,16 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics;
-using Dolittle.Execution.Contracts;
 using Dolittle.Protobuf.Contracts;
+using Dolittle.SDK.Execution;
 using Google.Protobuf;
+using ExecutionContext = Dolittle.Execution.Contracts.ExecutionContext;
 
 namespace Dolittle.SDK.Services;
 
 static class ActivityExtensions
 {
-    public static void SetTraceContext(this Activity activity, ExecutionContext context)
+    public static void PropagateTraceContext(this Activity activity, ExecutionContext context)
     {
         context.CorrelationId = activity.TraceId.ToUuid();
         context.SpanId = activity.SpanId.ToByteString();
@@ -25,6 +26,8 @@ static class ActivityExtensions
             Value = ByteString.CopyFrom(bytes)
         };
     }
+    
+
     
     static ByteString ToByteString(this ActivitySpanId spanId)
     {

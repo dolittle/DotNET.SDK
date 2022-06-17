@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Diagnostics;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
+using Dolittle.SDK.Execution;
 using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Events.Handling;
@@ -79,9 +80,8 @@ public class EventHandler : IEventHandler
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
-        using var activity = Tracing.ActivitySource.StartActivity()?
-            .SetTag(Tags.EventType, eventType.Id.Value)
-            .SetTag(Tags.EventTypeAlias, eventType.Alias.Value);
+        using var activity = context.CommittedExecutionContext.StartChildActivity("Handle " + @event.GetType().Name)
+            ?.Tag(eventType);
 
         try
         {
@@ -98,10 +98,10 @@ public class EventHandler : IEventHandler
         }
         catch (Exception e)
         {
-            activity?
-                .SetStatus(ActivityStatusCode.Error)
-                .RecordException(e);
+            activity?.RecordError(e);
             throw;
         }
+
+        activity?.SetStatus(ActivityStatusCode.Ok);
     }
 }

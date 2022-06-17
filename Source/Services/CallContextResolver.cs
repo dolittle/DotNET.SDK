@@ -18,7 +18,7 @@ public class CallContextResolver : IResolveCallContext
     public CallRequestContext ResolveFrom(ExecutionContext executionContext)
     {
         var context = executionContext.ToProtobuf();
-        Activity.Current?.SetTraceContext(context);
+        Activity.Current?.PropagateTraceContext(context);
         return new()
         {
             HeadId = HeadId.NotSet.Value.ToProtobuf(),

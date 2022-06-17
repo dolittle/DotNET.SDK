@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Globalization;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
@@ -24,6 +25,8 @@ public class an_execution_context
             {
                 new Claim("bibetudicu", "efajeakuga", "wovawjohoa"),
             }),
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture,
+            ActivitySpanId.CreateFromString("b00lb00lb00lb00l")
+            );
     };
 }
