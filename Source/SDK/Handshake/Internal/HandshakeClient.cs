@@ -61,7 +61,16 @@ public class HandshakeClient : IPerformHandshake
             }
 
             _logger.SuccessfullyPerformedHandshake(headVersion, sdkVersion, contractsVersion, response.RuntimeVersion.ToVersion(), response.ContractsVersion.ToVersion());
-            return new HandshakeResult(response.MicroserviceId.ToGuid(), response.EnvironmentName);
+            Uri? otlpEndpoint = null;
+            if (response.HasOtlpEndpoint)
+            {
+                if (Uri.TryCreate(response.OtlpEndpoint, UriKind.Absolute, out otlpEndpoint))
+                {
+                    throw new Exception($"Failed to create URI from OTLP Endpoint {response.OtlpEndpoint}");
+                };
+            }
+            
+            return new HandshakeResult(response.MicroserviceId.ToGuid(), response.EnvironmentName, otlpEndpoint);
         }
         catch (Exception ex)
         {

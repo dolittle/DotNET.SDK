@@ -58,8 +58,8 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     /// <inheritdoc />
     public async Task<ConnectionResult> ConnectForever(CancellationToken cancellationToken)
     {
-        var executionContext = await TryPerformHandshakeForever(cancellationToken).ConfigureAwait(false);
-        return new ConnectionResult(executionContext, await _tenants.GetAll(executionContext, cancellationToken).ConfigureAwait(false));
+        var (executionContext, handshakeResult) = await TryPerformHandshakeForever(cancellationToken).ConfigureAwait(false);
+        return new ConnectionResult(executionContext, await _tenants.GetAll(executionContext, cancellationToken).ConfigureAwait(false), handshakeResult.OTLPEndpoint);
     }
 
     static TimeSpan GetTimeToWait(TimeSpan current)
@@ -76,7 +76,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
             CultureInfo.InvariantCulture,
             null);
 
-    async Task<ExecutionContext> TryPerformHandshakeForever(CancellationToken cancellationToken)
+    async Task<(ExecutionContext, HandshakeResult)> TryPerformHandshakeForever(CancellationToken cancellationToken)
     {
         var currentWaitTime = GetTimeToWait(TimeSpan.FromSeconds(1));
         var startTime = DateTimeOffset.Now;
@@ -87,7 +87,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
             {
                 _logger.ConnectingToDolittleRuntime();
                 var handshakeResult = await _handshakePerformer.Perform(attempts++, DateTimeOffset.Now - startTime, _headVersion, cancellationToken).ConfigureAwait(false);
-                return CreateExecutionContextFromHandshake(handshakeResult);
+                return (CreateExecutionContextFromHandshake(handshakeResult), handshakeResult);
             }
             catch (RpcException ex) when (ex.Status.StatusCode == StatusCode.Unimplemented)
             {
