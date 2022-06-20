@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Dolittle.SDK.Events.Store;
@@ -15,6 +16,7 @@ public static class ActivityExtensions
     const string EventType = "type.id";
     const string EventTypeAlias = "type.alias";
     const string EventSourceId = "eventsource.id";
+    const string EventCount = "events.count";
 
     /// <param name="activity">Activity to tag</param>
     /// <param name="eventType">EventType metadata</param>
@@ -45,10 +47,38 @@ public static class ActivityExtensions
     /// <returns></returns>
     public static Activity Tag(this Activity activity, UncommittedEvents uncommittedEvents)
     {
-        foreach (var grouping in uncommittedEvents.GroupBy(@event => @event.EventType))
+        activity.SetTag(EventCount, uncommittedEvents.Count);
+
+        var seen = new HashSet<EventType>();
+
+        foreach (var @event in uncommittedEvents)
         {
-            activity.SetTag($"{grouping.Key.Id}.count", grouping.Count());
+            if (seen.Add(@event.EventType))
+            {
+                activity.Tag(@event.EventType);
+            }
         }
+
+        return activity;
+    }
+
+    /// <param name="activity">Activity to tag</param>
+    /// <param name="uncommittedEvents">EventSourceId metadata</param>
+    /// <returns></returns>
+    public static Activity Tag(this Activity activity, UncommittedAggregateEvents uncommittedEvents)
+    {
+        activity.SetTag(EventCount, uncommittedEvents.Count);
+
+        var seen = new HashSet<EventType>();
+
+        foreach (var @event in uncommittedEvents)
+        {
+            if (seen.Add(@event.EventType))
+            {
+                activity.Tag(@event.EventType);
+            }
+        }
+
 
         return activity;
     }
