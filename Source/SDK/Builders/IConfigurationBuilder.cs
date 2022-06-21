@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -43,6 +44,13 @@ public interface IConfigurationBuilder
     /// <param name="jsonSerializerSettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="JsonSerializerSettings"/> to modify settings.</param>
     /// <returns>the client configuration builder for continuation.</returns>
     public IConfigurationBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder);
+
+    /// <summary>
+    /// Sets a callback that configures the <see cref="JsonSerializerSettings"/> for serializing events.
+    /// </summary>
+    /// <param name="openTelemetrySettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="OpenTelemetrySettings"/> to modify settings.</param>
+    /// <returns>the client configuration builder for continuation.</returns>
+    public IConfigurationBuilder WithOpenTelemetrySettings(Action<OpenTelemetrySettings> openTelemetrySettingsBuilder);
 
     /// <summary>
     /// Sets the ping interval for communicating with the microservice.
