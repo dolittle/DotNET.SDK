@@ -102,6 +102,7 @@ public partial class TenantScopedServiceProviderMiddleware
 
     [LoggerMessage(0, LogLevel.Error, "No tenant configured in the Tenant-ID header and there are no tenants configured for the Dolittle Client")]
     partial void NoTenantsConfigured();
+
     [LoggerMessage(0, LogLevel.Error, "Dolittle client is not ready. Thr resources will not be set on the request")]
     partial void DolittleClientNotReady();
 }

@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Builders;
 /// <summary>
 /// Represents the <see cref="IDolittleClient"/> configuration.
 /// </summary>
-public class DolittleClientConfiguration : IConfigurationBuilder
+public class DolittleClientConfiguration : IConfigurationBuilder, IDolittleClientConfiguration
 {
     /// <summary>
     /// Gets or sets the <see cref="Version"/> of the Head.

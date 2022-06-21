@@ -23,7 +23,9 @@ public static class HostExtensions
     /// <returns>The builder for continuation.</returns>
     public static IHostBuilder UseDolittle(this IHostBuilder builder, SetupDolittleClient configureSetup = default,
         ConfigureDolittleClient configureClientConfiguration = default) =>
-        builder.ConfigureServices(services => services.AddDolittle(configureSetup, configureClientConfiguration));
+        builder
+            .ConfigureServices(services => services.AddDolittle(configureSetup, configureClientConfiguration))
+            .ConfigureOpenTelemetry();
 
     /// <summary>
     /// Gets a connected <see cref="IDolittleClient"/> from the <see cref="IHost"/> <see cref="IHost.Services"/>.
