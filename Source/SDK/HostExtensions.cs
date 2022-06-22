@@ -21,11 +21,15 @@ public static class HostExtensions
     /// <param name="configureSetup">The optional <see cref="SetupDolittleClient"/> callback for configuring the <see cref="SetupBuilder"/>.</param>
     /// <param name="configureClientConfiguration">The optional <see cref="ConfigureDolittleClient"/> callback for configuring the <see cref="DolittleClientConfiguration"/>.</param>
     /// <returns>The builder for continuation.</returns>
-    public static IHostBuilder UseDolittle(this IHostBuilder builder, SetupDolittleClient configureSetup = default,
-        ConfigureDolittleClient configureClientConfiguration = default) =>
-        builder
+    public static IHostBuilder UseDolittle(this IHostBuilder builder, SetupDolittleClient configureSetup = default, ConfigureDolittleClient configureClientConfiguration = default)
+        => builder
             .ConfigureServices(services => services.AddDolittle(configureSetup, configureClientConfiguration))
-            .ConfigureOpenTelemetry();
+            .ConfigureOpenTelemetry(() =>
+            {
+                var config = new DolittleClientConfiguration();
+                configureClientConfiguration?.Invoke(config);
+                return config.OpenTelemetrySettingsProvider();
+            });
 
     /// <summary>
     /// Gets a connected <see cref="IDolittleClient"/> from the <see cref="IHost"/> <see cref="IHost.Services"/>.

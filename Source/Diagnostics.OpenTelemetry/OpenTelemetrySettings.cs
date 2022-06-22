@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
@@ -16,7 +17,7 @@ public record OpenTelemetrySettings
     /// <summary>
     /// Service name as reported by OTLP
     /// </summary>
-    public string ServiceName { get; set; } = "dolittle-app";
+    public string ServiceName { get; set; } = AppDomain.CurrentDomain.FriendlyName;
 
     /// <summary>
     /// Enable logging via OTLP
@@ -32,4 +33,9 @@ public record OpenTelemetrySettings
     /// Tracing configuration callback
     /// </summary>
     public Action<TracerProviderBuilder>? ConfigureTracing { get; set; } = null;
+
+    /// <summary>
+    /// Logging configuration callback.
+    /// </summary>
+    public Action<OpenTelemetryLoggerOptions>? ConfigureLogging { get; set; } = null;
 }
