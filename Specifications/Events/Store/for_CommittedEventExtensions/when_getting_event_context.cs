@@ -35,7 +35,7 @@ public class when_getting_event_context
                     new Claim("zizgukouwl", "kegefobeci", "kiajrabija")
                 }),
                 CultureInfo.InvariantCulture,
-                ActivitySpanId.CreateFromString("b00lb00lb00lb00l")),
+                ActivitySpanId.CreateFromString("b00db00db00cb00a")),
             new EventType("c2bf94fd-491f-494a-bbf6-f3ef397bf5fc", 76),
             new object(),
             false);
@@ -51,7 +51,7 @@ public class when_getting_event_context
                 new Claim("janduthiwl", "wivjuwpesm", "vohocecouw")
             }),
             CultureInfo.InvariantCulture,
-            ActivitySpanId.CreateFromString("b00lb00lb00lb00l"));
+            ActivitySpanId.CreateFromString("b00cb00cb00cb00c"));
     };
 
     Because of = () => event_context = committed_event.GetEventContext(current_execution_context);
