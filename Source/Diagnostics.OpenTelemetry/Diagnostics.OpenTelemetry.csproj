@@ -3,7 +3,7 @@
     <Import Project="../../default.props" />
 
     <PropertyGroup>
-        <AssemblyName>Dolittle.SDK.OpenTelemetry</AssemblyName>
+        <AssemblyName>Dolittle.SDK.Diagnostics.OpenTelemetry</AssemblyName>
         <RootNamespace>Dolittle.SDK.Diagnostics.OpenTelemetry</RootNamespace>
     </PropertyGroup>
 
