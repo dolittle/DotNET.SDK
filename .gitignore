@@ -37,6 +37,7 @@ Artifacts
 !Specifications/Artifacts
 !Source/Tooling/Plugin/Boilerplates/Artifacts
 !Source/Build/Artifacts/
+Samples/Environment/grafana/tempo-data
 log.txt
 
 *.trx
