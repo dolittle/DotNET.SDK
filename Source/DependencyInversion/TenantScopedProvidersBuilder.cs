@@ -51,7 +51,6 @@ public class TenantScopedProvidersBuilder
         containerBuilder.RegisterInstance(tenant);
         containerBuilder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider));
         var container = containerBuilder.Build();
-
         var rootScope = container.BeginLifetimeScope(builder =>
         {
             builder.RegisterInstance(new ServiceScopeFactory(rootServiceProvider.GetRequiredService<IServiceScopeFactory>(), container)).As<IServiceScopeFactory>();
