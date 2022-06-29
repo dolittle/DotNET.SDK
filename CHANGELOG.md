@@ -1,3 +1,25 @@
+# [17.0.2] - 2022-6-21 [PR: #147](https://github.com/dolittle/DotNET.SDK/pull/147)
+## Summary
+
+An issue with the previous release resulted in the nuget packages not being published.
+
+### Fixed
+
+- Release pipeline
+
+### Changed
+
+- Use whole exception as failure reason when processing an event fails.
+
+
+# [17.0.1] - 2022-6-21 [PR: #146](https://github.com/dolittle/DotNET.SDK/pull/146)
+## Summary
+
+### Changed
+
+- Use whole exception as failure reason when processing an event fails.
+
+
 # [17.0.0] - 2022-3-25 [PR: #144](https://github.com/dolittle/DotNET.SDK/pull/144)
 ## Summary
 

@@ -71,7 +71,7 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
             };
             var failure = new ProcessorFailure
             {
-                Reason = ex.Message,
+                Reason = ex.ToString(),
                 Retry = true,
                 RetryTimeout = retryTimeout
             };
