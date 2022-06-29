@@ -31,39 +31,32 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     /// <inheritdoc />
     public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
     {
-        try
-        {
-            if (!(service is IServiceWithType serviceWithType)
-                || registrationAccessor(service).Any()
-                || _rootProvider.GetService(serviceWithType.ServiceType) == null)
-            {
-                return Enumerable.Empty<IComponentRegistration>();
-            }
-            var serviceType = serviceWithType.ServiceType;
-
-            var registration = new ComponentRegistration(
-                Guid.NewGuid(),
-                new DelegateActivator(
-                    serviceType,
-                    (_, __) => _rootProvider
-                        .GetRequiredService(serviceType)),
-                new CurrentScopeLifetime(),
-                InstanceSharing.None,
-                InstanceOwnership.ExternallyOwned,
-                new[]
-                {
-                    service
-                },
-                new Dictionary<string, object>());
-            return new[]
-            {
-                registration
-            };
-        }
-        catch
+        if (!(service is IServiceWithType serviceWithType)
+            || registrationAccessor(service).Any()
+            || _rootProvider.GetService(serviceWithType.ServiceType) == null)
         {
             return Enumerable.Empty<IComponentRegistration>();
         }
+        var serviceType = serviceWithType.ServiceType;
+
+        var registration = new ComponentRegistration(
+            Guid.NewGuid(),
+            new DelegateActivator(
+                serviceType,
+                (_, __) => _rootProvider
+                    .GetRequiredService(serviceType)),
+            new CurrentScopeLifetime(),
+            InstanceSharing.None,
+            InstanceOwnership.ExternallyOwned,
+            new[]
+            {
+                service
+            },
+            new Dictionary<string, object>());
+        return new[]
+        {
+            registration
+        };
     }
 
     /// <inheritdoc />

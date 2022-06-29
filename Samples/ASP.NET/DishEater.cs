@@ -7,31 +7,6 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Handling;
 using Microsoft.Extensions.Logging;
 
-public interface ISomeTenantScopedSingletonService : IDisposable
-{
-    void Log(string s);
-}
-
-public class TenantScopedSingletonService : ISomeTenantScopedSingletonService
-{
-    readonly ILogger<TenantScopedSingletonService> _logger;
-
-    public TenantScopedSingletonService(ILogger<TenantScopedSingletonService> logger)
-    {
-        
-        Console.WriteLine("Created TenantScopedSingletonService");
-        _logger = logger;
-    }
-
-    public void Log(string s)
-    {
-        _logger.LogInformation(s);
-    }
-
-    public void Dispose()
-        => Console.WriteLine("Disposed TenantScopedSingletonService");
-}
-
 public interface ISomeTenantScopedScopedService : IDisposable
 {
     void Log(string s);
@@ -90,15 +65,15 @@ public class SingletonGlobalService : ISingletonGloablService
 [EventHandler("86dd35ee-cd28-48d9-a0cd-cb2aa11851cb")]
 public class DishEater
 {
-    readonly ISomeTenantScopedSingletonService _tenantScopedSingletonService;
+    readonly ISomeTenantScopedScopedService _s;
 
-    public DishEater(ISomeTenantScopedSingletonService tenantScopedSingletonService, ISomeTenantScopedScopedService s, IScopedGloablService scopedGloablService, ISingletonGloablService x)
+    public DishEater(ISomeTenantScopedScopedService s, IScopedGloablService scopedGloablService, ISingletonGloablService x)
     {
-        _tenantScopedSingletonService = tenantScopedSingletonService;
+        _s = s;
     }
 
     public void Handle(DishEaten @event, EventContext ctx)
     {
-        _tenantScopedSingletonService.Log($"{ctx.EventSourceId} has eaten {@event.Dish}. Yummm!");
+        _s.Log($"{ctx.EventSourceId} has eaten {@event.Dish}. Yummm!");
     }
 }

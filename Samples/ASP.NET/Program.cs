@@ -9,9 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.UseDolittle(null, _ => _.WithTenantServices((_, services) => services
-    .AddSingleton<ISomeTenantScopedSingletonService, TenantScopedSingletonService>()
     .AddScoped<ISomeTenantScopedScopedService, TenantScopedScopedService>()));
 builder.Services.AddScoped<IScopedGloablService, ScopedGlobalService>();
 builder.Services.AddSingleton<ISingletonGloablService, SingletonGlobalService>();

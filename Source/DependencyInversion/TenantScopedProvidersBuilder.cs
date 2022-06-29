@@ -38,7 +38,7 @@ public class TenantScopedProvidersBuilder
     public ITenantScopedProviders Build(IServiceProvider rootServiceProvider, HashSet<TenantId> tenants)
         => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider)));
 
-    AutofacServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
+    (AutofacServiceProvider, IDisposable) CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
     {
         var containerBuilder = new ContainerBuilder();
         var services = new ServiceCollection();
@@ -47,9 +47,13 @@ public class TenantScopedProvidersBuilder
             configure?.Invoke(tenant, services);
         }
 
+        if (services.Any(_ => _.Lifetime == ServiceLifetime.Singleton && _.ImplementationInstance == null))
+        {
+            throw new CannotRegisterSingletonDependenciesOnTenantScopedContainer();
+        }
+
         containerBuilder.Populate(services);
         containerBuilder.RegisterInstance(tenant);
-        containerBuilder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider));
         var container = containerBuilder.Build();
         var rootScope = container.BeginLifetimeScope(builder =>
         {
@@ -57,6 +61,6 @@ public class TenantScopedProvidersBuilder
             builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider));
         });
 
-        return new AutofacServiceProvider(rootScope);
+        return (new AutofacServiceProvider(rootScope), container);
     }
 }
