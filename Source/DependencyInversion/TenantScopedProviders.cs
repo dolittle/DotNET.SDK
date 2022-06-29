@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK.Tenancy;
 
 namespace Dolittle.SDK.DependencyInversion;
@@ -13,15 +14,15 @@ namespace Dolittle.SDK.DependencyInversion;
 /// </summary>
 public class TenantScopedProviders : ITenantScopedProviders
 {
-    readonly IReadOnlyDictionary<TenantId, IServiceProvider> _serviceProviders;
+    readonly IReadOnlyDictionary<TenantId, AutofacServiceProvider> _serviceProviders;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TenantScopedProviders"/> class.
     /// </summary>
     /// <param name="tenantScopedServiceProviders">The <see cref="IDictionary{TKey,TValue}"/> of <see cref="IServiceProvider"/> per <see cref="TenantId" />.</param>
-    public TenantScopedProviders(IDictionary<TenantId, IServiceProvider> tenantScopedServiceProviders)
+    public TenantScopedProviders(IDictionary<TenantId, AutofacServiceProvider> tenantScopedServiceProviders)
     {
-        _serviceProviders = new ReadOnlyDictionary<TenantId, IServiceProvider>(tenantScopedServiceProviders);
+        _serviceProviders = new ReadOnlyDictionary<TenantId, AutofacServiceProvider>(tenantScopedServiceProviders);
     }
 
     /// <inheritdoc />
@@ -33,5 +34,14 @@ public class TenantScopedProviders : ITenantScopedProviders
         }
 
         return provider;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        foreach (var (_, provider) in _serviceProviders)
+        {
+            provider.Dispose();
+        }
     }
 }

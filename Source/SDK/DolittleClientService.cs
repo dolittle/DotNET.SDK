@@ -13,7 +13,7 @@ namespace Dolittle.SDK;
 /// <summary>
 /// Represents an implementation of <see cref="IHostedService"/> for the <see cref="IDolittleClient"/>.
 /// </summary>
-public class DolittleClientService : IHostedService
+public class DolittleClientService : IHostedService, IDisposable
 {
     readonly IDolittleClient _dolittleClient;
     readonly DolittleClientConfiguration _clientConfiguration;
@@ -52,4 +52,7 @@ public class DolittleClientService : IHostedService
         _logger.DisconnectingDolittleClient();
         return _dolittleClient.Disconnect(cancellationToken);
     }
+
+    public void Dispose()
+        => _dolittleClient?.Dispose();
 }

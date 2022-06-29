@@ -295,6 +295,7 @@ public class DolittleClient : IDisposable, IDolittleClient
 
         if (disposeManagedResources)
         {
+            _services?.Dispose();
             _clientCancellationTokenSource?.Dispose();
             _eventHorizons?.Dispose();
             _grpcChannel?.Dispose();

@@ -38,7 +38,7 @@ public class TenantScopedProvidersBuilder
     public ITenantScopedProviders Build(IServiceProvider rootServiceProvider, HashSet<TenantId> tenants)
         => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider)));
 
-    IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
+    AutofacServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
     {
         var containerBuilder = new ContainerBuilder();
         var services = new ServiceCollection();
