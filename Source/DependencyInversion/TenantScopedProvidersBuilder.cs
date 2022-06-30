@@ -38,7 +38,7 @@ public class TenantScopedProvidersBuilder
     public ITenantScopedProviders Build(IServiceProvider rootServiceProvider, HashSet<TenantId> tenants)
         => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider)));
 
-    (AutofacServiceProvider, IDisposable) CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
+    IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
     {
         var containerBuilder = new ContainerBuilder();
         var services = new ServiceCollection();
@@ -61,6 +61,6 @@ public class TenantScopedProvidersBuilder
             builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider));
         });
 
-        return (new AutofacServiceProvider(rootScope), container);
+        return new AutofacServiceProvider(rootScope);
     }
 }

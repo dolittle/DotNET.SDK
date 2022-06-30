@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK.Tenancy;
 
 namespace Dolittle.SDK.DependencyInversion;
@@ -14,15 +13,15 @@ namespace Dolittle.SDK.DependencyInversion;
 /// </summary>
 public class TenantScopedProviders : ITenantScopedProviders
 {
-    readonly IReadOnlyDictionary<TenantId, (AutofacServiceProvider, IDisposable)> _serviceProviders;
+    readonly IReadOnlyDictionary<TenantId, IServiceProvider> _serviceProviders;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TenantScopedProviders"/> class.
     /// </summary>
     /// <param name="tenantScopedServiceProviders">The <see cref="IDictionary{TKey,TValue}"/> of <see cref="IServiceProvider"/> per <see cref="TenantId" />.</param>
-    public TenantScopedProviders(IDictionary<TenantId, (AutofacServiceProvider, IDisposable)> tenantScopedServiceProviders)
+    public TenantScopedProviders(IDictionary<TenantId, IServiceProvider> tenantScopedServiceProviders)
     {
-        _serviceProviders = new ReadOnlyDictionary<TenantId, (AutofacServiceProvider, IDisposable)>(tenantScopedServiceProviders);
+        _serviceProviders = new ReadOnlyDictionary<TenantId, IServiceProvider>(tenantScopedServiceProviders);
     }
 
     /// <inheritdoc />
@@ -33,7 +32,7 @@ public class TenantScopedProviders : ITenantScopedProviders
             throw new MissingServiceProviderForTenant(tenant);
         }
 
-        return provider.Item1;
+        return provider;
     }
 
     /// <inheritdoc />
@@ -41,8 +40,7 @@ public class TenantScopedProviders : ITenantScopedProviders
     {
         foreach (var (_, provider) in _serviceProviders)
         {
-            provider.Item1?.Dispose();
-            provider.Item2?.Dispose();
+            (provider as IDisposable)?.Dispose();
         }
     }
 }
