@@ -40,25 +40,38 @@ public class TenantScopedProvidersBuilder
 
     IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
     {
-        var containerBuilder = new ContainerBuilder();
         var services = new ServiceCollection();
         foreach (var configure in _configureServicesForTenantCallbacks)
         {
             configure?.Invoke(tenant, services);
         }
+        services.AddSingleton(tenant);
+        return rootServiceProvider switch
+        {
+            AutofacServiceProvider autofacServiceProvider => CreateNestedContainerFromAutofacContainer(autofacServiceProvider.LifetimeScope, services),
+            ILifetimeScope autofacLifetimeScope => CreateNestedContainerFromAutofacContainer(autofacLifetimeScope, services),
+            _ => CreateNestedContainerFromStandardServiceProvider(rootServiceProvider, services)
+        };
+    }
 
+    static IServiceProvider CreateNestedContainerFromAutofacContainer(ILifetimeScope rootLifetimeScope, IServiceCollection services)
+        => new AutofacServiceProvider(rootLifetimeScope.BeginLifetimeScope(builder => builder.Populate(services)));
+
+    static IServiceProvider CreateNestedContainerFromStandardServiceProvider(IServiceProvider rootServiceProvider, IServiceCollection services)
+    {
+        var containerBuilder = new ContainerBuilder();
+       
         if (services.Any(_ => _.Lifetime == ServiceLifetime.Singleton && _.ImplementationInstance == null))
         {
             throw new CannotRegisterSingletonDependenciesOnTenantScopedContainer();
         }
 
         containerBuilder.Populate(services);
-        containerBuilder.RegisterInstance(tenant);
         var container = containerBuilder.Build();
         var rootScope = container.BeginLifetimeScope(builder =>
         {
             builder.RegisterInstance(new ServiceScopeFactory(rootServiceProvider.GetRequiredService<IServiceScopeFactory>(), container)).As<IServiceScopeFactory>();
-            builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider));
+            builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider)); ;
         });
 
         return new AutofacServiceProvider(rootScope);

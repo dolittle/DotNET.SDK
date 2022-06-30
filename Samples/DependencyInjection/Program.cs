@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK;
 using Dolittle.SDK.Extensions.AspNet;
 using Microsoft.AspNetCore;
@@ -13,10 +14,12 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder();
 
-builder.Host.UseDolittle(configureClientConfiguration: (x) => x.WithTenantServices((tenant, services) => services
-    // AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>() Not allowed yet
-    .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
-    .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
+builder.Host
+    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    .UseDolittle(configureClientConfiguration: (x) => x.WithTenantServices((tenant, services) => services
+        .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>()
+        .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
+        .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
 builder.Services
     .AddSingleton<IGlobalSingletonService, GlobalSingletonService>()
     .AddScoped<IGlobalScopedService, GlobalScopedService>()
@@ -25,6 +28,7 @@ builder.Services
     .AddSwaggerGen()
     .AddControllers();
 var app = builder.Build();
+app.Services.GetService<IGlobalSingletonService>();
 app.UseDolittle();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -41,6 +45,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
+app.MapGet("tenant/singleton", async ([FromServices]ITenantScopedSingletonService service) => Console.WriteLine("Handling request with tenant scoped singleton service"));
 app.MapGet("tenant/scoped", async ([FromServices]ITenantScopedScopedService service) => Console.WriteLine("Handling request with tenant scoped scoped service"));
 app.MapGet("tenant/transient", async ([FromServices]ITenantScopedTransientService service) => Console.WriteLine("Handling request with tenant scoped transient service"));
 app.MapGet("global/singleton", async ([FromServices]IGlobalSingletonService service) => Console.WriteLine("Handling request with global singleton service"));
