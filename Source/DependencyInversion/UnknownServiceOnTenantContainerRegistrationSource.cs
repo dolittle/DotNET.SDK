@@ -31,9 +31,10 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     /// <inheritdoc />
     public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
     {
-        if (!(service is IServiceWithType serviceWithType)
+        var serviceWithType = service as IServiceWithType;
+        if (serviceWithType is null
             || registrationAccessor(service).Any()
-            || _rootProvider.GetService(serviceWithType.ServiceType) == null)
+            || _rootProvider.GetService(serviceWithType.ServiceType) is null)
         {
             return Enumerable.Empty<IComponentRegistration>();
         }
