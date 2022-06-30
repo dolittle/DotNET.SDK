@@ -14,7 +14,7 @@ public class CannotRegisterSingletonDependenciesOnTenantScopedContainer : Except
     /// Initializes a new instance of the <see cref="CannotRegisterSingletonDependenciesOnTenantScopedContainer"/> class.
     /// </summary>
     public CannotRegisterSingletonDependenciesOnTenantScopedContainer()
-        : base("Currently registering singleton services that are not instances does not work on tenant scoped containers")
+        : base("Singleton services that are not registered as a value, is not supported in per-tenant containers")
     {
     }
 }
