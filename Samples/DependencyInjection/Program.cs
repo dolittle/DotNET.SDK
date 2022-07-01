@@ -2,20 +2,19 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading.Tasks;
-using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK;
 using Dolittle.SDK.Extensions.AspNet;
-using Microsoft.AspNetCore;
+using Dolittle.SDK.Extensions.DependencyInversion.Autofac;
+using Dolittle.SDK.Extensions.DependencyInversion.Lamar;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder();
 
 builder.Host
-    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    // .UseDolittleAutofacTenantContainers()
+    // .UseDolittleLamarTenantContainers()
     .UseDolittle(configureClientConfiguration: (x) => x.WithTenantServices((tenant, services) => services
         .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>()
         .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
@@ -28,7 +27,6 @@ builder.Services
     .AddSwaggerGen()
     .AddControllers();
 var app = builder.Build();
-app.Services.GetService<IGlobalSingletonService>();
 app.UseDolittle();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -53,4 +51,3 @@ app.MapGet("global/scoped", async ([FromServices]IGlobalScopedService service) =
 app.MapGet("global/transient", async ([FromServices]IGlobalTransientService service) => Console.WriteLine("Handling request with transient service"));
 
 app.Run();
-
