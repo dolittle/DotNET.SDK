@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Dolittle.SDK.DependencyInversion;
 
@@ -36,44 +36,41 @@ public class TenantScopedProvidersBuilder
     /// <param name="tenants">The list of <see cref="TenantId"/> to make tenant scoped <see cref="IServiceProvider"/> for.</param>
     /// <returns>The built <see cref="ITenantScopedProviders"/>.</returns>
     public ITenantScopedProviders Build(IServiceProvider rootServiceProvider, HashSet<TenantId> tenants)
-        => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider)));
-
-    IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
     {
+        var tenantScopedContainerCreators = rootServiceProvider.GetService<IEnumerable<ICanCreateTenantScopedContainer>>()?.ToArray() ?? Array.Empty<ICanCreateTenantScopedContainer>();
+        var tenantScopedContainerCreator = tenantScopedContainerCreators.Length switch
+        {
+            0 => new TenantScopedContainerCreator(),
+            1 => tenantScopedContainerCreators[0],
+            _ => throw new MultipleTenantScopedContainerCreatorsUsed()
+        };
+        return new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider, tenantScopedContainerCreator)));
+    }
+
+    IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider, ICanCreateTenantScopedContainer tenantScopedContainerCreator)
+    {
+        var logger = rootServiceProvider.GetService<ILogger<TenantScopedProvidersBuilder>>() ?? NullLogger<TenantScopedProvidersBuilder>.Instance;
+        if (!tenantScopedContainerCreator.CanCreateFrom(rootServiceProvider))
+        {
+            throw new TenantScopedContainerCreatorCannotCreateFromRootServiceProvider(tenantScopedContainerCreator, rootServiceProvider);
+        }
+
         var services = new ServiceCollection();
         foreach (var configure in _configureServicesForTenantCallbacks)
         {
             configure?.Invoke(tenant, services);
         }
         services.AddSingleton(tenant);
-        return rootServiceProvider switch
+        if (tenantScopedContainerCreator is not TenantScopedContainerCreator)
         {
-            AutofacServiceProvider autofacServiceProvider => CreateNestedContainerFromAutofacContainer(autofacServiceProvider.LifetimeScope, services),
-            ILifetimeScope autofacLifetimeScope => CreateNestedContainerFromAutofacContainer(autofacLifetimeScope, services),
-            _ => CreateNestedContainerFromStandardServiceProvider(rootServiceProvider, services)
-        };
-    }
+            return tenantScopedContainerCreator.Create(rootServiceProvider, services);
+        }
 
-    static IServiceProvider CreateNestedContainerFromAutofacContainer(ILifetimeScope rootLifetimeScope, IServiceCollection services)
-        => new AutofacServiceProvider(rootLifetimeScope.BeginLifetimeScope(builder => builder.Populate(services)));
-
-    static IServiceProvider CreateNestedContainerFromStandardServiceProvider(IServiceProvider rootServiceProvider, IServiceCollection services)
-    {
-        var containerBuilder = new ContainerBuilder();
-       
+        logger.LogWarning("Using the default TenantScopedContainerCreator using Microsoft's dependency injection framework. This is limited as it does not support singleton services that are not registered as a value");
         if (services.Any(_ => _.Lifetime == ServiceLifetime.Singleton && _.ImplementationInstance == null))
         {
             throw new CannotRegisterSingletonDependenciesOnTenantScopedContainer();
         }
-
-        containerBuilder.Populate(services);
-        var container = containerBuilder.Build();
-        var rootScope = container.BeginLifetimeScope(builder =>
-        {
-            builder.RegisterInstance(new ServiceScopeFactory(rootServiceProvider.GetRequiredService<IServiceScopeFactory>(), container)).As<IServiceScopeFactory>();
-            builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider)); ;
-        });
-
-        return new AutofacServiceProvider(rootScope);
+        return tenantScopedContainerCreator.Create(rootServiceProvider, services);
     }
 }
