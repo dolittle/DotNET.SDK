@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder();
 
 builder.Host
     // .UseDolittleAutofacTenantContainers()
-    // .UseDolittleLamarTenantContainers()
+    .UseDolittleLamarTenantContainers()
     .UseDolittle(configureClientConfiguration: (x) => x.WithTenantServices((tenant, services) => services
         .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>() // This will only work when using either Lamar or Autofac
         .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
