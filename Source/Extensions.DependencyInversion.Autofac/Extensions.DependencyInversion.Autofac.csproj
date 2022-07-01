@@ -13,7 +13,7 @@
     <ItemGroup>
         <PackageReference Include="Autofac" Version="$(AutofacVersion)" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="$(AutofacExtensionsDependencyInjectionVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsVersion)"/>
     </ItemGroup>
 
 </Project>

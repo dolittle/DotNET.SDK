@@ -25,7 +25,7 @@ public static class HostExtensions
     public static IHostBuilder UseDolittleLamarTenantContainers(this IHostBuilder hostBuilder, Action<HostBuilderContext, ServiceRegistry> configure = null)
         => hostBuilder
             .UseLamar(configure)
-            .ConfigureServices(_ => _.TryAddEnumerable(ServiceDescriptor.Singleton<ICanCreateTenantScopedContainer, TenantScopedContainerCreator>()));    
+            .UseDolittleTenantContainerCreator<TenantScopedContainerCreator>();  
     
     
 #if NET5_0_OR_GREATER
@@ -38,7 +38,7 @@ public static class HostExtensions
     public static IHostBuilder UseDolittleLamarTenantContainers(this IHostBuilder hostBuilder, Action<ServiceRegistry> configure)
         => hostBuilder
             .UseLamar(configure)
-            .ConfigureServices(_ => _.TryAddEnumerable(ServiceDescriptor.Singleton<ICanCreateTenantScopedContainer, TenantScopedContainerCreator>()));
+            .UseDolittleTenantContainerCreator<TenantScopedContainerCreator>();
 #endif
 #if NETCOREAPP3_1
     /// <summary> 
@@ -50,6 +50,6 @@ public static class HostExtensions
     public static IHostBuilder UseDolittleLamarTenantContainers(this IHostBuilder hostBuilder, ServiceRegistry registry)
         => hostBuilder
             .UseLamar(registry)
-            .ConfigureServices(_ => _.TryAddEnumerable(ServiceDescriptor.Singleton<ICanCreateTenantScopedContainer, TenantScopedContainerCreator>()));
+            .UseDolittleTenantContainerCreator<TenantScopedContainerCreator>();
 #endif
 }

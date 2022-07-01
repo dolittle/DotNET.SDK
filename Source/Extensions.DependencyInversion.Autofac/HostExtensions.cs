@@ -6,8 +6,6 @@ using Autofac;
 using Autofac.Builder;
 using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK.DependencyInversion;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace Dolittle.SDK.Extensions.DependencyInversion.Autofac;
@@ -26,7 +24,7 @@ public static class HostExtensions
     public static IHostBuilder UseDolittleAutofacTenantContainers(this IHostBuilder hostBuilder, Action<ContainerBuilder> configureContainer = null)
         => hostBuilder
             .UseServiceProviderFactory(new AutofacServiceProviderFactory(configureContainer))
-            .ConfigureServices(_ => _.TryAddEnumerable(ServiceDescriptor.Singleton<ICanCreateTenantScopedContainer, TenantScopedContainerCreator>()));
+            .UseDolittleTenantContainerCreator<TenantScopedContainerCreator>();
 
     /// <summary>
     /// Sets up the <see cref="AutofacServiceProviderFactory"/> as the service provider factory and 
@@ -38,6 +36,6 @@ public static class HostExtensions
     public static IHostBuilder UseDolittleAutofacTenantContainers(this IHostBuilder hostBuilder, ContainerBuildOptions containerBuildOptions, Action<ContainerBuilder> configureContainer = null)
         => hostBuilder
             .UseServiceProviderFactory(new AutofacServiceProviderFactory(containerBuildOptions, configureContainer))
-            .ConfigureServices(_ => _.TryAddEnumerable(ServiceDescriptor.Singleton<ICanCreateTenantScopedContainer, TenantScopedContainerCreator>()));
+            .UseDolittleTenantContainerCreator<TenantScopedContainerCreator>();
     
 }
