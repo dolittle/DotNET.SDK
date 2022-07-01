@@ -16,7 +16,7 @@ builder.Host
     // .UseDolittleAutofacTenantContainers()
     // .UseDolittleLamarTenantContainers()
     .UseDolittle(configureClientConfiguration: (x) => x.WithTenantServices((tenant, services) => services
-        .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>()
+        .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>() // This will only work when using either Lamar or Autofac
         .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
         .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
 builder.Services
