@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 namespace Dolittle.SDK.DependencyInversion;
 
 /// <summary>
-/// Extensions on <see cref="IHostBuilder"/> for setting up Dolittle tenant scoped child containers using Lamar. 
+/// Extensions on <see cref="IHostBuilder"/> for setting up Dolittle tenant scoped child containers using a custom tenant container creator. 
 /// </summary>
 public static class HostExtensions
 {
