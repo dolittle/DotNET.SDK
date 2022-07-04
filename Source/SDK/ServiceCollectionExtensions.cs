@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.DependencyInversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -55,8 +56,20 @@ public static class ServiceCollectionExtensions
             clientConfig.WithLogging(loggerFactory);
         }
 
-        clientConfig.WithServiceProvider(provider);
+
         configureClient?.Invoke(clientConfig);
+        if (clientConfig.ServiceProvider is null)
+        {
+            clientConfig.WithServiceProvider(provider);
+        }
+
+        if (clientConfig.CreateTenantContainer is null)
+        {
+            clientConfig.WithTenantContainerCreator(clientConfig.CreateTenantContainerFactory is not null
+                ? clientConfig.CreateTenantContainerFactory(clientConfig.ServiceProvider)
+                : services => new DefaultTenantContainersCreator().Create(clientConfig.ServiceProvider, services));
+        }
+        
         return clientConfig;
     }
 }

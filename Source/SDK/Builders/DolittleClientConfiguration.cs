@@ -4,6 +4,7 @@
 using System;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Microservices;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -57,6 +58,17 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
     /// </summary>
     public ConfigureTenantServices ConfigureTenantServices { get; private set; }
+    
+    /// <summary>
+    /// Gets or sets the <see cref="Func{TResult}"/> factory for <see cref="DependencyInversion.CreateTenantContainer"/>.
+    /// </summary>
+    public Func<IServiceProvider, CreateTenantContainer> CreateTenantContainerFactory { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="DependencyInversion.CreateTenantContainer"/>.
+    /// </summary>
+    public CreateTenantContainer CreateTenantContainer { get; private set; }
+    
 
     /// <summary>
     /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
@@ -90,24 +102,14 @@ public class DolittleClientConfiguration : IConfigurationBuilder
         return result;
     }
     
-    /// <summary>
-    /// Sets the <see cref="Version"/> of the Head.
-    /// </summary>
-    /// <param name="version">The <see cref="Version"/>.</param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public IConfigurationBuilder WithVersion(Version version)
     {
         Version = version;
         return this;
     }
     
-    /// <summary>
-    /// Connect to a specific host and port for the Dolittle runtime.
-    /// </summary>
-    /// <param name="host">The host name to connect to.</param>
-    /// <param name="port">The port to connect to.</param>
-    /// <returns>the client configuration builder for continuation.</returns>
-    /// <remarks>If not specified, host 'localhost' and port 50053 will be used.</remarks>
+    /// <inheritdoc />
     public IConfigurationBuilder WithRuntimeOn(string host, ushort port)
     {
         RuntimeHost = host;
@@ -115,23 +117,14 @@ public class DolittleClientConfiguration : IConfigurationBuilder
         return this;
     }
 
-    /// <summary>
-    /// Sets the <see cref="ILoggerFactory"/> to use for creating instances of <see cref="ILogger"/> for the client configuration.
-    /// </summary>
-    /// <param name="factory">The given <see cref="ILoggerFactory"/>.</param>
-    /// <returns>the client configuration builder for continuation.</returns>
-    /// <remarks>If not used, a factory with 'Trace' level logging will be used.</remarks>
+    /// <inheritdoc />
     public IConfigurationBuilder WithLogging(ILoggerFactory factory)
     {
         LoggerFactory = factory;
         return this;
     }
 
-    /// <summary>
-    /// Sets a callback that configures the <see cref="JsonSerializerSettings"/> for serializing events.
-    /// </summary>
-    /// <param name="jsonSerializerSettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="JsonSerializerSettings"/> to modify settings.</param>
-    /// <returns>the client configuration builder for continuation.</returns>
+    /// <inheritdoc />
     public IConfigurationBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder)
     {
         EventSerializerProvider = () =>
@@ -143,33 +136,67 @@ public class DolittleClientConfiguration : IConfigurationBuilder
         return this;
     }
 
-    /// <summary>
-    /// Sets the ping interval for communicating with the microservice.
-    /// </summary>
-    /// <param name="interval">The ping interval.</param>
-    /// <returns>the client configuration builder for continuation.</returns>
+    /// <inheritdoc />
     public IConfigurationBuilder WithPingInterval(TimeSpan interval)
     {
         PingInterval = interval;
         return this;
     }
 
-    /// <summary>
-    /// Configures the root <see cref="IServiceProvider"/> for the <see cref="IDolittleClient"/>.
-    /// </summary>
-    /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-    /// <returns>The client for continuation.</returns>
+    /// <inheritdoc />
     public IConfigurationBuilder WithServiceProvider(IServiceProvider serviceProvider)
     {
         ServiceProvider = serviceProvider;
+        
         return this;
     }
 
+    /// <inheritdoc />
+    public IConfigurationBuilder WithRootContainerAndTenantContainerCreator<TContainer>(TContainer container, ICreateTenantContainers<TContainer> creator)
+        where TContainer : class, IServiceProvider
+    {
+        ServiceProvider = container;
+        CreateTenantContainer = services => creator.Create(container, services);
+        return this;
+    }
+    
+    /// <inheritdoc />
+    public IConfigurationBuilder WithTenantContainerCreator<TContainer>(Func<TContainer, ICreateTenantContainers<TContainer>> factory)
+        where TContainer : class, IServiceProvider
+    {
+        CreateTenantContainerFactory = provider =>
+        {
+            var container = ICreateTenantContainers<TContainer>.RootContainerGuard(provider);
+            return services => factory(container).Create(container, services);
+        };
+        return this;
+    }
+    
+    /// <inheritdoc />
+    public IConfigurationBuilder WithTenantContainerCreator<TContainer>()
+        where TContainer : class, IServiceProvider
+    {
+        CreateTenantContainerFactory = provider =>
+        {
+            var container = ICreateTenantContainers<TContainer>.RootContainerGuard(provider);
+            return services => container.GetRequiredService<ICreateTenantContainers<TContainer>>().Create(container, services);
+        };
+        return this;
+    }
+    
+    
     /// <summary>
-    /// Configures a <see cref="ConfigureTenantServices"/> callback for configuring the tenant specific IoC containers.
+    /// Configures the <see cref="CreateTenantContainer"/>.
     /// </summary>
-    /// <param name="configureTenantServices">The <see cref="ConfigureTenantServices"/> callback.</param>
-    /// <returns>The client for continuation.</returns>
+    /// <param name="creator">The <see cref="DependencyInversion.CreateTenantContainer"/> delegate.</param>
+    /// <returns>The builder for continuation.</returns>
+    public IConfigurationBuilder WithTenantContainerCreator(CreateTenantContainer creator)
+    {
+        CreateTenantContainer = creator;
+        return this;
+    }
+
+    /// <inheritdoc />
     public IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices)
     {
         ConfigureTenantServices = configureTenantServices;
