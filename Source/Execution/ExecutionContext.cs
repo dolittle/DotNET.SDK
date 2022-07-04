@@ -27,4 +27,4 @@ public record ExecutionContext(
     CorrelationId CorrelationId,
     Claims Claims,
     CultureInfo Culture,
-    ActivitySpanId? SpanId);
+    ActivitySpanId? SpanId = null);
