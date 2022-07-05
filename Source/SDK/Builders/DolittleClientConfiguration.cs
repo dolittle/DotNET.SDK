@@ -173,6 +173,18 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     }
     
     /// <inheritdoc />
+    public IConfigurationBuilder WithTenantContainerCreator<TContainer>(ICreateTenantContainers<TContainer> creator)
+        where TContainer : class, IServiceProvider
+    {
+        CreateTenantContainerFactory = provider =>
+        {
+            var container = ICreateTenantContainers<TContainer>.RootContainerGuard(provider);
+            return services => creator.Create(container, services);
+        };
+        return this;
+    }
+    
+    /// <inheritdoc />
     public IConfigurationBuilder WithTenantContainerCreator<TContainer>()
         where TContainer : class, IServiceProvider
     {

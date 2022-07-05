@@ -90,6 +90,16 @@ public interface IConfigurationBuilder
     /// Configures the <see cref="CreateTenantContainer"/> delegate for creating tenant containers
     /// from the <typeparamref name="TContainer"/> root container.
     /// </summary>
+    /// <param name="creator">The <see cref="ICreateTenantContainers{TContainer}"/>.</param>
+    /// <typeparam name="TContainer">The <see cref="Type"/> of the root container.</typeparam>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithTenantContainerCreator<TContainer>(ICreateTenantContainers<TContainer> creator)
+        where TContainer : class, IServiceProvider;
+    
+    /// <summary>
+    /// Configures the <see cref="CreateTenantContainer"/> delegate for creating tenant containers
+    /// from the <typeparamref name="TContainer"/> root container.
+    /// </summary>
     /// <typeparam name="TContainer">The <see cref="Type"/> of the root container.</typeparam>
     /// <returns>The builder for continuation.</returns>
     IConfigurationBuilder WithTenantContainerCreator<TContainer>()

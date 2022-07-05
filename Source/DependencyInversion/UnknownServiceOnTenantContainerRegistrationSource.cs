@@ -18,6 +18,7 @@ namespace Dolittle.SDK.DependencyInversion;
 /// </summary>
 public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSource
 {
+    const string MetadataKey = "from-source";
     readonly IServiceProvider _rootProvider;
     readonly IEnumerable<IComponentRegistration> _registrations;
 
@@ -25,6 +26,7 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     /// Initializes a new instance of the <see cref="UnknownServiceOnTenantContainerRegistrationSource"/> class.
     /// </summary>
     /// <param name="rootProvider">The root <see cref="IServiceProvider"/>.s</param>
+    /// <param name="registrations">The <see cref="IEnumerable{T}"/> of <see cref="ComponentRegistration"/>.</param>
     public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider, IEnumerable<IComponentRegistration> registrations)
     {
         _rootProvider = rootProvider;
@@ -56,7 +58,10 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
             {
                 service
             },
-            ImmutableDictionary<string, object>.Empty);
+            new Dictionary<string, object>
+            {
+                [MetadataKey] = null
+            });
         return new[]
         {
             registration
@@ -67,7 +72,16 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     public bool IsAdapterForIndividualComponents => false;
 
     bool RegisteredInContainer(Service service)
-        => _registrations.SelectMany(_ => _.Services).Any(_ => _.Equals(service));
+    {
+        foreach (var registration in _registrations)
+        {
+            if (registration.Services.Any(_ => _.Equals(service)))
+            {
+                return !registration.Metadata.ContainsKey(MetadataKey);
+            }
+        }
+        return false;
+    }
     
     bool IsRegisteredInRootContainer(Type service)
     {
