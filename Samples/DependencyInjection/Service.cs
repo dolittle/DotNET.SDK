@@ -6,7 +6,10 @@ using Dolittle.SDK.Tenancy;
 
 public abstract class Service : IDisposable
 {
-    protected Service() => Console.WriteLine($"Creating {GetType().Name}");
+    protected Service()
+    {
+        Console.WriteLine($"Creating {GetType().Name}");   
+    }
     public void Dispose() => Console.WriteLine($"Disposing {GetType().Name}");
 }
 public abstract class TenantScopedService : IDisposable

@@ -2,10 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Extensions.AspNet;
-using Dolittle.SDK.Extensions.DependencyInversion.Autofac;
-using Dolittle.SDK.Extensions.DependencyInversion.Lamar;
+using Lamar.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,12 +14,17 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder();
 
 builder.Host
-    // .UseDolittleAutofacTenantContainers()
-    .UseDolittleLamarTenantContainers()
-    .UseDolittle(configureClientConfiguration: (x) => x.WithTenantServices((tenant, services) => services
-        .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>() // This will only work when using either Lamar or Autofac
-        .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
-        .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
+    // Use Autofac. No need to setup custom tenant container creator when using Autofac
+    // .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    // Use Lamar
+    // .UseLamar(_ => _.For<ICreateTenantContainers<Lamar.Container>>().Use<LamarTenantContainerCreator>())
+    .UseDolittle(configureClientConfiguration: _ => _
+        // Setup to use Lamar tenant containers
+        // .WithTenantContainerCreator<Lamar.Container>()
+        .WithTenantServices((tenant, services) => services
+            .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>() // This will only work when using either Lamar or Autofac
+            .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
+            .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
 builder.Services
     .AddSingleton<IGlobalSingletonService, GlobalSingletonService>()
     .AddScoped<IGlobalScopedService, GlobalScopedService>()
