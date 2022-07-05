@@ -4,6 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Microsoft.Extensions.Hosting;
 
 namespace Dolittle.SDK;
@@ -21,7 +22,14 @@ public static class HostExtensions
     /// <param name="configureClientConfiguration">The optional <see cref="ConfigureDolittleClient"/> callback for configuring the <see cref="DolittleClientConfiguration"/>.</param>
     /// <returns>The builder for continuation.</returns>
     public static IHostBuilder UseDolittle(this IHostBuilder builder, SetupDolittleClient configureSetup = default, ConfigureDolittleClient configureClientConfiguration = default)
-        => builder.ConfigureServices(services => services.AddDolittle(configureSetup, configureClientConfiguration));
+        => builder
+            .ConfigureServices(services => services.AddDolittle(configureSetup, configureClientConfiguration))
+            .ConfigureOpenTelemetry(() =>
+            {
+                var config = new DolittleClientConfiguration();
+                configureClientConfiguration?.Invoke(config);
+                return config.OpenTelemetrySettingsProvider();
+            });
 
     /// <summary>
     /// Gets a connected <see cref="IDolittleClient"/> from the <see cref="IHost"/> <see cref="IHost.Services"/>.
@@ -31,6 +39,7 @@ public static class HostExtensions
     /// <param name="configureClient">The optional <see cref="ConfigureDolittleClient"/> callback.</param>
     /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> used if the <see cref="IDolittleClient"/> needs to connect.</param>
     /// <returns>A <see cref="Task{TResult}"/> that, when resolved, returns the connected <see cref="IDolittleClient"/>.</returns>
-    public static Task<IDolittleClient> GetDolittleClient(this IHost host, ConfigureDolittleClient configureClient = default, CancellationToken cancellationToken = default)
+    public static Task<IDolittleClient> GetDolittleClient(this IHost host, ConfigureDolittleClient configureClient = default,
+        CancellationToken cancellationToken = default)
         => host.Services.GetDolittleClient(configureClient, cancellationToken);
 }

@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Diagnostics;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -57,20 +58,32 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// <inheritdoc/>
     public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken)
     {
-        if (!TryGetAggregateRoot(_eventSourceId, out var aggregateRoot, out var exception))
+        using var activity = Tracing.ActivitySource.StartActivity()
+            ?.Tag(_eventSourceId);
+
+        try
         {
-            throw new CouldNotGetAggregateRoot(typeof(TAggregate), _eventSourceId, exception.Message);
+            if (!TryGetAggregateRoot(_eventSourceId, out var aggregateRoot, out var exception))
+            {
+                throw new CouldNotGetAggregateRoot(typeof(TAggregate), _eventSourceId, exception.Message);
+            }
+
+            var aggregateRootId = aggregateRoot.GetAggregateRootId();
+            activity?.Tag(aggregateRootId);
+            await ReApplyEvents(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
+
+            _logger.PerformingOn(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.EventSourceId);
+            await method(aggregateRoot).ConfigureAwait(false);
+
+            if (aggregateRoot.AppliedEvents.Any())
+            {
+                await CommitAppliedEvents(aggregateRoot, aggregateRootId).ConfigureAwait(false);
+            }
         }
-
-        var aggregateRootId = aggregateRoot.GetAggregateRootId();
-        await ReApplyEvents(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
-
-        _logger.PerformingOn(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.EventSourceId);
-        await method(aggregateRoot).ConfigureAwait(false);
-
-        if (aggregateRoot.AppliedEvents.Any())
+        catch (Exception e)
         {
-            await CommitAppliedEvents(aggregateRoot, aggregateRootId).ConfigureAwait(false);
+            activity?.RecordError(e);
+            throw;
         }
     }
 

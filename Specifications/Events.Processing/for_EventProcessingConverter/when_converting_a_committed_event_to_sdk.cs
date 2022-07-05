@@ -35,7 +35,7 @@ public class when_converting_a_committed_event_to_sdk : given.a_converter
                 {
                     new Claim("bibetudicu", "efajeakuga", "wovawjohoa"),
                 }),
-                CultureInfo.InvariantCulture),
+                CultureInfo.InvariantCulture, null),
             new EventType("836faf72-6212-4351-adad-89bc1d7964c6", 3421559541),
             new object(),
             true);

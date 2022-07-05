@@ -238,7 +238,7 @@ public class DolittleClient : IDisposable, IDolittleClient
 #endif
                 });
             var methodCaller = new MethodCaller(_grpcChannel, configuration.RuntimeHost, configuration.RuntimePort);
-            var (executionContext, tenants) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            var (executionContext, tenants, otlpEndpoint) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
             Tenants = tenants;
 
             await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext, tenants).ConfigureAwait(false);

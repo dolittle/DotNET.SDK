@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
@@ -33,7 +34,8 @@ public class when_getting_event_context
                 {
                     new Claim("zizgukouwl", "kegefobeci", "kiajrabija")
                 }),
-                CultureInfo.InvariantCulture),
+                CultureInfo.InvariantCulture,
+                ActivitySpanId.CreateFromString("b00db00db00cb00a")),
             new EventType("c2bf94fd-491f-494a-bbf6-f3ef397bf5fc", 76),
             new object(),
             false);
@@ -48,7 +50,8 @@ public class when_getting_event_context
             {
                 new Claim("janduthiwl", "wivjuwpesm", "vohocecouw")
             }),
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture,
+            ActivitySpanId.CreateFromString("b00cb00cb00cb00c"));
     };
 
     Because of = () => event_context = committed_event.GetEventContext(current_execution_context);
