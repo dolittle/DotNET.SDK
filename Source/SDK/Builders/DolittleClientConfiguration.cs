@@ -1,19 +1,22 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable enable
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
+
 namespace Dolittle.SDK.Builders;
 
 /// <summary>
 /// Represents the <see cref="IDolittleClient"/> configuration.
 /// </summary>
-public class DolittleClientConfiguration : IConfigurationBuilder
+public class DolittleClientConfiguration : IConfigurationBuilder, IDolittleClientConfiguration
 {
     /// <summary>
     /// Gets or sets the <see cref="Version"/> of the Head.
@@ -40,6 +43,8 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// </summary>
     public Func<JsonSerializerSettings> EventSerializerProvider { get; private set; } = () => new JsonSerializerSettings();
 
+    public Func<OpenTelemetrySettings> OpenTelemetrySettingsProvider { get; private set; } = () => new OpenTelemetrySettings();
+
     /// <summary>
     /// Gets or sets the<see cref="ILoggerFactory"/>.
     /// </summary>
@@ -53,11 +58,6 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// Gets or sets the<see cref="IServiceProvider"/>.
     /// </summary>
     public IServiceProvider ServiceProvider { get; private set; }
-
-    /// <summary>
-    /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
-    /// </summary>
-    public ConfigureTenantServices ConfigureTenantServices { get; private set; }
     
     /// <summary>
     /// Gets or sets the <see cref="Func{TResult}"/> factory for <see cref="DependencyInversion.CreateTenantContainer"/>.
@@ -69,6 +69,11 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// </summary>
     public CreateTenantContainer CreateTenantContainer { get; private set; }
     
+
+    /// <summary>
+    /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
+    /// </summary>
+    public ConfigureTenantServices? ConfigureTenantServices { get; private set; }
 
     /// <summary>
     /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
@@ -85,20 +90,32 @@ public class DolittleClientConfiguration : IConfigurationBuilder
             {
                 result.RuntimeHost = config.Runtime.Host;
             }
-        
+
             if (runtime.Port.HasValue)
             {
                 result.RuntimePort = runtime.Port.Value;
             }
         }
+
         if (config.PingInterval.HasValue)
         {
             result.PingInterval = TimeSpan.FromSeconds(config.PingInterval.Value);
         }
+
         if (!string.IsNullOrEmpty(config.HeadVersion))
         {
             result.Version = new VersionConverter().FromString(config.HeadVersion);
         }
+
+        if (config.Otlp is { })
+        {
+            result.OpenTelemetrySettingsProvider = () => new OpenTelemetrySettings
+            {
+                Endpoint = config.Otlp.Endpoint,
+                ServiceName = config.Otlp.ServiceName,
+            };
+        }
+
         return result;
     }
     
@@ -133,6 +150,19 @@ public class DolittleClientConfiguration : IConfigurationBuilder
             jsonSerializerSettingsBuilder?.Invoke(settings);
             return settings;
         };
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IConfigurationBuilder WithOpenTelemetrySettings(Action<OpenTelemetrySettings> openTelemetrySettingsBuilder)
+    {
+        OpenTelemetrySettingsProvider = () =>
+        {
+            var settings = OpenTelemetrySettingsProvider();
+            openTelemetrySettingsBuilder.Invoke(settings);
+            return settings;
+        };
+
         return this;
     }
 

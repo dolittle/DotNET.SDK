@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +16,7 @@
     <ProjectReference Include="../Microservices/Microservices.csproj" />
     <ProjectReference Include="../Tenancy/Tenancy.csproj" />
     <ProjectReference Include="../Security/Security.csproj" />
+    <ProjectReference Include="..\Diagnostics\Diagnostics.csproj" />
   </ItemGroup>
 
 </Project>

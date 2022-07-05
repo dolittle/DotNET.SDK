@@ -18,6 +18,7 @@
         <ProjectReference Include="../Events/Events.csproj" />
         <ProjectReference Include="../Events.Processing/Events.Processing.csproj" />
         <ProjectReference Include="../Protobuf/Protobuf.csproj" />
+        <ProjectReference Include="..\Diagnostics\Diagnostics.csproj" />
     </ItemGroup>
     
 </Project>

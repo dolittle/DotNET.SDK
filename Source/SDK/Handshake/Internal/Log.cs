@@ -16,8 +16,11 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Debug, "Performing handshake between Head v{HeadVersion} using Dolittle DotNET SDK v{SDKVersion} using version {ContractsVersion} Contracts and Dolittle Runtime")]
     internal static partial void PerformHandshake(this ILogger logger, Version headVersion, Version sdkVersion, Version contractsVersion);
 
-    [LoggerMessage(0, LogLevel.Debug, "Error performing handshake with Dolittle Runtime")]
+    [LoggerMessage(0, LogLevel.Error, "Error performing handshake with Dolittle Runtime")]
     internal static partial void ErrorPerformingHandshake(this ILogger logger, Exception ex);
+    
+    [LoggerMessage(0, LogLevel.Warning, "Failed to parse OTLP endpoint: {OtlpEndpoint}")]
+    internal static partial void InvalidOtlpEndpoint(this ILogger logger, string otlpEndpoint);
 
     [LoggerMessage(0, LogLevel.Warning, "Dolittle Runtime failed performing handshake. ({FailureId}){FailureReason}")]
     internal static partial void HandshakeFailedResponse(this ILogger logger, FailureReason failureReason, FailureId failureId);

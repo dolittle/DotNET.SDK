@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Dolittle.Services.Contracts;
@@ -15,9 +16,13 @@ public class CallContextResolver : IResolveCallContext
 {
     /// <inheritdoc/>
     public CallRequestContext ResolveFrom(ExecutionContext executionContext)
-        => new()
+    {
+        var context = executionContext.ToProtobuf();
+        Activity.Current?.PropagateTraceContext(context);
+        return new()
         {
             HeadId = HeadId.NotSet.Value.ToProtobuf(),
-            ExecutionContext = executionContext.ToProtobuf()
+            ExecutionContext = context
         };
+    }
 }

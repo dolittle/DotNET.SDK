@@ -37,7 +37,7 @@ public class an_event_horizons
                 new Claim("kesoifzatf", "pupboowuep", "jihisgocru"),
                 new Claim("tazgecmiuc", "ridpezvado", "achizuwrag"),
             }),
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture, null);
 
         var logger = Mock.Of<ILogger>();
 
