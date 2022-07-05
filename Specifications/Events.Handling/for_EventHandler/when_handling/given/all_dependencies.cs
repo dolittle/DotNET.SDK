@@ -28,7 +28,7 @@ public class all_dependencies : an_event_handler
                 "some environment",
                 "281beded-b881-4f8c-a78e-260a15497adf",
                 Security.Claims.Empty,
-                CultureInfo.InvariantCulture),
+                CultureInfo.InvariantCulture, null),
             new Execution.ExecutionContext(
                 "d4810912-cb58-43d4-b3a2-f8b8a3530d64",
                 "dcc97ef3-0165-4881-9f3d-d7368b7a47b0",
@@ -36,7 +36,7 @@ public class all_dependencies : an_event_handler
                 "some environment",
                 "1451deb6-59e8-4f11-8c8e-88884e1fb7a8",
                 Security.Claims.Empty,
-                CultureInfo.InvariantCulture));
+                CultureInfo.InvariantCulture, null));
         @event = new object();
         service_provider = new Mock<IServiceProvider>();
     };

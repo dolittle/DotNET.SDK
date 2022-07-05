@@ -1,8 +1,11 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Diagnostics;
+using Dolittle.Runtime.Events.Contracts;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Services;
@@ -52,28 +55,39 @@ public class EventCommitter : ICommitEvents
     /// <inheritdoc/>
     public async Task<CommittedEvents> Commit(UncommittedEvents uncommittedEvents, CancellationToken cancellationToken = default)
     {
-        _logger.CommittingEvents(uncommittedEvents.Count);
+        using var activity = Tracing.ActivitySource.StartActivity()
+            ?.Tag(uncommittedEvents);
 
-        if (!_toProtobuf.TryConvert(uncommittedEvents, out var protobufEvents, out var error))
+        try
         {
-            _logger.UncommittedEventsCouldNotBeConverted(error);
+            _logger.CommittingEvents(uncommittedEvents.Count);
+
+            if (!_toProtobuf.TryConvert(uncommittedEvents, out var protobufEvents, out var error))
+            {
+                _logger.UncommittedEventsCouldNotBeConverted(error);
+                throw error;
+            }
+
+            var request = new CommitEventsRequest
+            {
+                CallContext = _callContextResolver.ResolveFrom(_executionContext)
+            };
+            request.Events.AddRange(protobufEvents);
+
+            var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
+            response.Failure.ThrowIfFailureIsSet();
+
+            if (_toSDK.TryConvert(response.Events, out var committedEvents, out error))
+            {
+                return committedEvents;
+            }
+            _logger.CommittedEventsCouldNotBeConverted(error);
             throw error;
         }
-
-        var request = new Runtime.Events.Contracts.CommitEventsRequest
+        catch (Exception e)
         {
-            CallContext = _callContextResolver.ResolveFrom(_executionContext)
-        };
-        request.Events.AddRange(protobufEvents);
-
-        var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
-        response.Failure.ThrowIfFailureIsSet();
-
-        if (_toSDK.TryConvert(response.Events, out var committedEvents, out error))
-        {
-            return committedEvents;
+            activity?.RecordError(e);
+            throw;
         }
-        _logger.CommittedEventsCouldNotBeConverted(error);
-        throw error;
     }
 }

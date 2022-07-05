@@ -17,7 +17,7 @@ public class DolittleClientService : IHostedService, IDisposable
 {
     readonly IDolittleClient _dolittleClient;
     readonly DolittleClientConfiguration _clientConfiguration;
-    ILogger _logger;
+    ILogger? _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClientService"/> class.

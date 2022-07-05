@@ -18,6 +18,7 @@
         <Copyright>Copyright Dolittle</Copyright>
         <Authors>all contributors</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     
     <ItemGroup>

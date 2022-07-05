@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Diagnostics;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Execution;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Copies;
 
@@ -56,7 +58,7 @@ public class Projection<TReadModel> : IProjection<TReadModel>
         ScopeId scopeId,
         IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
         ProjectionCopies copies)
-        :this(identifier, scopeId, onMethods, copies)
+        : this(identifier, scopeId, onMethods, copies)
     {
         Alias = alias;
         HasAlias = true;
@@ -87,17 +89,31 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public bool HasAlias { get; }
 
     /// <inheritdoc/>
-    public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context, CancellationToken cancellation)
+    public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context,
+        CancellationToken cancellation)
     {
-        if (!_onMethods.TryGetValue(eventType, out var method))
+        using var activity = context.EventContext.CommittedExecutionContext.StartChildActivity("Projection on " + @event.GetType().Name)
+            ?.Tag(eventType);
+
+        try
         {
-            throw new MissingOnMethodForEventType(eventType);
+            if (!_onMethods.TryGetValue(eventType, out var method))
+            {
+                throw new MissingOnMethodForEventType(eventType);
+            }
+
+            var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
+            if (tryOn.Exception != default)
+            {
+                throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
+            }
+
+            return tryOn.Result;
         }
-        var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
-        if (tryOn.Exception != default)
+        catch (Exception e)
         {
-            throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
+            activity?.RecordError(e);
+            throw;
         }
-        return tryOn.Result;
     }
 }

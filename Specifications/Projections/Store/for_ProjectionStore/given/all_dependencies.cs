@@ -43,7 +43,7 @@ public class all_dependencies
             "Some ENV",
             "A36492C2-786A-4210-941E-BFAF1A682607",
             Claims.Empty,
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture, null);
         read_model_types = new ProjectionReadModelTypes();
         projection_store = new ProjectionStore(
             method_caller.Object,

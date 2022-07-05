@@ -26,7 +26,7 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
             "environment",
             "d3f22054-f487-4ce6-8831-3283d881e282",
             Claims.Empty,
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture, null);
     };
 
     public static CommittedAggregateEvents build_committed_events(EventSourceId eventSource, AggregateRootId aggregateRootId, ExecutionContext executionContext)

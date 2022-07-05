@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Globalization;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Security;
@@ -16,6 +17,7 @@ public class an_execution_context
     protected static Version version;
     protected static Environment environment;
     protected static CorrelationId correlation_id;
+    protected static ActivitySpanId span_id;
     protected static Claims claims;
     protected static CultureInfo culture_info;
     protected static ExecutionContext execution_context;
@@ -29,6 +31,7 @@ public class an_execution_context
         correlation_id = "d1fa2359-52a9-479f-9b6d-72c6f72d7c3b";
         claims = new Claims(new[] { new Claim("some name", "some value", "some value type") });
         culture_info = CultureInfo.InvariantCulture;
-        execution_context = new ExecutionContext(microservice, tenant, version, environment, correlation_id, claims, culture_info);
+        span_id = ActivitySpanId.CreateFromString("cafecafecafecafe");
+        execution_context = new ExecutionContext(microservice, tenant, version, environment, correlation_id, claims, culture_info, span_id);
     };
 }

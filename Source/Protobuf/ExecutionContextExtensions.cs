@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
@@ -81,6 +82,12 @@ public static class ExecutionContextExtensions
             return false;
         }
 
+        ActivitySpanId? spanId = null;
+        if (source.HasSpanId)
+        {
+            spanId = ActivitySpanId.CreateFromBytes(source.SpanId.Span);
+        }
+
         executionContext = new ExecutionContext(
             microserviceId,
             tenantId,
@@ -88,7 +95,8 @@ public static class ExecutionContextExtensions
             source.Environment,
             correlationId,
             claims,
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture,
+            spanId);
         error = null;
         return true;
     }

@@ -37,7 +37,7 @@ public class all_dependencies : an_event_handler_processor
             "an environment",
             "c1da9511-f1af-431e-86e3-69141a391e91",
             Security.Claims.Empty,
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture, null);
         event_to_handle = new some_event { some_string = "hello world" };
         event_type_to_handle = handled_event_types.First();
         committed_event = new PbCommittedEvent

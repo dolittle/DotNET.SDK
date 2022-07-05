@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -45,6 +46,13 @@ public interface IConfigurationBuilder
     public IConfigurationBuilder WithEventSerializerSettings(Action<JsonSerializerSettings> jsonSerializerSettingsBuilder);
 
     /// <summary>
+    /// Sets a callback that configures the <see cref="JsonSerializerSettings"/> for serializing events.
+    /// </summary>
+    /// <param name="openTelemetrySettingsBuilder"><see cref="Action{T}"/> that gets called with <see cref="OpenTelemetrySettings"/> to modify settings.</param>
+    /// <returns>the client configuration builder for continuation.</returns>
+    public IConfigurationBuilder WithOpenTelemetrySettings(Action<OpenTelemetrySettings> openTelemetrySettingsBuilder);
+
+    /// <summary>
     /// Sets the ping interval for communicating with the microservice.
     /// </summary>
     /// <param name="interval">The ping interval.</param>
@@ -64,4 +72,44 @@ public interface IConfigurationBuilder
     /// <param name="configureTenantServices">The <see cref="ConfigureTenantServices"/> callback.</param>
     /// <returns>The client for continuation.</returns>
     public IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices);
+
+    /// <summary>
+    /// Configures the root <see cref="IServiceProvider"/> for the <see cref="IDolittleClient"/> as well as the <see cref="CreateTenantContainer"/> delegate for creating tenant containers
+    /// from the <typeparamref name="TContainer"/> root container.
+    /// </summary>
+    /// <param name="container">The root container.</param>
+    /// <param name="creator">The <see cref="ICreateTenantContainers{TContainer}"/>.</param>
+    /// <typeparam name="TContainer">The <see cref="Type"/> of the root container.</typeparam>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithRootContainerAndTenantContainerCreator<TContainer>(TContainer container, ICreateTenantContainers<TContainer> creator)
+        where TContainer : class, IServiceProvider;
+
+    /// <summary>
+    /// Configures the <see cref="CreateTenantContainer"/> delegate for creating tenant containers
+    /// from the <typeparamref name="TContainer"/> root container.
+    /// </summary>
+    /// <param name="factory">The <see cref="Func{TResult}"/> factory for creating a <see cref="ICreateTenantContainers{TContainer}"/> from a <typeparamref name="TContainer"/>.</param>
+    /// <typeparam name="TContainer">The <see cref="Type"/> of the root container.</typeparam>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithTenantContainerCreator<TContainer>(Func<TContainer, ICreateTenantContainers<TContainer>> factory)
+        where TContainer : class, IServiceProvider;
+
+    /// <summary>
+    /// Configures the <see cref="CreateTenantContainer"/> delegate for creating tenant containers
+    /// from the <typeparamref name="TContainer"/> root container.
+    /// </summary>
+    /// <param name="creator">The <see cref="ICreateTenantContainers{TContainer}"/>.</param>
+    /// <typeparam name="TContainer">The <see cref="Type"/> of the root container.</typeparam>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithTenantContainerCreator<TContainer>(ICreateTenantContainers<TContainer> creator)
+        where TContainer : class, IServiceProvider;
+    
+    /// <summary>
+    /// Configures the <see cref="CreateTenantContainer"/> delegate for creating tenant containers
+    /// from the <typeparamref name="TContainer"/> root container.
+    /// </summary>
+    /// <typeparam name="TContainer">The <see cref="Type"/> of the root container.</typeparam>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithTenantContainerCreator<TContainer>()
+        where TContainer : class, IServiceProvider;
 }

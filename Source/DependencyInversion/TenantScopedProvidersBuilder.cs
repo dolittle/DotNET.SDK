@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Dolittle.SDK.DependencyInversion;
 
@@ -32,45 +30,20 @@ public class TenantScopedProvidersBuilder
     /// <summary>
     /// Builds the <see cref="ITenantScopedProviders"/>.
     /// </summary>
-    /// <param name="rootServiceProvider">The root <see cref="IServiceProvider"/>.</param>
     /// <param name="tenants">The list of <see cref="TenantId"/> to make tenant scoped <see cref="IServiceProvider"/> for.</param>
+    /// <param name="createTenantContainer">The callback for creating tenant containers.</param>
     /// <returns>The built <see cref="ITenantScopedProviders"/>.</returns>
-    public ITenantScopedProviders Build(IServiceProvider rootServiceProvider, HashSet<TenantId> tenants)
-    {
-        var tenantScopedContainerCreators = rootServiceProvider.GetService<IEnumerable<ICanCreateTenantScopedContainer>>()?.ToArray() ?? Array.Empty<ICanCreateTenantScopedContainer>();
-        var tenantScopedContainerCreator = tenantScopedContainerCreators.Length switch
-        {
-            0 => new TenantScopedContainerCreator(),
-            1 => tenantScopedContainerCreators[0],
-            _ => throw new MultipleTenantScopedContainerCreatorsUsed()
-        };
-        return new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider, tenantScopedContainerCreator)));
-    }
+    public ITenantScopedProviders Build(HashSet<TenantId> tenants, CreateTenantContainer createTenantContainer)
+        => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, createTenantContainer)));
 
-    IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider, ICanCreateTenantScopedContainer tenantScopedContainerCreator)
+    IServiceProvider CreateTenantContainer(TenantId tenant, CreateTenantContainer createTenantContainer)
     {
-        var logger = rootServiceProvider.GetService<ILogger<TenantScopedProvidersBuilder>>() ?? NullLogger<TenantScopedProvidersBuilder>.Instance;
-        if (!tenantScopedContainerCreator.CanCreateFrom(rootServiceProvider))
-        {
-            throw new TenantScopedContainerCreatorCannotCreateFromRootServiceProvider(tenantScopedContainerCreator, rootServiceProvider);
-        }
-
         var services = new ServiceCollection();
         foreach (var configure in _configureServicesForTenantCallbacks)
         {
             configure?.Invoke(tenant, services);
         }
         services.AddSingleton(tenant);
-        if (tenantScopedContainerCreator is not TenantScopedContainerCreator)
-        {
-            return tenantScopedContainerCreator.Create(rootServiceProvider, services);
-        }
-
-        logger.LogWarning("Using the default TenantScopedContainerCreator using Microsoft's dependency injection framework. This is limited as it does not support singleton services that are not registered as a value");
-        if (services.Any(_ => _.Lifetime == ServiceLifetime.Singleton && _.ImplementationInstance == null))
-        {
-            throw new CannotRegisterSingletonDependenciesOnTenantScopedContainer();
-        }
-        return tenantScopedContainerCreator.Create(rootServiceProvider, services);
+        return createTenantContainer(services);
     }
 }

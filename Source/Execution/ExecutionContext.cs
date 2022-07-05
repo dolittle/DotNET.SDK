@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Globalization;
 using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Security;
@@ -25,4 +26,5 @@ public record ExecutionContext(
     Environment Environment,
     CorrelationId CorrelationId,
     Claims Claims,
-    CultureInfo Culture);
+    CultureInfo Culture,
+    ActivitySpanId? SpanId = null);
