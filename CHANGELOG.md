@@ -1,3 +1,14 @@
+# [17.1.0] - 2022-7-5 [PR: #145](https://github.com/dolittle/DotNET.SDK/pull/145)
+## Summary
+
+Sets up tracing by default using Open Telemetry and exporting with OTLP. The tracing configuration is configurable through code using the `.UseDolittle()` API. By default the OTLP endpoint is set with the `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable. If that is not set it uses `http://localhost:4317`
+
+### Added
+
+- Automatic setup of tracing though OTLP by convention feeding traces and logs to endpoint set with the `OTEL_EXPORTER_OTLP_ENDPOINT` environment.
+- Tracing on multiple important actions in the SDK like committing and handling events
+
+
 # [17.0.2] - 2022-6-21 [PR: #147](https://github.com/dolittle/DotNET.SDK/pull/147)
 ## Summary
 
