@@ -3,7 +3,7 @@
 
 namespace Dolittle.SDK.Artifacts.for_Artifacts.given;
 
-public record artifact_type : Artifact<ArtifactId>
+public class artifact_type : Artifact<ArtifactId>
 {
     public artifact_type(ArtifactId id)
         : base(id)

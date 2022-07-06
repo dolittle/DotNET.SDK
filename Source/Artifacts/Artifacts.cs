@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Artifacts;
 /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
 public abstract class Artifacts<TArtifact, TId> : UniqueBindings<TArtifact, Type>, IArtifacts<TArtifact, TId>
-    where TArtifact : Artifact<TId>, IEquatable<TArtifact>
+    where TArtifact : Artifact<TId>
     where TId : ArtifactId
 {
     /// <summary>
