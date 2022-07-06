@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Common.ClientSetup;
@@ -11,6 +12,11 @@ namespace Dolittle.SDK.Common.ClientSetup;
 /// </summary>
 public interface IClientBuildResults
 {
+    /// <summary>
+    /// Gets all <see cref="ClientBuildResult"/>.
+    /// </summary>
+    IEnumerable<ClientBuildResult> All { get; }
+
     /// <summary>
     /// Gets a value indicating whether the client building failed or not.
     /// </summary>

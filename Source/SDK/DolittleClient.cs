@@ -255,7 +255,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         }
     }
 
-    static Task<ConnectionResult> ConnectToRuntime(IPerformMethodCalls methodCaller, DolittleClientConfiguration configuration, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    Task<ConnectionResult> ConnectToRuntime(IPerformMethodCalls methodCaller, DolittleClientConfiguration configuration, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
     {
         var runtimeConnector = new DolittleRuntimeConnector(
             configuration.RuntimeHost,
@@ -263,6 +263,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             configuration.Version,
             new HandshakeClient(methodCaller, loggerFactory.CreateLogger<HandshakeClient>()),
             new TenantsClient(methodCaller, loggerFactory.CreateLogger<TenantsClient>()),
+            _buildResults.All,
             loggerFactory.CreateLogger<DolittleRuntimeConnector>());
         
         return runtimeConnector.ConnectForever(cancellationToken);

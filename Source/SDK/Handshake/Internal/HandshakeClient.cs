@@ -2,9 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Handshake.Contracts;
+using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
@@ -35,7 +38,7 @@ public class HandshakeClient : IPerformHandshake
     }
 
     /// <inheritdoc />
-    public async Task<HandshakeResult> Perform(uint attemptNum, TimeSpan timeSpent, Version headVersion, CancellationToken cancellationToken)
+    public async Task<HandshakeResult> Perform(uint attemptNum, TimeSpan timeSpent, Version headVersion, IEnumerable<ClientBuildResult> buildResults, CancellationToken cancellationToken)
     {
         try
         {
@@ -49,8 +52,8 @@ public class HandshakeClient : IPerformHandshake
                 SdkVersion = sdkVersion.ToProtobuf(),
                 HeadVersion = headVersion.ToProtobuf(),
                 Attempt = attemptNum,
-                TimeSpent = timeSpent.ToDuration()
-                
+                TimeSpent = timeSpent.ToDuration(),
+                BuildResults = {buildResults.Select(_ => _.ToProtobuf())}
             };
             var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
             if (response.Failure != null)

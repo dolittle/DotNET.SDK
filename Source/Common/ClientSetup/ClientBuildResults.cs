@@ -15,6 +15,9 @@ public class ClientBuildResults : IClientBuildResults
     readonly List<ClientBuildResult> _results = new();
 
     /// <inheritdoc />
+    public IEnumerable<ClientBuildResult> All => _results;
+
+    /// <inheritdoc />
     public void Add(ClientBuildResult result)
     {
         if (result.IsFailed)
