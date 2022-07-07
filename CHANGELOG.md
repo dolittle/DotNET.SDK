@@ -1,3 +1,10 @@
+# [17.1.1] - 2022-7-7 [PR: #143](https://github.com/dolittle/DotNET.SDK/pull/143)
+## Summary
+### Fixed
+
+- A bug where if there were errors while adding decorated event handler methods it would not try to add convention event handler methods
+
+
 # [17.1.0] - 2022-7-5 [PR: #145](https://github.com/dolittle/DotNET.SDK/pull/145)
 ## Summary
 
