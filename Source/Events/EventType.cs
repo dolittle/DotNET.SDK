@@ -38,7 +38,7 @@ public class EventType : Artifact<EventTypeId>
         : this(id, generation, null)
     {
     }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EventType"/> class.
     /// </summary>

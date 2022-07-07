@@ -8,8 +8,6 @@ using Dolittle.SDK.Concepts;
 
 namespace Dolittle.SDK.Artifacts;
 
-
-
 /// <summary>
 /// Represents the base representation of an artifact.
 /// </summary>
@@ -89,7 +87,7 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
         {
             return true;
         }
-        return obj.GetType() == this.GetType() && Equals((Artifact<TId>) obj);
+        return obj.GetType() == GetType() && Equals((Artifact<TId>) obj);
     }
 
     /// <inheritdoc />
