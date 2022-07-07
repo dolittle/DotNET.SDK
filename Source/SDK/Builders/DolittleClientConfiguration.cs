@@ -16,37 +16,40 @@ namespace Dolittle.SDK.Builders;
 /// <summary>
 /// Represents the <see cref="IDolittleClient"/> configuration.
 /// </summary>
-public class DolittleClientConfiguration : IConfigurationBuilder, IDolittleClientConfiguration
+public class DolittleClientConfiguration : IConfigurationBuilder
 {
     /// <summary>
-    /// Gets or sets the <see cref="Version"/> of the Head.
+    /// Gets the <see cref="Version"/> of the Head.
     /// </summary>
     public Version Version { get; private set; } = Version.NotSet;
 
     /// <summary>
-    /// Gets or sets the Runtime host.
+    /// Gets the Runtime host.
     /// </summary>
     public string RuntimeHost { get; private set; } = "localhost";
 
     /// <summary>
-    /// Gets or sets theRuntime port.
+    /// Gets the Runtime port.
     /// </summary>
     public ushort RuntimePort { get; private set; } = 50053;
 
     /// <summary>
-    /// Gets or sets the ping-interval <see cref="TimeSpan"/>.
+    /// Gets the ping-interval <see cref="TimeSpan"/>.
     /// </summary>
     public TimeSpan PingInterval { get; private set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// Gets or sets the event serializer provider.
+    /// Gets the event serializer provider.
     /// </summary>
     public Func<JsonSerializerSettings> EventSerializerProvider { get; private set; } = () => new JsonSerializerSettings();
 
+    /// <summary>
+    /// Gets the OpenTelemetry settings provider.
+    /// </summary>
     public Func<OpenTelemetrySettings> OpenTelemetrySettingsProvider { get; private set; } = () => new OpenTelemetrySettings();
 
     /// <summary>
-    /// Gets or sets the<see cref="ILoggerFactory"/>.
+    /// Gets the <see cref="ILoggerFactory"/>.
     /// </summary>
     public ILoggerFactory LoggerFactory { get; private set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
     {
@@ -55,23 +58,23 @@ public class DolittleClientConfiguration : IConfigurationBuilder, IDolittleClien
     });
 
     /// <summary>
-    /// Gets or sets the<see cref="IServiceProvider"/>.
+    /// Gets the<see cref="IServiceProvider"/>.
     /// </summary>
     public IServiceProvider ServiceProvider { get; private set; }
     
     /// <summary>
-    /// Gets or sets the <see cref="Func{TResult}"/> factory for <see cref="DependencyInversion.CreateTenantContainer"/>.
+    /// Gets the <see cref="Func{TResult}"/> factory for <see cref="DependencyInversion.CreateTenantContainer"/>.
     /// </summary>
     public Func<IServiceProvider, CreateTenantContainer> CreateTenantContainerFactory { get; private set; }
 
     /// <summary>
-    /// Gets or sets the <see cref="DependencyInversion.CreateTenantContainer"/>.
+    /// Gets the <see cref="DependencyInversion.CreateTenantContainer"/>.
     /// </summary>
     public CreateTenantContainer CreateTenantContainer { get; private set; }
     
 
     /// <summary>
-    /// Gets or sets the<see cref="ConfigureTenantServices"/> callback.
+    /// Gets the<see cref="ConfigureTenantServices"/> callback.
     /// </summary>
     public ConfigureTenantServices? ConfigureTenantServices { get; private set; }
 
@@ -83,18 +86,15 @@ public class DolittleClientConfiguration : IConfigurationBuilder, IDolittleClien
     public static DolittleClientConfiguration FromConfiguration(Configurations.Dolittle config)
     {
         var result = new DolittleClientConfiguration();
-        if (config.Runtime != default)
+        
+        if (!string.IsNullOrEmpty(config.Runtime.Host))
         {
-            var runtime = config.Runtime;
-            if (!string.IsNullOrEmpty(runtime.Host))
-            {
-                result.RuntimeHost = config.Runtime.Host;
-            }
+            result.RuntimeHost = config.Runtime.Host!;
+        }
 
-            if (runtime.Port.HasValue)
-            {
-                result.RuntimePort = runtime.Port.Value;
-            }
+        if (config.Runtime.Port.HasValue)
+        {
+            result.RuntimePort = config.Runtime.Port.Value;
         }
 
         if (config.PingInterval.HasValue)
@@ -107,7 +107,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder, IDolittleClien
             result.Version = new VersionConverter().FromString(config.HeadVersion);
         }
 
-        if (config.Otlp is { })
+        if (config.Otlp is not null)
         {
             result.OpenTelemetrySettingsProvider = () => new OpenTelemetrySettings
             {
