@@ -1,3 +1,13 @@
+# [17.1.2] - 2022-7-7 [PR: #153](https://github.com/dolittle/DotNET.SDK/pull/153)
+## Summary
+
+Fixes a problem with Artifacts caused event types with specified Alias to cause exception when being handled by an event handler
+
+### Fixed
+
+- EventType with explicit Alias should now work.
+
+
 # [17.1.1] - 2022-7-7 [PR: #143](https://github.com/dolittle/DotNET.SDK/pull/143)
 ## Summary
 ### Fixed
