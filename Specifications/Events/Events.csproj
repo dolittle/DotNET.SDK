@@ -4,6 +4,7 @@
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events.Specs</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Events</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
