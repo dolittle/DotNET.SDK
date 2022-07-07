@@ -8,16 +8,15 @@ namespace Dolittle.SDK.Events;
 /// <summary>
 /// Represents the type of an event.
 /// </summary>
-public record EventType : Artifact<EventTypeId>
+public class EventType : Artifact<EventTypeId>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EventType"/> class.
     /// </summary>
     /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
     public EventType(EventTypeId id)
-        : base(id)
+        : this(id, Generation.First, null)
     {
-        ThrowIfEventTypeIdIsNull(id);
     }
 
     /// <summary>
@@ -26,11 +25,8 @@ public record EventType : Artifact<EventTypeId>
     /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
     /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the <see cref="EventType"/>.</param>
     public EventType(EventTypeId id, EventTypeAlias alias)
-        : base(id)
+        : this(id, Generation.First, alias)
     {
-        ThrowIfEventTypeIdIsNull(id);
-        Alias = alias;
-        HasAlias = true;
     }
 
     /// <summary>
@@ -39,10 +35,8 @@ public record EventType : Artifact<EventTypeId>
     /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
     /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="EventType"/>.</param>
     public EventType(EventTypeId id, Generation generation)
-        : base(id, generation)
+        : this(id, generation, null)
     {
-        ThrowIfEventTypeIdIsNull(id);
-        ThrowIfGenerationIsNull(generation);
     }
 
     /// <summary>
@@ -57,18 +51,17 @@ public record EventType : Artifact<EventTypeId>
         ThrowIfEventTypeIdIsNull(id);
         ThrowIfGenerationIsNull(generation);
         Alias = alias;
-        HasAlias = true;
     }
 
     /// <summary>
     /// Gets the alias for the Event Type.
     /// </summary>
-    public EventTypeAlias Alias { get; }
+    public EventTypeAlias? Alias { get; }
 
     /// <summary>
     /// Gets a value indicating whether the Event Type has an alias or not.
     /// </summary>
-    public bool HasAlias { get; }
+    public bool HasAlias => !string.IsNullOrEmpty(Alias?.Value);
 
     static void ThrowIfEventTypeIdIsNull(EventTypeId id)
     {

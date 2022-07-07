@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Concepts;
 
@@ -11,9 +12,7 @@ namespace Dolittle.SDK.Artifacts;
 /// Represents the base representation of an artifact.
 /// </summary>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-/// <param name="Id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
-/// <param name="Generation"><see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.</param>
-public abstract record Artifact<TId>(TId Id, Generation Generation) : IIdentifier<TId>
+public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>>
     where TId : ArtifactId
 {
     /// <summary>
@@ -24,6 +23,27 @@ public abstract record Artifact<TId>(TId Id, Generation Generation) : IIdentifie
         : this(id, Generation.First)
     {
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Artifact{TId}"/> class.
+    /// </summary>
+    /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
+    /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.</param>
+    protected Artifact(TId id, Generation generation)
+    {
+        Id = id;
+        Generation = generation;
+    }
+    
+    /// <summary>
+    /// Gets the <typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.
+    /// </summary>
+    public TId Id { get; }
+
+    /// <summary>
+    /// Gets the <see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.
+    /// </summary>
+    public Generation Generation { get; }
 
     /// <inheritdoc />
     Guid IIdentifier.Id => Id.Value;
@@ -41,4 +61,36 @@ public abstract record Artifact<TId>(TId Id, Generation Generation) : IIdentifie
 
     /// <inheritdoc />
     public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith(typedIdentifier);
+
+    /// <inheritdoc />
+    public bool Equals(Artifact<TId> other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+        return EqualityComparer<TId>.Default.Equals(Id, other.Id) && Equals(Generation, other.Generation);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+        return obj.GetType() == GetType() && Equals((Artifact<TId>) obj);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+        => HashCode.Combine(Id, Generation);
 }
