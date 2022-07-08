@@ -224,6 +224,8 @@ public class DolittleClient : IDisposable, IDolittleClient
                 throw new CannotConnectDolittleClientMultipleTimes();
             }
             
+            AddDefaultsFromServiceProviderInConfiguration(configuration);
+            
             var loggerFactory = configuration.LoggerFactory;
             _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
             _grpcChannel = GrpcChannel.ForAddress(
@@ -424,6 +426,30 @@ public class DolittleClient : IDisposable, IDolittleClient
         }
 
         return service;
+    }
+
+    static void AddDefaultsFromServiceProviderInConfiguration(DolittleClientConfiguration config)
+    {
+        if (config.ServiceProvider is null)
+        {
+            return;
+        }
+
+        if (config.LoggerFactory is null)
+        {
+            var loggerFactory = config.ServiceProvider.GetService<ILoggerFactory>();
+            config.WithLogging(loggerFactory ?? LoggerFactory.Create(_ =>
+                {
+                    _.SetMinimumLevel(LogLevel.Information);
+                    _.AddConsole();
+                }));
+        }
+
+        if (config.TenantServiceProviderFactory is null)
+        {
+            // Resolve the ICreateTenantContainerThing
+            config.WithTenantServiceProviderFactory(DefaultTenantServiceProviderFactory.Instance);
+        }
     }
 
     void ConfigureContainer(DolittleClientConfiguration config)

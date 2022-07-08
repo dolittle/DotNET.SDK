@@ -50,11 +50,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <summary>
     /// Gets the <see cref="ILoggerFactory"/>.
     /// </summary>
-    public ILoggerFactory LoggerFactory { get; private set; } = Microsoft.Extensions.Logging.LoggerFactory.Create(_ =>
-    {
-        _.SetMinimumLevel(LogLevel.Information);
-        _.AddConsole();
-    });
+    public ILoggerFactory? LoggerFactory { get; private set; }
 
     /// <summary>
     /// Gets the <see cref="IServiceProvider"/>.
