@@ -447,8 +447,10 @@ public class DolittleClient : IDisposable, IDolittleClient
 
         if (config.TenantServiceProviderFactory is null)
         {
-            // Resolve the ICreateTenantContainerThing
-            config.WithTenantServiceProviderFactory(DefaultTenantServiceProviderFactory.Instance);
+            var providerFactory = config.ServiceProvider.GetService<ICreateTenantContainers>();
+            config.WithTenantServiceProviderFactory(providerFactory is not null
+                ? providerFactory.Create
+                : DefaultTenantServiceProviderFactory.Instance);
         }
     }
 
