@@ -18,7 +18,7 @@ namespace Dolittle.SDK.DependencyInversion;
 /// </summary>
 public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSource
 {
-    const string MetadataKey = "from-source";
+    const string MetadataKey = "from-dolittle-unknown-registration-source";
     readonly IServiceProvider _rootProvider;
     readonly IEnumerable<IComponentRegistration> _registrations;
 
