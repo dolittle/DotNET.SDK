@@ -4,6 +4,7 @@
         <Optimize>true</Optimize>
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>Dolittle.Benchmarks.SDK</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

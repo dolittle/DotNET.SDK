@@ -21,7 +21,7 @@ namespace Dolittle.SDK;
 /// <summary>
 /// Defines the Dolittle Client.
 /// </summary>
-public interface IDolittleClient
+public interface IDolittleClient : IDisposable
 {
     /// <summary>
     /// Gets a value indicating whether the Dolittle Client is connected.

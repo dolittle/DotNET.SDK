@@ -3,9 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +16,19 @@ namespace Dolittle.SDK.DependencyInversion;
 public class TenantScopedProvidersBuilder
 {
     readonly List<ConfigureTenantServices> _configureServicesForTenantCallbacks = new();
+    readonly IServiceProvider _serviceProvider;
+    readonly CreateTenantServiceProvider _factory;
+
+    /// <summary>
+    /// Initialises a new instance of the <see cref="TenantScopedProvidersBuilder"/> class.
+    /// </summary>
+    /// <param name="serviceProvider">The root <see cref="IServiceProvider"/> to use.</param>
+    /// <param name="factory">The factory to </param>
+    public TenantScopedProvidersBuilder(IServiceProvider serviceProvider, CreateTenantServiceProvider factory)
+    {
+        _serviceProvider = serviceProvider;
+        _factory = factory;
+    }
 
     /// <summary>
     /// Adds a callback that configures services for tenant.
@@ -32,31 +44,19 @@ public class TenantScopedProvidersBuilder
     /// <summary>
     /// Builds the <see cref="ITenantScopedProviders"/>.
     /// </summary>
-    /// <param name="rootServiceProvider">The root <see cref="IServiceProvider"/>.</param>
-    /// <param name="tenants">The list of <see cref="TenantId"/> to make tenant scoped <see cref="IServiceProvider"/> for.</param>
+    /// <param name="tenants">The set of <see cref="TenantId"/> to make tenant scoped <see cref="IServiceProvider"/> for.</param>
     /// <returns>The built <see cref="ITenantScopedProviders"/>.</returns>
-    public ITenantScopedProviders Build(IServiceProvider rootServiceProvider, HashSet<TenantId> tenants)
-        => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, tenant => CreateTenantContainer(tenant, rootServiceProvider)));
+    public ITenantScopedProviders Build(IImmutableSet<TenantId> tenants)
+        => new TenantScopedProviders(tenants.ToDictionary(tenant => tenant, CreateTenantContainer));
 
-    IServiceProvider CreateTenantContainer(TenantId tenant, IServiceProvider rootServiceProvider)
+    IServiceProvider CreateTenantContainer(TenantId tenant)
     {
-        var containerBuilder = new ContainerBuilder();
         var services = new ServiceCollection();
         foreach (var configure in _configureServicesForTenantCallbacks)
         {
             configure?.Invoke(tenant, services);
         }
-
-        containerBuilder.Populate(services);
-        containerBuilder.RegisterInstance(tenant);
-        var container = containerBuilder.Build();
-
-        var rootScope = container.BeginLifetimeScope(builder =>
-        {
-            builder.RegisterInstance(new ServiceScopeFactory(rootServiceProvider.GetRequiredService<IServiceScopeFactory>(), container)).As<IServiceScopeFactory>();
-            builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootServiceProvider));
-        });
-
-        return new AutofacServiceProvider(rootScope);
+        services.AddSingleton(tenant);
+        return _factory(_serviceProvider, tenant, services);
     }
 }

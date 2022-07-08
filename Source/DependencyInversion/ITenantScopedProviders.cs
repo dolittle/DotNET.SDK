@@ -9,7 +9,7 @@ namespace Dolittle.SDK.DependencyInversion;
 /// <summary>
 /// Defines an system that knows about <see cref="IServiceProvider"/> for specific Dolittle Tenants.
 /// </summary>
-public interface ITenantScopedProviders
+public interface ITenantScopedProviders : IDisposable
 {
     /// <summary>
     /// Gets the <see cref="IServiceProvider"/> for a specific <see cref="TenantId"/>.
