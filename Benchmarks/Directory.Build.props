@@ -2,4 +2,8 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>CA1051;CA1707;CA1816;CS0414;CS0108</NoWarn>
+    </PropertyGroup>
 </Project>
