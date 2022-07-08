@@ -24,5 +24,8 @@ public class Dolittle
     /// </summary>
     public ushort? PingInterval { get; set; }
 
-    public OtlpConfig? Otlp { get; set; }
+    /// <summary>
+    /// The OpenTelemetry configuration.
+    /// </summary>
+    public OpenTelemetry? Otlp { get; set; }
 }

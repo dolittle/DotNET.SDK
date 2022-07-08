@@ -3,9 +3,12 @@
 
 using System;
 using Autofac.Extensions.DependencyInjection;
+using DnsClient.Internal;
 using Dolittle.SDK;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Extensions.AspNet;
+using Dolittle.SDK.Tenancy;
+using Lamar;
 using Lamar.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -17,12 +20,10 @@ builder.Host
     // Use Autofac. No need to setup custom tenant container creator when using Autofac
     // .UseServiceProviderFactory(new AutofacServiceProviderFactory())
     // Use Lamar
-    // .UseLamar(_ => _.For<ICreateTenantContainers<Lamar.Container>>().Use<LamarTenantContainerCreator>())
+    // .UseLamar(_ => _.For<ICreateTenantContainers>().Use<LamarTenantContainerCreator>())
     .UseDolittle(configureClientConfiguration: _ => _
-        // Setup to use Lamar tenant containers
-        // .WithTenantContainerCreator<Lamar.Container>()
         .WithTenantServices((tenant, services) => services
-            .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>() // This will only work when using either Lamar or Autofac
+            .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>()
             .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
             .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
 builder.Services
