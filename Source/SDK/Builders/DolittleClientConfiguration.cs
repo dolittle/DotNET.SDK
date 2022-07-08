@@ -6,7 +6,6 @@ using System;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Microservices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -58,25 +57,19 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     });
 
     /// <summary>
-    /// Gets the<see cref="IServiceProvider"/>.
+    /// Gets the <see cref="IServiceProvider"/>.
     /// </summary>
-    public IServiceProvider ServiceProvider { get; private set; }
-    
-    /// <summary>
-    /// Gets the <see cref="Func{TResult}"/> factory for <see cref="DependencyInversion.CreateTenantContainer"/>.
-    /// </summary>
-    public Func<IServiceProvider, CreateTenantContainer> CreateTenantContainerFactory { get; private set; }
+    public IServiceProvider? ServiceProvider { get; private set; }
 
     /// <summary>
-    /// Gets the <see cref="DependencyInversion.CreateTenantContainer"/>.
-    /// </summary>
-    public CreateTenantContainer CreateTenantContainer { get; private set; }
-    
-
-    /// <summary>
-    /// Gets the<see cref="ConfigureTenantServices"/> callback.
+    /// Gets the <see cref="ConfigureTenantServices"/> callback.
     /// </summary>
     public ConfigureTenantServices? ConfigureTenantServices { get; private set; }
+    
+    /// <summary>
+    /// Gets the <see cref="CreateTenantServiceProvider"/> factory.
+    /// </summary>
+    public CreateTenantServiceProvider? TenantServiceProviderFactory { get; private set; }
 
     /// <summary>
     /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
@@ -182,66 +175,16 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     }
 
     /// <inheritdoc />
-    public IConfigurationBuilder WithRootContainerAndTenantContainerCreator<TContainer>(TContainer container, ICreateTenantContainers<TContainer> creator)
-        where TContainer : class, IServiceProvider
+    public IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices)
     {
-        ServiceProvider = container;
-        CreateTenantContainer = services => creator.Create(container, services);
-        return this;
-    }
-    
-    /// <inheritdoc />
-    public IConfigurationBuilder WithTenantContainerCreator<TContainer>(Func<TContainer, ICreateTenantContainers<TContainer>> factory)
-        where TContainer : class, IServiceProvider
-    {
-        CreateTenantContainerFactory = provider =>
-        {
-            var container = ICreateTenantContainers<TContainer>.RootContainerGuard(provider);
-            return services => factory(container).Create(container, services);
-        };
-        return this;
-    }
-    
-    /// <inheritdoc />
-    public IConfigurationBuilder WithTenantContainerCreator<TContainer>(ICreateTenantContainers<TContainer> creator)
-        where TContainer : class, IServiceProvider
-    {
-        CreateTenantContainerFactory = provider =>
-        {
-            var container = ICreateTenantContainers<TContainer>.RootContainerGuard(provider);
-            return services => creator.Create(container, services);
-        };
-        return this;
-    }
-    
-    /// <inheritdoc />
-    public IConfigurationBuilder WithTenantContainerCreator<TContainer>()
-        where TContainer : class, IServiceProvider
-    {
-        CreateTenantContainerFactory = provider =>
-        {
-            var container = ICreateTenantContainers<TContainer>.RootContainerGuard(provider);
-            return services => container.GetRequiredService<ICreateTenantContainers<TContainer>>().Create(container, services);
-        };
-        return this;
-    }
-    
-    
-    /// <summary>
-    /// Configures the <see cref="CreateTenantContainer"/>.
-    /// </summary>
-    /// <param name="creator">The <see cref="DependencyInversion.CreateTenantContainer"/> delegate.</param>
-    /// <returns>The builder for continuation.</returns>
-    public IConfigurationBuilder WithTenantContainerCreator(CreateTenantContainer creator)
-    {
-        CreateTenantContainer = creator;
+        ConfigureTenantServices = configureTenantServices;
         return this;
     }
 
     /// <inheritdoc />
-    public IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices)
+    public IConfigurationBuilder WithTenantServiceProviderFactory(CreateTenantServiceProvider factory)
     {
-        ConfigureTenantServices = configureTenantServices;
+        TenantServiceProviderFactory = factory;
         return this;
     }
 }
