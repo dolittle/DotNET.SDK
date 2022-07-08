@@ -3,15 +3,16 @@
 
 using System;
 using Dolittle.SDK.DependencyInversion;
+using Dolittle.SDK.Tenancy;
 using Lamar;
 using Microsoft.Extensions.DependencyInjection;
 
-public class LamarTenantContainerCreator : ICreateTenantContainers<Container>
+public class LamarTenantContainerCreator : TenantContainerCreator<Container>
 {
-    public IServiceProvider Create(Container rootContainer, IServiceCollection tenantScopedServices)
+    protected override IServiceProvider CreateFromContainer(Container container, TenantId tenant, IServiceCollection tenantServices)
     {
-        var childContainer = rootContainer.GetNestedContainer() as Container;
-        childContainer.Configure(tenantScopedServices);
+        var childContainer = (Container)container.GetNestedContainer();
+        childContainer.Configure(tenantServices);
         return childContainer;
     }
 }
