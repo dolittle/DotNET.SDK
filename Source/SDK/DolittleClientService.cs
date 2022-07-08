@@ -17,23 +17,24 @@ public class DolittleClientService : IHostedService, IDisposable
 {
     readonly IDolittleClient _dolittleClient;
     readonly DolittleClientConfiguration _clientConfiguration;
-    ILogger? _logger;
+    readonly ILogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DolittleClientService"/> class.
     /// </summary>
     /// <param name="dolittleClient">The <see cref="IDolittleClient"/>.</param>
     /// <param name="clientConfiguration">The <see cref="DolittleClientConfiguration"/>.</param>
-    public DolittleClientService(IDolittleClient dolittleClient, DolittleClientConfiguration clientConfiguration)
+    /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> to use for logging.</param>
+    public DolittleClientService(IDolittleClient dolittleClient, DolittleClientConfiguration clientConfiguration, ILogger<DolittleClientService> logger)
     {
         _dolittleClient = dolittleClient;
         _clientConfiguration = clientConfiguration;
+        _logger = logger;
     }
 
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger = _clientConfiguration.LoggerFactory.CreateLogger<DolittleClientService>();
         _logger.ConnectingDolittleClient();
         try
         {
@@ -53,6 +54,10 @@ public class DolittleClientService : IHostedService, IDisposable
         return _dolittleClient.Disconnect(cancellationToken);
     }
 
+    /// <inheritdoc />
     public void Dispose()
-        => _dolittleClient?.Dispose();
+    {
+        GC.SuppressFinalize(this); 
+        _dolittleClient?.Dispose();
+    }
 }

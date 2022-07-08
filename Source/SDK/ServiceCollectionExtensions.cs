@@ -4,6 +4,7 @@
 using System;
 using Dolittle.SDK.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Dolittle.SDK;
@@ -40,7 +41,11 @@ public static class ServiceCollectionExtensions
         var dolittleClient = DolittleClient.Setup(setupClient);
         return services
             .AddSingleton(dolittleClient)
-            .AddHostedService(provider => new DolittleClientService(dolittleClient, ConfigureWithDefaultsFromServiceProvider(provider, configureClient)));
+            .AddHostedService(provider =>
+                new DolittleClientService(
+                    dolittleClient,
+                    ConfigureWithDefaultsFromServiceProvider(provider, configureClient),
+                    provider.GetRequiredService<ILogger<DolittleClientService>>()));
     }
 
     static DolittleClientConfiguration ConfigureWithDefaultsFromServiceProvider(IServiceProvider provider, ConfigureDolittleClient configureClient = default)
