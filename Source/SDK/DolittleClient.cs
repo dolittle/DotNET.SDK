@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 #if NET5_0_OR_GREATER
 using System.Net.Http;
@@ -427,14 +428,14 @@ public class DolittleClient : IDisposable, IDolittleClient
 
     void ConfigureContainer(DolittleClientConfiguration config)
     {
-        Services = new TenantScopedProvidersBuilder()
+        var builder = new TenantScopedProvidersBuilder(config.ServiceProvider, config.TenantServiceProviderFactory)
             .AddTenantServices(AddBuilderServices)
             .AddTenantServices((_, collection) => collection.AddScoped(services => services.GetRequiredService<IResources>().MongoDB.GetDatabase()))
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
             .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)
-            .AddTenantServices(config.ConfigureTenantServices)
-            .Build(_tenants.Select(_ => _.Id).ToHashSet(), config.CreateTenantContainer);
+            .AddTenantServices(config.ConfigureTenantServices);
+        Services = builder.Build(_tenants.Select(_ => _.Id).ToImmutableHashSet());
     }
 
     void AddBuilderServices(TenantId tenant, IServiceCollection services)
