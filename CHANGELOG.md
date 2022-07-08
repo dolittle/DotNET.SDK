@@ -1,3 +1,19 @@
+# [17.2.0] - 2022-7-8 [PR: #149](https://github.com/dolittle/DotNET.SDK/pull/149)
+## Summary
+
+A problem with our tenant scoped service providers caused crashes when resolving tenant scoped singleton services with dependencies not present in the derived tenant scoped service provider directly, pluss other problems. 
+
+### Fixed
+- The DependencyInversion internals to fully support tenant child containers for all kinds of IServiceProvider using Autofac as the dependency injection engine
+
+### Changed
+- `IAggregateOf<>` registered as `transient` instead of `singleton` services 
+
+### Added
+- `ICreateTenantContainers<>` interface for hooking in your own dependency injection library of choice as the tenant containers. Look at Samples/DependencyInjection for example for setting up Lamar
+- Configuration methods for setting up the custom tenant container creator
+
+
 # [17.1.2] - 2022-7-7 [PR: #153](https://github.com/dolittle/DotNET.SDK/pull/153)
 ## Summary
 
