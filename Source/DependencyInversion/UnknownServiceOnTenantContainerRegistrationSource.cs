@@ -87,13 +87,6 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     {
         try
         {
-#if NET6_0_OR_GREATER
-            var provider = _rootProvider.GetService<IServiceProviderIsService>();
-            if (provider is not null)
-            {
-                return provider.IsService(service);
-            }
-#endif
             var scopeFactory = _rootProvider.GetService<IServiceScopeFactory>();
             if (scopeFactory is null)
             {
