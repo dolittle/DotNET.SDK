@@ -34,6 +34,6 @@ public class ServiceScopeFactory : IServiceScopeFactory
         return new TenantServiceScope(
             rootScope,
             _lifetimeScope.BeginLifetimeScope(builder =>
-                builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootScope.ServiceProvider, _lifetimeScope.ComponentRegistry.Registrations))));
+                builder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(rootScope.ServiceProvider, _lifetimeScope.ComponentRegistry.Registrations, false))));
     }
 }

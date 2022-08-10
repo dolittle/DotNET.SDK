@@ -21,16 +21,19 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     const string MetadataKey = "from-dolittle-unknown-registration-source";
     readonly IServiceProvider _rootProvider;
     readonly IEnumerable<IComponentRegistration> _registrations;
+    readonly bool _isTenantRootContainer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnknownServiceOnTenantContainerRegistrationSource"/> class.
     /// </summary>
     /// <param name="rootProvider">The root <see cref="IServiceProvider"/>.s</param>
     /// <param name="registrations">The <see cref="IEnumerable{T}"/> of <see cref="ComponentRegistration"/>.</param>
-    public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider, IEnumerable<IComponentRegistration> registrations)
+    /// <param name="isTenantRootContainer">Whether the registration source belongs to the tenant root container.</param>
+    public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider, IEnumerable<IComponentRegistration> registrations, bool isTenantRootContainer)
     {
         _rootProvider = rootProvider;
         _registrations = registrations;
+        _isTenantRootContainer = isTenantRootContainer;
     }
 
     /// <inheritdoc />
@@ -87,6 +90,11 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
     {
         try
         {
+            if (!_isTenantRootContainer)
+            {
+                return _rootProvider.GetService(service) is not null;
+            }
+
             var scopeFactory = _rootProvider.GetService<IServiceScopeFactory>();
             if (scopeFactory is null)
             {
