@@ -1,3 +1,13 @@
+# [17.2.1] - 2022-8-10 [PR: #156](https://github.com/dolittle/DotNET.SDK/pull/156)
+## Summary
+
+We noticed an issue with the `IsService` implementation of the Lamar IoC container not working as we expected. This caused an issue where services would not be resolved correctly. To fix this issue for Lamar we had to make the implementation a bit less optimized in that services will be created multiple times. 
+
+### Fixed
+
+- An issue in the tenant-specific dependency inversion container system that was present when using Lamar
+
+
 # [17.2.0] - 2022-7-8 [PR: #149](https://github.com/dolittle/DotNET.SDK/pull/149)
 ## Summary
 
