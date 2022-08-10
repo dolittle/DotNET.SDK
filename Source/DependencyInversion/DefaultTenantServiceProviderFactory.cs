@@ -26,7 +26,7 @@ public static class DefaultTenantServiceProviderFactory
         
         var containerBuilder = new ContainerBuilder();
         containerBuilder.Populate(services);
-        containerBuilder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(provider, Enumerable.Empty<IComponentRegistration>()));
+        containerBuilder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(provider, Enumerable.Empty<IComponentRegistration>(), true));
         containerBuilder.Register(_ => new ServiceScopeFactory(provider.GetRequiredService<IServiceScopeFactory>(), _.Resolve<ILifetimeScope>())).As<IServiceScopeFactory>().SingleInstance();
         var container = containerBuilder.Build();
         return new AutofacServiceProvider(container);
