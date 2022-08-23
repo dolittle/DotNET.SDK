@@ -2,6 +2,7 @@
   <Import Project="../../default.props" />
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.DependencyInversion</AssemblyName>
+    <RootNamespace>Dolittle.SDK.DependencyInversion</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,5 +14,6 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="$(AutofacExtensionsDependencyInjectionVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsVersion)" PrivateAssets="All" />
   </ItemGroup>
 </Project>

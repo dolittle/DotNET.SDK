@@ -39,14 +39,14 @@ public class commiting_and_processing_events : SingleRuntimeSetup
     [Benchmark]
     public async Task CommitAndProcess1Event()
     {
-        _eventStore.CommitEvent(lastEvent, "source");
+        _ = _eventStore.CommitEvent(lastEvent, "source");
         await _finishedProcessing.Task.ConfigureAwait(false);
     }
 
     [Benchmark]
     public async Task CommitAndProcess100Event()
     {
-        _eventStore.Commit(_ =>
+        _ = _eventStore.Commit(_ =>
         {
             for (var i = 0; i < 99; i++)
             {
@@ -59,7 +59,7 @@ public class commiting_and_processing_events : SingleRuntimeSetup
     [Benchmark]
     public async Task CommitAndProcess1000Event()
     {
-        _eventStore.Commit(_ =>
+        _ = _eventStore.Commit(_ =>
         {
             for (var i = 0; i < 999; i++)
             {

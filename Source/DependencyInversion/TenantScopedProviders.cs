@@ -34,4 +34,13 @@ public class TenantScopedProviders : ITenantScopedProviders
 
         return provider;
     }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        foreach (var (_, provider) in _serviceProviders)
+        {
+            (provider as IDisposable)?.Dispose();
+        }
+    }
 }

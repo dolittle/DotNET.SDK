@@ -39,7 +39,7 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
     {
         foreach (var type in Types)
         {
-            serviceCollection.AddSingleton(
+            serviceCollection.AddTransient(
                 typeof(IAggregateOf<>).MakeGenericType(type),
                 serviceProvider => Activator.CreateInstance(
                     typeof(AggregateOf<>).MakeGenericType(type),

@@ -1,3 +1,46 @@
+# [17.2.1] - 2022-8-10 [PR: #156](https://github.com/dolittle/DotNET.SDK/pull/156)
+## Summary
+
+We noticed an issue with the `IsService` implementation of the Lamar IoC container not working as we expected. This caused an issue where services would not be resolved correctly. To fix this issue for Lamar we had to make the implementation a bit less optimized in that services will be created multiple times. 
+
+### Fixed
+
+- An issue in the tenant-specific dependency inversion container system that was present when using Lamar
+
+
+# [17.2.0] - 2022-7-8 [PR: #149](https://github.com/dolittle/DotNET.SDK/pull/149)
+## Summary
+
+A problem with our tenant scoped service providers caused crashes when resolving tenant scoped singleton services with dependencies not present in the derived tenant scoped service provider directly, pluss other problems. 
+
+### Fixed
+- The DependencyInversion internals to fully support tenant child containers for all kinds of IServiceProvider using Autofac as the dependency injection engine
+
+### Changed
+- `IAggregateOf<>` registered as `transient` instead of `singleton` services 
+
+### Added
+- `ICreateTenantContainers<>` interface for hooking in your own dependency injection library of choice as the tenant containers. Look at Samples/DependencyInjection for example for setting up Lamar
+- Configuration methods for setting up the custom tenant container creator
+
+
+# [17.1.2] - 2022-7-7 [PR: #153](https://github.com/dolittle/DotNET.SDK/pull/153)
+## Summary
+
+Fixes a problem with Artifacts caused event types with specified Alias to cause exception when being handled by an event handler
+
+### Fixed
+
+- EventType with explicit Alias should now work.
+
+
+# [17.1.1] - 2022-7-7 [PR: #143](https://github.com/dolittle/DotNET.SDK/pull/143)
+## Summary
+### Fixed
+
+- A bug where if there were errors while adding decorated event handler methods it would not try to add convention event handler methods
+
+
 # [17.1.0] - 2022-7-5 [PR: #145](https://github.com/dolittle/DotNET.SDK/pull/145)
 ## Summary
 

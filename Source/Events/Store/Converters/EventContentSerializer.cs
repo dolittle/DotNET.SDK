@@ -74,19 +74,17 @@ public class EventContentSerializer : ISerializeEventContent
             var type = _eventTypes.GetTypeFor(eventType);
             content = JsonConvert.DeserializeObject(json, type, serializerSettings);
 
-            if (exceptionCatcher.Failed)
-                deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error, type);
-            else
-                deserializationError = null;
+            deserializationError = exceptionCatcher.Failed
+                ? new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error, type)
+                : null;
         }
         else
         {
             content = JsonConvert.DeserializeObject(json, serializerSettings);
 
-            if (exceptionCatcher.Failed)
-                deserializationError = new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error);
-            else
-                deserializationError = null;
+            deserializationError = exceptionCatcher.Failed
+                ? new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error)
+                : null;
         }
 
         return !exceptionCatcher.Failed;

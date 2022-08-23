@@ -120,15 +120,16 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
         IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods,
         IClientBuildResults buildResults)
     {
-        var publicMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
+        var allDeclaredMethods = EventHandlerType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
+        
         var hasWrongMethods = !TryAddDecoratedHandlerMethods(
-                publicMethods,
+                allDeclaredMethods,
                 eventHandlerId,
                 createUntypedHandlerMethod,
                 eventTypesToMethods,
                 buildResults)
-            || !TryAddConventionHandlerMethods(
-                publicMethods,
+            | !TryAddConventionHandlerMethods(
+                allDeclaredMethods,
                 eventHandlerId,
                 eventTypes,
                 createTypedHandlerMethod,

@@ -64,12 +64,19 @@ public interface IConfigurationBuilder
     /// </summary>
     /// <param name="serviceProvider">The <see cref="IDolittleClient"/>.</param>
     /// <returns>The client for continuation.</returns>
-    public IConfigurationBuilder WithServiceProvider(IServiceProvider serviceProvider);
+    IConfigurationBuilder WithServiceProvider(IServiceProvider serviceProvider);
 
     /// <summary>
     /// Configures a <see cref="ConfigureTenantServices"/> callback for configuring the tenant specific IoC containers.
     /// </summary>
     /// <param name="configureTenantServices">The <see cref="ConfigureTenantServices"/> callback.</param>
     /// <returns>The client for continuation.</returns>
-    public IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices);
+    IConfigurationBuilder WithTenantServices(ConfigureTenantServices configureTenantServices);
+
+    /// <summary>
+    /// Configures a <see cref="CreateTenantServiceProvider"/> factory to use when creating tenant specific IoC containers.
+    /// </summary>
+    /// <param name="factory">The <see cref="CreateTenantServiceProvider"/> factory.</param>
+    /// <returns>The client for continuation.</returns>
+    IConfigurationBuilder WithTenantServiceProviderFactory(CreateTenantServiceProvider factory);
 }
