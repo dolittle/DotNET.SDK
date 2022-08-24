@@ -30,7 +30,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     readonly Version _headVersion;
     readonly IPerformHandshake _handshakePerformer;
     readonly ITenants _tenants;
-    readonly IEnumerable<ClientBuildResult> _buildResults;
+    readonly IClientBuildResults _buildResults;
     readonly ILogger _logger;
 
     /// <summary>
@@ -49,7 +49,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
         Version headVersion,
         IPerformHandshake handshakePerformer,
         ITenants tenants,
-        IEnumerable<ClientBuildResult> buildResults,
+        IClientBuildResults buildResults,
         ILogger logger)
     {
         _runtimeHost = runtimeHost;

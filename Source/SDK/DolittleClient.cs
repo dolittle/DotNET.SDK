@@ -266,7 +266,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             configuration.Version,
             new HandshakeClient(methodCaller, loggerFactory.CreateLogger<HandshakeClient>()),
             new TenantsClient(methodCaller, loggerFactory.CreateLogger<TenantsClient>()),
-            _buildResults.All,
+            _buildResults,
             loggerFactory.CreateLogger<DolittleRuntimeConnector>());
         
         return runtimeConnector.ConnectForever(cancellationToken);
