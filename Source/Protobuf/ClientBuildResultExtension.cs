@@ -8,7 +8,7 @@ using PbBuildResult = Dolittle.Runtime.Client.Contracts.BuildResult;
 namespace Dolittle.SDK.Protobuf;
 
 /// <summary>
-/// Conversion extensions for converting between <see cref="Claim"/> and <see cref="PbClaim"/>.
+/// Conversion extensions for converting between <see cref="ClientBuildResult"/> and <see cref="PbBuildResult"/>.
 /// </summary>
 public static class ClientBuildResultExtension
 {

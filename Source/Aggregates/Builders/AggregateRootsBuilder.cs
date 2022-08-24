@@ -20,10 +20,10 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     readonly DecoratedTypeBindingsToModelAdder<AggregateRootAttribute, AggregateRootType, AggregateRootId> _decoratedTypeBindings;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="AggregateRootsBuilder"/> class.
     /// </summary>
-    /// <param name="modelBuilder"></param>
-    /// <param name="buildResults"></param>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     public AggregateRootsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
     {
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<AggregateRootAttribute, AggregateRootType, AggregateRootId>(
