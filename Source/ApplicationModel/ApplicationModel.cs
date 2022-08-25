@@ -8,15 +8,15 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.ApplicationModel;
 
 /// <summary>
-/// Represents an implementation of <see cref="IModel"/>.
+/// Represents an implementation of <see cref="IApplicationModel"/>.
 /// </summary>
-public class Model : IModel
+public class ApplicationModel : IApplicationModel
 {
     /// <summary>
-    /// Initializes an instance of the <see cref="Model"/> class.
+    /// Initializes an instance of the <see cref="ApplicationModel"/> class.
     /// </summary>
     /// <param name="bindings">The <see cref="IBinding"/> bindings that builds the Dolittle application model.</param>
-    public Model(IEnumerable<IBinding> bindings)
+    public ApplicationModel(IEnumerable<IBinding> bindings)
     {
         Bindings = bindings;
     }

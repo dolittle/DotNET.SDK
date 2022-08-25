@@ -43,12 +43,12 @@ public class EventFiltersBuilder : IEventFiltersBuilder
     /// <summary>
     /// Builds all the event filters.
     /// </summary>
-    /// <param name="model">The <see cref="IModel"/>.</param>
+    /// <param name="applicationModel">The <see cref="IApplicationModel"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public static IUnregisteredEventFilters Build(IModel model, IClientBuildResults buildResults)
+    public static IUnregisteredEventFilters Build(IApplicationModel applicationModel, IClientBuildResults buildResults)
     {
         var filters = new UniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor>();
-        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildFilter>().Select(_ => _.ProcessorBuilder))
+        foreach (var builder in applicationModel.GetProcessorBuilderBindings<ICanTryBuildFilter>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(buildResults, out var filter))
             {

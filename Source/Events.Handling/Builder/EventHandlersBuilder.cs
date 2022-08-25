@@ -80,13 +80,13 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     /// <summary>
     /// Build all event handlers.
     /// </summary>
-    /// <param name="model">The <see cref="IModel"/>.</param>
+    /// <param name="applicationModel">The <see cref="IApplicationModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
-    public static IUnregisteredEventHandlers Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
+    public static IUnregisteredEventHandlers Build(IApplicationModel applicationModel, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var eventHandlers = new UniqueBindings<EventHandlerModelId, IEventHandler>();
-        foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>())
+        foreach (var (_, builder) in applicationModel.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>())
         {
             if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
             {
@@ -97,7 +97,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
                 buildResults.AddFailure($"Failed to build Event Handler for '{builder.EventHandlerType}'. It will not be registered");
             }
         }
-        foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
+        foreach (var (_, builder) in applicationModel.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
         {
             if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
             {
@@ -108,7 +108,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
                 buildResults.AddFailure($"Failed to build Event Handler for instance of '{builder.EventHandlerType}'. It will not be registered");
             }
         }
-        foreach (var (_, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
+        foreach (var (_, builder) in applicationModel.GetProcessorBuilderBindings<EventHandlerBuilder>())
         {
             if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
             {
@@ -122,8 +122,8 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         }
         return new UnregisteredEventHandlers(
             eventHandlers,
-            model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>(),
-            model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>());
+            applicationModel.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>(),
+            applicationModel.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>());
     }
 
 }

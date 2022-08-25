@@ -11,7 +11,7 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.ApplicationModel;
 
 /// <summary>
-/// Represents a a thing that knows about <typeparamref name="TDecorator"/> decorated classes representing a unique <typeparamref name="TIdentifier"/> and how to add it to the <see cref="IModel"/>.
+/// Represents a a thing that knows about <typeparamref name="TDecorator"/> decorated classes representing a unique <typeparamref name="TIdentifier"/> and how to add it to the <see cref="IApplicationModel"/>.
 /// </summary>
 /// <typeparam name="TDecorator">The <see cref="Type"/> of the class decorator.</typeparam>
 /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>

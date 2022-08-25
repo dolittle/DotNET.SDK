@@ -54,8 +54,8 @@ public class ModelBuilder : IModelBuilder
     /// Builds a valid Dolittle application model from the bindings.
     /// </summary>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/> for keeping track of build results.</param>
-    /// <returns>The valid <see cref="IModel"/> representing the Dolittle application model.</returns>
-    public IModel Build(IClientBuildResults buildResults)
+    /// <returns>The valid <see cref="IApplicationModel"/> representing the Dolittle application model.</returns>
+    public IApplicationModel Build(IClientBuildResults buildResults)
     {
         var validBindings = new List<IBinding>();
         var deDuplicatedTypes = new DeDuplicatedIdentifierMap<Type>(
@@ -118,7 +118,7 @@ public class ModelBuilder : IModelBuilder
         {
             buildResults.AddInformation($"{binding} will be bound");
         }
-        return new Model(validBindings);
+        return new ApplicationModel(validBindings);
     }
 
     static void AddFailedBuildResultsForConflictingBindings(

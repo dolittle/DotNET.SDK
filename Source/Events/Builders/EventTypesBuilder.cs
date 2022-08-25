@@ -83,9 +83,9 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <summary>
     /// Builds the <see cref="IEventTypes"/>.
     /// </summary>
-    public static IUnregisteredEventTypes Build(IModel model)
+    public static IUnregisteredEventTypes Build(IApplicationModel applicationModel)
     {
-        var bindings = model.GetTypeBindings<EventType, EventTypeId>();
+        var bindings = applicationModel.GetTypeBindings<EventType, EventTypeId>();
         return new UnregisteredEventTypes(new UniqueBindings<EventType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));
     }
 }

@@ -7,7 +7,7 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.ApplicationModel;
 
 /// <summary>
-/// Defines a builder for building an <see cref="IModel"/>.
+/// Defines a builder for building an <see cref="IApplicationModel"/>.
 /// </summary>
 public interface IModelBuilder
 {

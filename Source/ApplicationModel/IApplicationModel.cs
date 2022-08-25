@@ -10,7 +10,7 @@ namespace Dolittle.SDK.ApplicationModel;
 /// <summary>
 /// Defines a Dolittle application model.
 /// </summary>
-public interface IModel
+public interface IApplicationModel
 {
     /// <summary>
     /// Gets the valid <see cref="IBinding"/> bindings.

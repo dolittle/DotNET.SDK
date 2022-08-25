@@ -80,20 +80,20 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     /// <summary>
     /// Build embeddings.
     /// </summary>
-    /// <param name="model">The <see cref="IModel"/>.</param>
+    /// <param name="applicationModel">The <see cref="IApplicationModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
-    public static IUnregisteredEmbeddings Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
+    public static IUnregisteredEmbeddings Build(IApplicationModel applicationModel, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var embeddings = new UniqueBindings<EmbeddingModelId, Internal.IEmbedding>();
-        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildEmbedding>().Select(_ => _.ProcessorBuilder))
+        foreach (var builder in applicationModel.GetProcessorBuilderBindings<ICanTryBuildEmbedding>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(eventTypes, buildResults, out var embedding))
             {
                 embeddings.Add(new EmbeddingModelId(embedding.Identifier), embedding);
             }
         }
-        var identifiers = model.GetTypeBindings<EmbeddingModelId, EmbeddingId>();
+        var identifiers = applicationModel.GetTypeBindings<EmbeddingModelId, EmbeddingId>();
         var readModelTypes = new EmbeddingReadModelTypes();
         foreach (var (identifier, type) in identifiers)
         {

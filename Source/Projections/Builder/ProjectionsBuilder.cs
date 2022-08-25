@@ -98,20 +98,20 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <summary>
     /// Build projections.
     /// </summary>
-    /// <param name="model">The <see cref="IModel"/>.</param>
+    /// <param name="applicationModel">The <see cref="IApplicationModel"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
-    public static IUnregisteredProjections Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
+    public static IUnregisteredProjections Build(IApplicationModel applicationModel, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var projections = new UniqueBindings<ProjectionModelId, IProjection>();
-        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildProjection>().Select(_ => _.ProcessorBuilder))
+        foreach (var builder in applicationModel.GetProcessorBuilderBindings<ICanTryBuildProjection>().Select(_ => _.ProcessorBuilder))
         {
             if (builder.TryBuild(eventTypes, buildResults, out var projection))
             {
                 projections.Add(new ProjectionModelId(projection.Identifier, projection.ScopeId), projection);
             }
         }
-        var identifiers = model.GetTypeBindings<ProjectionModelId, ProjectionId>();
+        var identifiers = applicationModel.GetTypeBindings<ProjectionModelId, ProjectionId>();
         var readModelTypes = new ProjectionReadModelTypes();
         foreach (var (identifier, type) in identifiers)
         {
