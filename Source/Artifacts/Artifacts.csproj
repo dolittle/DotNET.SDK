@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="../Common/Common.csproj" />
     <ProjectReference Include="../Concepts/Concepts.csproj" />
+    <ProjectReference Include="..\ApplicationModel\ApplicationModel.csproj" />
   </ItemGroup>
 
 </Project>

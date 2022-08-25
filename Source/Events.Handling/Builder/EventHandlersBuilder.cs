@@ -4,8 +4,8 @@
 using System;
 using System.Reflection;
 using Dolittle.SDK.Common;
-using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 using Dolittle.SDK.Events.Handling.Builder.Convention.Type;
 

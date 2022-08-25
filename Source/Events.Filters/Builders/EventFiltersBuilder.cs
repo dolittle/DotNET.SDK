@@ -3,8 +3,8 @@
 
 using System.Linq;
 using Dolittle.SDK.Common;
-using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Events.Filters.Builders.Partitioned;
 using Dolittle.SDK.Events.Filters.Builders.Partitioned.Public;
 

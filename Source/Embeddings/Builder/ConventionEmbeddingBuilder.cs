@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Embeddings.Internal;
 using Dolittle.SDK.Events;
 

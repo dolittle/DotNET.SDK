@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Concepts;
 
 namespace Dolittle.SDK.Artifacts;

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common;
-using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
+using Dolittle.SDK.ApplicationModel;
 
 namespace Dolittle.SDK.Events.Builders;
 

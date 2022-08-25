@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Common;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;

@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Embeddings.Builder;

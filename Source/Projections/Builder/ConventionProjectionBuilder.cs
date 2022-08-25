@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Copies;
 

@@ -1,7 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections;

@@ -4,7 +4,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
 namespace Dolittle.SDK.Events.Handling.Builder.Convention.Instance;

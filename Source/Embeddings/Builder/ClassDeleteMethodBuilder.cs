@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Embeddings.Builder;

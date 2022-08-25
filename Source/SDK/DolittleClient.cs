@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Builders;
-using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Embeddings.Builder;
