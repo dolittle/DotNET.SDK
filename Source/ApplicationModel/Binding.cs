@@ -15,8 +15,6 @@ public record Binding<TIdentifier, TId> : Binding, IBinding<TIdentifier, TId>
     where TIdentifier : IIdentifier<TId>
     where TId : ConceptAs<Guid>
 {
-    // public TIdentifier Identifier { get; }
-
     /// <summary>
     /// Initializes an instance of the <see cref="Binding{TIdentifier,TId}"/> class.
     /// </summary>

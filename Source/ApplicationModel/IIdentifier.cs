@@ -24,7 +24,7 @@ public interface IIdentifier<out TId> : IIdentifier
     /// </summary>
     /// <param name="identifier">The other identifier to check if can coexist with.</param>
     /// <returns>True if this identifier can coexist with the other identifier, false if not.</returns>
-    public bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier);
+    bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier);
 }
 
 /// <summary>
@@ -36,6 +36,11 @@ public interface IIdentifier
     /// Gets the globally unique id for the identifier.
     /// </summary>
     Guid Id { get; }
+    
+    /// <summary>
+    /// Gets the identifier alias.
+    /// </summary>
+    IdentifierAlias Alias { get; }
 
     /// <summary>
     /// Determines whether or not this identifier can coexist with another identifier.

@@ -8,23 +8,24 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.ApplicationModel;
 
 /// <summary>
-/// 
+/// Represents an identifier for a part of the <see cref="ApplicationModel"/>.
 /// </summary>
-/// <typeparam name="TId"></typeparam>
-/// <typeparam name="TExtras"></typeparam>
+/// <typeparam name="TId">The <see cref="Type"/> of the unique identifier.</typeparam>
+/// <typeparam name="TExtras">The <see cref="Type"/> of the extra properties that should be used to check if similar identifiers can coexist.</typeparam>
 public abstract class Identifier<TId, TExtras> : Identifier<TId>
     where TId : ConceptAs<Guid>
     where TExtras : IEquatable<TExtras>
 {
     readonly TExtras _extras;
-    
+
     /// <summary>
     /// Initializes an instance of the <see cref="Identifier{TId,TExtras}"/> class.
     /// </summary>
     /// <param name="tag">The tag name of this identifier.</param>
     /// <param name="id">The globally unique id for the identifier.</param>
+    /// <param name="alias">The identifier alias.</param>
     /// <param name="extras">The extra data for the identifier.</param>
-    protected Identifier(string tag, TId id, TExtras extras) : base(tag, id)
+    protected Identifier(string tag, TId id, IdentifierAlias alias, TExtras extras) : base(tag, id, alias)
     {
         _extras = extras;
     }
@@ -48,9 +49,9 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
 }
 
 /// <summary>
-/// 
+/// Represents an identifier for a part of the <see cref="ApplicationModel"/>.
 /// </summary>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The <see cref="Type"/> of the unique identifier.</typeparam>
 public abstract class Identifier<TId> : IIdentifier<TId>
     where TId : ConceptAs<Guid>
 {
@@ -59,14 +60,19 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     /// </summary>
     /// <param name="tag">The tag name of this identifier.</param>
     /// <param name="id">The globally unique id for the identifier.</param>
-    protected Identifier(string tag, TId id)
+    /// <param name="alias">The identifier alias.</param>
+    protected Identifier(string tag, TId id, IdentifierAlias alias)
     {
         Tag = tag;
         Id = id;
+        Alias = alias;
     }
 
     /// <inheritdoc />
     public TId Id { get; }
+
+    /// <inheritdoc />
+    public IdentifierAlias Alias { get; }
 
     /// <inheritdoc />
     Guid IIdentifier.Id => Id.Value;

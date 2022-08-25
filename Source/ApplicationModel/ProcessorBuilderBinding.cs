@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Concepts;
 
 namespace Dolittle.SDK.ApplicationModel;
 
@@ -10,9 +11,15 @@ namespace Dolittle.SDK.ApplicationModel;
 /// </summary>
 /// <param name="Identifier">The identifier that is bound.</param>
 /// <param name="ProcessorBuilder">The processor builder that the identifier is bound to.</param>
+/// <typeparam name="TProcessor">The <see cref="Type"/> of the processor to build.</typeparam>
 /// <typeparam name="TBuilder">The <see cref="Type"/>of the processor builder.</typeparam>
-public record ProcessorBuilderBinding<TBuilder>(IIdentifier Identifier, TBuilder ProcessorBuilder) : Binding(Identifier)
-    where TBuilder : class
+/// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
+/// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
+public record ProcessorBuilderBinding<TProcessor, TBuilder, TIdentifier, TId>(TIdentifier Identifier, TBuilder ProcessorBuilder) : Binding<TIdentifier, TId>(Identifier)
+    where TProcessor : class
+    where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId >
+    where TIdentifier : IIdentifier<TId>
+    where TId : ConceptAs<Guid>
 {
     /// <inheritdoc />
     public override string ToString()

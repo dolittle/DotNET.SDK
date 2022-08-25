@@ -25,7 +25,7 @@ public interface IModelBuilder
     /// <summary>
     /// Removes a binding between an identifier and a type.
     /// </summary>
-    /// <param name="identifier">The identifier to ubind.</param>
+    /// <param name="identifier">The identifier to unbind.</param>
     /// <param name="type">The type to unbind the identifier to.</param>
     /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
     /// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
@@ -39,8 +39,14 @@ public interface IModelBuilder
     /// <param name="identifier">The identifier to bind.</param>
     /// <param name="builder">The processor builder to bind the identifier to.</param>
     /// <typeparam name="TBuilder">The <see cref="Type"/>of the processor builder.</typeparam>
-    void BindIdentifierToProcessorBuilder<TBuilder>(IIdentifier identifier, TBuilder builder)
-        where TBuilder : class, IEquatable<TBuilder>;
+    /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
+    /// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
+    /// <typeparam name="TProcessor">The <see cref="Type"/> of the processor to build.</typeparam>
+    void BindIdentifierToProcessorBuilder<TBuilder, TProcessor, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
+        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
+        where TProcessor : class 
+        where TIdentifier : IIdentifier<TId>
+        where TId : ConceptAs<Guid>;
     
     /// <summary>
     /// Removes a binding between an identifier and a processor builder.
@@ -48,7 +54,13 @@ public interface IModelBuilder
     /// <param name="identifier">The identifier to unbind.</param>
     /// <param name="builder">The processor builder to unbind the identifier to.</param>
     /// <typeparam name="TBuilder">The <see cref="Type"/>of the processor builder.</typeparam>
-    void UnbindIdentifierToProcessorBuilder<TBuilder>(IIdentifier identifier, TBuilder builder)
-        where TBuilder : class, IEquatable<TBuilder>;
+    /// <typeparam name="TProcessor">The <see cref="Type"/> of the processor to build.</typeparam>
+    /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
+    /// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
+    void UnbindIdentifierToProcessorBuilder<TBuilder, TProcessor, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
+        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
+        where TProcessor : class 
+        where TIdentifier : IIdentifier<TId>
+        where TId : ConceptAs<Guid>;
 
 }
