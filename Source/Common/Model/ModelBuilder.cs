@@ -138,13 +138,15 @@ public class ModelBuilder : IModelBuilder
         }
         var sb = new StringBuilder();
         sb.Append(FormattableString.Invariant($"The identifier {id} was bound to conflicting {string.Join(" and ", conflicts)}:"));
-        foreach (var (binding, type)  in conflictingTypes)
+        foreach (var (binding, type) in conflictingTypes)
         {
             sb.Append(FormattableString.Invariant($"\n\t{binding.Identifier} was bound to type {type.Name}. This binding will be ignored"));
+            buildResults.AddFailure(binding.Identifier, binding.Identifier.Alias, "Will be ignored because it is bound to multiple types");
         }
         foreach (var (binding, processorBuilder) in conflictingProcessorBuilders)
         {
             sb.Append(FormattableString.Invariant($"\n\t{binding.Identifier} was bound to processor builder {processorBuilder}. This binding will be ignored"));
+            buildResults.AddFailure(binding.Identifier, binding.Identifier.Alias, "Will be ignored because it is bound to multiple processor builders");
         }
         buildResults.AddFailure(sb.ToString());
     }

@@ -10,7 +10,7 @@ namespace Dolittle.SDK.Events.Filters.Builders.Partitioned;
 /// </summary>
 public class PartitionedEventFilterBuilder : IPartitionedEventFilterBuilder, ICanBuildPrivateFilter
 {
-    PartitionedFilterEventCallback _callback;
+    PartitionedFilterEventCallback? _callback;
 
     /// <inheritdoc />
     public void Handle(PartitionedFilterEventCallback callback)

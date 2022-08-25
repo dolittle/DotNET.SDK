@@ -33,7 +33,7 @@ public class UnregisteredUnpartitionedEventFilter : ICanRegisterEventFilterProce
     }
 
     /// <inheritdoc />
-    public FilterModelId Identifier => new(_filterId, _scopeId);
+    public FilterModelId Identifier => new(_filterId, _scopeId, null);
 
     /// <inheritdoc />
     public void Register(

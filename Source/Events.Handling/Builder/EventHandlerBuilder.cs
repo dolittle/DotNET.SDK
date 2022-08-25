@@ -18,10 +18,9 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     readonly IModelBuilder _modelBuilder;
     readonly EventHandlerMethodsBuilder _methodsBuilder;
 
-    EventHandlerAlias _alias;
-    bool _hasAlias;
     bool _partitioned = true;
     ScopeId _scopeId = ScopeId.Default;
+    EventHandlerAlias? _alias;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
@@ -39,7 +38,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <summary>
     /// Gets the <see cref="EventHandlerModelId"/>.
     /// </summary>
-    public EventHandlerModelId ModelId => new(_eventHandlerId, _scopeId);
+    public EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, _alias);
     
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
@@ -73,7 +72,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
+    public bool TryBuild(EventHandlerModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
     {
         eventHandler = default;
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
@@ -89,9 +88,9 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
             return false;
         }
 
-        eventHandler = _hasAlias
+        eventHandler =
             ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
-            : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
+            : new EventHandler(, _scopeId, _partitioned, eventTypesToMethods);
         return true;
     }
     

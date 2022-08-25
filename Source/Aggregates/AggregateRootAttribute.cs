@@ -14,21 +14,21 @@ namespace Dolittle.SDK.Aggregates;
 [AttributeUsage(AttributeTargets.Class)]
 public class AggregateRootAttribute : Attribute, IDecoratedTypeDecorator<AggregateRootType>
 {
+    readonly AggregateRootId _id;
+    readonly string? _alias;
+    readonly Generation _generation = Generation.First;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootAttribute"/> class.
     /// </summary>
     /// <param name="id">The unique identifier.</param>
     /// <param name="alias">The alias for the aggregate root.</param>
-    public AggregateRootAttribute(string id, string alias = default)
+    public AggregateRootAttribute(string id, string? alias = null)
     {
-        Type = new AggregateRootType(id, Generation.First, alias);
+        _id = id;
+        _alias = alias;
     }
 
-    /// <summary>
-    /// Gets the <see cref="AggregateRootType"/>.
-    /// </summary>
-    public AggregateRootType Type { get; }
-
     /// <inheritdoc />
-    public AggregateRootType GetIdentifier() => Type;
+    public AggregateRootType GetIdentifier(Type decoratedType) => new(_id, _generation, _alias ?? decoratedType.Name);
 }

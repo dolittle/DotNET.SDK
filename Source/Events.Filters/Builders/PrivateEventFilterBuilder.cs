@@ -18,7 +18,7 @@ public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder, ICanTryBuil
     ScopeId _scopeId = ScopeId.Default;
     ICanBuildPrivateFilter _filterBuilder;
 
-    FilterModelId ModelId => new(_filterId, _scopeId);
+    FilterModelId ModelId => new(_filterId, _scopeId, null);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivateEventFilterBuilder"/> class.

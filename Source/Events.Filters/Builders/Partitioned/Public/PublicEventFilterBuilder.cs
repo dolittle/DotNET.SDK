@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Events.Filters.Builders.Partitioned.Public;
 public class PublicEventFilterBuilder : IPartitionedEventFilterBuilder, ICanTryBuildFilter
 {
     readonly FilterId _filterId;
-    PartitionedFilterEventCallback _callback;
+    PartitionedFilterEventCallback? _callback;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicEventFilterBuilder"/> class.
@@ -22,7 +22,7 @@ public class PublicEventFilterBuilder : IPartitionedEventFilterBuilder, ICanTryB
     public PublicEventFilterBuilder(FilterId filterId, IModelBuilder modelBuilder)
     {
         _filterId = filterId;
-        modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(new FilterModelId(_filterId, ScopeId.Default), this);
+        modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(new FilterModelId(_filterId, ScopeId.Default, null), this);
     }
     
     /// <inheritdoc />

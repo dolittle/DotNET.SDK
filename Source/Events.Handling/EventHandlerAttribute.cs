@@ -12,6 +12,9 @@ namespace Dolittle.SDK.Events.Handling;
 [AttributeUsage(AttributeTargets.Class)]
 public class EventHandlerAttribute : Attribute, IDecoratedTypeDecorator<EventHandlerModelId>
 {
+    readonly EventHandlerId _eventHandlerId;
+    readonly string? _alias;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerAttribute"/> class.
     /// </summary>
@@ -19,22 +22,13 @@ public class EventHandlerAttribute : Attribute, IDecoratedTypeDecorator<EventHan
     /// <param name="partitioned">Whether the event handler is partitioned.</param>
     /// <param name="inScope">The scope that the event handler handles events in.</param>
     /// <param name="alias">The alias for the event handler.</param>
-    public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string inScope = default, string alias = default)
+    public EventHandlerAttribute(string eventHandlerId, bool partitioned = true, string? inScope = null, string? alias = null)
     {
-        Identifier = Guid.Parse(eventHandlerId);
+        _eventHandlerId = eventHandlerId;
+        _alias = alias;
         Partitioned = partitioned;
         Scope = inScope ?? ScopeId.Default;
-        if (alias != default)
-        {
-            Alias = alias;
-            HasAlias = true;
-        }
     }
-
-    /// <summary>
-    /// Gets the unique identifier for this event handler.
-    /// </summary>
-    public EventHandlerId Identifier { get; }
 
     /// <summary>
     /// Gets a value indicating whether this event handler is partitioned.
@@ -46,16 +40,7 @@ public class EventHandlerAttribute : Attribute, IDecoratedTypeDecorator<EventHan
     /// </summary>
     public ScopeId Scope { get; }
 
-    /// <summary>
-    /// Gets the <see cref="EventHandlerAlias"/>.
-    /// </summary>
-    public EventHandlerAlias Alias { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether this event handler has an alias.
-    /// </summary>
-    public bool HasAlias { get; }
 
     /// <inheritdoc />
-    public EventHandlerModelId GetIdentifier() => new(Identifier, Scope);
+    public EventHandlerModelId GetIdentifier(Type decoratedType) => new(_eventHandlerId, Scope, _alias ?? decoratedType.Name);
 }

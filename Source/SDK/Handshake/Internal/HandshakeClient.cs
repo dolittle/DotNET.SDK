@@ -101,7 +101,7 @@ public class HandshakeClient : IPerformHandshake
         protobuf.AggregateRoots.AddRange(GetBuildResultsFor<AggregateRootType>(buildResults, _ => _.Generation));
         protobuf.EventHandlers.AddRange(GetBuildResultsFor<EventHandlerModelId>(buildResults, _ => 0));
         protobuf.EventTypes.AddRange(GetBuildResultsFor<EventType>(buildResults, _ => _.Generation));
-        protobuf.Unknown.AddRange(buildResults.All.Select(_ => _.ToProtobuf()));
+        protobuf.Other.AddRange(buildResults.All.Select(_ => _.ToProtobuf()));
         return protobuf;
     }
 

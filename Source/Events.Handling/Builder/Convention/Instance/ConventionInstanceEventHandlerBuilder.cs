@@ -18,9 +18,9 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
     /// Initializes a new instance of the <see cref="ConventionInstanceEventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerInstance">The event handler instance.</param>
-    /// <param name="decorator">The <see cref="EventHandlerAttribute"/>.</param>
-    public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance, EventHandlerAttribute decorator)
-        : base(decorator, eventHandlerInstance.GetType(), eventHandlerInstance)
+    /// <param name="identifier">The <see cref="EventHandlerAttribute"/>.</param>
+    public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance, EventHandlerModelId identifier)
+        : base(identifier, eventHandlerInstance.GetType(), eventHandlerInstance)
     {
         EventHandlerInstance = eventHandlerInstance;
     }

@@ -19,8 +19,9 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     /// Initializes a new instance of the <see cref="Artifact{TId}"/> class.
     /// </summary>
     /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
-    protected Artifact(TId id)
-        : this(id, Generation.First)
+    /// <param name="alias">The alias of the <see cref="Artifact{TId}"/>.</param>
+    protected Artifact(TId id, string? alias = null)
+        : this(id, Generation.First, alias)
     {
     }
 
@@ -29,16 +30,21 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     /// </summary>
     /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
     /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.</param>
-    protected Artifact(TId id, Generation generation)
+    /// <param name="alias">The alias of the <see cref="Artifact{TId}"/>.</param>
+    protected Artifact(TId id, Generation generation, string? alias = null)
     {
         Id = id;
         Generation = generation;
+        Alias = alias;
     }
     
     /// <summary>
     /// Gets the <typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.
     /// </summary>
     public TId Id { get; }
+
+    /// <inheritdoc />
+    public string? Alias { get; }
 
     /// <summary>
     /// Gets the <see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.

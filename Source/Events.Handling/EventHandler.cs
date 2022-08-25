@@ -23,14 +23,10 @@ public class EventHandler : IEventHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandler"/> class.
     /// </summary>
-    /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="partitioned">The value indicating whether the <see cref="EventHandler" /> is partitioned.</param>
+    /// <param name="identifier">The <see cref="EventHandlerModelId" />.</param>
     /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
     public EventHandler(
-        EventHandlerId identifier,
-        ScopeId scopeId,
-        bool partitioned,
+        EventHandlerModelId identifier,
         IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
     {
         Identifier = identifier;
@@ -39,25 +35,6 @@ public class EventHandler : IEventHandler
         _eventHandlerMethods = eventHandlerMethods;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EventHandler"/> class.
-    /// </summary>
-    /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
-    /// <param name="alias">The <see cref="EventHandlerAlias"/>.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="partitioned">The value indicating whether the <see cref="EventHandler" /> is partitioned.</param>
-    /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
-    public EventHandler(
-        EventHandlerId identifier,
-        EventHandlerAlias alias,
-        ScopeId scopeId,
-        bool partitioned,
-        IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
-        : this(identifier, scopeId, partitioned, eventHandlerMethods)
-    {
-        Alias = alias;
-        HasAlias = true;
-    }
 
     /// <inheritdoc/>
     public EventHandlerId Identifier { get; }
