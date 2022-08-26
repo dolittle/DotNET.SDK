@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Concepts;
 
@@ -12,33 +11,21 @@ namespace Dolittle.SDK.Artifacts;
 /// Represents the base representation of an artifact.
 /// </summary>
 /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
-public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>>
+public abstract class Artifact<TId> : Identifier<TId, Generation>, IEquatable<Artifact<TId>>
     where TId : ArtifactId
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Artifact{TId}"/> class.
     /// </summary>
     /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
-    protected Artifact(TId id)
-        : this(id, Generation.First)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Artifact{TId}"/> class.
-    /// </summary>
-    /// <param name="id"><typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.</param>
     /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.</param>
-    protected Artifact(TId id, Generation generation)
+    /// <param name="alias">The artifact alias.</param>
+    protected Artifact(TId id, Generation? generation = null, IdentifierAlias? alias = null)
+        : base(id, generation ?? Generation.First, alias)
     {
-        Id = id;
-        Generation = generation;
+        Tag = GetType().Name;
+        Generation = generation ?? Generation.First;
     }
-    
-    /// <summary>
-    /// Gets the <typeparamref name="TId">Id</typeparamref> of the <see cref="Artifact{TId}"/>.
-    /// </summary>
-    public TId Id { get; }
 
     /// <summary>
     /// Gets the <see cref="Generation">Generation</see> of the <see cref="Artifact{TId}"/>.
@@ -46,10 +33,7 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     public Generation Generation { get; }
 
     /// <inheritdoc />
-    Guid IIdentifier.Id => Id.Value;
-
-    /// <inheritdoc />
-    public bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier)
+    public override bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier)
     {
         if (identifier.GetType() != GetType())
         {
@@ -60,10 +44,7 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     }
 
     /// <inheritdoc />
-    public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith(typedIdentifier);
-
-    /// <inheritdoc />
-    public bool Equals(Artifact<TId> other)
+    public bool Equals(Artifact<TId>? other)
     {
         if (ReferenceEquals(null, other))
         {
@@ -73,24 +54,6 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
         {
             return true;
         }
-        return EqualityComparer<TId>.Default.Equals(Id, other.Id) && Equals(Generation, other.Generation);
+        return base.Equals(other);
     }
-
-    /// <inheritdoc />
-    public override bool Equals(object obj)
-    {
-        if (ReferenceEquals(null, obj))
-        {
-            return false;
-        }
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-        return obj.GetType() == GetType() && Equals((Artifact<TId>) obj);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-        => HashCode.Combine(Id, Generation);
 }
