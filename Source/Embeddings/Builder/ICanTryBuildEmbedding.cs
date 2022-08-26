@@ -15,8 +15,9 @@ public interface ICanTryBuildEmbedding : IProcessorBuilder<EmbeddingModelId, Emb
     /// <summary>
     /// Builds and registers the projection.
     /// </summary>
+    /// <param name="embeddingId">The <see cref="EmbeddingModelId"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="embedding">The built <see cref="IEmbedding"/>.</param>
-    bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding);
+    bool TryBuild(EmbeddingModelId embeddingId, IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding);
 }

@@ -27,5 +27,5 @@ public class EmbeddingAttribute : Attribute, IDecoratedTypeDecorator<EmbeddingMo
     public EmbeddingId Identifier { get; }
 
     /// <inheritdoc />
-    public EmbeddingModelId GetIdentifier() => new(Identifier, "");
+    public EmbeddingModelId GetIdentifier(Type type) => new(Identifier, type.Name);
 }

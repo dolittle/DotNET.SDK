@@ -18,22 +18,12 @@ public class ConventionEmbeddingBuilder<TEmbedding> : ICanTryBuildEmbedding
     where TEmbedding : class, new()
 {
     readonly Type _embeddingType = typeof(TEmbedding);
-    readonly EmbeddingModelId _identifier;
-
-    /// <summary>
-    /// Initializes an instance of the <see cref="ConventionEmbeddingBuilder{TEmbedding}"/> class.
-    /// </summary>
-    /// <param name="identifier">The <see cref="EmbeddingAttribute"/>.</param>
-    public ConventionEmbeddingBuilder(EmbeddingModelId identifier)
-    {
-        _identifier = identifier;
-    }
 
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
+    public bool TryBuild(EmbeddingModelId embeddingId, IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
     {
         embedding = default;
-        buildResults.AddInformation($"Building embedding {_identifier.Id} from type {_embeddingType}");
+        buildResults.AddInformation($"Building embedding {embeddingId.Id} from type {_embeddingType}");
 
         if (!HasParameterlessConstructor())
         {
@@ -48,16 +38,16 @@ public class ConventionEmbeddingBuilder<TEmbedding> : ICanTryBuildEmbedding
         }
 
         var success = ClassMethodBuilder<TEmbedding>
-            .ForProjection(_identifier.Id, eventTypes, buildResults)
+            .ForProjection(embeddingId.Id, eventTypes, buildResults)
             .TryBuild(out var eventTypesToMethods);
 
         success = ClassMethodBuilder<TEmbedding>
-            .ForUpdate(_identifier.Id, eventTypes, buildResults)
+            .ForUpdate(embeddingId.Id, eventTypes, buildResults)
             .TryBuild(out var updateMethod) && success;
 
 
         success = ClassMethodBuilder<TEmbedding>
-            .ForDelete(_identifier.Id, eventTypes, buildResults)
+            .ForDelete(embeddingId.Id, eventTypes, buildResults)
             .TryBuild(out var deleteMethod) && success;
 
         if (!success)
@@ -66,7 +56,7 @@ public class ConventionEmbeddingBuilder<TEmbedding> : ICanTryBuildEmbedding
         }
             
         embedding = new Embedding<TEmbedding>(
-            _identifier,
+            embeddingId,
             eventTypes,
             eventTypesToMethods,
             updateMethod,

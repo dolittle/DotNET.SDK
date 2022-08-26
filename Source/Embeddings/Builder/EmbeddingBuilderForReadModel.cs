@@ -134,7 +134,7 @@ public class EmbeddingBuilderForReadModel<TReadModel> : ICanTryBuildEmbedding, I
         => On(new EventType(eventTypeId, eventTypeGeneration), method);
 
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
+    public bool TryBuild(EmbeddingModelId embeddingId, IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
     {
         embedding = default;
         var eventTypesToMethods = new Dictionary<EventType, IOnMethod<TReadModel>>();

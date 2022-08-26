@@ -43,12 +43,12 @@ public class EmbeddingBuilder : IEmbeddingBuilder, ICanTryBuildEmbedding
     }
 
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
+    public bool TryBuild(EmbeddingModelId embeddingId, IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
     {
         embedding = default;
         if (_methodsBuilder != null)
         {
-            return _methodsBuilder.TryBuild(eventTypes, buildResults, out embedding);
+            return _methodsBuilder.TryBuild(embeddingId, eventTypes, buildResults, out embedding);
         }
         buildResults.AddFailure($"Failed to register embedding {_embeddingId}. No read model defined for embedding.");    
         return false;

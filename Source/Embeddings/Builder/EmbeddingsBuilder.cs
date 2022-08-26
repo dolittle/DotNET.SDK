@@ -48,11 +48,11 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     /// <inheritdoc />
     public IEmbeddingsBuilder Register(Type type)
     {
-        if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
+        if (!_decoratedTypeBindings.TryAdd(type, out var binding))
         {
             return this;
         }
-        BindBuilder(type, decorator);
+        BindBuilder(binding);
         return this;
     }
 
@@ -60,22 +60,21 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     public IEmbeddingsBuilder RegisterAllFrom(Assembly assembly)
     {
         var addedEmbeddingBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
-        foreach (var (type, decorator) in addedEmbeddingBindings)
+        foreach (var binding in addedEmbeddingBindings)
         {
-            BindBuilder(type, decorator);
+            BindBuilder(binding);
         }
 
         return this;
     }
-    void BindBuilder(Type type, EmbeddingAttribute decorator)
+    void BindBuilder(TypeBinding<EmbeddingModelId, EmbeddingId> binding)
         =>  _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding, EmbeddingModelId, EmbeddingId>(
-            decorator.GetIdentifier(),
-            CreateConventionEmbeddingBuilderFor(type, decorator));
+            binding.Identifier,
+            CreateConventionEmbeddingBuilderFor(binding));
     
-    static ICanTryBuildEmbedding CreateConventionEmbeddingBuilderFor(Type type, EmbeddingAttribute decorator)
+    static ICanTryBuildEmbedding CreateConventionEmbeddingBuilderFor(TypeBinding<EmbeddingModelId, EmbeddingId> binding)
         => Activator.CreateInstance(
-                typeof(ConventionEmbeddingBuilder<>).MakeGenericType(type),
-                decorator)
+                typeof(ConventionEmbeddingBuilder<>).MakeGenericType(binding.Type))
             as ICanTryBuildEmbedding;
 
     /// <summary>
@@ -89,7 +88,7 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
         var embeddings = new UniqueBindings<EmbeddingModelId, Internal.IEmbedding>();
         foreach (var (identifier, builder) in applicationModel.GetProcessorBuilderBindings<ICanTryBuildEmbedding, EmbeddingModelId, EmbeddingId>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var embedding))
+            if (builder.TryBuild(identifier, eventTypes, buildResults, out var embedding))
             {
                 embeddings.Add(identifier, embedding);
             }

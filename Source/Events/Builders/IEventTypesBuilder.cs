@@ -3,6 +3,7 @@
 
 using System;
 using System.Reflection;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Artifacts;
 
 namespace Dolittle.SDK.Events.Builders;
@@ -36,7 +37,7 @@ public interface IEventTypesBuilder
     /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
     /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
     /// <returns>The <see cref="IEventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, EventTypeAlias alias = default)
+    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, IdentifierAlias alias = default)
         where T : class;
 
     /// <summary>
@@ -46,7 +47,7 @@ public interface IEventTypesBuilder
     /// <param name="eventTypeId">The <see cref="EventTypeId" /> that the <see cref="Type" /> is associated to.</param>
     /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
     /// <returns>The <see cref="IEventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, EventTypeAlias alias = default);
+    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, IdentifierAlias alias = default);
 
     /// <summary>
     /// Associate a <see cref="Type" /> with an <see cref="EventType" />.
@@ -56,7 +57,7 @@ public interface IEventTypesBuilder
     /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
     /// <typeparam name="T">The <see cref="Type" /> that gets associated to an <see cref="EventType" />.</typeparam>
     /// <returns>The <see cref="IEventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation, EventTypeAlias alias = default)
+    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation, IdentifierAlias alias = default)
         where T : class;
 
     /// <summary>
@@ -67,7 +68,7 @@ public interface IEventTypesBuilder
     /// <param name="generation">The <see cref="Generation" /> of the <see cref="EventType" />.</param>
     /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the Event Type.</param>
     /// <returns>The <see cref="IEventTypesBuilder"/> for building <see cref="IEventTypes" />.</returns>
-    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation, EventTypeAlias alias = default);
+    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation, IdentifierAlias alias = default);
 
     /// <summary>
     /// Associate a <see cref="Type" /> with the <see cref="EventType" /> given by an attribute.

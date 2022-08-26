@@ -44,21 +44,21 @@ public class EventTypesBuilder : IEventTypesBuilder
     }
 
     /// <inheritdoc />
-    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, EventTypeAlias alias = default)
+    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, IdentifierAlias alias = default)
         where T : class
         => Associate(typeof(T), eventTypeId, alias);
 
     /// <inheritdoc />
-    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, EventTypeAlias alias = default)
-        => Associate(type, new EventType(eventTypeId, alias));
+    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, IdentifierAlias alias = default)
+        => Associate(type, new EventType(eventTypeId, alias: alias));
 
     /// <inheritdoc />
-    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation, EventTypeAlias alias = default)
+    public IEventTypesBuilder Associate<T>(EventTypeId eventTypeId, Generation generation, IdentifierAlias alias = default)
         where T : class
         => Associate(typeof(T), eventTypeId, generation, alias);
 
     /// <inheritdoc />
-    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation, EventTypeAlias alias = default)
+    public IEventTypesBuilder Associate(Type type, EventTypeId eventTypeId, Generation generation, IdentifierAlias alias = default)
         => Associate(type, new EventType(eventTypeId, generation, alias));
     
     /// <inheritdoc />
