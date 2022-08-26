@@ -107,6 +107,7 @@ public class UniqueBindings<TKey, TValue> : IUniqueBindings<TKey, TValue>
         _valueToKey.Add(value, key);
         _keyToValue.Add(key, value);
     }
+
     void ThrowIfKeyAlreadyAssociatedWithValue(TKey key, TValue value)
     {
         if (_keyToValue.TryGetValue(key, out var existingValue))
