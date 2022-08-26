@@ -19,7 +19,8 @@ public class UnregisteredEventTypes : EventTypes, IUnregisteredEventTypes
     /// Initializes an instance of the <see cref="UnregisteredEventTypes"/> class.
     /// </summary>
     /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for <see cref="EventType"/> to <see cref="Type"/>.</param>
-    public UnregisteredEventTypes(IUniqueBindings<EventType, Type> bindings) : base(bindings)
+    public UnregisteredEventTypes(IUniqueBindings<EventType, Type> bindings)
+        : base(bindings)
     {
     }
 

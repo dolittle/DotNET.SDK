@@ -15,7 +15,7 @@ public class EventBuilder
     readonly bool _isPublic;
     readonly EventSourceId _eventSourceId;
     readonly object _event;
-    EventType _eventType;
+    EventType? _eventType;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventBuilder"/> class.
