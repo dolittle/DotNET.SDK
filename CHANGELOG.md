@@ -1,3 +1,13 @@
+# [17.2.2] - 2022-8-26 [PR: #158](https://github.com/dolittle/DotNET.SDK/pull/158)
+## Summary
+
+We have experienced applications that were crashing due to grpc messages growing too big due to the volume of events for an aggregate root. As a quick workaround for this we can increase the maximum size of the grpc messages. In the long term a better solution will be to implement streaming and batch mechanisms.
+
+### Changed
+
+- The max size of grpc messages to 32 mb
+
+
 # [17.2.1] - 2022-8-10 [PR: #156](https://github.com/dolittle/DotNET.SDK/pull/156)
 ## Summary
 
