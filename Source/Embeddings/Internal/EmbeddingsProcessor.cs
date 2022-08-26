@@ -49,7 +49,7 @@ public class EmbeddingsProcessor<TReadModel> : EventProcessor<EmbeddingId, Embed
         IConvertProjectionsToSDK projectionConverter,
         IEventTypes eventTypes,
         ILogger logger)
-        : base("Embedding", embedding.Identifier, logger)
+        : base("Embedding", embedding.Identifier.Id, logger)
     {
         _embedding = embedding;
         _eventsToProtobuf = eventsToProtobuf;
@@ -64,7 +64,7 @@ public class EmbeddingsProcessor<TReadModel> : EventProcessor<EmbeddingId, Embed
         {
             var registrationRequest = new EmbeddingRegistrationRequest
             {
-                EmbeddingId = _embedding.Identifier.ToProtobuf(),
+                EmbeddingId = _embedding.Identifier.Id.ToProtobuf(),
                 InitialState = JsonConvert.SerializeObject(_embedding.InitialState, Formatting.None),
             };
             registrationRequest.Events.AddRange(_embedding.Events.Select(_ => _.ToProtobuf()));

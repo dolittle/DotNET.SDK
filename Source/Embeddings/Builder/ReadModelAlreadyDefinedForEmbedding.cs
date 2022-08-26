@@ -15,8 +15,8 @@ public class ReadModelAlreadyDefinedForEmbedding : Exception
     /// </summary>
     /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
     /// <param name="type">The type of the readmodel already defined.</param>
-    public ReadModelAlreadyDefinedForEmbedding(EmbeddingId embeddingId, Type type)
-        : base($"Embedding {embeddingId} already has a readmodel of type {type} defined for it.")
+    public ReadModelAlreadyDefinedForEmbedding(EmbeddingModelId embeddingId, Type type)
+        : base($"{embeddingId} already has a readmodel of type {type} defined for it.")
     {
     }
 }

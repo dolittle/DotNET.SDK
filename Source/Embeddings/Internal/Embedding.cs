@@ -34,7 +34,7 @@ public class Embedding<TReadModel> : IEmbedding<TReadModel>
     /// <param name="updateMethod">The compare method.</param>
     /// <param name="removeMethod">The remove method.</param>
     public Embedding(
-        EmbeddingId identifier,
+        EmbeddingModelId identifier,
         IEventTypes eventTypes,
         IDictionary<EventType, IOnMethod<TReadModel>> onMethods,
         IUpdateMethod<TReadModel> updateMethod,
@@ -53,7 +53,7 @@ public class Embedding<TReadModel> : IEmbedding<TReadModel>
     public Type ReadModelType { get; }
 
     /// <inheritdoc/>
-    public EmbeddingId Identifier { get; }
+    public EmbeddingModelId Identifier { get; }
 
     /// <inheritdoc/>
     public TReadModel InitialState { get; } = new();
@@ -67,11 +67,11 @@ public class Embedding<TReadModel> : IEmbedding<TReadModel>
         var tryUpdate = _updateMethod.TryUpdate(receivedState, currentState, context);
         if (tryUpdate.Exception != default)
         {
-            throw new EmbeddingUpdateMethodFailed(Identifier, context, tryUpdate.Exception);
+            throw new EmbeddingUpdateMethodFailed(Identifier.Id, context, tryUpdate.Exception);
         }
         if (tryUpdate.Result.All(_ => _ == default))
         {
-            throw new EmbeddingUpdateMethodDidNotReturnEvents(Identifier, context);
+            throw new EmbeddingUpdateMethodDidNotReturnEvents(Identifier.Id, context);
         }
         return CreateUncommittedEvents(tryUpdate.Result);
     }
@@ -82,11 +82,11 @@ public class Embedding<TReadModel> : IEmbedding<TReadModel>
         var tryDelete = _removeMethod.TryDelete(currentState, context);
         if (tryDelete.Exception != default)
         {
-            throw new EmbeddingDeleteMethodFailed(Identifier, context, tryDelete.Exception);
+            throw new EmbeddingDeleteMethodFailed(Identifier.Id, context, tryDelete.Exception);
         }
         if (tryDelete.Result.All(_ => _ == default))
         {
-            throw new EmbeddingDeleteMethodDidNotReturnEvents(Identifier, context);
+            throw new EmbeddingDeleteMethodDidNotReturnEvents(Identifier.Id, context);
         }
         return CreateUncommittedEvents(tryDelete.Result);
     }
@@ -101,7 +101,7 @@ public class Embedding<TReadModel> : IEmbedding<TReadModel>
         var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
         if (tryOn.Exception != default)
         {
-            throw new EmbeddingOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
+            throw new EmbeddingOnMethodFailed(Identifier.Id, eventType, @event, tryOn.Exception);
         }
         return tryOn.Result;
     }

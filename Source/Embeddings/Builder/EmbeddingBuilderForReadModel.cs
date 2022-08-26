@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Embeddings.Internal;
@@ -18,21 +19,21 @@ public class EmbeddingBuilderForReadModel<TReadModel> : ICanTryBuildEmbedding, I
     where TReadModel : class, new()
 {
     readonly List<IOnMethod<TReadModel>> _methods = new();
-    readonly EmbeddingId _embeddingId;
-    IUpdateMethod<TReadModel> _updateMethod;
-    IDeleteMethod<TReadModel> _deleteMethod;
+    readonly EmbeddingModelId _embeddingId;
+    IUpdateMethod<TReadModel>? _updateMethod;
+    IDeleteMethod<TReadModel>? _deleteMethod;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmbeddingBuilderForReadModel{TReadModel}"/> class.
     /// </summary>
     /// <param name="embeddingId">The <see cref="EmbeddingId" />.</param>
-    public EmbeddingBuilderForReadModel(EmbeddingId embeddingId)
+    public EmbeddingBuilderForReadModel(EmbeddingModelId embeddingId)
     {
         _embeddingId = embeddingId;
     }
     
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildEmbedding other) => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<EmbeddingModelId, EmbeddingId> other) => ReferenceEquals(this, other);
 
     /// <summary>
     /// Add the update method for resolving the received and current state of the embedding.

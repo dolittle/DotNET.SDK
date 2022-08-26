@@ -12,16 +12,16 @@ namespace Dolittle.SDK.Embeddings.Builder;
 /// </summary>
 public class EmbeddingBuilder : IEmbeddingBuilder, ICanTryBuildEmbedding
 {
-    readonly EmbeddingId _embeddingId;
     readonly IModelBuilder _modelBuilder;
-    ICanTryBuildEmbedding _methodsBuilder;
+    EmbeddingModelId _embeddingId;
+    ICanTryBuildEmbedding? _methodsBuilder;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EmbeddingBuilder"/> class.
     /// </summary>
-    /// <param name="embeddingId">The <see cref="EmbeddingId" />.</param>
+    /// <param name="embeddingId">The <see cref="EmbeddingModelId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
-    public EmbeddingBuilder(EmbeddingId embeddingId, IModelBuilder modelBuilder)
+    public EmbeddingBuilder(EmbeddingModelId embeddingId, IModelBuilder modelBuilder)
     {
         _embeddingId = embeddingId;
         _modelBuilder = modelBuilder;
@@ -36,7 +36,7 @@ public class EmbeddingBuilder : IEmbeddingBuilder, ICanTryBuildEmbedding
             throw new ReadModelAlreadyDefinedForEmbedding(_embeddingId, typeof(TReadModel));
         }
 
-        _modelBuilder.BindIdentifierToType<EmbeddingModelId, EmbeddingId>(new EmbeddingModelId(_embeddingId), typeof(TReadModel));
+        _modelBuilder.BindIdentifierToType<EmbeddingModelId, EmbeddingId>(_embeddingId, typeof(TReadModel));
         var builder = new EmbeddingBuilderForReadModel<TReadModel>(_embeddingId);
         _methodsBuilder = builder;
         return builder;
@@ -55,5 +55,5 @@ public class EmbeddingBuilder : IEmbeddingBuilder, ICanTryBuildEmbedding
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildEmbedding other) => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<EmbeddingModelId, EmbeddingId> other) => ReferenceEquals(this, other);
 }

@@ -34,8 +34,9 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     /// <inheritdoc />
     public IEmbeddingBuilder Create(EmbeddingId embeddingId)
     {
-        var builder = new EmbeddingBuilder(embeddingId, _modelBuilder);
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding>(new EmbeddingModelId(embeddingId), builder);
+        var identifier = new EmbeddingModelId(embeddingId, "");
+        var builder = new EmbeddingBuilder(identifier, _modelBuilder);
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding, EmbeddingModelId, EmbeddingId>(identifier, builder);
         return builder;
     }
 
@@ -67,7 +68,7 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
         return this;
     }
     void BindBuilder(Type type, EmbeddingAttribute decorator)
-        =>  _modelBuilder.BindIdentifierToProcessorBuilder(
+        =>  _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding, EmbeddingModelId, EmbeddingId>(
             decorator.GetIdentifier(),
             CreateConventionEmbeddingBuilderFor(type, decorator));
     
@@ -86,11 +87,11 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     public static IUnregisteredEmbeddings Build(IApplicationModel applicationModel, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var embeddings = new UniqueBindings<EmbeddingModelId, Internal.IEmbedding>();
-        foreach (var builder in applicationModel.GetProcessorBuilderBindings<ICanTryBuildEmbedding>().Select(_ => _.ProcessorBuilder))
+        foreach (var (identifier, builder) in applicationModel.GetProcessorBuilderBindings<ICanTryBuildEmbedding, EmbeddingModelId, EmbeddingId>())
         {
             if (builder.TryBuild(eventTypes, buildResults, out var embedding))
             {
-                embeddings.Add(new EmbeddingModelId(embedding.Identifier), embedding);
+                embeddings.Add(identifier, embedding);
             }
         }
         var identifiers = applicationModel.GetTypeBindings<EmbeddingModelId, EmbeddingId>();

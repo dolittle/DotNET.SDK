@@ -14,8 +14,8 @@ public class EmbeddingAlreadyHasADeleteMethod : Exception
     /// Initializes a new instance of the <see cref="EmbeddingAlreadyHasADeleteMethod"/> class.
     /// </summary>
     /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
-    public EmbeddingAlreadyHasADeleteMethod(EmbeddingId embeddingId)
-        : base($"Embedding {embeddingId} already has a deletion method defined for it.")
+    public EmbeddingAlreadyHasADeleteMethod(EmbeddingModelId embeddingId)
+        : base($"{embeddingId} already has a deletion method defined for it.")
     {
     }
 }

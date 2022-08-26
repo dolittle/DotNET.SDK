@@ -13,9 +13,9 @@ public class EmbeddingAlreadyHasAnUpdateMethod : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="EmbeddingAlreadyHasAnUpdateMethod"/> class.
     /// </summary>
-    /// <param name="embeddingId">The <see cref="EmbeddingId"/>.</param>
-    public EmbeddingAlreadyHasAnUpdateMethod(EmbeddingId embeddingId)
-        : base($"Embedding {embeddingId} already has an update method defined for it.")
+    /// <param name="embeddingId">The <see cref="EmbeddingModelId"/>.</param>
+    public EmbeddingAlreadyHasAnUpdateMethod(EmbeddingModelId embeddingId)
+        : base($"{embeddingId} already has an update method defined for it.")
     {
     }
 }

@@ -24,7 +24,7 @@ public interface IEmbedding
     /// <summary>
     /// Gets the unique identifier for embedding - <see cref="EmbeddingId" />.
     /// </summary>
-    EmbeddingId Identifier { get; }
+    EmbeddingModelId Identifier { get; }
 
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this embedding.
