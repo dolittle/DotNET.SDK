@@ -41,10 +41,8 @@ public interface IModelBuilder
     /// <typeparam name="TBuilder">The <see cref="Type"/>of the processor builder.</typeparam>
     /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
     /// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
-    /// <typeparam name="TProcessor">The <see cref="Type"/> of the processor to build.</typeparam>
-    void BindIdentifierToProcessorBuilder<TBuilder, TProcessor, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
-        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
-        where TProcessor : class 
+    void BindIdentifierToProcessorBuilder<TBuilder, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
+        where TBuilder : IProcessorBuilder<TIdentifier, TId>
         where TIdentifier : IIdentifier<TId>
         where TId : ConceptAs<Guid>;
     
@@ -54,12 +52,10 @@ public interface IModelBuilder
     /// <param name="identifier">The identifier to unbind.</param>
     /// <param name="builder">The processor builder to unbind the identifier to.</param>
     /// <typeparam name="TBuilder">The <see cref="Type"/>of the processor builder.</typeparam>
-    /// <typeparam name="TProcessor">The <see cref="Type"/> of the processor to build.</typeparam>
     /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
     /// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
-    void UnbindIdentifierToProcessorBuilder<TBuilder, TProcessor, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
-        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
-        where TProcessor : class 
+    void UnbindIdentifierToProcessorBuilder<TBuilder, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
+        where TBuilder : IProcessorBuilder<TIdentifier, TId>
         where TIdentifier : IIdentifier<TId>
         where TId : ConceptAs<Guid>;
 

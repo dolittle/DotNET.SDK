@@ -36,17 +36,15 @@ public class ModelBuilder : IModelBuilder
     }
 
     /// <inheritdoc />
-    public void BindIdentifierToProcessorBuilder<TBuilder, TProcessor, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
-        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
-        where TProcessor : class 
+    public void BindIdentifierToProcessorBuilder<TBuilder, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
+        where TBuilder : IProcessorBuilder<TIdentifier, TId>
         where TIdentifier : IIdentifier<TId>
         where TId : ConceptAs<Guid>
-        => _processorBuildersByIdentifier.AddBinding(new ProcessorBuilderBinding<TProcessor, TBuilder, TIdentifier, TId>(identifier, builder), builder);
+        => _processorBuildersByIdentifier.AddBinding(new ProcessorBuilderBinding<TBuilder, TIdentifier, TId>(identifier, builder), builder);
 
     /// <inheritdoc />
-    public void UnbindIdentifierToProcessorBuilder<TBuilder, TProcessor, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
-        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
-        where TProcessor : class 
+    public void UnbindIdentifierToProcessorBuilder<TBuilder, TIdentifier, TId>(TIdentifier identifier, TBuilder builder)
+        where TBuilder : IProcessorBuilder<TIdentifier, TId>
         where TIdentifier : IIdentifier<TId>
         where TId : ConceptAs<Guid>
     {

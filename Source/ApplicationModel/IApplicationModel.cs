@@ -32,14 +32,12 @@ public interface IApplicationModel
     /// <summary>
     /// Gets the bindings for a specific kind of processor builder.
     /// </summary>
-    /// <typeparam name="TProcessor">The <see cref="Type"/> of the processor to build.</typeparam>
     /// <typeparam name="TBuilder">The <see cref="Type"/>of the processor builder.</typeparam>
     /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
     /// <typeparam name="TId">The type of the globally unique id of the identifier.</typeparam>
     /// <returns>The bound processor builders.</returns>
-    IEnumerable<ProcessorBuilderBinding<TProcessor, TBuilder, TIdentifier, TId>> GetProcessorBuilderBindings<TProcessor, TBuilder, TIdentifier, TId>()
-        where TProcessor : class
-        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
+    IEnumerable<ProcessorBuilderBinding<TBuilder, TIdentifier, TId>> GetProcessorBuilderBindings<TBuilder, TIdentifier, TId>()
+        where TBuilder : IProcessorBuilder<TIdentifier, TId>
         where TIdentifier : IIdentifier<TId>
         where TId : ConceptAs<Guid>;
 }

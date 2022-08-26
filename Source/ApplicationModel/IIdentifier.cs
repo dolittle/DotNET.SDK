@@ -43,6 +43,11 @@ public interface IIdentifier
     IdentifierAlias Alias { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the identifier has an alias.
+    /// </summary>
+    bool HasAlias { get; }
+    
+    /// <summary>
     /// Determines whether or not this identifier can coexist with another identifier.
     /// By default identifiers with a similar id cannot coexist, but subtype can implement custom logic.
     /// </summary>

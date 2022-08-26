@@ -19,7 +19,8 @@ public record Binding<TIdentifier, TId> : Binding, IBinding<TIdentifier, TId>
     /// Initializes an instance of the <see cref="Binding{TIdentifier,TId}"/> class.
     /// </summary>
     /// <param name="identifier">The <typeparamref name="TIdentifier"/>.</param>
-    public Binding(TIdentifier identifier) : base(identifier)
+    public Binding(TIdentifier identifier)
+        : base(identifier)
     {
         Identifier = identifier;
     }

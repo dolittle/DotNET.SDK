@@ -25,9 +25,22 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
     /// <param name="id">The globally unique id for the identifier.</param>
     /// <param name="alias">The identifier alias.</param>
     /// <param name="extras">The extra data for the identifier.</param>
-    protected Identifier(string tag, TId id, IdentifierAlias alias, TExtras extras) : base(tag, id, alias)
+    protected Identifier(string tag, TId id, TExtras extras, IdentifierAlias? alias)
+        : base(tag, id, alias)
     {
         _extras = extras;
+    }
+    
+    /// <summary>
+    /// Initializes an instance of the <see cref="Identifier{TId,TExtras}"/> class.
+    /// </summary>
+    /// <param name="tag">The tag name of this identifier.</param>
+    /// <param name="id">The globally unique id for the identifier.</param>
+    /// <param name="alias">The identifier alias.</param>
+    /// <param name="extras">The extra data for the identifier.</param>
+    protected Identifier(TId id, TExtras extras, IdentifierAlias? alias)
+        : this("", id, extras, alias)
+    {
     }
 
     /// <inheritdoc />
@@ -42,7 +55,7 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
     public override int GetHashCode() => HashCode.Combine(Id, _extras);
     
     /// <inheritdoc />
-    public override string ToString() => $"{Tag}({Id.Value} {ExtrasAsString()})";
+    public override string ToString() => $"{Title}({Id.Value} {ExtrasAsString()})";
 
     string ExtrasAsString()
         => _extras == null ? string.Empty : $"{typeof(TExtras).Name}: {_extras}";
@@ -61,11 +74,11 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     /// <param name="tag">The tag name of this identifier.</param>
     /// <param name="id">The globally unique id for the identifier.</param>
     /// <param name="alias">The identifier alias.</param>
-    protected Identifier(string tag, TId id, IdentifierAlias alias)
+    protected Identifier(string tag, TId id, IdentifierAlias? alias)
     {
-        Tag = tag;
-        Id = id;
-        Alias = alias;
+        Id = id ?? throw new IdentifierIdCannotBeNull(GetType(), typeof(TId));
+        Tag = tag ?? "";
+        Alias = alias ?? "";
     }
 
     /// <inheritdoc />
@@ -75,12 +88,15 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     public IdentifierAlias Alias { get; }
 
     /// <inheritdoc />
+    public bool HasAlias => Alias?.Exists ?? false;
+
+    /// <inheritdoc />
     Guid IIdentifier.Id => Id.Value;
     
     /// <summary>
     /// Gets the tag name.
     /// </summary>
-    protected string Tag { get; }
+    protected string Tag { get; init; }
 
     /// <inheritdoc />
     public virtual bool CanCoexistWith(IIdentifier<ConceptAs<Guid>> identifier) => false;
@@ -106,5 +122,10 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     public override int GetHashCode() => EqualityComparer<TId>.Default.GetHashCode(Id);
 
     /// <inheritdoc />
-    public override string ToString() => $"{Tag}({Id.Value})";
+    public override string ToString() => $"{Title}({Id.Value})";
+
+    /// <summary>
+    /// Gets the beginning part used in the <see cref="ToString"/> method.
+    /// </summary>
+    protected string Title => Alias.Exists ? Tag : $"{Tag} {Alias}";
 }

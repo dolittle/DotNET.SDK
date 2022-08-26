@@ -36,12 +36,11 @@ public class ApplicationModel : IApplicationModel
         => BindingsOfType<TypeBinding<TIdentifier, TId>>();
 
     /// <inheritdoc />
-    public IEnumerable<ProcessorBuilderBinding<TProcessor, TBuilder, TIdentifier, TId>> GetProcessorBuilderBindings<TProcessor, TBuilder, TIdentifier, TId>()
-        where TProcessor : class
-        where TBuilder : IProcessorBuilder<TProcessor, TIdentifier, TId>
+    public IEnumerable<ProcessorBuilderBinding<TBuilder, TIdentifier, TId>> GetProcessorBuilderBindings<TBuilder, TIdentifier, TId>()
+        where TBuilder : IProcessorBuilder<TIdentifier, TId>
         where TIdentifier : IIdentifier<TId>
         where TId : ConceptAs<Guid>
-        => BindingsOfType<ProcessorBuilderBinding<TProcessor, TBuilder, TIdentifier, TId>>();
+        => BindingsOfType<ProcessorBuilderBinding<TBuilder, TIdentifier, TId>>();
 
     IEnumerable<TBinding> BindingsOfType<TBinding>()
         where TBinding : IBinding
