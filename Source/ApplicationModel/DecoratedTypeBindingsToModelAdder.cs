@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Common;
@@ -11,7 +12,7 @@ using Dolittle.SDK.Concepts;
 namespace Dolittle.SDK.ApplicationModel;
 
 /// <summary>
-/// Represents a a thing that knows about <typeparamref name="TDecorator"/> decorated classes representing a unique <typeparamref name="TIdentifier"/> and how to add it to the <see cref="IApplicationModel"/>.
+/// Represents a thing that knows about decorated types representing a unique <typeparamref name="TIdentifier"/> and how to add it to the <see cref="IApplicationModel"/>.
 /// </summary>
 /// <typeparam name="TDecorator">The <see cref="Type"/> of the class decorator.</typeparam>
 /// <typeparam name="TIdentifier">The <see cref="Type"/> of the <see cref="IIdentifier{TId}"/>.</typeparam>
@@ -26,7 +27,7 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     readonly IClientBuildResults _buildResults;
 
     /// <summary>
-    /// Initializes an instance of the <see cref="DecoratedTypeBindingsToModelAdder{TDecorator,TIdentifier,TId}"/> class.
+    /// Initializes an instance of the <see cref="DecoratedTypeBindingsToModelAdder{TDecorator, TIdentifier,TId}"/> class.
     /// </summary>
     /// <param name="decoratedTypeTag">The log-friendly name of the models decorated with the <typeparamref name="TDecorator"/>.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/> to bind the derived <see cref="TypeBinding{TIdentifier,TId}"/> on.</param>
@@ -39,39 +40,42 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     }
     
     /// <summary>
-    /// Try add the <typeparamref name="TIdentifier"/> derived from the <typeparamref name="TDecorator"/> on the given <see cref="Type"/>.
+    /// Try add the <typeparamref name="TIdentifier"/> derived from the decorator on the given <see cref="Type"/>.
     /// </summary>
-    /// <param name="type">The <see cref="Type"/> that is decorated with <typeparamref name="TDecorator"/> and is to be bound to the derived <typeparamref name="TIdentifier"/>.</param>
-    /// <param name="decorator">The <typeparamref name="TDecorator"/> that has the <typeparamref name="TIdentifier"/>.</param>
+    /// <param name="type">The <see cref="Type"/> that is decorated with an <see cref="Attribute"/> that implements <see cref="IDecoratedTypeDecorator{TIdentifier}"/> and is to be bound to the derived <typeparamref name="TIdentifier"/>.</param>
+    /// <param name="binding">The <typeparamref name="TIdentifier"/> derived from the decoration.</param>
     /// <returns>A value indicating whether the given <see cref="Type"/> is decorated with <typeparamref name="TDecorator"/>.</returns>
-    public bool TryAdd(Type type, out TDecorator decorator)
+    public bool TryAdd(Type type, [NotNullWhen(true)]out TypeBinding<TIdentifier, TId>? binding)
     {
-        if (!type.TryGetDecorator(out decorator))
+        binding = null;
+        if (!type.TryGetDecorator<TDecorator>(out var decorator))
         {
             _buildResults.AddFailure($"The {_decoratedTypeTag} class {type.Name} is is not decorated as an {_decoratedTypeTag}", $"Add the [{nameof(TDecorator)}] decorator to the class");
             return false;
         }
-        AddBinding(decorator.GetIdentifier(), type);
+        binding = new TypeBinding<TIdentifier, TId>(decorator.GetIdentifier(type), type);
+        AddBinding(binding.Identifier, type);
         return true;
     }
 
     /// <summary>
     /// Adds all the <typeparamref name="TIdentifier"/> bindings found in the <see cref="Assembly"/> <see cref="Assembly.ExportedTypes"/>;
     /// </summary>
-    /// <param name="assembly"></param>
-    public IEnumerable<(Type, TDecorator)> AddFromAssembly(Assembly assembly)
+    /// <param name="assembly">The <see cref="Assembly"/> to search in.</param>
+    /// <returns>The </returns>
+    public IEnumerable<TypeBinding<TIdentifier, TId>> AddFromAssembly(Assembly assembly)
     {
-        var result = new List<(Type, TDecorator)>();
+        var result = new List<TypeBinding<TIdentifier, TId>>();
         try
         {
             foreach (var type in assembly.ExportedTypes)
             {
-                if (!type.TryGetDecorator<TDecorator>(out var decorator))
+                if (!type.TryGetIdentifier<TIdentifier>(out var identifier))
                 {
                     continue;
                 }
-                AddBinding(decorator.GetIdentifier(), type);
-                result.Add((type, decorator));
+                AddBinding(identifier, type);
+                result.Add(new TypeBinding<TIdentifier, TId>(identifier, type));
             }
         }
         catch
