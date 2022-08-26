@@ -33,7 +33,7 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
         IEventHandler eventHandler,
         IEventProcessingConverter converter,
         ILogger logger)
-        : base("EventHandler", eventHandler.Identifier, logger)
+        : base("EventHandler", eventHandler.Identifier.Id, logger)
     {
         _eventHandler = eventHandler;
         _converter = converter;
@@ -46,13 +46,13 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
         {
             var registrationRequest = new EventHandlerRegistrationRequest
             {
-                EventHandlerId = _eventHandler.Identifier.ToProtobuf(),
-                ScopeId = _eventHandler.ScopeId.ToProtobuf(),
-                Partitioned = _eventHandler.Partitioned
+                EventHandlerId = _eventHandler.Identifier.Id.ToProtobuf(),
+                ScopeId = _eventHandler.Identifier.Scope.ToProtobuf(),
+                Partitioned = _eventHandler.Identifier.Partitioned
             };
-            if (_eventHandler.HasAlias)
+            if (_eventHandler.Identifier.HasAlias)
             {
-                registrationRequest.Alias = _eventHandler.Alias.Value;
+                registrationRequest.Alias = _eventHandler.Identifier.Alias.Value;
             }
 
             registrationRequest.EventTypes.AddRange(_eventHandler.HandledEvents.Select(_ => _.ToProtobuf()).ToArray());

@@ -24,58 +24,18 @@ public class EventHandler : IEventHandler
     /// Initializes a new instance of the <see cref="EventHandler"/> class.
     /// </summary>
     /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="partitioned">The value indicating whether the <see cref="EventHandler" /> is partitioned.</param>
     /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
-    public EventHandler(
-        EventHandlerId identifier,
-        ScopeId scopeId,
-        bool partitioned,
-        IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
+    public EventHandler(EventHandlerModelId identifier, IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
     {
         Identifier = identifier;
-        ScopeId = scopeId;
-        Partitioned = partitioned;
         _eventHandlerMethods = eventHandlerMethods;
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EventHandler"/> class.
-    /// </summary>
-    /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
-    /// <param name="alias">The <see cref="EventHandlerAlias"/>.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="partitioned">The value indicating whether the <see cref="EventHandler" /> is partitioned.</param>
-    /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
-    public EventHandler(
-        EventHandlerId identifier,
-        EventHandlerAlias alias,
-        ScopeId scopeId,
-        bool partitioned,
-        IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
-        : this(identifier, scopeId, partitioned, eventHandlerMethods)
-    {
-        Alias = alias;
-        HasAlias = true;
-    }
-
     /// <inheritdoc/>
-    public EventHandlerId Identifier { get; }
-
-    /// <inheritdoc/>
-    public ScopeId ScopeId { get; }
-
-    /// <inheritdoc/>
-    public bool Partitioned { get; }
+    public EventHandlerModelId Identifier { get; }
 
     /// <inheritdoc/>
     public IEnumerable<EventType> HandledEvents => _eventHandlerMethods.Keys;
 
-    /// <inheritdoc />
-    public EventHandlerAlias Alias { get; }
-
-    /// <inheritdoc />
-    public bool HasAlias { get; }
 
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)

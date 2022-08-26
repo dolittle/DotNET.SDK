@@ -14,12 +14,20 @@ public class EventHandlerModelId : Identifier<EventHandlerId, ScopeId>
     /// Initializes a new instance of the <see cref="EventHandlerModelId"/> class.
     /// </summary>
     /// <param name="id">The <see cref="EventHandlerId"/>.</param>
+    /// <param name="partitioned">The value indicating whether the event handler is partitioned.</param>
     /// <param name="scope">The <see cref="ScopeId"/>.></param>
-    public EventHandlerModelId(EventHandlerId id, ScopeId scope)
-        : base("EventHandler", id, scope)
+    /// <param name="alias">The alias.</param>
+    public EventHandlerModelId(EventHandlerId id, bool partitioned, ScopeId scope, IdentifierAlias? alias)
+        : base("EventHandler", id, scope, alias)
     {
+        Partitioned = partitioned;
         Scope = scope;
     }
+    
+    /// <summary>
+    /// Gets whether the event handler is partitioned.
+    /// </summary>
+    public bool Partitioned { get; }
     
     /// <summary>
     /// Gets the <see cref="ScopeId"/>.

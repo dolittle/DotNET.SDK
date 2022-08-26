@@ -12,14 +12,13 @@ namespace Dolittle.SDK.Events.Handling.Builder;
 /// <summary>
 /// Represents a building event handlers.
 /// </summary>
-public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandler, IEquatable<EventHandlerBuilder>
+public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandler
 {
     readonly EventHandlerId _eventHandlerId;
     readonly IModelBuilder _modelBuilder;
     readonly EventHandlerMethodsBuilder _methodsBuilder;
 
-    EventHandlerAlias _alias;
-    bool _hasAlias;
+    IdentifierAlias? _alias;
     bool _partitioned = true;
     ScopeId _scopeId = ScopeId.Default;
 
@@ -35,23 +34,24 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
         Bind();
     }
-    
-    /// <summary>
-    /// Gets the <see cref="EventHandlerModelId"/>.
-    /// </summary>
-    public EventHandlerModelId ModelId => new(_eventHandlerId, _scopeId);
+
+    EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, _alias);
     
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
     {
+        Unbind();
         _partitioned = true;
+        Bind();
         return _methodsBuilder;
     }
 
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Unpartitioned()
     {
+        Unbind();
         _partitioned = false;
+        Bind();
         return _methodsBuilder;
     }
 
@@ -65,15 +65,16 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     }
 
     /// <inheritdoc />
-    public IEventHandlerBuilder WithAlias(EventHandlerAlias alias)
+    public IEventHandlerBuilder WithAlias(IdentifierAlias alias)
     {
+        Unbind();
         _alias = alias;
-        _hasAlias = true;
+        Bind();
         return this;
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
+    public bool TryBuild(EventHandlerModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
     {
         eventHandler = default;
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
@@ -89,15 +90,13 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
             return false;
         }
 
-        eventHandler = _hasAlias
-            ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
-            : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
+        eventHandler = new EventHandler(identifier, eventTypesToMethods);
         return true;
     }
     
     /// <inheritdoc />
-    public bool Equals(EventHandlerBuilder other)
-        => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<EventHandlerModelId, EventHandlerId> other)
+        => other is EventHandlerBuilder && ReferenceEquals(this, other);
 
     /// <inheritdoc />
     public override bool Equals(object other)
@@ -105,14 +104,14 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
 
     /// <inheritdoc />
     public override int GetHashCode() =>
-        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _hasAlias, _partitioned, _scopeId);
+        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _partitioned, _scopeId);
 
     void Bind()
     {
-        _modelBuilder.BindIdentifierToProcessorBuilder(ModelId, this);
+        _modelBuilder.BindIdentifierToProcessorBuilder<EventHandlerBuilder, EventHandlerModelId, EventHandlerId>(ModelId, this);
     }
     void Unbind()
     {
-        _modelBuilder.UnbindIdentifierToProcessorBuilder(ModelId, this);
+        _modelBuilder.UnbindIdentifierToProcessorBuilder<EventHandlerBuilder, EventHandlerModelId, EventHandlerId>(ModelId, this);
     }
 }

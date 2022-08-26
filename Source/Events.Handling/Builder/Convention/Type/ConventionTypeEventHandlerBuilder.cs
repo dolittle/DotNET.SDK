@@ -4,6 +4,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
@@ -12,20 +13,20 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention.Type;
 /// <summary>
 /// Methods for building <see cref="IEventHandler"/> instances by convention from an instantiated event handler class.
 /// </summary>
-public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, IEquatable<ConventionTypeEventHandlerBuilder>
+public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ConventionTypeEventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerType">The <see cref="Type" /> of the event handler.</param>
     /// <param name="decorator">The <see cref="EventHandlerAttribute"/>.</param>
-    public ConventionTypeEventHandlerBuilder(System.Type eventHandlerType, EventHandlerAttribute decorator)
-        : base(decorator, eventHandlerType)
+    public ConventionTypeEventHandlerBuilder(TypeBinding<EventHandlerModelId, EventHandlerId> binding)
+        : base(binding)
     {
     }
     
     /// <inheritdoc />
-    public bool Equals(ConventionTypeEventHandlerBuilder other)
+    public bool Equals(IProcessorBuilder<EventHandlerModelId, EventHandlerId> other)
         => base.Equals(other);
 
     /// <inheritdoc />
@@ -38,6 +39,7 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
 
     /// <inheritdoc/>
     public override bool TryBuild(
+        EventHandlerModelId id,
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
         out IEventHandler eventHandler)

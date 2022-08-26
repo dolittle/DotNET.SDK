@@ -4,6 +4,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
@@ -12,15 +13,15 @@ namespace Dolittle.SDK.Events.Handling.Builder.Convention.Instance;
 /// <summary>
 /// Methods for building <see cref="IEventHandler"/> instances by convention from an instantiated event handler class.
 /// </summary>
-public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuilder, IEquatable<ConventionInstanceEventHandlerBuilder>
+public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuilder
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ConventionInstanceEventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerInstance">The event handler instance.</param>
     /// <param name="decorator">The <see cref="EventHandlerAttribute"/>.</param>
-    public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance, EventHandlerAttribute decorator)
-        : base(decorator, eventHandlerInstance.GetType(), eventHandlerInstance)
+    public ConventionInstanceEventHandlerBuilder(object eventHandlerInstance, TypeBinding<EventHandlerModelId, EventHandlerId> binding)
+        : base(binding, eventHandlerInstance)
     {
         EventHandlerInstance = eventHandlerInstance;
     }
@@ -31,7 +32,7 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
     public object EventHandlerInstance { get; }
     
     /// <inheritdoc />
-    public bool Equals(ConventionInstanceEventHandlerBuilder other)
+    public bool Equals(IProcessorBuilder<EventHandlerModelId, EventHandlerId> other)
         => base.Equals(other);
 
     /// <inheritdoc />
@@ -44,6 +45,7 @@ public class ConventionInstanceEventHandlerBuilder : ConventionEventHandlerBuild
 
     /// <inheritdoc/>
     public override bool TryBuild(
+        EventHandlerModelId id,
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
         out IEventHandler eventHandler)

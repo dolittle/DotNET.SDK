@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
 namespace Dolittle.SDK.Events.Handling.Builder;
@@ -30,9 +31,9 @@ public interface IEventHandlerBuilder
     IEventHandlerBuilder InScope(ScopeId scopeId);
 
     /// <summary>
-    /// Defines the event handler to have a specific <see cref="EventHandlerAlias" />.
+    /// Defines the event handler to have a specific <see cref="IdentifierAlias" />.
     /// </summary>
-    /// <param name="alias">The <see cref="EventHandlerAlias" />.</param>
+    /// <param name="alias">The <see cref="IdentifierAlias" />.</param>
     /// <returns>The builder for continuation.</returns>
-    IEventHandlerBuilder WithAlias(EventHandlerAlias alias);
+    IEventHandlerBuilder WithAlias(IdentifierAlias alias);
 }

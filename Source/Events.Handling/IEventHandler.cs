@@ -15,34 +15,14 @@ namespace Dolittle.SDK.Events.Handling;
 public interface IEventHandler
 {
     /// <summary>
-    /// Gets the unique identifier for event handler - <see cref="EventHandlerId" />.
+    /// Gets the unique identifier for event handler - <see cref="EventHandlerModelId" />.
     /// </summary>
-    EventHandlerId Identifier { get; }
-
-    /// <summary>
-    /// Gets the scope the event handler is in.
-    /// </summary>
-    ScopeId ScopeId { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether or not the event handler is partitioned.
-    /// </summary>
-    bool Partitioned { get; }
+    EventHandlerModelId Identifier { get; }
 
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this event handler.
     /// </summary>
     IEnumerable<EventType> HandledEvents { get; }
-
-    /// <summary>
-    /// Gets the alias of the event handler.
-    /// </summary>
-    EventHandlerAlias Alias { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether the event handler has an alias or not.
-    /// </summary>
-    bool HasAlias { get; }
 
     /// <summary>
     /// Handle an event.
