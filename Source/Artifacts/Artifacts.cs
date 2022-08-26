@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Common;
 
 namespace Dolittle.SDK.Artifacts;
@@ -16,6 +17,22 @@ public abstract class Artifacts<TArtifact, TId> : UniqueBindings<TArtifact, Type
     where TArtifact : Artifact<TId>
     where TId : ArtifactId
 {
+    /// <summary>
+    /// Creates <typeparamref name="TUniqueBindings"/> derived from the <see cref="IApplicationModel"/>.
+    /// </summary>
+    /// <param name="model">The <see cref="IApplicationModel"/>.</param>
+    /// <returns></returns>
+    public static TUniqueBindings FromApplicationModel<TUniqueBindings>(IApplicationModel model)
+        where TUniqueBindings : Artifacts<TArtifact, TId>, new()
+    {
+        var result = new TUniqueBindings();
+        foreach (var binding in model.GetTypeBindings<TArtifact, TId>())
+        {
+            result.Add(binding.Identifier, binding.Type);
+        }
+        return result;
+    }
+
     /// <summary>
     /// Initializes an instance of the <see cref="Artifacts{TArtifact,TId}"/> class.
     /// </summary>
