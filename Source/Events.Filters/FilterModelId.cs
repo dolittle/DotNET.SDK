@@ -15,7 +15,9 @@ public class FilterModelId : Identifier<FilterId, ScopeId>
     /// </summary>
     /// <param name="id">The <see cref="FilterId"/>.</param>
     /// <param name="scope">The <see cref="ScopeId"/>.</param>
-    public FilterModelId(FilterId id, ScopeId scope) : base("Filter", id, scope)
+    /// <param name="alias">The alias.</param>
+    public FilterModelId(FilterId id, ScopeId scope, IdentifierAlias alias)
+        : base("Filter", id, scope, alias)
     {
         Scope = scope;
     }

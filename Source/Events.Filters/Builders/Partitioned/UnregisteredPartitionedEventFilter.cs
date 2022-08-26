@@ -14,9 +14,7 @@ namespace Dolittle.SDK.Events.Filters.Builders.Partitioned;
 public class UnregisteredPartitionedEventFilter : ICanRegisterEventFilterProcessor
 {
     static readonly PartitionedEventFilterProtocol _protocol = new();
-
-    readonly FilterId _filterId;
-    readonly ScopeId _scopeId;
+    
     readonly PartitionedFilterEventCallback _callback;
 
     /// <summary>
@@ -25,15 +23,14 @@ public class UnregisteredPartitionedEventFilter : ICanRegisterEventFilterProcess
     /// <param name="filterId">The <see cref="FilterId"/>.</param>
     /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
     /// <param name="callback">The <see cref="PartitionedFilterEventCallback"/>.</param>
-    public UnregisteredPartitionedEventFilter(FilterId filterId, ScopeId scopeId, PartitionedFilterEventCallback callback)
+    public UnregisteredPartitionedEventFilter(FilterModelId filterId, PartitionedFilterEventCallback callback)
     {
-        _filterId = filterId;
-        _scopeId = scopeId;
+        Identifier = filterId;
         _callback = callback;
     }
 
     /// <inheritdoc />
-    public FilterModelId Identifier => new(_filterId, _scopeId); 
+    public FilterModelId Identifier { get; } 
 
     /// <inheritdoc />
     public void Register(
@@ -42,7 +39,7 @@ public class UnregisteredPartitionedEventFilter : ICanRegisterEventFilterProcess
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
-        var filter = new PartitionedEventFilterProcessor(_filterId, _scopeId, _callback, converter, loggerFactory);
+        var filter = new PartitionedEventFilterProcessor(Identifier, _callback, converter, loggerFactory);
         eventProcessors.Register(filter, _protocol, cancellationToken);
     }
 }

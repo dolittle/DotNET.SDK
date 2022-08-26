@@ -10,22 +10,22 @@ namespace Dolittle.SDK.Events.Filters.Builders.Partitioned;
 /// </summary>
 public class PartitionedEventFilterBuilder : IPartitionedEventFilterBuilder, ICanBuildPrivateFilter
 {
-    PartitionedFilterEventCallback _callback;
+    PartitionedFilterEventCallback? _callback;
 
     /// <inheritdoc />
     public void Handle(PartitionedFilterEventCallback callback)
         => _callback = callback;
 
     /// <inheritdoc />
-    public bool TryBuild(FilterId filterId, ScopeId scopeId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
+    public bool TryBuild(FilterModelId filterId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_callback == default)
         {
-            buildResults.AddError(new MissingFilterCallback(filterId, scopeId));
+            buildResults.AddError(new MissingFilterCallback(filterId));
             return false;
         }
-        filter = new UnregisteredPartitionedEventFilter(filterId, scopeId, _callback);
+        filter = new UnregisteredPartitionedEventFilter(filterId, _callback);
         return true;
     }
 }

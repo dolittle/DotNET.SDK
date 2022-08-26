@@ -14,9 +14,8 @@ public class MissingFilterCallback : Exception
     /// Initializes a new instance of the <see cref="MissingFilterCallback"/> class.
     /// </summary>
     /// <param name="filterId">The <see cref="FilterId" />.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    public MissingFilterCallback(FilterId filterId, ScopeId scopeId)
-        : base($"Filter callback is not configured for filter '{filterId}' in scope '{scopeId}'")
+    public MissingFilterCallback(FilterModelId filterId)
+        : base($"Filter callback is not configured for filter '{filterId.Id}' in scope '{filterId.Scope}'")
     {
     }
 }

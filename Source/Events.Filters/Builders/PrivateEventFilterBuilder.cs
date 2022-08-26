@@ -15,32 +15,36 @@ public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder, ICanTryBuil
 {
     readonly FilterId _filterId;
     readonly IModelBuilder _modelBuilder;
-    ScopeId _scopeId = ScopeId.Default;
-    ICanBuildPrivateFilter _filterBuilder;
+    ScopeId _scopeId;
+    IdentifierAlias _alias;
+    ICanBuildPrivateFilter? _filterBuilder;
 
-    FilterModelId ModelId => new(_filterId, _scopeId);
+    FilterModelId ModelId => new(_filterId, _scopeId, _alias);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivateEventFilterBuilder"/> class.
     /// </summary>
     /// <param name="filterId">The <see cref="_filterId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
-    public PrivateEventFilterBuilder(FilterId filterId, IModelBuilder modelBuilder)
+    public PrivateEventFilterBuilder(FilterModelId filterId, IModelBuilder modelBuilder)
     {
-        _filterId = filterId;
+        _filterId = filterId.Id;
+        _scopeId = filterId.Scope;
+        _alias = filterId.Alias;
         _modelBuilder = modelBuilder;
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(ModelId, this);
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter, FilterModelId, FilterId>(ModelId, this);
     }
     
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildFilter other) => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<FilterModelId, FilterId> other)
+        => other is PrivateEventFilterBuilder && ReferenceEquals(this, other);
 
     /// <inheritdoc />
     public IPrivateEventFilterBuilder InScope(ScopeId scopeId)
     {
-        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildFilter>(ModelId, this);
+        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildFilter, FilterModelId, FilterId>(ModelId, this);
         _scopeId = scopeId;
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(ModelId, this);
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter, FilterModelId, FilterId>(ModelId, this);
         return this;
     }
 
@@ -61,12 +65,12 @@ public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder, ICanTryBuil
     }
     
     /// <inheritdoc />
-    public bool TryBuild(IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
+    public bool TryBuild(FilterModelId filterId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_filterBuilder != default)
         {
-            return _filterBuilder.TryBuild(_filterId, _scopeId, buildResults, out filter);
+            return _filterBuilder.TryBuild(filterId, buildResults, out filter);
         }
         buildResults.AddError(new FilterDefinitionIncomplete(_filterId, _scopeId, "Call Partitioned() or Handle(...) before building private filter"));
         return false;

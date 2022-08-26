@@ -16,8 +16,7 @@ namespace Dolittle.SDK.Events.Filters.Internal;
 public class UnpartitionedEventFilterProcessor : FilterEventProcessor<FilterRegistrationRequest, FilterResponse>
 {
     readonly FilterEventCallback _filterEventCallback;
-    readonly FilterId _filterId;
-    readonly ScopeId _scopeId;
+    readonly FilterModelId _filterId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnpartitionedEventFilterProcessor"/> class.
@@ -28,15 +27,13 @@ public class UnpartitionedEventFilterProcessor : FilterEventProcessor<FilterRegi
     /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
     public UnpartitionedEventFilterProcessor(
-        FilterId filterId,
-        ScopeId scopeId,
+        FilterModelId filterId,
         FilterEventCallback filterEventCallback,
         IEventProcessingConverter converter,
         ILoggerFactory loggerFactory)
-        : base("Unpartitioned Filter", filterId, converter, loggerFactory)
+        : base("Unpartitioned Filter", filterId.Id, converter, loggerFactory)
     {
         _filterId = filterId;
-        _scopeId = scopeId;
         _filterEventCallback = filterEventCallback;
     }
 
@@ -44,8 +41,8 @@ public class UnpartitionedEventFilterProcessor : FilterEventProcessor<FilterRegi
     public override FilterRegistrationRequest RegistrationRequest
         => new()
         {
-            FilterId = _filterId.ToProtobuf(),
-            ScopeId = _scopeId.ToProtobuf(),
+            FilterId = _filterId.Id.ToProtobuf(),
+            ScopeId = _filterId.Scope.ToProtobuf(),
         };
 
     /// <inheritdoc/>

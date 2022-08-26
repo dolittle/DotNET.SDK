@@ -11,8 +11,8 @@ namespace Dolittle.SDK.Events.Filters.Builders.Partitioned.Public;
 /// </summary>
 public class PublicEventFilterBuilder : IPartitionedEventFilterBuilder, ICanTryBuildFilter
 {
-    readonly FilterId _filterId;
-    PartitionedFilterEventCallback _callback;
+    readonly FilterModelId _filterId;
+    PartitionedFilterEventCallback? _callback;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicEventFilterBuilder"/> class.
@@ -21,12 +21,12 @@ public class PublicEventFilterBuilder : IPartitionedEventFilterBuilder, ICanTryB
     /// <param name="modelBuilder">The <see cref="IClientBuildResults"/>.</param>
     public PublicEventFilterBuilder(FilterId filterId, IModelBuilder modelBuilder)
     {
-        _filterId = filterId;
-        modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter>(new FilterModelId(_filterId, ScopeId.Default), this);
+        _filterId = new FilterModelId(filterId, ScopeId.Default, "");
+        modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildFilter, FilterModelId, FilterId>(_filterId, this);
     }
     
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildFilter other) => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<FilterModelId, FilterId> other) => other is PublicEventFilterBuilder && ReferenceEquals(this, other);
     
     /// <inheritdoc />
     public void Handle(PartitionedFilterEventCallback callback)
@@ -34,12 +34,12 @@ public class PublicEventFilterBuilder : IPartitionedEventFilterBuilder, ICanTryB
 
 
     /// <inheritdoc />
-    public bool TryBuild(IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
+    public bool TryBuild(FilterModelId filterModelId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_callback == default)
         {
-            buildResults.AddError(new MissingFilterCallback(_filterId, ScopeId.Default));
+            buildResults.AddError(new MissingFilterCallback(_filterId));
             return false;
         }
         filter = new UnregisteredPublicEventFilter(_filterId, _callback);

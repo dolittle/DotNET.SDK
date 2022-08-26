@@ -16,36 +16,32 @@ namespace Dolittle.SDK.Events.Filters.Internal;
 public class PartitionedEventFilterProcessor : FilterEventProcessor<PartitionedFilterRegistrationRequest, PartitionedFilterResponse>
 {
     readonly PartitionedFilterEventCallback _filterEventCallback;
-    readonly FilterId _filterId;
-    readonly ScopeId _scopeId;
+    readonly FilterModelId _filterId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PartitionedEventFilterProcessor"/> class.
     /// </summary>
-    /// <param name="filterId">The <see cref="FilterId" />.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
+    /// <param name="filterId">The <see cref="FilterModelId" />.</param>
     /// <param name="filterEventCallback">The <see cref="PartitionedFilterEventCallback" />.</param>
     /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
     public PartitionedEventFilterProcessor(
-        FilterId filterId,
-        ScopeId scopeId,
+        FilterModelId filterId,
         PartitionedFilterEventCallback filterEventCallback,
         IEventProcessingConverter converter,
         ILoggerFactory loggerFactory)
-        : base("Partitioned Filter", filterId, converter, loggerFactory)
+        : base("Partitioned Filter", filterId.Id, converter, loggerFactory)
     {
-        _filterEventCallback = filterEventCallback;
         _filterId = filterId;
-        _scopeId = scopeId;
+        _filterEventCallback = filterEventCallback;
     }
 
     /// <inheritdoc/>
     public override PartitionedFilterRegistrationRequest RegistrationRequest
         => new()
         {
-            FilterId = _filterId.ToProtobuf(),
-            ScopeId = _scopeId.ToProtobuf(),
+            FilterId = _filterId.Id.ToProtobuf(),
+            ScopeId = _filterId.Scope.ToProtobuf(),
         };
 
     /// <inheritdoc/>

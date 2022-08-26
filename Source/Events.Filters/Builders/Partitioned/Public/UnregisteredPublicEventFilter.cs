@@ -14,8 +14,6 @@ namespace Dolittle.SDK.Events.Filters.Builders.Partitioned.Public;
 public class UnregisteredPublicEventFilter : ICanRegisterEventFilterProcessor
 {
     static readonly PublicEventFilterProtocol _protocol = new();
-
-    readonly FilterId _filterId;
     readonly PartitionedFilterEventCallback _callback;
 
     /// <summary>
@@ -23,14 +21,14 @@ public class UnregisteredPublicEventFilter : ICanRegisterEventFilterProcessor
     /// </summary>
     /// <param name="filterId">The <see cref="FilterId"/>.</param>
     /// <param name="callback">The <see cref="PartitionedFilterEventCallback"/>.</param>
-    public UnregisteredPublicEventFilter(FilterId filterId, PartitionedFilterEventCallback callback)
+    public UnregisteredPublicEventFilter(FilterModelId filterId, PartitionedFilterEventCallback callback)
     {
-        _filterId = filterId;
+        Identifier = filterId;
         _callback = callback;
     }
 
     /// <inheritdoc />
-    public FilterModelId Identifier => new(_filterId, ScopeId.Default);
+    public FilterModelId Identifier { get; }
 
     /// <inheritdoc />
     public void Register(
@@ -39,7 +37,7 @@ public class UnregisteredPublicEventFilter : ICanRegisterEventFilterProcessor
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
-        var filter = new PublicEventFilterProcessor(_filterId, _callback, converter, loggerFactory);
+        var filter = new PublicEventFilterProcessor(Identifier, _callback, converter, loggerFactory);
         eventProcessors.Register(filter, _protocol, cancellationToken);
     }
 }

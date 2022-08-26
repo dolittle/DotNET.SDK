@@ -13,10 +13,9 @@ public interface ICanBuildPrivateFilter
     /// <summary>
     /// Builds the private filter.
     /// </summary>
-    /// <param name="filterId">The <see cref="FilterId"/>.</param>
-    /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
+    /// <param name="filterId">The <see cref="FilterModelId"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="filter">The outputted <see cref="ICanRegisterEventFilterProcessor"/> that can register the private filter.</param>
     /// <returns>A value indicating whether the building succeeded or not.</returns>
-    bool TryBuild(FilterId filterId, ScopeId scopeId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter);
+    bool TryBuild(FilterModelId filterId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter);
 }

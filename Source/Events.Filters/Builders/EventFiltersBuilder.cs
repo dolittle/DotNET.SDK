@@ -29,7 +29,7 @@ public class EventFiltersBuilder : IEventFiltersBuilder
     /// <inheritdoc />
     public IPrivateEventFilterBuilder CreatePrivate(FilterId filterId)
     {
-        var builder = new PrivateEventFilterBuilder(filterId, _modelBuilder);
+        var builder = new PrivateEventFilterBuilder(new FilterModelId(filterId, ScopeId.Default, ""), _modelBuilder);
         return builder;
     }
 
@@ -48,11 +48,11 @@ public class EventFiltersBuilder : IEventFiltersBuilder
     public static IUnregisteredEventFilters Build(IApplicationModel applicationModel, IClientBuildResults buildResults)
     {
         var filters = new UniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor>();
-        foreach (var builder in applicationModel.GetProcessorBuilderBindings<ICanTryBuildFilter>().Select(_ => _.ProcessorBuilder))
+        foreach (var (identifier, builder) in applicationModel.GetProcessorBuilderBindings<ICanTryBuildFilter, FilterModelId, FilterId>())
         {
-            if (builder.TryBuild(buildResults, out var filter))
+            if (builder.TryBuild(identifier, buildResults, out var filter))
             {
-                filters.Add(filter.Identifier, filter);
+                filters.Add(identifier, filter);
             }
         }
         return new UnregisteredEventFilters(filters);

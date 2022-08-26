@@ -13,7 +13,7 @@ namespace Dolittle.SDK.Embeddings.Builder;
 public class EmbeddingBuilder : IEmbeddingBuilder, ICanTryBuildEmbedding
 {
     readonly IModelBuilder _modelBuilder;
-    EmbeddingModelId _embeddingId;
+    readonly EmbeddingModelId _embeddingId;
     ICanTryBuildEmbedding? _methodsBuilder;
 
     /// <summary>

@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Events.Filters.Internal;
 public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegistrationRequest, PartitionedFilterResponse>
 {
     readonly PartitionedFilterEventCallback _filterEventCallback;
-    readonly FilterId _filterId;
+    readonly FilterModelId _filterId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicEventFilterProcessor"/> class.
@@ -26,11 +26,11 @@ public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegis
     /// <param name="converter">The <see cref="IEventProcessingConverter" />.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
     public PublicEventFilterProcessor(
-        FilterId filterId,
+        FilterModelId filterId,
         PartitionedFilterEventCallback filterEventCallback,
         IEventProcessingConverter converter,
         ILoggerFactory loggerFactory)
-        : base("Public Filter", filterId, converter, loggerFactory)
+        : base("Public Filter", filterId.Id, converter, loggerFactory)
     {
         _filterEventCallback = filterEventCallback;
         _filterId = filterId;
@@ -38,7 +38,7 @@ public class PublicEventFilterProcessor : FilterEventProcessor<PublicFilterRegis
 
     /// <inheritdoc/>
     public override PublicFilterRegistrationRequest RegistrationRequest
-        => new() { FilterId = _filterId.ToProtobuf() };
+        => new() { FilterId = _filterId.Id.ToProtobuf() };
 
     /// <inheritdoc/>
     protected override PartitionedFilterResponse CreateResponseFromFailure(ProcessorFailure failure)
