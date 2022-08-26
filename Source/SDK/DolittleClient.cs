@@ -233,6 +233,8 @@ public class DolittleClient : IDisposable, IDolittleClient
                 new GrpcChannelOptions
                 {
                     Credentials = ChannelCredentials.Insecure,
+                    MaxReceiveMessageSize = 32 * 1024 * 1024,
+                    MaxSendMessageSize = 32 * 1024 * 1024,
 #if NET5_0_OR_GREATER
                     HttpHandler = new SocketsHttpHandler
                     {
