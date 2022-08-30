@@ -46,7 +46,7 @@ public class EventToSDKConverter : IConvertEventsToSDK
             return false;
         }
 
-        if (!source.EventType.TryTo<EventType, EventTypeId>(out var eventType, out var eventTypeError))
+        if (!source.EventType.TryToArtifact<EventTypeId>(out var eventTypeId, out var generation, out var eventTypeError))
         {
             error = new InvalidCommittedEventInformation(nameof(source.EventType), eventTypeError);
             return false;
@@ -58,6 +58,7 @@ public class EventToSDKConverter : IConvertEventsToSDK
             return false;
         }
 
+        var eventType = new EventType(eventTypeId, generation);
         if (!_serializer.TryDeserialize(eventType, source.EventLogSequenceNumber, source.Content, out var content, out var deserializationError))
         {
             error = new InvalidCommittedEventInformation(nameof(source.Content), deserializationError);

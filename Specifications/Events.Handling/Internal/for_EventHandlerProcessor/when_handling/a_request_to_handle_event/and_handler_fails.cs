@@ -32,9 +32,11 @@ public class and_handler_fails : given.all_dependencies
         event_processing_converter
             .Setup(_ => _.ToSDK(request.Event))
             .Returns(stream_event);
+        var (eventTypeId, generation) = committed_event.EventType.ToArtifact<EventTypeId>();
+        var eventType = new EventType(eventTypeId, generation);
         event_context = new EventContext(
             committed_event.EventLogSequenceNumber,
-            committed_event.EventType.To<EventType, EventTypeId>(),
+            eventType,
             committed_event.EventSourceId,
             committed_event.Occurred.ToDateTimeOffset(),
             execution_context,

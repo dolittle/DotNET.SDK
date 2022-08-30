@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Protobuf.for_ArtifactExtensions.given;
 using Machine.Specifications;
 using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 
@@ -13,7 +14,7 @@ public class a_protobuf_artifact
     static Guid id;
     static Generation generation;
     static PbArtifact artifact;
-    static (ArtifactId Id, Generation Generation) result;
+    static (custom_artifact_id Id, Generation Generation) result;
 
     Establish context = () =>
     {
@@ -22,7 +23,7 @@ public class a_protobuf_artifact
         artifact = new PbArtifact { Id = id.ToProtobuf(), Generation = generation };
     };
 
-    Because of = () => result = artifact.ToArtifact();
+    Because of = () => result = artifact.ToArtifact<custom_artifact_id>();
 
     It should_have_the_same_id = () => result.Id.Value.ShouldEqual(id);
     It should_have_the_same_generation = () => result.Generation.ShouldEqual(generation);
