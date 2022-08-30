@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.ApplicationModel.ClientSetup;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Copies;
@@ -20,7 +21,6 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     where TProjection : class, new()
 {
-    readonly ProjectionAttribute _decorator;
     readonly Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> _copyToMongoDbBuilder;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
@@ -30,14 +30,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// </summary>
     /// <param name="decorator">The <see cref="ProjectionAttribute"/> decorator.</param>
     /// <param name="copyToMongoDbBuilder">The <see cref="Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder{TProjection}"/>.</param>
-    public ConventionProjectionBuilder(ProjectionAttribute decorator, Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
+    public ConventionProjectionBuilder(Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
     {
-        _decorator = decorator;
         _copyToMongoDbBuilder = copyToMongoDbBuilder;
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildProjection other)
+    public bool Equals(IProcessorBuilder<ProjectionModelId, ProjectionId> other)
     {
         if (ReferenceEquals(this, other))
         {
@@ -49,11 +48,10 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     }
     
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId id, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
     {
         projection = default;
-        buildResults.AddInformation($"Building projection {_decorator.Identifier} processing events in scope {_decorator.Scope} from type {_projectionType}");
-        
+        buildResults.AddInformation($"Building projection {id.Id} processing events in scope {id.Scope} from type {_projectionType}");
         if (!HasParameterlessConstructor())
         {
             buildResults.AddFailure($"The projection class {_projectionType} has no default/parameterless constructor");
@@ -67,37 +65,35 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         }
 
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TProjection>>();
-        if (!TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults))
+        if (!TryBuildOnMethods(id, eventTypes, eventTypesToMethods, buildResults))
         {
             return false;
         }
+
         if (!_copyToMongoDbBuilder.TryBuildFromReadModel(buildResults, out var copyToMongoDB))
         {
-            buildResults.AddFailure($"Failed to build projection copies definition for projection {_decorator.Identifier} using conventions from projection type {_projectionType}");
+            buildResults.AddFailure($"Failed to build projection copies definition for projection {id.Id} using conventions from projection type {_projectionType}");
             return false;
         }
-        
-        projection = _decorator.HasAlias
-            ? new Projection<TProjection>(_decorator.Identifier, _decorator.Alias, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB))
-            : new Projection<TProjection>(_decorator.Identifier, _projectionType.Name, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
-        
+
+        projection = new Projection<TProjection>(id, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
         return true;
     }
-    
-    
+
     bool HasParameterlessConstructor()
         => _projectionType.GetConstructors().Any(t => t.GetParameters().Length == 0);
 
     bool HasMoreThanOneConstructor() => _projectionType.GetConstructors().Length > 1;
     
     bool TryBuildOnMethods(
+        ProjectionModelId id,
         IEventTypes eventTypes,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
         IClientBuildResults buildResults)
     {
         var allMethods = _projectionType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
-        var hasWrongMethods = !TryAddDecoratedOnMethods(allMethods, eventTypesToMethods, buildResults)
-            || !TryAddConventionOnMethods(allMethods, eventTypes, eventTypesToMethods, buildResults);
+        var hasWrongMethods = !TryAddDecoratedOnMethods(id, allMethods, eventTypesToMethods, buildResults)
+            || !TryAddConventionOnMethods(id, allMethods, eventTypes, eventTypesToMethods, buildResults);
 
         if (hasWrongMethods)
         {
@@ -114,6 +110,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     }
 
     bool TryAddDecoratedOnMethods(
+        ProjectionModelId id, 
         IEnumerable<MethodInfo> methods,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
         IClientBuildResults buildResults)
@@ -162,13 +159,14 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 continue;
             }
             allMethodsAdded = false;
-            buildResults.AddFailure($"Event type {eventType} is already handled in projection {_decorator.Identifier}");
+            buildResults.AddFailure($"Event type {eventType} is already handled in projection {id.Id}");
         }
 
         return allMethodsAdded;
     }
 
     bool TryAddConventionOnMethods(
+        ProjectionModelId id,
         IEnumerable<MethodInfo> methods,
         IEventTypes eventTypes,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
@@ -220,7 +218,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 continue;
             }
             allMethodsAdded = false;
-            buildResults.AddFailure($"Event type {eventParameterType} is already handled in projection {_decorator.Identifier}");
+            buildResults.AddFailure($"Event type {eventParameterType} is already handled in projection {id.Id}");
         }
 
         return allMethodsAdded;

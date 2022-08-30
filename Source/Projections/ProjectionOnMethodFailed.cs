@@ -18,7 +18,7 @@ public class ProjectionOnMethodFailed : Exception
     /// <param name="eventType">The <see cref="EventType" />.</param>
     /// <param name="event">The event that failed handling.</param>
     /// <param name="exception">The <see cref="Exception" /> that caused the handling to fail.</param>
-    public ProjectionOnMethodFailed(ProjectionId projection, EventType eventType, object @event, Exception exception)
+    public ProjectionOnMethodFailed(ProjectionModelId projection, EventType eventType, object @event, Exception exception)
         : base($"Projection {projection} failed to handle event {@event} with event type {eventType} ", exception)
     {
     }

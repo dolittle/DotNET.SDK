@@ -40,7 +40,7 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
         IEventProcessingConverter eventConverter,
         IConvertProjectionsToSDK projectionConverter,
         ILogger logger)
-        : base("Projection", projection.Identifier, logger)
+        : base("Projection", projection.Identifier.Id, logger)
     {
         _projection = projection;
         _eventConverter = eventConverter;
@@ -54,14 +54,14 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
         {
             var registrationRequest = new ProjectionRegistrationRequest
             {
-                ProjectionId = _projection.Identifier.ToProtobuf(),
-                ScopeId = _projection.ScopeId.ToProtobuf(),
+                ProjectionId = _projection.Identifier.Id.ToProtobuf(),
+                ScopeId = _projection.Identifier.Scope.ToProtobuf(),
                 InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None),
                 Copies = _projection.Copies.ToProtobuf()
             };
-            if (_projection.HasAlias)
+            if (_projection.Identifier.HasAlias)
             {
-                registrationRequest.Alias = _projection.Alias.Value;
+                registrationRequest.Alias = _projection.Identifier.Alias.Value;
             }
             
             registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());

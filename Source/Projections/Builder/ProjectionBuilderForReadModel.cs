@@ -22,13 +22,13 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 {
     readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
     readonly ProjectionId _projectionId;
-    ProjectionAlias _alias;
+    IdentifierAlias _alias;
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
     readonly ProjectionBuilder _parentBuilder;
     readonly IProjectionCopyDefinitionBuilder<TReadModel> _projectionCopyDefinitionBuilder;
 
-    ProjectionModelId ModelId => new(_projectionId, _scopeId);
+    ProjectionModelId ModelId => new(_projectionId, _scopeId, _alias);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionBuilderForReadModel{TReadModel}"/> class.
@@ -53,18 +53,18 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         _projectionCopyDefinitionBuilder = copyDefinitionBuilder;
         
         modelBuilder.BindIdentifierToType<ProjectionModelId, ProjectionId>(ModelId, typeof(TReadModel));
-        modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
+        modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection, ProjectionModelId, ProjectionId>(ModelId, _parentBuilder);
     }
     
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildProjection other) => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<ProjectionModelId, ProjectionId> other) => ReferenceEquals(this, other);
 
     /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> InScope(ScopeId scopeId)
     {
-        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
+        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildProjection, ProjectionModelId, ProjectionId>(ModelId, _parentBuilder);
         _scopeId = scopeId;
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection>(ModelId, _parentBuilder);
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection, ProjectionModelId, ProjectionId>(ModelId, _parentBuilder);
         return this;
     }
 
@@ -116,9 +116,11 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> WithAlias(ProjectionAlias alias)
+    public IProjectionBuilderForReadModel<TReadModel> WithAlias(IdentifierAlias alias)
     {
+        _modelBuilder.UnbindIdentifierToProcessorBuilder<ICanTryBuildProjection, ProjectionModelId, ProjectionId>(ModelId, _parentBuilder);
         _alias = alias;
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection, ProjectionModelId, ProjectionId>(ModelId, _parentBuilder);
         return this;
     }
 
@@ -130,7 +132,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId id, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
     {
         projection = default;
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TReadModel>>();
@@ -148,7 +150,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 
         if (eventTypesToMethods.Any())
         {
-            projection = new Projection<TReadModel>(_projectionId, _alias, _scopeId, eventTypesToMethods, projectionCopies);
+            projection = new Projection<TReadModel>(id, eventTypesToMethods, projectionCopies);
             return true;
         }
         buildResults.AddFailure($"Failed to build projection {_projectionId}. No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");

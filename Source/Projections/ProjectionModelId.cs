@@ -16,8 +16,9 @@ public class ProjectionModelId : Identifier<ProjectionId, ScopeId>
     /// </summary>
     /// <param name="id">The <see cref="ProjectionId"/>.</param>
     /// <param name="scope">The <see cref="ScopeId"/>.></param>
-    public ProjectionModelId(ProjectionId id, ScopeId scope)
-        : base("Projection", id, scope)
+    /// <param name="alias">The alias.</param>
+    public ProjectionModelId(ProjectionId id, ScopeId scope, IdentifierAlias alias)
+        : base("Projection", id, scope, alias)
     {
         Scope = scope;
     }

@@ -19,30 +19,15 @@ public interface IProjection
     Type ProjectionType { get; }
 
     /// <summary>
-    /// Gets the unique identifier for projection - <see cref="ProjectionId" />.
+    /// Gets the unique identifier for projection - <see cref="ProjectionModelId" />.
     /// </summary>
-    ProjectionId Identifier { get; }
-
-    /// <summary>
-    /// Gets the scope the projection is in.
-    /// </summary>
-    ScopeId ScopeId { get; }
+    ProjectionModelId Identifier { get; }
 
     /// <summary>
     /// Gets the <see cref="ProjectionCopies"/>.
     /// </summary>
     ProjectionCopies Copies { get; }
     
-    /// <summary>
-    /// Gets the alias of the projection.
-    /// </summary>
-    ProjectionAlias Alias { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether the projection has an alias or not.
-    /// </summary>
-    bool HasAlias { get; }
-
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this event handler.
     /// </summary>

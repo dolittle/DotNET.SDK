@@ -55,11 +55,11 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <inheritdoc />
     public IProjectionsBuilder Register(Type type)
     {
-        if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
+        if (!_decoratedTypeBindings.TryAdd(type, out var identifier))
         {
             return this;
         }
-        BindBuilder(type, decorator);
+        BindBuilder(type, identifier.Identifier);
         return this;
     }
 
@@ -67,23 +67,22 @@ public class ProjectionsBuilder : IProjectionsBuilder
     public IProjectionsBuilder RegisterAllFrom(Assembly assembly)
     {
         var addedEventHandlerBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
-        foreach (var (type, decorator) in addedEventHandlerBindings)
+        foreach (var (identifier, type) in addedEventHandlerBindings)
         {
-            BindBuilder(type, decorator);
+            BindBuilder(type, identifier);
         }
 
         return this;
     }
 
-    void BindBuilder(Type type, ProjectionAttribute decorator)
-        =>  _modelBuilder.BindIdentifierToProcessorBuilder(
-            decorator.GetIdentifier(),
-            CreateConventionProjectionBuilderFor(type, decorator));
+    void BindBuilder(Type type, ProjectionModelId identifier)
+        =>  _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildProjection, ProjectionModelId, ProjectionId>(
+            identifier,
+            CreateConventionProjectionBuilderFor(type));
 
-    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType, ProjectionAttribute decorator)
+    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType)
         => Activator.CreateInstance(
                 typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType),
-                decorator,
                 CreateForMethodForReadModel(readModelType).Invoke(_copyToMongoDbBuilderFactory, Array.Empty<object>()))
             as ICanTryBuildProjection;
     
@@ -104,11 +103,11 @@ public class ProjectionsBuilder : IProjectionsBuilder
     public static IUnregisteredProjections Build(IApplicationModel applicationModel, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var projections = new UniqueBindings<ProjectionModelId, IProjection>();
-        foreach (var builder in applicationModel.GetProcessorBuilderBindings<ICanTryBuildProjection>().Select(_ => _.ProcessorBuilder))
+        foreach (var (id, builder) in applicationModel.GetProcessorBuilderBindings<ICanTryBuildProjection, ProjectionModelId, ProjectionId>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var projection))
+            if (builder.TryBuild(id, eventTypes, buildResults, out var projection))
             {
-                projections.Add(new ProjectionModelId(projection.Identifier, projection.ScopeId), projection);
+                projections.Add(id, projection);
             }
         }
         var identifiers = applicationModel.GetTypeBindings<ProjectionModelId, ProjectionId>();

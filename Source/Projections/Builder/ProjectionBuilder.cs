@@ -18,7 +18,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     readonly ProjectionId _projectionId;
     readonly IModelBuilder _modelBuilder;
     readonly IProjectionCopyToMongoDBBuilderFactory _copyToMongoDbBuilderFactory;
-    ICanTryBuildProjection _methodsBuilder;
+    ICanTryBuildProjection? _methodsBuilder;
 
     ScopeId _scopeId = ScopeId.Default;
 
@@ -36,7 +36,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildProjection other) => ReferenceEquals(this, other);
+    public bool Equals(IProcessorBuilder<ProjectionModelId, ProjectionId> other) => ReferenceEquals(this, other);
 
     /// <inheritdoc />
     public IProjectionBuilder InScope(ScopeId scopeId)
@@ -65,15 +65,14 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     }
 
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId id, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
     {
         projection = default;
         if (_methodsBuilder != null)
         {
-            return _methodsBuilder.TryBuild(eventTypes, buildResults, out projection);
+            return _methodsBuilder.TryBuild(id, eventTypes, buildResults, out projection);
         }
         buildResults.AddFailure($"Failed to build projection {_projectionId}. No read model defined for projection.");
         return false;
-
     }
 }

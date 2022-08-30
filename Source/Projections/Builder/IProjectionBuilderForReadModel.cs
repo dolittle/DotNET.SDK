@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
@@ -99,11 +100,11 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
 
     /// <summary>
-    /// Defines the projection to have a specific <see cref="ProjectionAlias" />.
+    /// Defines the projection to have a specific <see cref="IdentifierAlias" />.
     /// </summary>
-    /// <param name="alias">The <see cref="ProjectionAlias" />.</param>
+    /// <param name="alias">The <see cref="IdentifierAlias" />.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionBuilderForReadModel<TReadModel> WithAlias(ProjectionAlias alias);
+    IProjectionBuilderForReadModel<TReadModel> WithAlias(IdentifierAlias alias);
     
     /// <summary>
     /// Adds the copy to MongoDB definition.

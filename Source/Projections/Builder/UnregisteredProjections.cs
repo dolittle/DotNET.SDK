@@ -90,8 +90,8 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                     serviceProvider.GetRequiredService<IProjectionStore>(),
                     new object[]
                     {
-                        projection.Identifier,
-                        projection.ScopeId
+                        projection.Identifier.Id,
+                        projection.Identifier.Scope
                     }));
             if (projection.Copies.MongoDB.ShouldCopy)
             {
