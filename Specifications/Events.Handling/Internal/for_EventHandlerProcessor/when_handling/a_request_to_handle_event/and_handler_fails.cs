@@ -26,7 +26,7 @@ public class and_handler_fails : given.all_dependencies
                 event_type_to_handle,
                 event_to_handle,
                 committed_event.Public),
-            partitioned,
+            event_handler_id.Partitioned,
             request.Event.PartitionId,
             request.Event.ScopeId.To<ScopeId>());
         event_processing_converter

@@ -12,9 +12,7 @@ namespace Dolittle.SDK.Events.Handling.Internal.for_EventHandlerProcessor;
 
 public class when_creating
 {
-    static EventHandlerId event_handler_id;
-    static ScopeId event_handler_scope;
-    static bool partitioned;
+    static EventHandlerModelId event_handler_id;
     static IEnumerable<EventType> handled_event_types;
     static Moq.Mock<IEventHandler> event_handler;
     static Moq.Mock<IEventProcessingConverter> event_processing_converter;
@@ -25,9 +23,7 @@ public class when_creating
         event_handler = new Moq.Mock<IEventHandler>();
         event_processing_converter = new Moq.Mock<IEventProcessingConverter>();
 
-        event_handler_id = "1d6f4e60-6453-423e-baa0-3dda3ecaa719";
-        event_handler_scope = "35b14dda-ac5e-4ab2-9bf3-c710ffb17d69";
-        partitioned = true;
+        event_handler_id = new EventHandlerModelId("1d6f4e60-6453-423e-baa0-3dda3ecaa719", true, "35b14dda-ac5e-4ab2-9bf3-c710ffb17d69", "alias");
         handled_event_types = new EventType[]
         {
             new("a57ecc5a-9fca-47a3-89d0-24064a6f9e34"),
@@ -35,21 +31,19 @@ public class when_creating
         };
 
         event_handler.SetupGet(_ => _.Identifier).Returns(event_handler_id);
-        event_handler.SetupGet(_ => _.ScopeId).Returns(event_handler_scope);
-        event_handler.SetupGet(_ => _.Partitioned).Returns(partitioned);
         event_handler.SetupGet(_ => _.HandledEvents).Returns(handled_event_types);
     };
 
     Because of = () => event_handler_processor = new EventHandlerProcessor(event_handler.Object, event_processing_converter.Object, Moq.Mock.Of<ILogger>());
 
     It should_not_be_null = () => event_handler_processor.ShouldNotBeNull();
-    It should_have_the_correct_identifier = () => event_handler_processor.Identifier.ShouldEqual(event_handler_id);
+    It should_have_the_correct_identifier = () => event_handler_processor.Identifier.ShouldEqual(event_handler_id.Id);
     It should_have_the_correct_registartion_request = () =>
     {
         var registration_request = event_handler_processor.RegistrationRequest;
-        registration_request.EventHandlerId.ShouldEqual(event_handler_id.ToProtobuf());
-        registration_request.ScopeId.ShouldEqual(event_handler_scope.ToProtobuf());
-        registration_request.Partitioned.ShouldEqual(partitioned);
+        registration_request.EventHandlerId.ShouldEqual(event_handler_id.Id.ToProtobuf());
+        registration_request.ScopeId.ShouldEqual(event_handler_id.Scope.ToProtobuf());
+        registration_request.Partitioned.ShouldEqual(event_handler_id.Partitioned);
         registration_request.EventTypes.ShouldContainOnly(handled_event_types.Select(_ => _.ToProtobuf()));
     };
 }

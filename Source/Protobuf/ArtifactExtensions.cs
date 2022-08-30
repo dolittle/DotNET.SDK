@@ -41,7 +41,6 @@ public static class ArtifactExtensions
         where TId : ArtifactId
     {
         artifact = default;
-
         if (source == default)
         {
             error = new ArgumentNullException(nameof(source));

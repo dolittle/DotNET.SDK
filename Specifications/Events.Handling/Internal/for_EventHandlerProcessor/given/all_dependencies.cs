@@ -56,9 +56,9 @@ public class all_dependencies : an_event_handler_processor
         stream_event = new PbStreamEvent
         {
             Event = committed_event,
-            Partitioned = partitioned,
+            Partitioned = event_handler_id.Partitioned,
             PartitionId = "a-partition-id",
-            ScopeId = event_handler_scope.ToProtobuf()
+            ScopeId = event_handler_id.Scope.ToProtobuf()
         };
         request = new HandleEventRequest
         {

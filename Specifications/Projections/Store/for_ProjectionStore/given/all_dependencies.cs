@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Projections.Contracts;
+using Dolittle.SDK.ApplicationModel;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
@@ -57,9 +58,9 @@ public class all_dependencies
     {
         foreach (var type in projection_types)
         {
-            if (type.TryGetDecorator<ProjectionAttribute>(out var decorator))
+            if (type.TryGetIdentifier<ProjectionModelId>(out var identifier))
             {
-                read_model_types.Add(new ScopedProjectionId(decorator.Identifier, decorator.Scope), type);
+                read_model_types.Add(new ScopedProjectionId(identifier.Id, identifier.Scope), type);
             }
         }
     }

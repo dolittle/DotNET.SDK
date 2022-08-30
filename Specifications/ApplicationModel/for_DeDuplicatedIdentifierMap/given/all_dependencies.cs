@@ -13,7 +13,7 @@ public class all_dependencies
 public record an_id(Guid Value) : ConceptAs<Guid>(Value);
 public class an_identifier : Identifier<an_id>
 {
-    public an_identifier(an_id id) : base("an_id", id)
+    public an_identifier(an_id id) : base("an_id", id, "some alias")
     {
     }
 }
