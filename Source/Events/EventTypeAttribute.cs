@@ -22,10 +22,10 @@ public class EventTypeAttribute : Attribute, IDecoratedTypeDecorator<EventType>
     /// <param name="eventTypeId">The unique identifier of the <see cref="EventType" />.</param>
     /// <param name="generation">The generation of the <see cref="EventType" />..</param>
     /// <param name="alias">The alias for the <see cref="EventType"/>.</param>
-    public EventTypeAttribute(string eventTypeId, uint? generation = 0, string? alias = null)
+    public EventTypeAttribute(string eventTypeId, uint generation = 0, string? alias = null)
     {
         _id = eventTypeId;
-        _generation = generation is 0 or null ? Generation.First : generation;
+        _generation = generation is 0 ? Generation.First : generation;
         _alias = alias ?? "";
     }
 
