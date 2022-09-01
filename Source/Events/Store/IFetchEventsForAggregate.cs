@@ -20,6 +20,7 @@ public interface IFetchEventsForAggregate
     /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
     /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
     /// <returns>A <see cref="Task"/> that, when resolved, returns the <see cref="CommittedAggregateEvents" />.</returns>
+    [Obsolete($"This method is superseded by FetchForAggregate that takes in a collection of event types used to specify which aggregate events to get.")]
     Task<CommittedAggregateEvents> FetchForAggregate(
         AggregateRootId aggregateRootId,
         EventSourceId eventSourceId,
