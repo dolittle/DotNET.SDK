@@ -1,6 +1,9 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Store.Converters;
@@ -17,7 +20,8 @@ namespace Dolittle.SDK.Events.Store.Internal;
 /// </summary>
 public class EventsForAggregateFetcher : IFetchEventsForAggregate
 {
-    static readonly EventStoreFetchForAggregateMethod _fetchForAggregateMethod = new();
+    static readonly EventStoreFetchForAggregateInBatchesMethod _fetchForAggregateInBatchesMethod = new();
+    
     readonly IPerformMethodCalls _caller;
     readonly IConvertAggregateEventsToSDK _toSDK;
     readonly IResolveCallContext _callContextResolver;
@@ -47,31 +51,55 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
     }
 
     /// <inheritdoc/>
-    public async Task<CommittedAggregateEvents> FetchForAggregate(
+    public Task<CommittedAggregateEvents> FetchForAggregate(
         AggregateRootId aggregateRootId,
         EventSourceId eventSourceId,
         CancellationToken cancellationToken = default)
     {
         _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId);
-        var request = new Runtime.Events.Contracts.FetchForAggregateRequest
+        return DoFetchForAggregate(aggregateRootId, eventSourceId, Enumerable.Empty<EventType>(), cancellationToken);
+    }
+    
+    /// <inheritdoc/>
+    public Task<CommittedAggregateEvents> FetchForAggregate(
+        AggregateRootId aggregateRootId,
+        EventSourceId eventSourceId,
+        IEnumerable<EventType> eventTypes,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId, eventTypes);
+        return DoFetchForAggregate(aggregateRootId, eventSourceId, eventTypes, cancellationToken);
+    }
+
+    async Task<CommittedAggregateEvents> DoFetchForAggregate(
+        AggregateRootId aggregateRootId,
+        EventSourceId eventSourceId,
+        IEnumerable<EventType> eventTypes,
+        CancellationToken cancellationToken)
+    {
+        var request = new Runtime.Events.Contracts.FetchForAggregateInBatchesRequest()
         {
             CallContext = _callContextResolver.ResolveFrom(_executionContext),
             Aggregate = new Runtime.Events.Contracts.Aggregate
             {
                 AggregateRootId = aggregateRootId.Value.ToProtobuf(),
                 EventSourceId = eventSourceId.Value,
-            }
+            },
+            EventTypes = { eventTypes.Select(_ => _.ToProtobuf()) }
         };
 
-        var response = await _caller.Call(_fetchForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
-        response.Failure.ThrowIfFailureIsSet();
-
-        if (_toSDK.TryConvert(response.Events, out var committedAggregateEvents, out var error))
+        var fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, ImmutableList<CommittedAggregateEvent>.Empty);
+        await foreach (var response in _caller.Call(_fetchForAggregateInBatchesMethod, request, cancellationToken))
         {
-            return committedAggregateEvents;
+            response.Failure.ThrowIfFailureIsSet();
+            if (!_toSDK.TryConvert(response.Events, out var batch, out var error))
+            {
+                _logger.FetchedEventsForAggregateCouldNotBeConverted(error);
+                throw error;
+            }
+            
+            fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, fetchedEvents.Concat(batch).ToList());
         }
-        _logger.FetchedEventsForAggregateCouldNotBeConverted(error);
-        throw error;
-
+        return fetchedEvents;
     }
 }
