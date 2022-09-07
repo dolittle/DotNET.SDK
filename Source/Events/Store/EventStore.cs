@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Store.Builders;
@@ -68,7 +67,7 @@ public class EventStore : IEventStore
         AggregateRootId aggregateRootId,
         EventSourceId eventSourceId,
         CancellationToken cancellationToken = default)
-        => FetchForAggregate(aggregateRootId, eventSourceId, Enumerable.Empty<EventType>(), cancellationToken);
+        => _eventsForAggregate.FetchForAggregate(aggregateRootId, eventSourceId, cancellationToken);
     
     /// <inheritdoc/>
     public Task<CommittedAggregateEvents> FetchForAggregate(
