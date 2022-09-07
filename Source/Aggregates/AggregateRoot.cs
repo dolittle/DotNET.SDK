@@ -128,32 +128,6 @@ public class AggregateRoot
     public void ApplyPublic(object @event, EventType eventType)
         => Apply(@event, eventType, true);
 
-    /// <summary>
-    /// Re-apply events from the Event Store.
-    /// </summary>
-    /// <remarks>
-    /// This method is not supposed to be used by application code.
-    /// This is for internal rehydration of aggregate roots.
-    /// </remarks>
-    /// <param name="events">Sequence that contains the events to re-apply.</param>
-    [Obsolete("This should eventually be removed from the AggregateRoot interface and replaced by an internal method")]
-    public virtual void ReApply(CommittedAggregateEvents events)
-    {
-        ThrowIfEventWasAppliedToOtherEventSource(events);
-        ThrowIfEventWasAppliedByOtherAggregateRoot(events);
-        if (IsStateless || !events.HasEvents)
-        {
-            Version = events.AggregateRootVersion;
-            return;
-        }
-
-        foreach (var @event in events)
-        {
-            Version = @event.AggregateRootVersion + 1;
-            InvokeOnMethod(@event.Content);
-        }
-    }
-    
     internal virtual void Rehydrate(CommittedAggregateEvents events)
     {
         ThrowIfEventWasAppliedToOtherEventSource(events);
