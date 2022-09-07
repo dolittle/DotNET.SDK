@@ -128,7 +128,11 @@ public class AggregateRoot
     public void ApplyPublic(object @event, EventType eventType)
         => Apply(@event, eventType, true);
 
-    internal virtual void Rehydrate(CommittedAggregateEvents events)
+    /// <summary>
+    /// Rehydrates the aggregate root with the <see cref="CommittedAggregateEvents"/> for this aggregate.
+    /// </summary>
+    /// <param name="events">The <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
+    public void Rehydrate(CommittedAggregateEvents events)
     {
         ThrowIfEventWasAppliedToOtherEventSource(events);
         ThrowIfEventWasAppliedByOtherAggregateRoot(events);
