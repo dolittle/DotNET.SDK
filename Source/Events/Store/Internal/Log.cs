@@ -30,8 +30,8 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Error, "The Runtime acknowledges that the events have been committed, but the returned CommittedEvents could not be converted.")]
     internal static partial void CommittedEventsCouldNotBeConverted(this ILogger logger, Exception ex);
     
-    [LoggerMessage(0, LogLevel.Debug, "Fetching all events for aggregate root {AggregateRoot} and event source {EventSource} that is of one of the following event types: [{EventTypes}]")]
-    internal static partial void FetchingEventsForAggregate(this ILogger logger, AggregateRootId aggregateRoot, EventSourceId eventSource);
+    [LoggerMessage(0, LogLevel.Debug, "Fetching all events for aggregate root {AggregateRoot} and event source {EventSource}")]
+    internal static partial void FetchingAllEventsForAggregate(this ILogger logger, AggregateRootId aggregateRoot, EventSourceId eventSource);
     
     [LoggerMessage(0, LogLevel.Debug, "Fetching events for aggregate root {AggregateRoot} and event source {EventSource} that is of one of the following event types: [{EventTypes}]")]
     internal static partial void FetchingEventsForAggregate(this ILogger logger, AggregateRootId aggregateRoot, EventSourceId eventSource, IEnumerable<EventType> eventTypes);

@@ -56,7 +56,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         EventSourceId eventSourceId,
         CancellationToken cancellationToken = default)
     {
-        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId);
+        _logger.FetchingAllEventsForAggregate(aggregateRootId, eventSourceId);
         return DoFetchForAggregate(aggregateRootId, eventSourceId, Enumerable.Empty<EventType>(), cancellationToken);
     }
     
@@ -88,7 +88,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
             EventTypes = { eventTypes.Select(_ => _.ToProtobuf()) }
         };
 
-        var fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, ImmutableList<CommittedAggregateEvent>.Empty);
+        var fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, AggregateRootVersion.Initial, ImmutableList<CommittedAggregateEvent>.Empty);
         await foreach (var response in _caller.Call(_fetchForAggregateInBatchesMethod, request, cancellationToken))
         {
             response.Failure.ThrowIfFailureIsSet();
@@ -98,7 +98,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
                 throw error;
             }
             
-            fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, fetchedEvents.Concat(batch).ToList());
+            fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, batch.AggregateRootVersion, fetchedEvents.Concat(batch).ToList());
         }
         return fetchedEvents;
     }

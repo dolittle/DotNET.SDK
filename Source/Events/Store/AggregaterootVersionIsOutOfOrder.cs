@@ -14,9 +14,9 @@ public class AggregateRootVersionIsOutOfOrder : ArgumentException
     /// Initializes a new instance of the <see cref="AggregateRootVersionIsOutOfOrder"/> class.
     /// </summary>
     /// <param name="eventVersion">The <see cref="AggregateRootVersion"/> the Event was applied by.</param>
-    /// <param name="expectedVersion">Expected <see cref="AggregateRootVersion"/>.</param>
-    public AggregateRootVersionIsOutOfOrder(AggregateRootVersion eventVersion, AggregateRootVersion expectedVersion)
-        : base($"Aggregate Root version is out of order. Version '{eventVersion}' from event does not match '{expectedVersion}'")
+    /// <param name="previousVersion">Previous <see cref="AggregateRootVersion"/>.</param>
+    public AggregateRootVersionIsOutOfOrder(AggregateRootVersion eventVersion, AggregateRootVersion previousVersion)
+        : base($"Aggregate Root version is out of order. Version '{eventVersion}' from event is not greater than previous version '{previousVersion}'")
     {
     }
 }

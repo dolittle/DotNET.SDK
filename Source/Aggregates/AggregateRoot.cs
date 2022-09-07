@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Aggregates;
 /// </summary>
 public class AggregateRoot
 {
-    readonly IList<AppliedEvent> _appliedEvents;
+    readonly List<AppliedEvent> _appliedEvents = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
@@ -25,7 +25,7 @@ public class AggregateRoot
     {
         EventSourceId = eventSourceId;
         Version = AggregateRootVersion.Initial;
-        _appliedEvents = new List<AppliedEvent>();
+        IsStateless = this.IsStateless();
     }
 
     /// <summary>
@@ -42,6 +42,11 @@ public class AggregateRoot
     /// Gets the <see cref="IEnumerable{T}" /> of applied events to commit.
     /// </summary>
     public IEnumerable<AppliedEvent> AppliedEvents => _appliedEvents;
+    
+    /// <summary>
+    /// Gets a value indicating whether this aggregate root is stateless or not.
+    /// </summary>
+    public bool IsStateless { get; }
 
     /// <summary>
     /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -126,23 +131,53 @@ public class AggregateRoot
     /// <summary>
     /// Re-apply events from the Event Store.
     /// </summary>
+    /// <remarks>
+    /// This method is not supposed to be used by application code.
+    /// This is for internal rehydration of aggregate roots.
+    /// </remarks>
     /// <param name="events">Sequence that contains the events to re-apply.</param>
+    [Obsolete("This should eventually be removed from the AggregateRoot interface and replaced by an internal method")]
     public virtual void ReApply(CommittedAggregateEvents events)
     {
         ThrowIfEventWasAppliedToOtherEventSource(events);
         ThrowIfEventWasAppliedByOtherAggregateRoot(events);
+        if (IsStateless || !events.HasEvents)
+        {
+            Version = events.AggregateRootVersion;
+            return;
+        }
 
         foreach (var @event in events)
         {
-            ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
-            Version++;
-            if (!this.IsStateless()) InvokeOnMethod(@event.Content);
+            Version = @event.AggregateRootVersion + 1;
+            InvokeOnMethod(@event.Content);
         }
     }
+    
+    internal virtual void Rehydrate(CommittedAggregateEvents events)
+    {
+        ThrowIfEventWasAppliedToOtherEventSource(events);
+        ThrowIfEventWasAppliedByOtherAggregateRoot(events);
+        if (IsStateless || !events.HasEvents)
+        {
+            Version = events.AggregateRootVersion;
+            return;
+        }
 
+        foreach (var @event in events)
+        {
+            Version = @event.AggregateRootVersion + 1;
+            InvokeOnMethod(@event.Content);
+        }
+    }
+    
     void Apply(object @event, EventType eventType, bool isPublic)
     {
-        if (@event == null) throw new EventContentCannotBeNull();
+        if (@event == null)
+        {
+            throw new EventContentCannotBeNull();
+        }
+
         _appliedEvents.Add(new AppliedEvent(@event, eventType, isPublic));
         Version++;
         InvokeOnMethod(@event);
@@ -156,19 +191,20 @@ public class AggregateRoot
         }
     }
 
-    void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
-    {
-        if (@event.AggregateRootVersion != Version) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, Version);
-    }
-
     void ThrowIfEventWasAppliedByOtherAggregateRoot(CommittedAggregateEvents events)
     {
         var aggregateRootId = this.GetAggregateRootId();
-        if (events.AggregateRoot != this.GetAggregateRootId()) throw new EventWasAppliedByOtherAggregateRoot(events.AggregateRoot, aggregateRootId);
+        if (events.AggregateRoot != this.GetAggregateRootId())
+        {
+            throw new EventWasAppliedByOtherAggregateRoot(events.AggregateRoot, aggregateRootId);
+        }
     }
 
     void ThrowIfEventWasAppliedToOtherEventSource(CommittedAggregateEvents events)
     {
-        if (events.EventSource != EventSourceId) throw new EventWasAppliedToOtherEventSource(events.EventSource, EventSourceId);
+        if (events.EventSource != EventSourceId)
+        {
+            throw new EventWasAppliedToOtherEventSource(events.EventSource, EventSourceId);
+        }
     }
 }

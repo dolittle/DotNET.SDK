@@ -61,7 +61,7 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
                 false,
                 executionContext),
         };
-        return new CommittedAggregateEvents(eventSource, aggregateRootId, events);
+        return new CommittedAggregateEvents(eventSource, aggregateRootId, 3, events);
     }
 
     static CommittedAggregateEvent build_committed_event(
