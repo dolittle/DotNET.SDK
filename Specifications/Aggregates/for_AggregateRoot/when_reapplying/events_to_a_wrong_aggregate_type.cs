@@ -15,7 +15,7 @@ public class events_to_a_wrong_aggregate_type : given.committed_events_and_two_a
 
     Establish context = () => events = build_committed_events(event_source_id, stateless_aggregate_root.GetAggregateRootId(), execution_context);
 
-    Because of = () => exception = Catch.Exception(() => statefull_aggregate_root.ReApply(events));
+    Because of = () => exception = Catch.Exception(() => statefull_aggregate_root.Rehydrate(events));
 
     It should_throw_an_exception = () => exception.ShouldBeOfExactType<EventWasAppliedByOtherAggregateRoot>();
     It should_be_at_version_three = () => statefull_aggregate_root.Version.ShouldEqual(AggregateRootVersion.Initial);

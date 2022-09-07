@@ -31,7 +31,7 @@ public class committed_aggregate_events_and_a_converter : a_converter_and_a_prot
         event_source = "Rena Pearson";
         aggregate_root_id = "717915c1-bb88-4bec-b1c1-61451c5a6608";
 
-        aggregate_root_version = 186206759u;
+        aggregate_root_version = 0;
         occured = new DateTimeOffset(2018, 5, 12, 22, 17, 19, TimeSpan.Zero);
         event_log_sequence_number = 1581420095;
 

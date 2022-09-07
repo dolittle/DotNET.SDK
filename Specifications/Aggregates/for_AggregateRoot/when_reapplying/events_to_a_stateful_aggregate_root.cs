@@ -13,7 +13,7 @@ public class events_to_a_stateful_aggregate_root : given.committed_events_and_tw
 
     Establish context = () => events = build_committed_events(event_source_id, statefull_aggregate_root.GetAggregateRootId(), execution_context);
 
-    Because of = () => statefull_aggregate_root.ReApply(events);
+    Because of = () => statefull_aggregate_root.Rehydrate(events);
 
     It should_be_at_version_three = () => statefull_aggregate_root.Version.ShouldEqual<AggregateRootVersion>(3);
     It should_handle_simple_event_two_times = () => statefull_aggregate_root.AnEventOnCalled.ShouldEqual(2);

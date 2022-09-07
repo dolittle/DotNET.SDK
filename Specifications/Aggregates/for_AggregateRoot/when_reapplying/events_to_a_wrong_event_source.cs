@@ -15,7 +15,7 @@ public class events_to_a_wrong_event_source : given.committed_events_and_two_agg
 
     Establish context = () => events = build_committed_events("aa81d146-0c45-4121-bce0-fcc547257ccd", statefull_aggregate_root.GetAggregateRootId(), execution_context);
 
-    Because of = () => exception = Catch.Exception(() => statefull_aggregate_root.ReApply(events));
+    Because of = () => exception = Catch.Exception(() => statefull_aggregate_root.Rehydrate(events));
 
     It should_throw_an_exception = () => exception.ShouldBeOfExactType<EventWasAppliedToOtherEventSource>();
     It should_be_at_version_three = () => statefull_aggregate_root.Version.ShouldEqual(AggregateRootVersion.Initial);
