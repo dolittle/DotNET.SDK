@@ -93,22 +93,14 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         return getAggregateRoot.Success;
     }
 
-    async Task Rehydrate(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
+    Task Rehydrate(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
     {
         var eventSourceId = aggregateRoot.EventSourceId;
         _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
         var eventTypesToFetch = aggregateRoot.GetEventTypes(_eventTypes);
         
-        var committedEvents = await _eventStore.FetchForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken).ConfigureAwait(false);
-        if (aggregateRoot.IsStateless())
-        {
-            _logger.NoEventsToReApply();
-        }
-        if (committedEvents.HasEvents && !aggregateRoot.IsStateless)
-        {
-            _logger.ReApplying(committedEvents.Count);
-        }
-        aggregateRoot.Rehydrate(committedEvents);
+        var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
+        return aggregateRoot.Rehydrate(committedEventsBatches, cancellationToken);
     }
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)

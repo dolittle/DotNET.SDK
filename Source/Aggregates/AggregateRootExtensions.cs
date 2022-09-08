@@ -54,7 +54,10 @@ public static class AggregateRootExtensions
     {
         var aggregateRootType = aggregateRoot.GetType();
         var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
-        if (aggregateRootAttribute == null) throw new MissingAggregateRootAttribute(aggregateRootType);
+        if (aggregateRootAttribute == null)
+        {
+            throw new MissingAggregateRootAttribute(aggregateRootType);
+        }
         return aggregateRootAttribute.Type.Id;
     }
 

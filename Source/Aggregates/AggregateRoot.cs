@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
@@ -16,6 +17,7 @@ namespace Dolittle.SDK.Aggregates;
 public class AggregateRoot
 {
     readonly List<AppliedEvent> _appliedEvents = new();
+    AggregateRootId? _aggregateRootId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
@@ -32,6 +34,11 @@ public class AggregateRoot
     /// Gets the current <see cref="AggregateRootVersion" />.
     /// </summary>
     public AggregateRootVersion Version { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="Events.AggregateRootId"/>.
+    /// </summary>
+    public AggregateRootId AggregateRootId => _aggregateRootId ??= this.GetAggregateRootId();
 
     /// <summary>
     /// Gets the <see cref="Events.EventSourceId" /> that the <see cref="AggregateRoot" /> applies events to.
@@ -131,24 +138,38 @@ public class AggregateRoot
     /// <summary>
     /// Rehydrates the aggregate root with the <see cref="CommittedAggregateEvents"/> for this aggregate.
     /// </summary>
-    /// <param name="events">The <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
-    public void Rehydrate(CommittedAggregateEvents events)
+    /// <param name="aggregateRootId">The aggregate root id.</param>
+    /// <param name="batches">The <see cref="IAsyncEnumerator{T}"/> batches of <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> used for cancelling the rehydration.</param>
+    public async Task Rehydrate(IAsyncEnumerable<CommittedAggregateEvents> batches, CancellationToken cancellationToken)
     {
-        ThrowIfEventWasAppliedToOtherEventSource(events);
-        ThrowIfEventWasAppliedByOtherAggregateRoot(events);
-        if (IsStateless || !events.HasEvents)
+        var batchesEnumerator = batches.WithCancellation(cancellationToken).GetAsyncEnumerator();
+        if (!await batchesEnumerator.MoveNextAsync())
         {
-            Version = events.AggregateRootVersion;
-            return;
+            throw new NoCommittedAggregateEventsBatches(AggregateRootId, EventSourceId);
         }
-
-        foreach (var @event in events)
+        
+        do
         {
-            Version = @event.AggregateRootVersion + 1;
-            InvokeOnMethod(@event.Content);
+            var batch = batchesEnumerator.Current;
+            ThrowIfEventWasAppliedToOtherEventSource(batch);
+            ThrowIfEventWasAppliedByOtherAggregateRoot(batch);
+            if (IsStateless)
+            {
+                Version = batch.AggregateRootVersion;
+                break;
+            }
+            foreach (var @event in batch)
+            {
+                Version = @event.AggregateRootVersion + 1;
+                InvokeOnMethod(@event.Content);
+            }
         }
+        while (await batchesEnumerator.MoveNextAsync());
+        cancellationToken.ThrowIfCancellationRequested();
     }
-    
+
+
     void Apply(object @event, EventType eventType, bool isPublic)
     {
         if (@event == null)
