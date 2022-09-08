@@ -76,4 +76,12 @@ public class EventStore : IEventStore
         IEnumerable<EventType> eventTypes,
         CancellationToken cancellationToken = default)
         => _eventsForAggregate.FetchForAggregate(aggregateRootId, eventSourceId, eventTypes, cancellationToken);
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<CommittedAggregateEvents> FetchStreamForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        => _eventsForAggregate.FetchStreamForAggregate(aggregateRootId, eventSourceId, cancellationToken);
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<CommittedAggregateEvents> FetchStreamForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, IEnumerable<EventType> eventTypes, CancellationToken cancellationToken = default)
+        => _eventsForAggregate.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypes, cancellationToken);
 }
