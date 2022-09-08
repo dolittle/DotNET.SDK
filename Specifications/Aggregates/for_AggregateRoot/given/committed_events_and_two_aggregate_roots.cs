@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Execution;
@@ -29,39 +30,54 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
             CultureInfo.InvariantCulture, null);
     };
 
-    public static CommittedAggregateEvents build_committed_events(EventSourceId eventSource, AggregateRootId aggregateRootId, ExecutionContext executionContext)
+    public static async IAsyncEnumerable<CommittedAggregateEvents> build_committed_events(EventSourceId eventSource, AggregateRootId aggregateRootId, ExecutionContext executionContext)
     {
-        var events = new List<CommittedAggregateEvent>()
+        var events = Enumerable.Range(0, 3)
+            .Select(i =>
+            {
+                object @event = i switch
+                {
+                    0 => first_event,
+                    1 => second_event,
+                    2 => third_event
+                };
+
+                return build_committed_event(
+                    eventSource,
+                    aggregateRootId,
+                    (ulong) i,
+                    (ulong) i,
+                    @event,
+                    event_types.GetFor(@event.GetType()),
+                    false,
+                    executionContext);
+            });
+        yield return new CommittedAggregateEvents(eventSource, aggregateRootId, 3, events.ToList());
+    }
+
+    public static async IAsyncEnumerable<CommittedAggregateEvents> build_committed_events_batches(EventSourceId eventSource, AggregateRootId aggregateRootId, ExecutionContext executionContext)
+    {
+        foreach (ulong i in Enumerable.Range(0, 3))
         {
-            build_committed_event(
-                eventSource,
-                aggregateRootId,
-                0,
-                0,
-                first_event,
-                event_types.GetFor(first_event.GetType()),
-                false,
-                executionContext),
-            build_committed_event(
-                eventSource,
-                aggregateRootId,
-                1,
-                1,
-                second_event,
-                event_types.GetFor(second_event.GetType()),
-                false,
-                executionContext),
-            build_committed_event(
-                eventSource,
-                aggregateRootId,
-                2,
-                2,
-                third_event,
-                event_types.GetFor(third_event.GetType()),
-                false,
-                executionContext),
-        };
-        return new CommittedAggregateEvents(eventSource, aggregateRootId, 3, events);
+            object @event = i switch
+            {
+                0 => first_event,
+                1 => second_event,
+                2 => third_event
+            };
+            yield return new CommittedAggregateEvents(eventSource, aggregateRootId, 3, new []
+            {
+                build_committed_event(
+                    eventSource,
+                    aggregateRootId,
+                    i,
+                    i,
+                    @event,
+                    event_types.GetFor(@event.GetType()),
+                    false,
+                    executionContext)
+            });
+        }
     }
 
     static CommittedAggregateEvent build_committed_event(
