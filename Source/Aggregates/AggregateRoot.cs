@@ -14,18 +14,18 @@ namespace Dolittle.SDK.Aggregates;
 /// <summary>
 /// Represents the aggregate root.
 /// </summary>
-public class AggregateRoot
+public abstract class AggregateRoot
 {
     readonly List<AppliedEvent> _appliedEvents = new();
-    AggregateRootId? _aggregateRootId;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
     /// </summary>
     /// <param name="eventSourceId">The <see cref="Events.EventSourceId" />.</param>
-    public AggregateRoot(EventSourceId eventSourceId)
+    protected AggregateRoot(EventSourceId eventSourceId)
     {
         EventSourceId = eventSourceId;
+        AggregateRootId = this.GetAggregateRootId();
         Version = AggregateRootVersion.Initial;
         IsStateless = this.IsStateless();
     }
@@ -38,7 +38,7 @@ public class AggregateRoot
     /// <summary>
     /// Gets the <see cref="Events.AggregateRootId"/>.
     /// </summary>
-    public AggregateRootId AggregateRootId => _aggregateRootId ??= this.GetAggregateRootId();
+    public AggregateRootId AggregateRootId { get; }
 
     /// <summary>
     /// Gets the <see cref="Events.EventSourceId" /> that the <see cref="AggregateRoot" /> applies events to.
@@ -170,7 +170,7 @@ public class AggregateRoot
     }
 
 
-    void Apply(object @event, EventType eventType, bool isPublic)
+    void Apply(object @event, EventType? eventType, bool isPublic)
     {
         if (@event == null)
         {
