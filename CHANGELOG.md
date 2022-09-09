@@ -1,3 +1,9 @@
+# [17.2.3] - 2022-9-9 [PR: #161](https://github.com/dolittle/DotNET.SDK/pull/161)
+### Fixed
+
+* Fixes bug in `WithOpenTelemetrySettings`
+
+
 # [17.2.2] - 2022-8-26 [PR: #158](https://github.com/dolittle/DotNET.SDK/pull/158)
 ## Summary
 
