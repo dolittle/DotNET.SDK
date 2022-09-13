@@ -63,8 +63,6 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
         var committedEvents = source.ToArray();
         for (ulong i = 0; i < (ulong)committedEvents.Length; i++)
         {
-            // We have to manually calculate and set the AggregateRootVersion for the events as the
-            // CommittedAggregateEvents.AggregateRootVersion is set to the latest version.
             var sourceEvent = committedEvents[i];
 
             if (!TryConvert(sourceEvent, eventSourceId, aggregateRootId, out var @event, out error))
