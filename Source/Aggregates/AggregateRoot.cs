@@ -50,10 +50,7 @@ public abstract class AggregateRoot
     /// </summary>
     public IEnumerable<AppliedEvent> AppliedEvents => _appliedEvents;
     
-    /// <summary>
-    /// Gets a value indicating whether this aggregate root is stateless or not.
-    /// </summary>
-    public bool IsStateless { get; }
+    bool IsStateless { get; }
 
     /// <summary>
     /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -138,20 +135,14 @@ public abstract class AggregateRoot
     /// <summary>
     /// Rehydrates the aggregate root with the <see cref="CommittedAggregateEvents"/> for this aggregate.
     /// </summary>
-    /// <param name="aggregateRootId">The aggregate root id.</param>
     /// <param name="batches">The <see cref="IAsyncEnumerator{T}"/> batches of <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> used for cancelling the rehydration.</param>
     public async Task Rehydrate(IAsyncEnumerable<CommittedAggregateEvents> batches, CancellationToken cancellationToken)
     {
-        var batchesEnumerator = batches.WithCancellation(cancellationToken).GetAsyncEnumerator();
-        if (!await batchesEnumerator.MoveNextAsync())
+        var hasBatches = false;
+        await foreach (var batch in batches.WithCancellation(cancellationToken))
         {
-            throw new NoCommittedAggregateEventsBatches(AggregateRootId, EventSourceId);
-        }
-        
-        do
-        {
-            var batch = batchesEnumerator.Current;
+            hasBatches = true;
             ThrowIfEventWasAppliedToOtherEventSource(batch);
             ThrowIfEventWasAppliedByOtherAggregateRoot(batch);
             if (IsStateless)
@@ -165,7 +156,10 @@ public abstract class AggregateRoot
                 InvokeOnMethod(@event.Content);
             }
         }
-        while (await batchesEnumerator.MoveNextAsync());
+        if (!hasBatches)
+        {
+            throw new NoCommittedAggregateEventsBatches(AggregateRootId, EventSourceId);
+        }
         cancellationToken.ThrowIfCancellationRequested();
     }
 
