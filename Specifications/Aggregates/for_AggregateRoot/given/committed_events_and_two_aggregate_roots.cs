@@ -65,7 +65,7 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
                 1 => second_event,
                 2 => third_event
             };
-            yield return new CommittedAggregateEvents(eventSource, aggregateRootId, 3, new []
+            var events = new[]
             {
                 build_committed_event(
                     eventSource,
@@ -75,8 +75,21 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
                     @event,
                     event_types.GetFor(@event.GetType()),
                     false,
-                    executionContext)
-            });
+                    executionContext),
+            };
+            if (i == 2)
+            {
+                events = events.Append(build_committed_event(
+                    eventSource,
+                    aggregateRootId,
+                    i + 1,
+                    i + 1,
+                    @event,
+                    event_types.GetFor(@event.GetType()),
+                    false,
+                    executionContext)).ToArray();
+            }
+            yield return new CommittedAggregateEvents(eventSource, aggregateRootId, 4, events);
         }
     }
 
