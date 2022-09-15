@@ -15,8 +15,8 @@ static partial class Log
     [LoggerMessage(0, LogLevel.Debug,"Performing operation on {AggregateRoot} with aggregate root id {AggregateRootId} applying events to event source {EventSource}")]
     internal static partial void PerformingOn(this ILogger logger, Type aggregateRoot, AggregateRootId aggregateRootId, EventSourceId eventSource);
     
-    [LoggerMessage(0, LogLevel.Debug, "Re-applying events for {AggregateRoot} with aggregate root id {AggregateRootId} with event source id {EventSource}")]
-    internal static partial void ReApplyingEventsFor(this ILogger logger, Type aggregateRoot, AggregateRootId aggregateRootId, EventSourceId eventSource);
+    [LoggerMessage(0, LogLevel.Debug, "Rehydrating {AggregateRoot} with aggregate root id {AggregateRootId} with event source id {EventSource}")]
+    internal static partial void RehydratingAggregateRoot(this ILogger logger, Type aggregateRoot, AggregateRootId aggregateRootId, EventSourceId eventSource);
 
     [LoggerMessage(0, LogLevel.Trace, "Re-applying {NumberOfEvents} events")]
     internal static partial void ReApplying(this ILogger logger, int numberOfEvents);

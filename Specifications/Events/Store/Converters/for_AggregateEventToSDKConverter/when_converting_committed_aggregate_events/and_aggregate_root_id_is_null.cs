@@ -22,7 +22,8 @@ public class and_aggregate_root_id_is_null : given.committed_aggregate_events_an
             EventSourceId = event_source.Value,
             AggregateRootId = null,
             AggregateRootVersion = aggregate_root_version,
-            Events = { committed_aggregate_event }
+            Events = { committed_aggregate_event },
+            CurrentAggregateRootVersion = aggregate_root_version
         };
 
         object_from_serializer = new object();

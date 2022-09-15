@@ -70,11 +70,9 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
 
             var aggregateRootId = aggregateRoot.GetAggregateRootId();
             activity?.Tag(aggregateRootId);
-            await ReApplyEvents(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
-
+            await Rehydrate(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
             _logger.PerformingOn(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.EventSourceId);
             await method(aggregateRoot).ConfigureAwait(false);
-
             if (aggregateRoot.AppliedEvents.Any())
             {
                 await CommitAppliedEvents(aggregateRoot, aggregateRootId).ConfigureAwait(false);
@@ -95,21 +93,14 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         return getAggregateRoot.Success;
     }
 
-    async Task ReApplyEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
+    Task Rehydrate(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
     {
         var eventSourceId = aggregateRoot.EventSourceId;
-        _logger.ReApplyingEventsFor(typeof(TAggregate), aggregateRootId, eventSourceId);
-
-        var committedEvents = await _eventStore.FetchForAggregate(aggregateRootId, eventSourceId, cancellationToken).ConfigureAwait(false);
-        if (committedEvents.HasEvents)
-        {
-            _logger.ReApplying(committedEvents.Count);
-            aggregateRoot.ReApply(committedEvents);
-        }
-        else
-        {
-            _logger.NoEventsToReApply();
-        }
+        _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
+        var eventTypesToFetch = aggregateRoot.GetEventTypes(_eventTypes);
+        
+        var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
+        return aggregateRoot.Rehydrate(committedEventsBatches, cancellationToken);
     }
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)

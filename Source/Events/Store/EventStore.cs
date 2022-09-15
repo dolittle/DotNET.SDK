@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events.Store.Builders;
@@ -67,4 +68,20 @@ public class EventStore : IEventStore
         EventSourceId eventSourceId,
         CancellationToken cancellationToken = default)
         => _eventsForAggregate.FetchForAggregate(aggregateRootId, eventSourceId, cancellationToken);
+    
+    /// <inheritdoc/>
+    public Task<CommittedAggregateEvents> FetchForAggregate(
+        AggregateRootId aggregateRootId,
+        EventSourceId eventSourceId,
+        IEnumerable<EventType> eventTypes,
+        CancellationToken cancellationToken = default)
+        => _eventsForAggregate.FetchForAggregate(aggregateRootId, eventSourceId, eventTypes, cancellationToken);
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<CommittedAggregateEvents> FetchStreamForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
+        => _eventsForAggregate.FetchStreamForAggregate(aggregateRootId, eventSourceId, cancellationToken);
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<CommittedAggregateEvents> FetchStreamForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, IEnumerable<EventType> eventTypes, CancellationToken cancellationToken = default)
+        => _eventsForAggregate.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypes, cancellationToken);
 }

@@ -52,7 +52,10 @@ public class CommitForAggregateWithEventSourceAndExpectedVersionBuilder
         Action<UncommittedAggregateEventsBuilder> callback,
         CancellationToken cancellationToken = default)
     {
-        if (_builder != default) throw new EventBuilderMethodAlreadyCalled("Commit");
+        if (_builder != default)
+        {
+            throw new EventBuilderMethodAlreadyCalled("Commit");
+        }
         _builder = new UncommittedAggregateEventsBuilder(_aggregateRootId, _eventSourceId, _expectedVersion);
         callback(_builder);
         var uncommittedAggregateEvents = _builder.Build(_eventTypes);

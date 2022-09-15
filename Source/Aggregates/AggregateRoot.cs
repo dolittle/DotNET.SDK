@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
@@ -13,25 +14,31 @@ namespace Dolittle.SDK.Aggregates;
 /// <summary>
 /// Represents the aggregate root.
 /// </summary>
-public class AggregateRoot
+public abstract class AggregateRoot
 {
-    readonly IList<AppliedEvent> _appliedEvents;
+    readonly List<AppliedEvent> _appliedEvents = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
     /// </summary>
     /// <param name="eventSourceId">The <see cref="Events.EventSourceId" />.</param>
-    public AggregateRoot(EventSourceId eventSourceId)
+    protected AggregateRoot(EventSourceId eventSourceId)
     {
         EventSourceId = eventSourceId;
+        AggregateRootId = this.GetAggregateRootId();
         Version = AggregateRootVersion.Initial;
-        _appliedEvents = new List<AppliedEvent>();
+        IsStateless = this.IsStateless();
     }
 
     /// <summary>
     /// Gets the current <see cref="AggregateRootVersion" />.
     /// </summary>
     public AggregateRootVersion Version { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="Events.AggregateRootId"/>.
+    /// </summary>
+    public AggregateRootId AggregateRootId { get; }
 
     /// <summary>
     /// Gets the <see cref="Events.EventSourceId" /> that the <see cref="AggregateRoot" /> applies events to.
@@ -42,6 +49,8 @@ public class AggregateRoot
     /// Gets the <see cref="IEnumerable{T}" /> of applied events to commit.
     /// </summary>
     public IEnumerable<AppliedEvent> AppliedEvents => _appliedEvents;
+    
+    bool IsStateless { get; }
 
     /// <summary>
     /// Apply the event to the <see cref="AggregateRoot" /> so that it will be committed to the <see cref="IEventStore" />
@@ -124,25 +133,44 @@ public class AggregateRoot
         => Apply(@event, eventType, true);
 
     /// <summary>
-    /// Re-apply events from the Event Store.
+    /// Rehydrates the aggregate root with the <see cref="CommittedAggregateEvents"/> for this aggregate.
     /// </summary>
-    /// <param name="events">Sequence that contains the events to re-apply.</param>
-    public virtual void ReApply(CommittedAggregateEvents events)
+    /// <param name="batches">The <see cref="IAsyncEnumerator{T}"/> batches of <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> used for cancelling the rehydration.</param>
+    public async Task Rehydrate(IAsyncEnumerable<CommittedAggregateEvents> batches, CancellationToken cancellationToken)
     {
-        ThrowIfEventWasAppliedToOtherEventSource(events);
-        ThrowIfEventWasAppliedByOtherAggregateRoot(events);
-
-        foreach (var @event in events)
+        var hasBatches = false;
+        await foreach (var batch in batches.WithCancellation(cancellationToken))
         {
-            ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
-            Version++;
-            if (!this.IsStateless()) InvokeOnMethod(@event.Content);
+            hasBatches = true;
+            ThrowIfEventWasAppliedToOtherEventSource(batch);
+            ThrowIfEventWasAppliedByOtherAggregateRoot(batch);
+            if (IsStateless)
+            {
+                Version = batch.AggregateRootVersion;
+                break;
+            }
+            foreach (var @event in batch)
+            {
+                Version = @event.AggregateRootVersion + 1;
+                InvokeOnMethod(@event.Content);
+            }
         }
+        if (!hasBatches)
+        {
+            throw new NoCommittedAggregateEventsBatches(AggregateRootId, EventSourceId);
+        }
+        cancellationToken.ThrowIfCancellationRequested();
     }
 
-    void Apply(object @event, EventType eventType, bool isPublic)
+
+    void Apply(object @event, EventType? eventType, bool isPublic)
     {
-        if (@event == null) throw new EventContentCannotBeNull();
+        if (@event == null)
+        {
+            throw new EventContentCannotBeNull();
+        }
+
         _appliedEvents.Add(new AppliedEvent(@event, eventType, isPublic));
         Version++;
         InvokeOnMethod(@event);
@@ -156,19 +184,20 @@ public class AggregateRoot
         }
     }
 
-    void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
-    {
-        if (@event.AggregateRootVersion != Version) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, Version);
-    }
-
     void ThrowIfEventWasAppliedByOtherAggregateRoot(CommittedAggregateEvents events)
     {
         var aggregateRootId = this.GetAggregateRootId();
-        if (events.AggregateRoot != this.GetAggregateRootId()) throw new EventWasAppliedByOtherAggregateRoot(events.AggregateRoot, aggregateRootId);
+        if (events.AggregateRoot != this.GetAggregateRootId())
+        {
+            throw new EventWasAppliedByOtherAggregateRoot(events.AggregateRoot, aggregateRootId);
+        }
     }
 
     void ThrowIfEventWasAppliedToOtherEventSource(CommittedAggregateEvents events)
     {
-        if (events.EventSource != EventSourceId) throw new EventWasAppliedToOtherEventSource(events.EventSource, EventSourceId);
+        if (events.EventSource != EventSourceId)
+        {
+            throw new EventWasAppliedToOtherEventSource(events.EventSource, EventSourceId);
+        }
     }
 }

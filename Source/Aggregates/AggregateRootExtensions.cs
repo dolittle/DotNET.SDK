@@ -37,6 +37,15 @@ public static class AggregateRootExtensions
         => GetHandleMethodsFor(aggregateRoot.GetType()).Count == 0;
 
     /// <summary>
+    /// Gets all the <see cref="IEnumerable{T}"/> of <see cref="EventType"/> that the 
+    /// </summary>
+    /// <param name="aggregateRoot"></param>
+    /// <param name="eventTypes"></param>
+    /// <returns></returns>
+    public static IEnumerable<EventType> GetEventTypes(this AggregateRoot aggregateRoot, IEventTypes eventTypes)
+        => GetHandleMethodsFor(aggregateRoot.GetType()).Keys.Select(eventTypes.GetFor);
+
+    /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
     /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
@@ -45,7 +54,10 @@ public static class AggregateRootExtensions
     {
         var aggregateRootType = aggregateRoot.GetType();
         var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
-        if (aggregateRootAttribute == null) throw new MissingAggregateRootAttribute(aggregateRootType);
+        if (aggregateRootAttribute == null)
+        {
+            throw new MissingAggregateRootAttribute(aggregateRootType);
+        }
         return aggregateRootAttribute.Type.Id;
     }
 

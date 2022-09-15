@@ -13,32 +13,34 @@ namespace Dolittle.SDK.Events.Store;
 public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
 {
     readonly ImmutableList<CommittedAggregateEvent> _events;
-    readonly AggregateRootVersion _nextAggregateRootVersion;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommittedAggregateEvents"/> class.
     /// </summary>
     /// <param name="eventSource">The <see cref="EventSourceId"/> that the Events were applied to.</param>
     /// <param name="aggregateRootId">The <see cref="AggregateRootId"/> of the Aggregate Root that applied the Events to the Event Source.</param>
+    /// <param name="currentAggregateRootVersion">The current <see cref="AggregateRootVersion"/> after all events was applied.</param>
     /// <param name="events">The <see cref="CommittedAggregateEvent">events</see>.</param>
-    public CommittedAggregateEvents(EventSourceId eventSource, AggregateRootId aggregateRootId, IReadOnlyList<CommittedAggregateEvent> events)
+    public CommittedAggregateEvents(EventSourceId eventSource, AggregateRootId aggregateRootId, AggregateRootVersion currentAggregateRootVersion, IReadOnlyList<CommittedAggregateEvent> events)
     {
         ThrowIfEventsSourceIdIsNull(eventSource);
         ThrowIfAggregateRootIdIsNull(aggregateRootId);
 
         EventSource = eventSource;
         AggregateRoot = aggregateRootId;
-
+        AggregateRootVersion = currentAggregateRootVersion;
         for (var i = 0; i < events.Count; i++)
         {
-            if (i == 0) _nextAggregateRootVersion = events[0].AggregateRootVersion;
             var @event = events[i];
             ThrowIfEventIsNull(@event);
             ThrowIfEventWasAppliedToOtherEventSource(@event);
             ThrowIfEventWasAppliedByOtherAggregateRoot(@event);
-            ThrowIfAggreggateRootVersionIsOutOfOrder(@event);
-            if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
-            _nextAggregateRootVersion++;
+            if (i <= 0)
+            {
+                continue;
+            }
+            ThrowIfAggregateRootVersionIsOutOfOrder(@event, events[i - 1]);
+            ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
         }
 
         _events = ImmutableList<CommittedAggregateEvent>.Empty.AddRange(events);
@@ -57,7 +59,7 @@ public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
     /// <summary>
     /// Gets the <see cref="AggregateRootVersion"/>  of the Aggregate Root after all the Events was applied.
     /// </summary>
-    public AggregateRootVersion AggregateRootVersion => _events.Count == 0 ? AggregateRootVersion.Initial : _events[^1].AggregateRootVersion;
+    public AggregateRootVersion AggregateRootVersion { get; }
 
     /// <summary>
     /// Gets a value indicating whether or not there are any events in the committed sequence.
@@ -76,38 +78,59 @@ public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => _events.GetEnumerator();
 
-    void ThrowIfEventsSourceIdIsNull(EventSourceId eventSource)
+    static void ThrowIfEventsSourceIdIsNull(EventSourceId eventSource)
     {
-        if (eventSource == null) throw new EventSourceIdCannotBeNull();
+        if (eventSource == null)
+        {
+            throw new EventSourceIdCannotBeNull();
+        }
     }
 
-    void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
+    static void ThrowIfAggregateRootIdIsNull(AggregateRootId aggregateRootId)
     {
-        if (aggregateRootId == null) throw new AggregateRootIdCannotBeNull();
+        if (aggregateRootId == null)
+        {
+            throw new AggregateRootIdCannotBeNull();
+        }
     }
 
-    void ThrowIfEventIsNull(CommittedAggregateEvent @event)
+    static void ThrowIfEventIsNull(CommittedAggregateEvent @event)
     {
-        if (@event == null) throw new EventCannotBeNull();
+        if (@event == null)
+        {
+            throw new EventCannotBeNull();
+        }
     }
 
     void ThrowIfEventWasAppliedToOtherEventSource(CommittedAggregateEvent @event)
     {
-        if (@event.EventSource != EventSource) throw new EventWasAppliedToOtherEventSource(@event.EventSource, EventSource);
+        if (@event.EventSource != EventSource)
+        {
+            throw new EventWasAppliedToOtherEventSource(@event.EventSource, EventSource);
+        }
     }
 
     void ThrowIfEventWasAppliedByOtherAggregateRoot(CommittedAggregateEvent @event)
     {
-        if (@event.AggregateRoot != AggregateRoot) throw new EventWasAppliedByOtherAggregateRoot(@event.AggregateRoot, AggregateRoot);
+        if (@event.AggregateRoot != AggregateRoot)
+        {
+            throw new EventWasAppliedByOtherAggregateRoot(@event.AggregateRoot, AggregateRoot);
+        }
     }
 
-    void ThrowIfAggreggateRootVersionIsOutOfOrder(CommittedAggregateEvent @event)
+    static void ThrowIfAggregateRootVersionIsOutOfOrder(CommittedAggregateEvent @event, CommittedAggregateEvent previousEvent)
     {
-        if (@event.AggregateRootVersion != _nextAggregateRootVersion) throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, _nextAggregateRootVersion);
+        if (@event.AggregateRootVersion <= previousEvent.AggregateRootVersion)
+        {
+            throw new AggregateRootVersionIsOutOfOrder(@event.AggregateRootVersion, previousEvent.AggregateRootVersion);
+        }
     }
 
-    void ThrowIfEventLogVersionIsOutOfOrder(CommittedAggregateEvent @event, CommittedAggregateEvent previousEvent)
+    static void ThrowIfEventLogVersionIsOutOfOrder(CommittedAggregateEvent @event, CommittedAggregateEvent previousEvent)
     {
-        if (@event.EventLogSequenceNumber <= previousEvent.EventLogSequenceNumber) throw new EventLogSequenceNumberIsOutOfOrder(@event.EventLogSequenceNumber, previousEvent.EventLogSequenceNumber);
+        if (@event.EventLogSequenceNumber <= previousEvent.EventLogSequenceNumber)
+        {
+            throw new EventLogSequenceNumberIsOutOfOrder(@event.EventLogSequenceNumber, previousEvent.EventLogSequenceNumber);
+        }
     }
 }
