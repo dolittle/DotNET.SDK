@@ -35,6 +35,7 @@ public class and_second_event_is_invalid : given.committed_aggregate_events_and_
             EventSourceId = event_source.Value,
             AggregateRootId = aggregate_root_id.ToProtobuf(),
             AggregateRootVersion = aggregate_root_version,
+            CurrentAggregateRootVersion = aggregate_root_version,
             Events = { committed_aggregate_event, second_committed_aggregate_event }
         };
 
