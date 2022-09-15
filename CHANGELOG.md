@@ -1,3 +1,25 @@
+# [18.0.0] - 2022-9-15 [PR: #160](https://github.com/dolittle/DotNET.SDK/pull/160)
+## Summary
+
+Adds a new method to the `EventStore` for fetching committed aggregate events filtered by event types. This allows us to change the rehydration of aggregates to be much more effective by just fetching the committed aggregate events for an aggregate that are relevant to the rehydration (meaning that there are an `On` method for that event type). This can have a significant impact on the performance of aggregates that have many events, but few state changes or are completely stateless. 
+
+### Added
+
+- `FetchForAggregate` that takes in a list event types used for filtering
+- `FetchStreamForAggregate` fetches a stream of committed aggregate event batches
+
+### Changed
+
+- Rehydration logic of aggregate roots. It now only fetches the committed aggregate events that are relevant
+- `AggregateRootVersion` on the `CommittedAggregateEvents` now represents the current aggregate root version of the aggregate root, not the version of the last committed aggregate event
+- Minor version of Contracts meaning that this version of the SDK is only compatible with version `>= 8.5.0` of the Runtime
+
+
+### Fixed
+
+- Some users could experience exceptions when performing actions on aggregate roots that had lots of events or big events due to the protobuf messages being too big. This should be fixed now since the internals of fetching aggregate roots are now implemented using streaming and batching.
+
+
 # [17.2.3] - 2022-9-9 [PR: #161](https://github.com/dolittle/DotNET.SDK/pull/161)
 ### Fixed
 
