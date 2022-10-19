@@ -20,21 +20,20 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
 {
     const string MetadataKey = "from-dolittle-unknown-registration-source";
     readonly IServiceProvider _rootProvider;
-    readonly IEnumerable<IComponentRegistration> _registrations;
     readonly bool _isTenantRootContainer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnknownServiceOnTenantContainerRegistrationSource"/> class.
     /// </summary>
     /// <param name="rootProvider">The root <see cref="IServiceProvider"/>.s</param>
-    /// <param name="registrations">The <see cref="IEnumerable{T}"/> of <see cref="ComponentRegistration"/>.</param>
     /// <param name="isTenantRootContainer">Whether the registration source belongs to the tenant root container.</param>
-    public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider, IEnumerable<IComponentRegistration> registrations, bool isTenantRootContainer)
+    public UnknownServiceOnTenantContainerRegistrationSource(IServiceProvider rootProvider, bool isTenantRootContainer)
     {
         _rootProvider = rootProvider;
-        _registrations = registrations;
         _isTenantRootContainer = isTenantRootContainer;
     }
+
+    internal IEnumerable<IComponentRegistration> Registrations { private get; set; } = Enumerable.Empty<IComponentRegistration>();
 
     /// <inheritdoc />
     public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
@@ -76,7 +75,7 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
 
     bool RegisteredInContainer(Service service)
     {
-        foreach (var registration in _registrations)
+        foreach (var registration in Registrations)
         {
             if (registration.Services.Any(_ => _.Equals(service)))
             {
