@@ -39,11 +39,9 @@ public class UnregisteredAggregateRoots : AggregateRootTypes, IUnregisteredAggre
     {
         foreach (var type in Types)
         {
-            serviceCollection.AddTransient(
-                typeof(IAggregateOf<>).MakeGenericType(type),
-                serviceProvider => Activator.CreateInstance(
-                    typeof(AggregateOf<>).MakeGenericType(type),
-                    serviceProvider.GetService<IAggregates>()) ?? throw new CouldNotCreateAggregateOf(type, tenantId));
+            var implementationType = typeof(AggregateOf<>).MakeGenericType(type);
+            serviceCollection.AddScoped(implementationType);
+            serviceCollection.AddScoped(typeof(IAggregateOf<>).MakeGenericType(type), implementationType);
         }
     }
 
