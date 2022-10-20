@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates;
 
@@ -14,8 +15,8 @@ public class CouldNotCreateAggregateRootInstance : Exception
     /// Initializes a new instance of the <see cref="CouldNotCreateAggregateRootInstance"/> class.
     /// </summary>
     /// <param name="type">The <see cref="Type" /> of the aggregate root that could not be instantiated.</param>
-    public CouldNotCreateAggregateRootInstance(Type type)
-        : base($"Could not create an instance of aggregate root {type}")
+    public CouldNotCreateAggregateRootInstance(Type type, EventSourceId eventSource, Exception error)
+        : base($"Could not create an instance of aggregate root {type} with event source {eventSource}", error)
     {
     }
 }

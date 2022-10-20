@@ -5,16 +5,14 @@
 using System;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Tenancy;
 
 [AggregateRoot("01ad9a9f-711f-47a8-8549-43320f782a1e")]
 public class Kitchen : AggregateRoot
 {
+    readonly SomeGlobalService _globalService;
+    readonly SomeTenantService _tenantService;
     int _ingredients = 2;
-
-    public Kitchen(EventSourceId eventSource)
-        : base(eventSource)
-    {
-    }
 
     public void PrepareDish(string dish, string chef)
     {
