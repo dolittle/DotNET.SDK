@@ -1,9 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Linq;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,12 +21,14 @@ public static class DefaultTenantServiceProviderFactory
         {
             return new AutofacServiceProvider(autofacProvider.LifetimeScope.BeginLifetimeScope(_ => _.Populate(services)));
         }
-        
+
         var containerBuilder = new ContainerBuilder();
+        var registrationSource = new UnknownServiceOnTenantContainerRegistrationSource(provider, true);
         containerBuilder.Populate(services);
-        containerBuilder.RegisterSource(new UnknownServiceOnTenantContainerRegistrationSource(provider, Enumerable.Empty<IComponentRegistration>(), true));
+        containerBuilder.RegisterSource(registrationSource);
         containerBuilder.Register(_ => new ServiceScopeFactory(provider.GetRequiredService<IServiceScopeFactory>(), _.Resolve<ILifetimeScope>())).As<IServiceScopeFactory>().SingleInstance();
         var container = containerBuilder.Build();
+        registrationSource.Registrations = container.ComponentRegistry.Registrations;
         return new AutofacServiceProvider(container);
     };
 }
