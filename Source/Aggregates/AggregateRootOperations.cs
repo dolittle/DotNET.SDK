@@ -84,7 +84,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         catch (Exception e)
         {
             activity?.RecordError(e);
-            throw;
+            throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, e);
         }
     }
 
