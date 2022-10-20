@@ -1,3 +1,13 @@
+# [18.0.1] - 2022-10-20 [PR: #162](https://github.com/dolittle/DotNET.SDK/pull/162)
+## Summary
+
+Fixes for a problem with the tenant scoped containers where it could not resolve tenant scoped dependencies registered as callbacks.
+
+### Fixed
+
+- Tenant Scoped Containers
+
+
 # [18.0.0] - 2022-9-15 [PR: #160](https://github.com/dolittle/DotNET.SDK/pull/160)
 ## Summary
 
