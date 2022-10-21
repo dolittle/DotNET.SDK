@@ -18,7 +18,7 @@ var client = await host.GetDolittleClient();
 
 await client.Aggregates
     .ForTenant(TenantId.Development)
-    .Get<Kitchen>("Dolittle Tacos5")
+    .Get<Kitchen>("Dolittle Tacos")
     .Perform(kitchen => kitchen.PrepareDish("Bean Blaster Taco", "Mr. Taco"));
 
 await host.WaitForShutdownAsync();
