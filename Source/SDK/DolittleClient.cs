@@ -336,6 +336,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             _eventStore,
             _unregisteredEventTypes,
             new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>()),
+            tenant => Services.ForTenant(tenant),
             loggerFactory);
         EventHorizons = new EventHorizons(
             methodCaller,

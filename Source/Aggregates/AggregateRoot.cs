@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
@@ -17,14 +18,22 @@ namespace Dolittle.SDK.Aggregates;
 public abstract class AggregateRoot
 {
     readonly List<AppliedEvent> _appliedEvents = new();
-
+    EventSourceId? _eventSourceId;
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
     /// </summary>
     /// <param name="eventSourceId">The <see cref="Events.EventSourceId" />.</param>
+    [Obsolete("This base constructor is deprecated and only used to set the EventSourceId property so that it could be used in the constructor")]
     protected AggregateRoot(EventSourceId eventSourceId)
+        : this()
     {
         EventSourceId = eventSourceId;
+    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
+    /// </summary>
+    protected AggregateRoot()
+    {
         AggregateRootId = this.GetAggregateRootId();
         Version = AggregateRootVersion.Initial;
         IsStateless = this.IsStateless();
@@ -43,7 +52,22 @@ public abstract class AggregateRoot
     /// <summary>
     /// Gets the <see cref="Events.EventSourceId" /> that the <see cref="AggregateRoot" /> applies events to.
     /// </summary>
-    public EventSourceId EventSourceId { get; }
+    [Obsolete("This will eventually be marked as internal. If you need to know the event source id in the aggregate root then include it in the constructor and keep it as a field")]
+    public EventSourceId EventSourceId
+    {
+        get => _eventSourceId ?? throw new EventSourceIdOnAggregateRootNotReady(GetType());
+        internal set
+        {
+            if (_eventSourceId is null)
+            {
+                _eventSourceId = value;
+            }
+            else if (_eventSourceId.Value != value.Value)
+            {
+                throw new CannotChangeEventSourceIdForAggregateRoot(GetType(), _eventSourceId, value);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the <see cref="IEnumerable{T}" /> of applied events to commit.
