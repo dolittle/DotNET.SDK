@@ -1,3 +1,17 @@
+# [18.1.0] - 2022-10-26 [PR: #163](https://github.com/dolittle/DotNET.SDK/pull/163)
+## Summary
+
+Enables dependency injection for aggregate roots
+
+### Added
+
+- Tenant scoped dependencies will now be injected in the aggregate roots
+
+### Deprecated
+
+- AggregateRoot base constructor with event source id is no longer necessary
+
+
 # [18.0.1] - 2022-10-20 [PR: #162](https://github.com/dolittle/DotNET.SDK/pull/162)
 ## Summary
 
