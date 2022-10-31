@@ -1,3 +1,13 @@
+# [18.1.1] - 2022-10-31 [PR: #164](https://github.com/dolittle/DotNET.SDK/pull/164)
+## Summary
+
+A recently added bug in the aggregate root that would occur for aggregate roots where the aggregate committed events that was not used to manipulate the state of the aggregate root.
+
+### Fixed
+
+- Set the correct aggregate root version at the end of rehydration.
+
+
 # [18.1.0] - 2022-10-26 [PR: #163](https://github.com/dolittle/DotNET.SDK/pull/163)
 ## Summary
 
