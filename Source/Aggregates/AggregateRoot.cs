@@ -164,14 +164,15 @@ public abstract class AggregateRoot
     public async Task Rehydrate(IAsyncEnumerable<CommittedAggregateEvents> batches, CancellationToken cancellationToken)
     {
         var hasBatches = false;
+        var expectedVersion = AggregateRootVersion.Initial;
         await foreach (var batch in batches.WithCancellation(cancellationToken))
         {
+            expectedVersion = batch.AggregateRootVersion;
             hasBatches = true;
             ThrowIfEventWasAppliedToOtherEventSource(batch);
             ThrowIfEventWasAppliedByOtherAggregateRoot(batch);
             if (IsStateless)
             {
-                Version = batch.AggregateRootVersion;
                 break;
             }
             foreach (var @event in batch)
@@ -184,6 +185,8 @@ public abstract class AggregateRoot
         {
             throw new NoCommittedAggregateEventsBatches(AggregateRootId, EventSourceId);
         }
+        
+        Version = expectedVersion;
         cancellationToken.ThrowIfCancellationRequested();
     }
 
