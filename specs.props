@@ -2,7 +2,7 @@
     <Import Project="versions.props"/>
     
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFramework>net7.0</TargetFramework>
         <IsTestProject>true</IsTestProject>
         <NoWarn>IDE0044;IDE0051;IDE0052;IDE0060</NoWarn>
     </PropertyGroup>
