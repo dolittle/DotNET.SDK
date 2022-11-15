@@ -4,6 +4,7 @@
 using System;
 using Dolittle.Runtime.Resources.Contracts;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 
 namespace Dolittle.SDK.Resources.MongoDB.Internal;
 
@@ -23,6 +24,7 @@ public class MongoDBResource : IMongoDBResource
     {
         _mongoUrl = MongoUrl.Create(runtimeMongoDBResponse.ConnectionString);
         var clientSettings = MongoClientSettings.FromUrl(_mongoUrl);
+        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         _mongoClient = new MongoClient(clientSettings.Freeze());
     }
 
