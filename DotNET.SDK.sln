@@ -111,6 +111,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diagnostics", "Source\Diagn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diagnostics.OpenTelemetry", "Source\Diagnostics.OpenTelemetry\Diagnostics.OpenTelemetry.csproj", "{437AB7C0-4374-4561-A6F4-08628A721038}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{8E6E3E7B-EF5C-4AEB-919B-FED3DB5F3A73}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		specs.props = specs.props
+		versions.props = versions.props
+		default.props = default.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{9A48B407-5649-44A1-9433-04CCD42F48E5}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{257B583D-D4AC-4E78-B010-E1442BA778BF}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
+		.github\workflows\dotnet-library.yml = .github\workflows\dotnet-library.yml
+		.github\workflows\ms-teams-release.yml = .github\workflows\ms-teams-release.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -776,5 +797,7 @@ Global
 		{593D07B1-99BB-4307-9E10-0CB2D3B6227C} = {22418224-6C53-4187-A7FE-BDB8C1763764}
 		{F0C7C800-ED73-49ED-9835-D4BD8D30198E} = {F02DF920-7E63-4C4B-8494-8D98C34E27EF}
 		{437AB7C0-4374-4561-A6F4-08628A721038} = {F02DF920-7E63-4C4B-8494-8D98C34E27EF}
+		{9A48B407-5649-44A1-9433-04CCD42F48E5} = {8E6E3E7B-EF5C-4AEB-919B-FED3DB5F3A73}
+		{257B583D-D4AC-4E78-B010-E1442BA778BF} = {9A48B407-5649-44A1-9433-04CCD42F48E5}
 	EndGlobalSection
 EndGlobal
