@@ -80,7 +80,7 @@ public class EventHandler : IEventHandler
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
-        using var activity = context.CommittedExecutionContext.StartChildActivity("Handle " + @event.GetType().Name)
+        using var activity = context.CommittedExecutionContext.StartChildActivity($"{(HasAlias ? Alias.Value + "." : "")}Handle {@event.GetType().Name}")
             ?.Tag(eventType);
 
         try
