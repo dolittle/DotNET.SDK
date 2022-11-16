@@ -14,7 +14,7 @@ using OpenTelemetry.Trace;
 namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
 
 /// <summary>
-/// Helper class to simplify setting up logs & traces via OTLP
+/// Helper class to simplify setting up logs and traces via OTLP
 /// </summary>
 public static class OpenTelemetryConfigurationExtensions
 {
@@ -88,6 +88,8 @@ public static class OpenTelemetryConfigurationExtensions
             {
                 builder.SetResourceBuilder(resourceBuilder)
                     .AddDolittleInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddMongoDBInstrumentation()
                     .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
                 configure?.Invoke(builder);
             }));

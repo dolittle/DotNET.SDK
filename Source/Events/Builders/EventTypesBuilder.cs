@@ -39,6 +39,10 @@ public class EventTypesBuilder : IEventTypesBuilder
     public IEventTypesBuilder Associate(Type type, EventType eventType)
     {
         Register(type);
+        if (!eventType.HasAlias)
+        {
+            eventType = new EventType(eventType.Id, eventType.Generation, type.Name);
+        }
         _modelBuilder.BindIdentifierToType<EventType, EventTypeId>(eventType, type);
         return this;
     }

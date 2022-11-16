@@ -61,7 +61,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// <inheritdoc/>
     public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {
-        using var activity = Tracing.ActivitySource.StartActivity()
+        using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.Perform")
             ?.Tag(_eventSourceId);
 
         try
