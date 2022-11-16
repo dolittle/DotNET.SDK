@@ -24,7 +24,6 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     readonly EventSourceId _eventSourceId;
     readonly IEventStore _eventStore;
     readonly IEventTypes _eventTypes;
-    readonly IAggregateRoots _aggregateRoots;
     readonly IServiceProvider _serviceProvider;
     readonly ILogger _logger;
 
@@ -39,13 +38,12 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/> used for getting an aggregate root instance.</param>
     /// <param name="serviceProvider">The tenant scoped <see cref="IServiceProvider"/>.</param>
     /// <param name="logger">The <see cref="ILogger" />.</param>
-    public AggregateWrapper(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IAggregateRoots aggregateRoots,
-        IServiceProvider serviceProvider, ILogger logger)
+    public AggregateWrapper(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IServiceProvider serviceProvider, ILogger<AggregateWrapper<TAggregate>> logger)
     {
         _eventSourceId = eventSourceId;
         _eventTypes = eventTypes;
         _eventStore = eventStore;
-        _aggregateRoots = aggregateRoots;
+        // _aggregateRoots = aggregateRoots;
         _serviceProvider = serviceProvider;
         _logger = logger;
     }
@@ -91,7 +89,7 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
 
     bool TryGetAggregateRoot(out TAggregate aggregateRoot, out Exception exception)
     {
-        var getAggregateRoot = _aggregateRoots.TryGet<TAggregate>(_eventSourceId, _serviceProvider);
+        var getAggregateRoot = AggregateRootMetadata<TAggregate>.Construct(_serviceProvider, _eventSourceId);
         aggregateRoot = getAggregateRoot.Result;
         exception = getAggregateRoot.Exception;
         return getAggregateRoot.Success;

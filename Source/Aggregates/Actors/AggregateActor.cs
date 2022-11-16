@@ -9,12 +9,15 @@ using Diagnostics;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Proto;
 using Proto.Cluster;
 
 namespace Dolittle.SDK.Aggregates.Actors;
+
+delegate Task<IServiceProvider> GetServiceProviderForTenant(TenantId tenantId);
 
 class Perform<TAggregate> where TAggregate : AggregateRoot
 {
@@ -30,15 +33,18 @@ class Perform<TAggregate> where TAggregate : AggregateRoot
 
 public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
 {
-    readonly IServiceProvider _serviceProvider;
+    readonly GetServiceProviderForTenant _getServiceProvider;
     readonly ILogger<AggregateActor<TAggregate>> _logger;
     AggregateWrapper<TAggregate>? _aggregateWrapper;
 
     EventSourceId? _eventSourceId;
 
-    public AggregateActor(IServiceProvider serviceProvider, ILogger<AggregateActor<TAggregate>> logger)
+    // ReSharper disable once StaticMemberInGenericType
+    static readonly TimeSpan _idleUnloadTimeout = TimeSpan.FromSeconds(20);
+
+    internal AggregateActor(GetServiceProviderForTenant getServiceProvider, ILogger<AggregateActor<TAggregate>> logger)
     {
-        _serviceProvider = serviceProvider;
+        _getServiceProvider = getServiceProvider;
         _logger = logger;
     }
 
@@ -55,25 +61,33 @@ public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoo
 
     Task OnReceiveTimeout(IContext context)
     {
+        _logger.UnloadingAggregate(typeof(TAggregate));
         context.Poison(context.Self);
         return Task.CompletedTask;
     }
 
-    Task OnStarted(IContext context)
+    async Task OnStarted(IContext context)
     {
         try
         {
-            var identity = context.ClusterIdentity();
-            _eventSourceId = identity!.Identity;
-            _aggregateWrapper = ActivatorUtilities.CreateInstance<AggregateWrapper<TAggregate>>(_serviceProvider, _eventSourceId);
-            context.SetReceiveTimeout(TimeSpan.FromSeconds(10));
-            return Task.CompletedTask;
+            var (tenantId, eventSourceId) = GetIdentifiers(context);
+
+            _eventSourceId = eventSourceId;
+            var serviceProvider = await _getServiceProvider(tenantId);
+            _aggregateWrapper = ActivatorUtilities.CreateInstance<AggregateWrapper<TAggregate>>(serviceProvider, _eventSourceId);
+            context.SetReceiveTimeout(_idleUnloadTimeout);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.FailedToCreate(e, typeof(TAggregate));
+            Activity.Current?.RecordError(e);
             throw;
         }
+    }
+
+    static (TenantId, EventSourceId) GetIdentifiers(IContext context)
+    {
+        return ClusterIdentityMapper.GetTenantAndEventSourceId(context.ClusterIdentity()!);
     }
 
     async Task OnPerform(Perform<TAggregate> perform, IContext context)

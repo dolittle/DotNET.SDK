@@ -6,10 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Diagnostics;
 using Dolittle.SDK.Aggregates.Actors;
-using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store;
+using Dolittle.SDK.Tenancy;
 using Proto;
 using Proto.Cluster;
 
@@ -30,15 +29,13 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// Initializes a new instance of the <see cref="AggregateRootOperations{TAggregate}"/> class.
     /// </summary>
     /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the aggregate root instance.</param>
-    /// <param name="eventStore">The <see cref="IEventStore" /> used for committing the <see cref="UncommittedAggregateEvents" /> when actions are performed on the <typeparamref name="TAggregate">aggregate</typeparamref>. </param>
-    /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
-    /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/> used for getting an aggregate root instance.</param>
-    /// <param name="serviceProvider">The tenant scoped <see cref="IServiceProvider"/>.</param>
-    public AggregateRootOperations(IRootContext context, EventSourceId eventSourceId)
+    /// <param name="tenantId">The <see cref="TenantId"/> of the current tenant.</param>
+    /// <param name="context">The <see cref="IRootContext" />Root context used to communicate with actors</param>
+    public AggregateRootOperations(EventSourceId eventSourceId, TenantId tenantId, IRootContext context)
     {
         _context = context;
         _eventSourceId = eventSourceId;
-        _clusterIdentity = GetClusterIdentity(_eventSourceId);
+        _clusterIdentity = ClusterIdentityMapper.GetClusterIdentity<TAggregate>(tenantId, eventSourceId);
     }
 
     /// <inheritdoc/>
@@ -60,7 +57,8 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         try
         {
             await _context.System.Cluster()
-                .RequestAsync<Try<bool>>(_clusterIdentity, new Perform<TAggregate>(method, cancellationToken), _context, cancellationToken);
+                .RequestAsync<Try<bool>>(_clusterIdentity, new Perform<TAggregate>(method, cancellationToken), _context,
+                    cancellationToken);
         }
         catch (Exception e)
         {
@@ -69,6 +67,6 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         }
     }
 
-    static ClusterIdentity GetClusterIdentity(EventSourceId eventSourceId) =>
-        ClusterIdentity.Create(eventSourceId, AggregateRootMetadata<TAggregate>.GetAggregateRootId().Value.ToString());
+    // static ClusterIdentity GetClusterIdentity(TenantId tenantId,EventSourceId eventSourceId) =>
+    //     ClusterIdentity.Create($"{tenantId}:{eventSourceId}", AggregateRootMetadata<TAggregate>.GetAggregateRootId().Value.ToString());
 }
