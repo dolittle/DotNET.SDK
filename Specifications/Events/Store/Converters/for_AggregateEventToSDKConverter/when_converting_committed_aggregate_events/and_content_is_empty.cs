@@ -34,6 +34,7 @@ public class and_content_is_empty : given.committed_aggregate_events_and_a_conve
             EventSourceId = event_source.Value,
             AggregateRootId = aggregate_root_id.ToProtobuf(),
             AggregateRootVersion = aggregate_root_version,
+            CurrentAggregateRootVersion = aggregate_root_version,
             Events = { committed_aggregate_event }
         };
 

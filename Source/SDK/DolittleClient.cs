@@ -233,6 +233,8 @@ public class DolittleClient : IDisposable, IDolittleClient
                 new GrpcChannelOptions
                 {
                     Credentials = ChannelCredentials.Insecure,
+                    MaxReceiveMessageSize = 32 * 1024 * 1024,
+                    MaxSendMessageSize = 32 * 1024 * 1024,
 #if NET5_0_OR_GREATER
                     HttpHandler = new SocketsHttpHandler
                     {
@@ -335,6 +337,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             _eventStore,
             _unregisteredEventTypes,
             new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>()),
+            tenant => Services.ForTenant(tenant),
             loggerFactory);
         EventHorizons = new EventHorizons(
             methodCaller,
@@ -431,14 +434,15 @@ public class DolittleClient : IDisposable, IDolittleClient
 
     static void AddDefaultsFromServiceProviderInConfiguration(DolittleClientConfiguration config)
     {
-        if (config.ServiceProvider is null)
+        var serviceProvider = config.ServiceProvider;
+        if (serviceProvider is null)
         {
             return;
         }
 
         if (config.LoggerFactory is null)
         {
-            var loggerFactory = config.ServiceProvider.GetService<ILoggerFactory>();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
             config.WithLogging(loggerFactory ?? LoggerFactory.Create(_ =>
                 {
                     _.SetMinimumLevel(LogLevel.Information);
@@ -448,7 +452,7 @@ public class DolittleClient : IDisposable, IDolittleClient
 
         if (config.TenantServiceProviderFactory is null)
         {
-            var providerFactory = config.ServiceProvider.GetService<ICreateTenantContainers>();
+            var providerFactory = serviceProvider.GetService<ICreateTenantContainers>();
             config.WithTenantServiceProviderFactory(providerFactory is not null
                 ? providerFactory.Create
                 : DefaultTenantServiceProviderFactory.Instance);

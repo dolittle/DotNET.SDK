@@ -16,7 +16,7 @@ public class AppliedEvent
     /// <param name="event">The event content.</param>
     /// <param name="eventType">The <see cref="EventType" />.</param>
     /// <param name="isPublic">Whether the event is public or not.</param>
-    public AppliedEvent(object @event, EventType eventType, bool isPublic)
+    public AppliedEvent(object @event, EventType? eventType, bool isPublic)
     {
         Event = @event;
         EventType = eventType;
@@ -31,7 +31,7 @@ public class AppliedEvent
     /// <summary>
     /// Gets the event's <see cref="EventType" />.
     /// </summary>
-    public EventType EventType { get; }
+    public EventType? EventType { get; }
 
     /// <summary>
     /// Gets a value indicating whether this event is public or not.

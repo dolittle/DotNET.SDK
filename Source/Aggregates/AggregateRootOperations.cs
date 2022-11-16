@@ -26,6 +26,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     readonly IEventStore _eventStore;
     readonly IEventTypes _eventTypes;
     readonly IAggregateRoots _aggregateRoots;
+    readonly IServiceProvider _serviceProvider;
     readonly ILogger _logger;
 
     /// <summary>
@@ -35,18 +36,20 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// <param name="eventStore">The <see cref="IEventStore" /> used for committing the <see cref="UncommittedAggregateEvents" /> when actions are performed on the <typeparamref name="TAggregate">aggregate</typeparamref>. </param>
     /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
     /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/> used for getting an aggregate root instance.</param>
+    /// <param name="serviceProvider">The tenant scoped <see cref="IServiceProvider"/>.</param>
     /// <param name="logger">The <see cref="ILogger" />.</param>
-    public AggregateRootOperations(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IAggregateRoots aggregateRoots, ILogger logger)
+    public AggregateRootOperations(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IAggregateRoots aggregateRoots, IServiceProvider serviceProvider, ILogger logger)
     {
         _eventSourceId = eventSourceId;
         _eventTypes = eventTypes;
         _eventStore = eventStore;
         _aggregateRoots = aggregateRoots;
+        _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
     /// <inheritdoc/>
-    public Task Perform(Action<TAggregate> method, CancellationToken cancellationToken)
+    public Task Perform(Action<TAggregate> method, CancellationToken cancellationToken = default)
         => Perform(
             aggregate =>
             {
@@ -56,25 +59,23 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
             cancellationToken);
 
     /// <inheritdoc/>
-    public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken)
+    public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {
         using var activity = Tracing.ActivitySource.StartActivity()
             ?.Tag(_eventSourceId);
 
         try
         {
-            if (!TryGetAggregateRoot(_eventSourceId, out var aggregateRoot, out var exception))
+            if (!TryGetAggregateRoot(out var aggregateRoot, out var exception))
             {
-                throw new CouldNotGetAggregateRoot(typeof(TAggregate), _eventSourceId, exception.Message);
+                throw new CouldNotGetAggregateRoot(typeof(TAggregate), _eventSourceId, exception);
             }
 
             var aggregateRootId = aggregateRoot.GetAggregateRootId();
             activity?.Tag(aggregateRootId);
-            await ReApplyEvents(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
-
+            await Rehydrate(aggregateRoot, aggregateRootId, cancellationToken).ConfigureAwait(false);
             _logger.PerformingOn(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.EventSourceId);
             await method(aggregateRoot).ConfigureAwait(false);
-
             if (aggregateRoot.AppliedEvents.Any())
             {
                 await CommitAppliedEvents(aggregateRoot, aggregateRootId).ConfigureAwait(false);
@@ -83,33 +84,26 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         catch (Exception e)
         {
             activity?.RecordError(e);
-            throw;
+            throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, e);
         }
     }
 
-    bool TryGetAggregateRoot(EventSourceId eventSourceId, out TAggregate aggregateRoot, out Exception exception)
+    bool TryGetAggregateRoot(out TAggregate aggregateRoot, out Exception exception)
     {
-        var getAggregateRoot = _aggregateRoots.TryGet<TAggregate>(eventSourceId);
+        var getAggregateRoot = _aggregateRoots.TryGet<TAggregate>(_eventSourceId, _serviceProvider);
         aggregateRoot = getAggregateRoot.Result;
         exception = getAggregateRoot.Exception;
         return getAggregateRoot.Success;
     }
 
-    async Task ReApplyEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
+    Task Rehydrate(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
     {
         var eventSourceId = aggregateRoot.EventSourceId;
-        _logger.ReApplyingEventsFor(typeof(TAggregate), aggregateRootId, eventSourceId);
-
-        var committedEvents = await _eventStore.FetchForAggregate(aggregateRootId, eventSourceId, cancellationToken).ConfigureAwait(false);
-        if (committedEvents.HasEvents)
-        {
-            _logger.ReApplying(committedEvents.Count);
-            aggregateRoot.ReApply(committedEvents);
-        }
-        else
-        {
-            _logger.NoEventsToReApply();
-        }
+        _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
+        var eventTypesToFetch = aggregateRoot.GetEventTypes(_eventTypes);
+        
+        var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
+        return aggregateRoot.Rehydrate(committedEventsBatches, cancellationToken);
     }
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)

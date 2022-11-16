@@ -16,9 +16,9 @@ public class CouldNotGetAggregateRoot : Exception
     /// </summary>
     /// <param name="type">The <see cref="Type" /> of the aggregate root.</param>
     /// <param name="eventSourceId">The <see cref="EventSourceId" />.</param>
-    /// <param name="reason">The reason for why the aggregate root could not be retrieved.</param>
-    public CouldNotGetAggregateRoot(Type type, EventSourceId eventSourceId, string reason)
-        : base($"Could not get aggregate root of type {type} with event source id {eventSourceId}. {reason}")
+    /// <param name="error">The inner error <see cref="Exception"/>.</param>
+    public CouldNotGetAggregateRoot(Type type, EventSourceId eventSourceId, Exception error)
+        : base($"Could not get aggregate root of type {type} with event source id {eventSourceId}", error)
     {
     }
 }

@@ -41,12 +41,12 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
             return false;
         }
 
-        if (!TryConvert(source.Events, source.EventSourceId, aggregateRootId, source.AggregateRootVersion, out var committedAggregateEventList, out error))
+        if (!TryConvert(source.Events, source.EventSourceId, aggregateRootId, out var committedAggregateEventList, out error))
         {
             return false;
         }
 
-        events = new CommittedAggregateEvents(source.EventSourceId, aggregateRootId, committedAggregateEventList);
+        events = new CommittedAggregateEvents(source.EventSourceId, aggregateRootId, source.CurrentAggregateRootVersion, committedAggregateEventList);
         error = null;
         return true;
     }
@@ -55,7 +55,6 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
         IEnumerable<Runtime.Events.Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent> source,
         EventSourceId eventSourceId,
         AggregateRootId aggregateRootId,
-        AggregateRootVersion aggregateRootVersion,
         out List<CommittedAggregateEvent> events,
         out Exception error)
     {
@@ -64,12 +63,9 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
         var committedEvents = source.ToArray();
         for (ulong i = 0; i < (ulong)committedEvents.Length; i++)
         {
-            // We have to manually calculate and set the AggregateRootVersion for the events as the
-            // CommittedAggregateEvents.AggregateRootVersion is set to the latest version.
-            var version = aggregateRootVersion + 1u - (ulong)committedEvents.Length + i;
             var sourceEvent = committedEvents[i];
 
-            if (!TryConvert(sourceEvent, eventSourceId, aggregateRootId, version, out var @event, out error))
+            if (!TryConvert(sourceEvent, eventSourceId, aggregateRootId, out var @event, out error))
             {
                 return false;
             }
@@ -86,7 +82,6 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
         Runtime.Events.Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent source,
         EventSourceId eventSourceId,
         AggregateRootId aggregateRootId,
-        AggregateRootVersion aggregateRootVersion,
         out CommittedAggregateEvent result,
         out Exception error)
     {
@@ -134,7 +129,7 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
             source.Occurred.ToDateTimeOffset(),
             eventSourceId,
             aggregateRootId,
-            aggregateRootVersion,
+            source.AggregateRootVersion,
             executionContext,
             eventType,
             content,

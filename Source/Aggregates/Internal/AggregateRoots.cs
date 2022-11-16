@@ -2,10 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Aggregates.Internal;
@@ -27,86 +29,61 @@ public class AggregateRoots : IAggregateRoots
     }
 
     /// <inheritdoc />
-    public Try<TAggregate> TryGet<TAggregate>(EventSourceId eventSourceId)
+    public Try<TAggregate> TryGet<TAggregate>(EventSourceId eventSourceId, IServiceProvider provider)
         where TAggregate : AggregateRoot
     {
         _logger.Get(typeof(TAggregate), eventSourceId);
-        if (InvalidConstructor(typeof(TAggregate), out var constructor, out var exception))
+        if (!TryGetConstructor(typeof(TAggregate), out var constructor, out var exception))
         {
             return exception;
         }
 
-        return CreateInstance<TAggregate>(eventSourceId, constructor);
+        return CreateInstance<TAggregate>(eventSourceId, constructor, provider);
     }
 
-    static Try<TAggregate> CreateInstance<TAggregate>(EventSourceId eventSourceId, ConstructorInfo constructor)
+    static Try<TAggregate> CreateInstance<TAggregate>(EventSourceId eventSourceId, ConstructorInfo constructor, IServiceProvider provider)
         where TAggregate : AggregateRoot
     {
-        var aggregateRoot = constructor.Invoke(new object[] { eventSourceId }) as TAggregate;
-        if (CouldNotCreateAggregateRoot(aggregateRoot, out var exception))
+        try
         {
-            return exception;
+            var aggregateRoot = HasEventSourceIdParameter(constructor) switch
+            {
+                true => ActivatorUtilities.CreateInstance<TAggregate>(provider, eventSourceId),
+                false => ActivatorUtilities.CreateInstance<TAggregate>(provider)
+            };
+            aggregateRoot.EventSourceId = eventSourceId;
+            return aggregateRoot;
         }
-
-        return aggregateRoot;
+        catch (Exception ex)
+        {
+            return new CouldNotCreateAggregateRootInstance(typeof(TAggregate), eventSourceId, ex);
+        }
     }
 
-    static bool InvalidConstructor(Type type, out ConstructorInfo constructor, out Exception ex)
+    static bool TryGetConstructor(Type type, [NotNullWhen(true)]out ConstructorInfo? constructor, [NotNullWhen(false)]out Exception? ex)
     {
         constructor = default;
-        if (NotOnlyOneConstructor(type, out ex))
-        {
-            return true;
-        }
-
-        constructor = type.GetConstructors().Single();
-        return ConstructorIsInvalid(type, constructor, out ex);
-    }
-
-    static bool NotOnlyOneConstructor(Type type, out Exception ex)
-    {
-        ex = default;
-        if (ThereIsOnlyOneConstructor(type))
+        if (MoreThanOnePublicConstructor(type, out ex))
         {
             return false;
         }
 
-        ex = new InvalidAggregateRootConstructorSignature(type, "expected only a single constructor");
+        constructor = type.GetConstructors().SingleOrDefault() ?? type.GetConstructor(Type.EmptyTypes)!;
         return true;
     }
 
-    static bool ConstructorIsInvalid(Type type, ConstructorInfo constructor, out Exception ex)
-        => IncorrectParameter(type, constructor.GetParameters(), out ex);
-
-    static bool IncorrectParameter(Type type, ParameterInfo[] parameters, out Exception ex)
+    static bool MoreThanOnePublicConstructor(Type type, [NotNullWhen(true)]out Exception? ex)
     {
         ex = default;
-        if (ThereIsOnlyOneParameter(parameters) && ParameterTypeIsGuidOrEventSourceId(parameters))
+        if (type.GetConstructors().Length <= 1)
         {
             return false;
         }
 
-        ex = new InvalidAggregateRootConstructorSignature(type, $"expected only one parameter and it must be of type {typeof(Guid)} or {typeof(EventSourceId)}");
+        ex = new InvalidAggregateRootConstructorSignature(type, "expected at most a single public constructor");
         return true;
     }
 
-    static bool CouldNotCreateAggregateRoot<TAggregate>(TAggregate aggregateRoot, out Exception ex)
-        where TAggregate : AggregateRoot
-    {
-        ex = default;
-        if (aggregateRoot != default)
-        {
-            return false;
-        }
-
-        ex = new CouldNotCreateAggregateRootInstance(typeof(TAggregate));
-        return true;
-    }
-
-    static bool ThereIsOnlyOneConstructor(Type type) => type.GetConstructors().Length == 1;
-
-    static bool ThereIsOnlyOneParameter(ParameterInfo[] parameters) => parameters.Length == 1;
-
-    static bool ParameterTypeIsGuidOrEventSourceId(ParameterInfo[] parameters)
-        => parameters[0].ParameterType == typeof(Guid) || parameters[0].ParameterType == typeof(EventSourceId);
+    static bool HasEventSourceIdParameter(ConstructorInfo constructor)
+        => constructor.GetParameters().Any(_ => _.ParameterType == typeof(EventSourceId));
 }

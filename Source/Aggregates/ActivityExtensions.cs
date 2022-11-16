@@ -12,8 +12,7 @@ namespace Dolittle.SDK.Aggregates;
 public static class ActivityExtensions
 {
     const string AggregateRootId = "aggregate.id";
-
-
+    
     /// <summary>
     /// Set parent execution context if spanId is present
     /// </summary>

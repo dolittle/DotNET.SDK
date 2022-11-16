@@ -145,9 +145,10 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <inheritdoc />
     public IConfigurationBuilder WithOpenTelemetrySettings(Action<OpenTelemetrySettings> openTelemetrySettingsBuilder)
     {
+        var provider = OpenTelemetrySettingsProvider;
         OpenTelemetrySettingsProvider = () =>
         {
-            var settings = OpenTelemetrySettingsProvider();
+            var settings = provider();
             openTelemetrySettingsBuilder.Invoke(settings);
             return settings;
         };
