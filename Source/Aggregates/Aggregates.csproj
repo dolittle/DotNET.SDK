@@ -9,6 +9,7 @@
     
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Proto.Cluster" Version="1.0.0-rc4.12" />
   </ItemGroup>
 
   <ItemGroup>

@@ -52,7 +52,7 @@ public static class AggregateRootExtensions
 
         return aggregateRootAttribute.Type.Id;
     }
-
+    
     internal static IReadOnlyDictionary<Type, MethodInfo> GetHandleMethodsFor(Type aggregateRootType)
         => typeof(AggregateRootHandleMethods<>)
             .MakeGenericType(aggregateRootType)

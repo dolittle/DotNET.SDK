@@ -5,6 +5,7 @@ using System;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Aggregates.Builders;
@@ -14,11 +15,7 @@ namespace Dolittle.SDK.Aggregates.Builders;
 /// </summary>
 public class Aggregates : IAggregates
 {
-    readonly IEventStore _eventStore;
-    readonly IEventTypes _eventTypes;
-    readonly IAggregateRoots _aggregateRoots;
     readonly IServiceProvider _serviceProvider;
-    readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Aggregates"/> class.
@@ -30,23 +27,13 @@ public class Aggregates : IAggregates
     /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
     public Aggregates(IEventStore eventStore, IEventTypes eventTypes, IAggregateRoots aggregateRoots, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
     {
-        _eventStore = eventStore;
-        _eventTypes = eventTypes;
-        _aggregateRoots = aggregateRoots;
         _serviceProvider = serviceProvider;
-        _loggerFactory = loggerFactory;
     }
 
     /// <inheritdoc />
     public IAggregateRootOperations<TAggregateRoot> Get<TAggregateRoot>(EventSourceId eventSourceId)
         where TAggregateRoot : AggregateRoot
-        => new AggregateRootOperations<TAggregateRoot>(
-            eventSourceId,
-            _eventStore,
-            _eventTypes,
-            _aggregateRoots,
-            _serviceProvider,
-            _loggerFactory.CreateLogger<AggregateRootOperations<TAggregateRoot>>());
+        => ActivatorUtilities.CreateInstance<AggregateRootOperations<TAggregateRoot>>(_serviceProvider, eventSourceId);
 
     /// <inheritdoc />
     public IAggregateOf<TAggregateRoot> Of<TAggregateRoot>()
