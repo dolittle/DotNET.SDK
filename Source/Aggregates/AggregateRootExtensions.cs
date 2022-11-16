@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Aggregates;
@@ -37,15 +37,6 @@ public static class AggregateRootExtensions
         => GetHandleMethodsFor(aggregateRoot.GetType()).Count == 0;
 
     /// <summary>
-    /// Gets all the <see cref="IEnumerable{T}"/> of <see cref="EventType"/> that the 
-    /// </summary>
-    /// <param name="aggregateRoot"></param>
-    /// <param name="eventTypes"></param>
-    /// <returns></returns>
-    public static IEnumerable<EventType> GetEventTypes(this AggregateRoot aggregateRoot, IEventTypes eventTypes)
-        => GetHandleMethodsFor(aggregateRoot.GetType()).Keys.Select(eventTypes.GetFor);
-
-    /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
     /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
@@ -58,31 +49,23 @@ public static class AggregateRootExtensions
         {
             throw new MissingAggregateRootAttribute(aggregateRootType);
         }
+
         return aggregateRootAttribute.Type.Id;
     }
 
-    static Dictionary<Type, MethodInfo> GetHandleMethodsFor(Type aggregateRootType)
+    internal static IReadOnlyDictionary<Type, MethodInfo> GetHandleMethodsFor(Type aggregateRootType)
         => typeof(AggregateRootHandleMethods<>)
             .MakeGenericType(aggregateRootType)
             .GetRuntimeField("MethodsPerEventType")
-            .GetValue(null) as Dictionary<Type, MethodInfo>;
+            .GetValue(null) as IReadOnlyDictionary<Type, MethodInfo>;
+
+    internal static IReadOnlyDictionary<Type, MethodInfo> GetHandleMethodsFor<TAggregateRoot>() where TAggregateRoot : AggregateRoot
+        => AggregateRootMetadata<TAggregateRoot>.MethodsPerEventType;
 
     static class AggregateRootHandleMethods<TAggregateRoot>
         where TAggregateRoot : AggregateRoot
     {
-        public static readonly Dictionary<Type, MethodInfo> MethodsPerEventType = new();
-
-        static AggregateRootHandleMethods()
-        {
-            var aggregateRootType = typeof(TAggregateRoot);
-
-            foreach (var method in aggregateRootType
-                         .GetTypeInfo()
-                         .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                         .Where(m => m.Name.Equals("On", StringComparison.InvariantCultureIgnoreCase)))
-            {
-                MethodsPerEventType[method.GetParameters()[0].ParameterType] = method;
-            }
-        }
+        // ReSharper disable once StaticMemberInGenericType
+        public static readonly IReadOnlyDictionary<Type, MethodInfo> MethodsPerEventType = AggregateRootMetadata<TAggregateRoot>.MethodsPerEventType;
     }
 }

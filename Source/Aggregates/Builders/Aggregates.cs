@@ -5,7 +5,6 @@ using System;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
-using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Aggregates.Builders;

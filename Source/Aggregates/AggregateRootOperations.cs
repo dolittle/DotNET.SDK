@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,11 +101,24 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     {
         var eventSourceId = aggregateRoot.EventSourceId;
         _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
-        var eventTypesToFetch = aggregateRoot.GetEventTypes(_eventTypes);
-        
+        if (AggregateRootMetadata<TAggregate>.IsStateLess)
+        {
+            return Task.CompletedTask;
+        }
+
+        var eventTypesToFetch = GetEventTypes(_eventTypes);
         var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
-        return aggregateRoot.Rehydrate(committedEventsBatches, cancellationToken);
+        return aggregateRoot.RehydrateInternal(committedEventsBatches, AggregateRootMetadata<TAggregate>.MethodsPerEventType, cancellationToken);
     }
+    
+    /// <summary>
+    /// Gets all the <see cref="IEnumerable{T}"/> of <see cref="EventType"/> that the aggregates handles
+    /// </summary>
+    /// <param name="aggregateRoot"></param>
+    /// <param name="eventTypes"></param>
+    /// <returns></returns>
+    static IEnumerable<EventType> GetEventTypes(IEventTypes eventTypes)
+        => AggregateRootMetadata<TAggregate>.MethodsPerEventType.Keys.Select(eventTypes.GetFor);
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)
     {
