@@ -38,6 +38,7 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
 
     /// <inheritdoc/>
     public override bool TryBuild(
+        EventHandlerModelId identifier,
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
         out IEventHandler eventHandler)

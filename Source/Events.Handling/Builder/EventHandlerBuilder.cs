@@ -43,14 +43,18 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
     {
+        Unbind();
         _partitioned = true;
+        Bind();
         return _methodsBuilder;
     }
 
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Unpartitioned()
     {
+        Unbind();
         _partitioned = false;
+        Bind();
         return _methodsBuilder;
     }
 
@@ -66,8 +70,9 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <inheritdoc />
     public IEventHandlerBuilder WithAlias(EventHandlerAlias alias)
     {
+        Unbind();
         _alias = alias;
-        _hasAlias = true;
+        Bind();
         return this;
     }
 
@@ -88,9 +93,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
             return false;
         }
 
-        eventHandler =
-            ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
-            : new EventHandler(, _scopeId, _partitioned, eventTypesToMethods);
+        eventHandler = new EventHandler(identifier, eventTypesToMethods);
         return true;
     }
     
@@ -104,7 +107,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
 
     /// <inheritdoc />
     public override int GetHashCode() =>
-        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _hasAlias, _partitioned, _scopeId);
+        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _partitioned, _scopeId);
 
     void Bind()
     {

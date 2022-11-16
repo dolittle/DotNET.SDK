@@ -88,7 +88,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         var eventHandlers = new UniqueBindings<EventHandlerModelId, IEventHandler>();
         foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            if (builder.TryBuild((EventHandlerModelId)identifier, eventTypes, buildResults, out var eventHandler))
             {
                 eventHandlers.Add((EventHandlerModelId)identifier, eventHandler);
             }
@@ -99,7 +99,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         }
         foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            if (builder.TryBuild((EventHandlerModelId)identifier, eventTypes, buildResults, out var eventHandler))
             {
                 eventHandlers.Add((EventHandlerModelId)identifier, eventHandler);
             }
@@ -110,7 +110,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
         }
         foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            if (builder.TryBuild((EventHandlerModelId)identifier, eventTypes, buildResults, out var eventHandler))
             {
                 eventHandlers.Add((EventHandlerModelId)identifier, eventHandler);
             }

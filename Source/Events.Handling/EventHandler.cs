@@ -29,9 +29,9 @@ public class EventHandler : IEventHandler
         EventHandlerModelId identifier,
         IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
     {
-        Identifier = identifier;
-        ScopeId = scopeId;
-        Partitioned = partitioned;
+        Identifier = identifier.Id;
+        ScopeId = identifier.Scope;
+        Partitioned = identifier.Partitioned;
         _eventHandlerMethods = eventHandlerMethods;
     }
 

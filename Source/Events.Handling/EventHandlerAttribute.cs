@@ -42,5 +42,5 @@ public class EventHandlerAttribute : Attribute, IDecoratedTypeDecorator<EventHan
 
 
     /// <inheritdoc />
-    public EventHandlerModelId GetIdentifier(Type decoratedType) => new(_eventHandlerId, Scope, _alias ?? decoratedType.Name);
+    public EventHandlerModelId GetIdentifier(Type decoratedType) => new(_eventHandlerId, Partitioned, Scope, _alias ?? decoratedType.Name);
 }
