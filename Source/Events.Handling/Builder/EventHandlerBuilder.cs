@@ -83,13 +83,13 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
         if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, buildResults))
         {
-            buildResults.AddFailure($"Failed to build event handler {_eventHandlerId}. One or more event handler methods could not be built");
+            buildResults.AddFailure(identifier, "One or more event handler methods could not be built");
             return false;
         }
 
         if (eventTypesToMethods.Count < 1)
         {
-            buildResults.AddFailure($"Failed to build event handler {_eventHandlerId}. No event handler methods are configured for event handler");
+            buildResults.AddFailure(identifier, "No event types to handle");
             return false;
         }
 

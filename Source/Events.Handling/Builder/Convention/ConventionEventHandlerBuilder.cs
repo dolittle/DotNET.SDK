@@ -85,7 +85,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
         out IEventHandler eventHandler)
     {
         eventHandler = default;
-        buildResults.AddInformation($"Building {(_identifier.Partitioned ? "partitioned" : "unpartitioned")} event handler {_identifier} processing events in scope {_identifier.Scope} from type {EventHandlerType}");
+        buildResults.AddInformation(_identifier, $"Building from type {EventHandlerType}");
 
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
 
@@ -138,7 +138,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
         {
             return true;
         }
-        buildResults.AddFailure($"There are no event handler methods to register in event handler {EventHandlerType}. An event handler method either needs to be decorated with [{nameof(HandlesAttribute)}] or have the name {MethodName}");
+        buildResults.AddFailure(_identifier, $"There are no event handler methods to register in event handler {EventHandlerType}. An event handler method either needs to be decorated with [{nameof(HandlesAttribute)}] or have the name {MethodName}");
         return false;
     }
 
@@ -156,7 +156,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
             var eventType = (method.GetCustomAttributes(typeof(HandlesAttribute), true)[0] as HandlesAttribute)?.EventType;
             if (!TryGetFirstMethodParameterType(method, out var eventParameterType))
             {
-                buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} has no parameters, but is decorated with [{nameof(HandlesAttribute)}]. An event handler method should take in as parameters an event and an {nameof(EventContext)}");
+                buildResults.AddFailure(_identifier, $"{method} has no parameters, but is decorated with [{nameof(HandlesAttribute)}]. An event handler method should take in as parameters an event and an {nameof(EventContext)}");
                 shouldAddHandler = false;
             }
 
@@ -167,13 +167,13 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
 
             if (eventParameterType != typeof(object))
             {
-                buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} should only handle an event of type object");
+                buildResults.AddFailure(_identifier, $"{method} should only handle an event of type object");
                 shouldAddHandler = false;
             }
 
             if (!method.IsPublic)
             {
-                buildResults.AddFailure($"Method {method} on event handler {EventHandlerType} has the signature of an event handler method, but is not public. Event handler methods needs to be public");
+                buildResults.AddFailure(_identifier, $"{method} has the signature of an event handler method, but is not public. Event handler methods needs to be public");
                 shouldAddHandler = false;
             }
 
@@ -181,7 +181,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
             {
                 case true when !eventTypesToMethods.TryAdd(eventType, createUntypedHandlerMethod(method)):
                     allMethodsAdded = false;
-                    buildResults.AddFailure($"Event type {eventType} is already handled in event handler {eventHandlerId}");
+                    buildResults.AddFailure(_identifier, $"Multiple handlers for {eventType}");
                     break;
                 case false:
                     allMethodsAdded = false;
@@ -205,19 +205,19 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
             var shouldAddHandler = true;
             if (!TryGetFirstMethodParameterType(method, out var eventParameterType))
             {
-                buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} has no parameters. An event handler method should take in as parameters an event and an {nameof(EventContext)}");
+                buildResults.AddFailure(_identifier, $"{method} has no parameters. An event handler method should take in as parameters an event and an {nameof(EventContext)}");
                 shouldAddHandler = false;
             }
 
             if (eventParameterType == typeof(object))
             {
-                buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} cannot handle an untyped event when not decorated with [{nameof(HandlesAttribute)}]");
+                buildResults.AddFailure(_identifier, $"{method} cannot handle an untyped event when not decorated with [{nameof(HandlesAttribute)}]");
                 shouldAddHandler = false;
             }
 
             if (!eventTypes.HasFor(eventParameterType))
             {
-                buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} handles event of type {eventParameterType}, but it is not associated to any event type");
+                buildResults.AddFailure(_identifier, $"{method} handles event of type {eventParameterType}, but it is not associated to any event type");
                 shouldAddHandler = false;
             }
 
@@ -228,7 +228,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
 
             if (!method.IsPublic)
             {
-                buildResults.AddFailure($"Method {method} on event handler {EventHandlerType} has the signature of an event handler method, but is not public. Event handler methods needs to be public");
+                buildResults.AddFailure(_identifier, $"{method} has the signature of an event handler method, but is not public. Event handler methods needs to be public");
                 shouldAddHandler = false;
             }
 
@@ -236,7 +236,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
             {
                 case true when !eventTypesToMethods.TryAdd(eventTypes.GetFor(eventParameterType), createTypedHandlerMethod(eventParameterType, method)):
                     allMethodsAdded = false;
-                    buildResults.AddFailure($"Event type {eventParameterType} is already handled in event handler {eventHandlerId}");
+                    buildResults.AddFailure(_identifier, $"Multiple handlers for {eventParameterType}");
                     break;
                 case false:
                     allMethodsAdded = false;
@@ -251,19 +251,19 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
         var hasErrors = false;
         if (!SecondMethodParameterIsEventContext(method))
         {
-            buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to have two parameters where the second parameter is {nameof(EventContext)}");
+            buildResults.AddFailure(_identifier, $"{method} needs to have two parameters where the second parameter is {nameof(EventContext)}");
             hasErrors = true;
         }
 
         if (!MethodHasNoExtraParameters(method))
         {
-            buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to only have two parameters where the first is the event to handle and the second is {nameof(EventContext)}");
+            buildResults.AddFailure(_identifier, $"{method} needs to only have two parameters where the first is the event to handle and the second is {nameof(EventContext)}");
             hasErrors = true;
         }
 
         if (MethodReturnsAsyncVoid(method) || (!MethodReturnsVoid(method) && !MethodReturnsTask(method)))
         {
-            buildResults.AddFailure($"Event handler method {method} on event handler {EventHandlerType} needs to return either {typeof(void)} or {typeof(Task)}");
+            buildResults.AddFailure(_identifier, $"{method} needs to return either {typeof(void)} or {typeof(Task)}");
             hasErrors = true;
         }
 

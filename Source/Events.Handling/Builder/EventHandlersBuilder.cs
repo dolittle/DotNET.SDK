@@ -94,7 +94,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
             }
             else
             {
-                buildResults.AddFailure($"Failed to build Event Handler for '{builder.EventHandlerType}'. It will not be registered");
+                buildResults.AddFailure(identifier, "Event handler will not be registered");
             }
         }
         foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
@@ -105,7 +105,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
             }
             else
             {
-                buildResults.AddFailure($"Failed to build Event Handler for instance of '{builder.EventHandlerType}'. It will not be registered");
+                buildResults.AddFailure(identifier, "Event handler will not be registered");
             }
         }
         foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
@@ -117,7 +117,7 @@ public class EventHandlersBuilder : IEventHandlersBuilder
             
             else
             {
-                buildResults.AddFailure($"Failed to build Event Handler '{builder.ModelId.Id}' in Scope '{builder.ModelId.Scope}'. It will not be registered");
+                buildResults.AddFailure(identifier, "Event handler will not be registered");
             }
         }
         return new UnregisteredEventHandlers(

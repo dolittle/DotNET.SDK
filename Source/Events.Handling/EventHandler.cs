@@ -33,6 +33,10 @@ public class EventHandler : IEventHandler
         ScopeId = identifier.Scope;
         Partitioned = identifier.Partitioned;
         _eventHandlerMethods = eventHandlerMethods;
+        if (!string.IsNullOrEmpty(identifier.Alias))
+        {
+            Alias = identifier.Alias;
+        }
     }
 
 
@@ -49,10 +53,10 @@ public class EventHandler : IEventHandler
     public IEnumerable<EventType> HandledEvents => _eventHandlerMethods.Keys;
 
     /// <inheritdoc />
-    public EventHandlerAlias Alias { get; }
+    public EventHandlerAlias? Alias { get; }
 
     /// <inheritdoc />
-    public bool HasAlias { get; }
+    public bool HasAlias => Alias is not null; 
 
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
