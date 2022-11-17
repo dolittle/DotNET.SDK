@@ -40,24 +40,24 @@ public class ClientBuildResults : IClientBuildResults
         => Add(ClientBuildResult.Information(message));
 
     /// <inheritdoc />
-    public void AddInformation(IIdentifier id, string alias, string message)
-        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, alias, ClientBuildResult.Information(message)));
+    public void AddInformation(IIdentifier id, string message)
+        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Information(message)));
 
     /// <inheritdoc />
     public void AddFailure(string message, string fix = "")
         => Add(ClientBuildResult.Failure(message, fix));
 
     /// <inheritdoc />
-    public void AddFailure(IIdentifier id, string alias, string message, string fix = "")
-        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, alias, ClientBuildResult.Failure(message, fix)));
+    public void AddFailure(IIdentifier id, string message, string fix = "")
+        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Failure(message, fix)));
 
     /// <inheritdoc />
     public void AddError(Exception error)
         => Add(ClientBuildResult.Error(error));
 
     /// <inheritdoc />
-    public void AddError(IIdentifier id, string alias, Exception error)
-        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, alias, ClientBuildResult.Error(error)));
+    public void AddError(IIdentifier id,  Exception error)
+        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Error(error)));
 
     /// <inheritdoc />
     public bool Failed { get; private set; }
@@ -70,7 +70,7 @@ public class ClientBuildResults : IClientBuildResults
             result.Log(logger);
         }
         
-        foreach (var group in _identifiableResults.GroupBy(_ => (_.Identifier, _.Alias)))
+        foreach (var group in _identifiableResults.GroupBy(_ => _.Identifier))
         {
             using (logger.BeginScope(group.Key))
             {

@@ -47,7 +47,7 @@ public interface IClientBuildResults
     /// <param name="id">The <see cref="IIdentifier"/>.</param>
     /// <param name="alias">The alias.</param>
     /// <param name="message">The information message</param>
-    void AddInformation(IIdentifier id, string alias, string message);
+    void AddInformation(IIdentifier id, string message);
 
     /// <summary>
     /// Adds a failure build result.
@@ -63,7 +63,7 @@ public interface IClientBuildResults
     /// <param name="alias">The alias.</param>
     /// <param name="message">The failure message.</param>
     /// <param name="fix">The optional suggested fix to resolve the failure.</param>
-    void AddFailure(IIdentifier id, string alias, string message, string fix = "");
+    void AddFailure(IIdentifier id, string message, string fix = "");
 
     /// <summary>
     /// Adds an error build result.
@@ -77,7 +77,7 @@ public interface IClientBuildResults
     /// <param name="id">The <see cref="IIdentifier"/>.</param>
     /// <param name="alias">The alias.</param>
     /// <param name="error">The <see cref="Exception"/> that was thrown.</param>
-    void AddError(IIdentifier id, string alias, Exception error);
+    void AddError(IIdentifier id, Exception error);
 
     /// <summary>
     /// Writes the build result to the provided logger.

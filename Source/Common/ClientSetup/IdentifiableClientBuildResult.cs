@@ -9,6 +9,5 @@ namespace Dolittle.SDK.Common.ClientSetup;
 /// Represents a <see cref="ClientBuildResult"/> for a specific identifiable thing.
 /// </summary>
 /// <param name="Identifier">The <see cref="IIdentifier"/>.</param>
-/// <param name="Alias">The alias of the identifiable thing.</param>
 /// <param name="Result">The <see cref="ClientBuildResult"/>.</param>
-public record IdentifiableClientBuildResult(IIdentifier Identifier, string Alias, ClientBuildResult Result);
+public record IdentifiableClientBuildResult(IIdentifier Identifier, ClientBuildResult Result);
