@@ -22,11 +22,23 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     /// Initializes a new instance of the <see cref="ProjectionOf{TReadModel}"/> class.
     /// </summary>
     /// <param name="projectionStore">The <see cref="IProjectionStore"/>.</param>
-    /// <param name="scopedProjectionId">The <see cref="ScopedProjectionId"/>.</param>
-    public ProjectionOf(IProjectionStore projectionStore, ScopedProjectionId scopedProjectionId)
+    /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
+    public ProjectionOf(IProjectionStore projectionStore, ProjectionModelId identifier)
+        : this(projectionStore, identifier.Id, identifier.Scope)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProjectionOf{TReadModel}"/> class.
+    /// </summary>
+    /// <param name="projectionStore">The <see cref="IProjectionStore"/>.</param>
+    /// <param name="identifier">The <see cref="ProjectionId"/>.</param>
+    /// <param name="scope">The <see cref="ScopeId"/>.</param>
+    public ProjectionOf(IProjectionStore projectionStore, ProjectionId identifier, ScopeId scope)
     {
         _projectionStore = projectionStore;
-        (Identifier, Scope) = scopedProjectionId;
+        Identifier = identifier;
+        Scope = scope;
     }
 
     /// <inheritdoc />

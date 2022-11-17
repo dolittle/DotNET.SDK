@@ -74,14 +74,14 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition)
+    public bool TryBuild(ProjectionModelId identifier, IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition)
     {
         copyDefinition = default;
         var succeeded = true;
 
-        if (!_collectionNameValidator.Validate(buildResults, _collectionName))
+        if (!_collectionNameValidator.Validate(identifier, buildResults, _collectionName))
         {
-            buildResults.AddFailure($"MongoDB Copy collection name {_collectionName} is not valid");
+            buildResults.AddFailure(identifier, $"MongoDB Copy collection name {_collectionName} is not valid");
             succeeded = false;
         }
         if (!_withoutDefaultConversions)
@@ -102,12 +102,12 @@ public class ProjectionCopyToMongoDBBuilder<TReadModel> : Internal.IProjectionCo
     }
 
     /// <inheritdoc />
-    public bool TryBuildFromReadModel(IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition)
+    public bool TryBuildFromReadModel(ProjectionModelId identifier, IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition)
     {
         copyDefinition = default;
         if (_mongoDbCopyFromReadModelBuilder.CanBuild<TReadModel>())
         {
-            return _mongoDbCopyFromReadModelBuilder.TryBuild(buildResults, this) && TryBuild(buildResults, out copyDefinition);
+            return _mongoDbCopyFromReadModelBuilder.TryBuild(identifier, buildResults, this) && TryBuild(identifier, buildResults, out copyDefinition);
         }
         copyDefinition = ProjectionCopyToMongoDB.Default;
         return true;

@@ -28,12 +28,12 @@ public class MongoDBCopyDefinitionFromReadModelBuilder : IMongoDBCopyDefinitionF
         => typeof(TReadModel).TryGetDecorator<CopyProjectionToMongoDBAttribute>(out _);
 
     /// <inheritdoc />
-    public bool TryBuild<TReadModel>(IClientBuildResults buildResults, IProjectionCopyToMongoDBBuilder<TReadModel> copyToMongoDbBuilder)
+    public bool TryBuild<TReadModel>(ProjectionModelId identifier, IClientBuildResults buildResults, IProjectionCopyToMongoDBBuilder<TReadModel> copyToMongoDbBuilder)
         where TReadModel : class, new()
     {
         if (!CanBuild<TReadModel>())
         {
-            buildResults.AddFailure($"Could not get projection MongoDB Copy collection name from projection read model type {nameof(TReadModel)}");
+            buildResults.AddFailure(identifier, $"Could not get projection MongoDB Copy collection name from projection read model type {nameof(TReadModel)}");
             return false;
         }
         _conversionsFromAttributesBuilder.BuildFrom<TReadModel>(buildResults, copyToMongoDbBuilder.Conversions);

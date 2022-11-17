@@ -37,13 +37,13 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IClientBuildResults buildResults, out ProjectionCopies definition)
+    public bool TryBuild(ProjectionModelId identifier, IClientBuildResults buildResults, out ProjectionCopies definition)
     {
         definition = default;
         var succeeded = true;
         var mongoDBCopy = ProjectionCopyToMongoDB.Default;
         
-        if (_copyToMongoDB && !_copyToMongoDBBuilder.TryBuild(buildResults, out mongoDBCopy))
+        if (_copyToMongoDB && !_copyToMongoDBBuilder.TryBuild(identifier, buildResults, out mongoDBCopy))
         {
             buildResults.AddFailure($"Failed to build Copy To MongoDB Definition");
             succeeded = false;

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.Runtime.Projections.Contracts;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
@@ -25,21 +26,21 @@ public class ProjectionStoreRequestCreator : ICreateProjectionStoreRequest
     }
 
     /// <inheritdoc />
-    public GetOneRequest CreateGetOne(Key key, ScopedProjectionId scopedProjectionId, ExecutionContext executionContext)
+    public GetOneRequest CreateGetOne(Key key, ProjectionId id, ScopeId scope, ExecutionContext executionContext)
         => new()
         {
             CallContext = _callContextResolver.ResolveFrom(executionContext),
             Key = key,
-            ProjectionId = scopedProjectionId.Identifier.ToProtobuf(),
-            ScopeId = scopedProjectionId.ScopeId.ToProtobuf()
+            ProjectionId = id.ToProtobuf(),
+            ScopeId = scope.ToProtobuf()
         };
 
     /// <inheritdoc />
-    public GetAllRequest CreateGetAll(ScopedProjectionId scopedProjectionId, ExecutionContext executionContext)
+    public GetAllRequest CreateGetAll(ProjectionId id, ScopeId scope, ExecutionContext executionContext)
         => new()
         {
             CallContext = _callContextResolver.ResolveFrom(executionContext),
-            ProjectionId = scopedProjectionId.Identifier.ToProtobuf(),
-            ScopeId = scopedProjectionId.ScopeId.ToProtobuf()
+            ProjectionId = id.ToProtobuf(),
+            ScopeId = scope.ToProtobuf()
         };
 }

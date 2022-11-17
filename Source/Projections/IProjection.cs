@@ -36,7 +36,7 @@ public interface IProjection
     /// <summary>
     /// Gets the alias of the projection.
     /// </summary>
-    ProjectionAlias Alias { get; }
+    ProjectionAlias? Alias { get; }
 
     /// <summary>
     /// Gets a value indicating whether the projection has an alias or not.

@@ -31,38 +31,23 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
     /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
     public Projection(
-        ProjectionId identifier,
-        ScopeId scopeId,
+        ProjectionModelId identifier,
         IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
         ProjectionCopies copies)
     {
         _onMethods = onMethods;
-        Identifier = identifier;
-        ScopeId = scopeId;
+        Identifier = identifier.Id;
+        ScopeId = identifier.Scope;
         Events = onMethods.Select(_ => new EventSelector(_.Key, _.Value.KeySelector)).ToList();
         ProjectionType = typeof(TReadModel);
         Copies = copies;
+
+        if (!string.IsNullOrEmpty(identifier.Alias))
+        {
+            Alias = identifier.Alias;
+        }
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Projection{TReadModel}"/> class.
-    /// </summary>
-    /// <param name="identifier">The <see cref="ProjectionId" />.</param>
-    /// <param name="alias">The <see cref="ProjectionAlias" />.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
-    /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
-    public Projection(
-        ProjectionId identifier,
-        ProjectionAlias alias,
-        ScopeId scopeId,
-        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
-        ProjectionCopies copies)
-        : this(identifier, scopeId, onMethods, copies)
-    {
-        Alias = alias;
-        HasAlias = true;
-    }
 
     /// <inheritdoc />
     public Type ProjectionType { get; }
@@ -83,10 +68,10 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public ProjectionCopies Copies { get; }
 
     /// <inheritdoc />
-    public ProjectionAlias Alias { get; }
+    public ProjectionAlias? Alias { get; }
 
     /// <inheritdoc />
-    public bool HasAlias { get; }
+    public bool HasAlias => Alias is not null;
 
     /// <inheritdoc/>
     public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context,

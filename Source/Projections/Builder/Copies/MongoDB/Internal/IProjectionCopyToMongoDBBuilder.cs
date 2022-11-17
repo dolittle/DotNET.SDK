@@ -22,18 +22,20 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel> : MongoDB.IProjecti
     /// <summary>
     /// Builds the <see cref="ProjectionCopyToMongoDB"/>.
     /// </summary>
+    /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="copyDefinition">The built <see cref="ProjectionCopyToMongoDB"/>.</param>
     /// <returns>True if successfully built.</returns>
-    bool TryBuild(IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition);
+    bool TryBuild(ProjectionModelId identifier, IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition);
     
     /// <summary>
     /// Builds the <see cref="ProjectionCopyToMongoDB"/>.
     /// </summary>
+    /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="copyDefinition">The built <see cref="ProjectionCopyToMongoDB"/>.</param>
     /// <returns>True if successfully built.</returns>
-    bool TryBuildFromReadModel(IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition);
+    bool TryBuildFromReadModel(ProjectionModelId identifier, IClientBuildResults buildResults, out ProjectionCopyToMongoDB copyDefinition);
 
 
 }
