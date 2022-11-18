@@ -10,6 +10,7 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Proto.OpenTelemetry;
 
 namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
 
@@ -90,6 +91,7 @@ public static class OpenTelemetryConfigurationExtensions
                     .AddDolittleInstrumentation()
                     .AddAspNetCoreInstrumentation()
                     .AddMongoDBInstrumentation()
+                    .AddProtoActorInstrumentation()
                     .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
                 configure?.Invoke(builder);
             }));
