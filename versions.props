@@ -8,6 +8,7 @@
         <MachineSpecificationsVersion>1.0.0</MachineSpecificationsVersion>
         <MicrosoftExtensionsVersion>6.0.0</MicrosoftExtensionsVersion>
         <MicrosoftDotNetTestVersion>16.4.0</MicrosoftDotNetTestVersion>
+        <ProtoActorVersion>1.0.0-rc4.12</ProtoActorVersion>
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.18.1</ProtobufVersion>
         <GrpcVersion>2.43.0</GrpcVersion>

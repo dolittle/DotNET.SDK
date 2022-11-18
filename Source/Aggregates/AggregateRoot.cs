@@ -248,4 +248,9 @@ public abstract class AggregateRoot
             throw new EventWasAppliedToOtherEventSource(events.EventSource, EventSourceId);
         }
     }
+    
+    internal void ClearAppliedEvents()
+    {
+        _appliedEvents.Clear();
+    }
 }

@@ -23,6 +23,7 @@ static class AggregateRootMetadata<TAggregateRoot>
     public static Func<IServiceProvider, EventSourceId, Try<TAggregateRoot>> Construct { get; }
     public static IReadOnlyDictionary<Type, MethodInfo> MethodsPerEventType { get; }
     public static bool IsStateLess { get; }
+    public static AggregateRootType? AggregateRootType { get; }
 
     static AggregateRootMetadata()
     {
@@ -31,6 +32,34 @@ static class AggregateRootMetadata<TAggregateRoot>
         Construct = CreateConstruct(aggregateRootType);
         MethodsPerEventType = CreateMethodsPerEventType(aggregateRootType);
         IsStateLess = MethodsPerEventType.Count == 0;
+        AggregateRootType = GetAggregateRootType();
+    }
+
+    /// <summary>
+    /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
+    /// </summary>
+    /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
+    /// <returns>The <see cref="AggregateRootId" />.</returns>
+    public static AggregateRootId GetAggregateRootId()
+    {
+        if (AggregateRootType == null)
+        {
+            throw new MissingAggregateRootAttribute(typeof(TAggregateRoot));
+        }
+
+        return AggregateRootType.Id;
+    }
+    
+    /// <summary>
+    /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
+    /// </summary>
+    /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
+    /// <returns>The <see cref="AggregateRootId" />.</returns>
+    static AggregateRootType? GetAggregateRootType()
+    {
+        var aggregateRootType = typeof(TAggregateRoot);
+        var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
+        return aggregateRootAttribute?.Type;
     }
 
     static IReadOnlyDictionary<Type, MethodInfo> CreateMethodsPerEventType(Type aggregateRootType)
