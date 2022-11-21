@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Common.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Common.ClientSetup;
@@ -72,6 +73,14 @@ public abstract class ClientBuildResult
     public void Log(ILogger logger)
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
         => logger.Log(_logLevel, 0, _error, Message);
+    
+    /// <summary>
+    /// Logs the build message.
+    /// </summary>
+    /// <param name="logger">The provided <see cref="ILogger"/>to log the message to.</param>
+    public void Log(ILogger logger, IIdentifier identifier)
+        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
+        => logger.Log(_logLevel, 0, _error, $"{identifier}\n\t{Message}");
 #pragma warning restore CA2254
 #pragma warning restore CA1848
 }

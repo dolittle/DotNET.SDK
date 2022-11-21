@@ -81,7 +81,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     {
         eventHandler = default;
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
-        if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, buildResults))
+        if (!_methodsBuilder.TryAddEventHandlerMethods(identifier, eventTypes, eventTypesToMethods, buildResults))
         {
             buildResults.AddFailure(identifier, "One or more event handler methods could not be built");
             return false;

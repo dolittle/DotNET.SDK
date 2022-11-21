@@ -19,14 +19,14 @@ public class and_setting_collection_name : given.all_dependencies
         builder.ToCollection(collection_name);
     };
     
-    Because of = () => succeeded = builder.TryBuild(build_results, out copy_definition_result);
+    Because of = () => succeeded = builder.TryBuild(identifier, build_results, out copy_definition_result);
 
     It should_not_fail = () => succeeded.ShouldBeTrue();
     It should_output_a_copy_definition = () => copy_definition_result.ShouldNotBeNull();
     It should_have_the_given_collection_name = () => copy_definition_result.CollectionName.ShouldEqual(collection_name);
     It should_have_no_conversions = () => copy_definition_result.Conversions.ShouldBeEmpty();
     It should_copy_to_mongo = () => copy_definition_result.ShouldCopy.ShouldBeTrue();
-    It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(build_results, collection_name), Times.Once);
+    It should_validate_collection_name = () => collection_name_validator.Verify(_ => _.Validate(identifier, build_results, collection_name), Times.Once);
     It should_get_default_conversions = () => conversions_from_bson_class_map.Verify(_ => _.BuildFrom<given.read_model_type>(build_results, Moq.It.IsAny<IPropertyConversions>()), Times.Once);
     It should_not_have_failed_build_results = () => build_results.Failed.ShouldBeFalse();
 }

@@ -15,7 +15,8 @@ public class ErrorBuildResult : ClientBuildResult
     /// Initializes an instance of the <see cref="ErrorBuildResult"/> class.
     /// </summary>
     /// <param name="error">The error <see cref="Exception"/>.</param>
-    public ErrorBuildResult(Exception error) : base(LogLevel.Error, error.Message, true, error)
+    public ErrorBuildResult(Exception error)
+        : base(LogLevel.Error, error.Message, true, error)
     {
     }
 }

@@ -15,7 +15,7 @@ public class EmbeddingModelId : Identifier<EmbeddingId>
     /// </summary>
     /// <param name="id">The <see cref="EmbeddingId"/>.</param>
     /// <param name="alias">The optional embedding alias.</param>
-    public EmbeddingModelId(EmbeddingId id, string? alias)
+    public EmbeddingModelId(EmbeddingId id, string? alias = default)
         : base("Embedding", id, alias)
     {
     }

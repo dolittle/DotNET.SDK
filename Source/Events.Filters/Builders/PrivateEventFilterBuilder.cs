@@ -61,14 +61,14 @@ public class PrivateEventFilterBuilder : IPrivateEventFilterBuilder, ICanTryBuil
     }
     
     /// <inheritdoc />
-    public bool TryBuild(IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
+    public bool TryBuild(FilterModelId identifier, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_filterBuilder != default)
         {
-            return _filterBuilder.TryBuild(_filterId, _scopeId, buildResults, out filter);
+            return _filterBuilder.TryBuild(identifier, _scopeId, buildResults, out filter);
         }
-        buildResults.AddError(new FilterDefinitionIncomplete(_filterId, _scopeId, "Call Partitioned() or Handle(...) before building private filter"));
+        buildResults.AddError(identifier, new FilterDefinitionIncomplete(_filterId, _scopeId, "Call Partitioned() or Handle(...) before building private filter"));
         return false;
     }
 }

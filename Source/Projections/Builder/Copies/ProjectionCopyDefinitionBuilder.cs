@@ -45,7 +45,7 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
         
         if (_copyToMongoDB && !_copyToMongoDBBuilder.TryBuild(identifier, buildResults, out mongoDBCopy))
         {
-            buildResults.AddFailure($"Failed to build Copy To MongoDB Definition");
+            buildResults.AddFailure(identifier, "Failed to build Copy To MongoDB Definition");
             succeeded = false;
         }
         if (!succeeded)

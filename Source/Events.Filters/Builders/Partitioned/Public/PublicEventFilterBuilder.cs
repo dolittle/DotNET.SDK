@@ -34,12 +34,12 @@ public class PublicEventFilterBuilder : IPartitionedEventFilterBuilder, ICanTryB
 
 
     /// <inheritdoc />
-    public bool TryBuild(IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
+    public bool TryBuild(FilterModelId identifier, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_callback == default)
         {
-            buildResults.AddError(new MissingFilterCallback(_filterId, ScopeId.Default));
+            buildResults.AddError(identifier, new MissingFilterCallback(_filterId, ScopeId.Default));
             return false;
         }
         filter = new UnregisteredPublicEventFilter(_filterId, _callback);

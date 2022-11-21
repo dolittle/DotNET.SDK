@@ -29,6 +29,6 @@ public class an_event_handler
         {
             { handled_event_type, event_handler_method.Object }
         };
-        event_handler = new EventHandler(identifier, scope_id, partitioned, event_handler_methods);
+        event_handler = new EventHandler(new EventHandlerModelId(identifier, partitioned, scope_id, "some alias"), event_handler_methods);
     };
 }

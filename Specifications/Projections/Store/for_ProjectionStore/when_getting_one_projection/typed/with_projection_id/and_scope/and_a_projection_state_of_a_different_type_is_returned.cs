@@ -27,7 +27,7 @@ public class and_a_projection_state_of_a_different_type_is_returned : given.all_
 
     It should_call_get_one_with = () => method_caller.Verify(_ => _.Call(
         Moq.It.IsAny<ProjectionsGetOne>(),
-        request_like(key, new ScopedProjectionId(another_id, another_scope)), 
+        request_like(key, another_id, another_scope), 
         Moq.It.IsAny<CancellationToken>()));
     
     It should_only_call_it_once = () => method_caller.VerifyNoOtherCalls();

@@ -14,7 +14,8 @@ public class InformationBuildResult : ClientBuildResult
     /// Initializes an instance of the <see cref="InformationBuildResult"/> class.
     /// </summary>
     /// <param name="message">The build message.</param>
-    public InformationBuildResult(string message) : base(LogLevel.Debug, message, false)
+    public InformationBuildResult(string message)
+        : base(LogLevel.Debug, message, false)
     {
     }
 }

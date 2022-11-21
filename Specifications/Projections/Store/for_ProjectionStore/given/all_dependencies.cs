@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Projections.Contracts;
 using Dolittle.SDK.Common;
+using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Security;
@@ -57,9 +59,9 @@ public class all_dependencies
     {
         foreach (var type in projection_types)
         {
-            if (type.TryGetDecorator<ProjectionAttribute>(out var decorator))
+            if (type.TryGetIdentifier<ProjectionModelId>(out var identifier))
             {
-                read_model_types.Add(new ScopedProjectionId(decorator.Identifier, decorator.Scope), type);
+                read_model_types.Add(identifier, type);
             }
         }
     }
@@ -97,11 +99,18 @@ public class all_dependencies
             .Returns(enumerable);
     
 
-    protected static GetOneRequest request_like(Key key, ScopedProjectionId id)
+    protected static GetOneRequest request_like(Key key, ProjectionModelId id)
         => Moq.It.Is<GetOneRequest>(_ =>
             _.Key == key.Value
-            && _.ProjectionId.Equals(id.Identifier.ToProtobuf())
-            && _.ScopeId.Equals(id.ScopeId.ToProtobuf())
+            && _.ProjectionId.Equals(id.Id.ToProtobuf())
+            && _.ScopeId.Equals(id.Scope.ToProtobuf())
+            && _.CallContext.ExecutionContext.ToExecutionContext().Equals(an_execution_context));
+    
+    protected static GetOneRequest request_like(Key key, ProjectionId id, ScopeId scope)
+        => Moq.It.Is<GetOneRequest>(_ =>
+            _.Key == key.Value
+            && _.ProjectionId.Equals(id.ToProtobuf())
+            && _.ScopeId.Equals(scope.ToProtobuf())
             && _.CallContext.ExecutionContext.ToExecutionContext().Equals(an_execution_context));
 
     protected static ServerStreamingEnumerable<GetAllResponse> create_enumerable(params ProjectionCurrentState[][] batches)

@@ -16,7 +16,7 @@ public interface IClientBuildResults
     /// <summary>
     /// Gets all <see cref="ClientBuildResult"/>.
     /// </summary>
-    IEnumerable<ClientBuildResult> All { get; }
+    IEnumerable<ClientBuildResult> AllNonIdentifiable { get; }
 
     /// <summary>
     /// Gets a value indicating whether the client building failed or not.

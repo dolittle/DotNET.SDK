@@ -62,13 +62,13 @@ public class ModelBuilder : IModelBuilder
             _typesByIdentifier,
             (binding, _, numDuplicates) =>
             {
-                buildResults.AddInformation($"{binding} appeared {numDuplicates} times");
+                buildResults.AddInformation(binding.Identifier, $"{binding} appeared {numDuplicates} times");
             });
         var deDuplicatedProcessorBuilders = new DeDuplicatedIdentifierMap<object>(
             _processorBuildersByIdentifier,
             (binding, _, numDuplicates) =>
             {
-                buildResults.AddInformation($"{binding} appeared {numDuplicates} times");
+                buildResults.AddInformation(binding.Identifier, $"{binding} appeared {numDuplicates} times");
             });
 
         var singlyBoundTypes = new SinglyBoundDeDuplicatedIdentifierMap<Type>(
@@ -112,11 +112,6 @@ public class ModelBuilder : IModelBuilder
             {
                 AddFailedBuildResultsForCoexistentBindings(id, coexistentTypes, coexistentProcessorBuilders, buildResults);
             }
-        }
-
-        foreach (var binding in validBindings)
-        {
-            buildResults.AddInformation($"{binding} will be bound");
         }
         return new Model(validBindings);
     }

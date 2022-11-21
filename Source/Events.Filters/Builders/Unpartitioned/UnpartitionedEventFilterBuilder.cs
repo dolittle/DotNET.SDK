@@ -17,15 +17,15 @@ public class UnpartitionedEventFilterBuilder : IUnpartitionedEventFilterBuilder,
         => _callback = callback;
     
     /// <inheritdoc />
-    public bool TryBuild(FilterId filterId, ScopeId scopeId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
+    public bool TryBuild(FilterModelId filterId, ScopeId scopeId, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter)
     {
         filter = default;
         if (_callback == default)
         {
-            buildResults.AddError(new MissingFilterCallback(filterId, scopeId));
+            buildResults.AddError(filterId, new MissingFilterCallback(filterId.Id, scopeId));
             return false;
         }
-        filter = new UnregisteredUnpartitionedEventFilter(filterId, scopeId, _callback);
+        filter = new UnregisteredUnpartitionedEventFilter(filterId.Id, scopeId, _callback);
         return true;
     }
 }

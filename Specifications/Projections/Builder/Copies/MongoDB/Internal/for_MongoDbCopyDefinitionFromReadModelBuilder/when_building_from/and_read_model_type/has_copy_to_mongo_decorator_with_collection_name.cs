@@ -22,7 +22,7 @@ public class has_copy_to_mongo_decorator_with_collection_name : given.all_depend
             .Setup(_ => _.BuildFrom<projection_type_with_mongo_db_copy_and_collection_name>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()));
     };
     
-    Because of = () => succeeded = builder.TryBuild(build_results, mongo_builder.Object);
+    Because of = () => succeeded = builder.TryBuild(identifier, build_results, mongo_builder.Object);
 
     It should_succeed = () => succeeded.ShouldBeTrue();
     It should_not_result_in_failed_build_results = () => build_results.Failed.ShouldBeFalse();

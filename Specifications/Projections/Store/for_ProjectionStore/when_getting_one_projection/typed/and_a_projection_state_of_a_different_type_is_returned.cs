@@ -10,7 +10,7 @@ namespace Dolittle.SDK.Projections.Store.for_ProjectionStore.when_getting_one_pr
 public class and_a_projection_state_of_a_different_type_is_returned : given.all_dependencies
 {
     static Key key;
-    static ScopedProjectionId scoped_projection_id;
+    static ProjectionModelId scoped_projection_id;
     static given.a_decorated_projection_type result;
     
     Establish context = () =>

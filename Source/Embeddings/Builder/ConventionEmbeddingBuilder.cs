@@ -32,7 +32,7 @@ public class ConventionEmbeddingBuilder<TEmbedding> : ICanTryBuildEmbedding
     public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out Internal.IEmbedding embedding)
     {
         embedding = default;
-        buildResults.AddInformation($"Building {_identifier} from type {_embeddingType}");
+        buildResults.AddInformation(_identifier, $"Building from type {_embeddingType}");
 
         if (!HasParameterlessConstructor())
         {

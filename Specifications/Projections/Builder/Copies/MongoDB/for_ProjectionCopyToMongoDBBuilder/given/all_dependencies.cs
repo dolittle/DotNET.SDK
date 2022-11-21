@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Copies;
 using Dolittle.SDK.Projections.Copies.MongoDB;
@@ -21,6 +22,7 @@ public class all_dependencies
     protected static Mock<IResolvePropertyPath> property_path_resolver;
     protected static ProjectionCopyToMongoDB copy_definition_result;
     protected static IClientBuildResults build_results;
+    protected static ProjectionModelId identifier;
     protected static bool succeeded;
 
     Establish context = () =>
@@ -30,13 +32,14 @@ public class all_dependencies
         conversions_from_bson_class_map = new Mock<IBuildPropertyConversionsFromBsonClassMap>();
         from_read_model_builder = new Mock<IMongoDBCopyDefinitionFromReadModelBuilder>();
         property_path_resolver = new Mock<IResolvePropertyPath>();
+        identifier = new ProjectionModelId("69891694-022c-4df4-8384-55a0804ca7b1", ScopeId.Default, "some alias2");
     };
 
     protected static ProjectionCopyToMongoDBBuilder<TReadModel> setup_for<TReadModel>()
         where TReadModel : class, new()
     {
         conversions_from_bson_class_map.Setup(_ => _.BuildFrom<TReadModel>(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<IPropertyConversions>()));
-        collection_name_validator.Setup(_ => _.Validate(Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<MongoDBCopyCollectionName>())).Returns(true);
+        collection_name_validator.Setup(_ => _.Validate(Moq.It.IsAny<ProjectionModelId>(), Moq.It.IsAny<IClientBuildResults>(), Moq.It.IsAny<MongoDBCopyCollectionName>())).Returns(true);
         return new ProjectionCopyToMongoDBBuilder<TReadModel>(collection_name_validator.Object, conversions_from_bson_class_map.Object, from_read_model_builder.Object, property_path_resolver.Object);
     }
 

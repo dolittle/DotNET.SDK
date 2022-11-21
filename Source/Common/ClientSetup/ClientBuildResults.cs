@@ -18,7 +18,7 @@ public class ClientBuildResults : IClientBuildResults
     readonly List<IdentifiableClientBuildResult> _identifiableResults = new();
 
     /// <inheritdoc />
-    public IEnumerable<ClientBuildResult> All => _results;
+    public IEnumerable<ClientBuildResult> AllNonIdentifiable => _results;
 
     /// <inheritdoc />
     public IEnumerable<IdentifiableClientBuildResult> GetFor<TId>()
@@ -72,12 +72,9 @@ public class ClientBuildResults : IClientBuildResults
         
         foreach (var group in _identifiableResults.GroupBy(_ => _.Identifier))
         {
-            using (logger.BeginScope(group.Key))
+            foreach (var result in group)
             {
-                foreach (var result in group)
-                {
-                    result.Result.Log(logger);
-                }
+                result.Log(logger);
             }
         }
     }

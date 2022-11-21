@@ -14,8 +14,9 @@ public interface ICanTryBuildFilter : IEquatable<ICanTryBuildFilter>
     /// <summary>
     /// Builds the filter.
     /// </summary>
+    /// <param name="identifier">The <see cref="FilterModelId"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="filter">The outputted <see cref="ICanRegisterEventFilterProcessor"/> that can register the private filter.</param>
     /// <returns>A value indicating whether the building succeeded or not.</returns>
-    bool TryBuild(IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter);
+    bool TryBuild(FilterModelId identifier, IClientBuildResults buildResults, out ICanRegisterEventFilterProcessor filter);
 }

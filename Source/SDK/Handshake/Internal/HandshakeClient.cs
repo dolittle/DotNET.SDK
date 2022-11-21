@@ -95,13 +95,13 @@ public class HandshakeClient : IPerformHandshake
     static BuildResults ToProtobuf(IClientBuildResults buildResults)
     {
         var protobuf = new BuildResults();
-        protobuf.Embeddings.AddRange(GetBuildResultsFor<EmbeddingModelId>(buildResults, _ => 0));
+        protobuf.AggregateRoots.AddRange(GetBuildResultsFor<AggregateRootType>(buildResults, _ => _.Generation));
+        protobuf.EventTypes.AddRange(GetBuildResultsFor<EventType>(buildResults, _ => _.Generation));
+        protobuf.EventHandlers.AddRange(GetBuildResultsFor<EventHandlerModelId>(buildResults, _ => 0));
         protobuf.Filters.AddRange(GetBuildResultsFor<FilterModelId>(buildResults, _ => 0));
         protobuf.Projections.AddRange(GetBuildResultsFor<ProjectionModelId>(buildResults, _ => 0));
-        protobuf.AggregateRoots.AddRange(GetBuildResultsFor<AggregateRootType>(buildResults, _ => _.Generation));
-        protobuf.EventHandlers.AddRange(GetBuildResultsFor<EventHandlerModelId>(buildResults, _ => 0));
-        protobuf.EventTypes.AddRange(GetBuildResultsFor<EventType>(buildResults, _ => _.Generation));
-        protobuf.Other.AddRange(buildResults.All.Select(_ => _.ToProtobuf()));
+        protobuf.Embeddings.AddRange(GetBuildResultsFor<EmbeddingModelId>(buildResults, _ => 0));
+        protobuf.Other.AddRange(buildResults.AllNonIdentifiable.Select(_ => _.ToProtobuf()));
         return protobuf;
     }
 
@@ -114,7 +114,6 @@ public class HandshakeClient : IPerformHandshake
     {
         var result = new ArtifactBuildResult
         {
-            Alias = buildResult.Alias,
             Aritfact = new Artifact
             {
                 Id = buildResult.Identifier.Id.ToProtobuf(),
@@ -122,6 +121,11 @@ public class HandshakeClient : IPerformHandshake
             },
             BuildResult = buildResult.Result.ToProtobuf()
         };
+        if (!string.IsNullOrEmpty(buildResult.Identifier.Alias))
+        {
+            result.Alias = buildResult.Identifier.Alias;
+        }
+
         return result;
     }
 

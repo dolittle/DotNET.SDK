@@ -112,7 +112,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         {
             return true;
         }
-        buildResults.AddFailure($"There are no projection methods to register in projection {_projectionType}. A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
+        buildResults.AddFailure(identifier, $"There are no projection methods to register in projection {_projectionType}", $"A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
         return false;
 
     }

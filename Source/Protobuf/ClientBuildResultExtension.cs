@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Common.ClientSetup;
-using Dolittle.SDK.Security;
 using PbBuildResult = Dolittle.Runtime.Client.Contracts.BuildResult;
 
 namespace Dolittle.SDK.Protobuf;
