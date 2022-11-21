@@ -115,15 +115,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregates", "Tests\Aggrega
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E1103442-E3E5-43AE-B5B5-9F1965309E24}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{8A2CE842-7F1A-4B36-AE73-B15F1ECA2800}"
-	ProjectSection(SolutionItems) = preProject
-		default.props = default.props
-		DotNET.SDK.sln.DotSettings = DotNET.SDK.sln.DotSettings
-		specs.props = specs.props
-		tests.props = tests.props
-		versions.props = versions.props
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{8E6E3E7B-EF5C-4AEB-919B-FED3DB5F3A73}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
