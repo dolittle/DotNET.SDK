@@ -56,9 +56,14 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
 
         try
         {
-            await _context.System.Cluster()
+            var result = await _context.System.Cluster()
                 .RequestAsync<Try<bool>>(_clusterIdentity, new Perform<TAggregate>(method, cancellationToken), _context,
                     cancellationToken);
+
+            if (!result.Success)
+            {
+                throw result.Exception;
+            }
         }
         catch (Exception e)
         {
