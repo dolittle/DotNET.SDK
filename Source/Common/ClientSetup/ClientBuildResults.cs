@@ -41,7 +41,7 @@ public class ClientBuildResults : IClientBuildResults
 
     /// <inheritdoc />
     public void AddInformation(IIdentifier id, string message)
-        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Information(message)));
+        => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Information(message)));
 
     /// <inheritdoc />
     public void AddFailure(string message, string fix = "")
@@ -49,7 +49,7 @@ public class ClientBuildResults : IClientBuildResults
 
     /// <inheritdoc />
     public void AddFailure(IIdentifier id, string message, string fix = "")
-        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Failure(message, fix)));
+        => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Failure(message, fix)));
 
     /// <inheritdoc />
     public void AddError(Exception error)
@@ -57,7 +57,7 @@ public class ClientBuildResults : IClientBuildResults
 
     /// <inheritdoc />
     public void AddError(IIdentifier id,  Exception error)
-        => _identifiableResults.Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Error(error)));
+        => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Error(error)));
 
     /// <inheritdoc />
     public bool Failed { get; private set; }
@@ -77,5 +77,14 @@ public class ClientBuildResults : IClientBuildResults
                 result.Log(logger);
             }
         }
+    }
+    
+    void Add(IdentifiableClientBuildResult result)
+    {
+        if (result.Result.IsFailed)
+        {
+            Failed = true;
+        }
+        _identifiableResults.Add(result);
     }
 }
