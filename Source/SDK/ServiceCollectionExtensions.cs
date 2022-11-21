@@ -2,21 +2,24 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Actors;
-using Dolittle.SDK.Aggregates.Builders;
-using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Builders;
-using Dolittle.SDK.Events;
+using Dolittle.SDK.Proto;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Proto;
 using Proto.Cluster;
+using Proto.Cluster.Partition;
+using Proto.Cluster.Seed;
 using Proto.Cluster.SingleNode;
+using Proto.DependencyInjection;
 using Proto.OpenTelemetry;
+using Proto.Remote.GrpcNet;
 
 namespace Dolittle.SDK;
 
@@ -38,9 +41,20 @@ public static class ServiceCollectionExtensions
         return services
             .AddDolittleOptions()
             .AddDolittleClient(setupClient, configureClient)
-            .AddProto();
+            .AddProtoInfra(GetClusterKinds);
     }
 
+    static IEnumerable<ClusterKind> GetClusterKinds(IServiceProvider serviceProvider)
+    {
+        var client = serviceProvider.GetRequiredService<IDolittleClient>() as DolittleClient;
+        var aggregateTypes = client
+            .AggregateRootTypes
+            .Types;
+
+        return aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
+            .Select(kind => kind.WithProps(props => props.WithTracing()));
+    }
+    
     static IServiceCollection AddDolittleOptions(this IServiceCollection services)
     {
         services
@@ -49,42 +63,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    static IServiceCollection AddProto(this IServiceCollection services)
-    {
-        return services
-            .AddProtoCluster((sp, config) =>
-            {
-                config.ClusterName = "sdk";
-                config.ClusterProvider = new SingleNodeProvider();
-                config.IdentityLookup = new SingleNodeLookup();
-                config.ConfigureCluster = cluster => cluster with
-                {
-                    ClusterKinds = GetClusterKinds(sp),
-                };
-            })
-            .AddSingleton(sp => sp.GetRequiredService<ActorSystem>().Root.WithTracing())
-            .AddSingleton<GetServiceProviderForTenant>(sp =>
-            {
-                var client = sp.GetRequiredService<IDolittleClient>();
-                return async tenantId =>
-                {
-                    await client.Connected;
-                    return client.Services.ForTenant(tenantId);
-                };
-            });
-    }
-
-    static ImmutableList<ClusterKind> GetClusterKinds(IServiceProvider serviceProvider)
-    {
-        var client = serviceProvider.GetRequiredService<IDolittleClient>() as DolittleClient;
-        var aggregateTypes = client
-            .AggregateRootTypes
-            .Types;
-
-        return aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
-            .Select(kind => kind.WithProps(props => props.WithTracing()))
-            .ToImmutableList();
-    }
+    
 
     static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default,
         ConfigureDolittleClient configureClient = default)
