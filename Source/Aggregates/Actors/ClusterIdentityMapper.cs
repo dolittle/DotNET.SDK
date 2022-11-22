@@ -17,10 +17,13 @@ static class ClusterIdentityMapper
     public static (TenantId, EventSourceId) GetTenantAndEventSourceId(ClusterIdentity clusterIdentity)
     {
         if (clusterIdentity is null) throw new ArgumentNullException(nameof(clusterIdentity));
-        var parts = clusterIdentity.Identity.Split(':');
-        if (parts.Length != 2) throw new ArgumentException($"The cluster identity '{clusterIdentity.Identity}' is not a valid aggregate identity");
-        TenantId tenantId = parts[0];
-        EventSourceId eventSourceId = parts[1];
+        var separator = clusterIdentity.Identity.IndexOf(":", StringComparison.Ordinal);
+        
+        if(separator == -1) throw new ArgumentException("ClusterIdentity is not in the correct format", nameof(clusterIdentity));
+        
+        TenantId tenantId = clusterIdentity.Identity[..separator];
+        EventSourceId eventSourceId = clusterIdentity.Identity[(separator + 1)..];
+
         return (tenantId, eventSourceId);
     }
 }
