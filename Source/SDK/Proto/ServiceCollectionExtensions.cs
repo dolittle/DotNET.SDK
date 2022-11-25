@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Dolittle.SDK.Aggregates.Actors;
+using Dolittle.SDK.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,13 @@ static class ServiceCollectionExtensions
                     await client.Connected;
                     return client.Services.ForTenant(tenantId);
                 };
+            })
+            .AddSingleton<AggregateUnloadTimeout>(sp =>
+            {
+                var dolittleClientConfiguration = sp.GetRequiredService<DolittleClientConfiguration>();
+                var timeout = dolittleClientConfiguration.AggregateIdleTimeout;
+
+                return () => timeout;
             });
     }
 

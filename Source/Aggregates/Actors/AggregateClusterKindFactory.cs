@@ -21,14 +21,15 @@ static class AggregateClusterKindFactory
 
 static class AggregateClusterKindFactory<TAggregate> where TAggregate : AggregateRoot
 {
+    // ReSharper disable once UnusedMember.Global - Called by reflection
     public static ClusterKind CreateKind(IServiceProvider serviceProvider)
     {
         var aggregateRootType = AggregateRootMetadata<TAggregate>.AggregateRootType ?? throw new MissingAggregateRootAttribute(typeof(TAggregate));
-
         var providerForTenant = serviceProvider.GetRequiredService<GetServiceProviderForTenant>();
         var logger = serviceProvider.GetRequiredService<ILogger<AggregateActor<TAggregate>>>();
+        var idleUnloadTimeout = serviceProvider.GetRequiredService<AggregateUnloadTimeout>()();
 
         return new ClusterKind(aggregateRootType.Id.Value.ToString(),
-            Props.FromProducer(() => new AggregateActor<TAggregate>(providerForTenant, logger)));
+            Props.FromProducer(() => new AggregateActor<TAggregate>(providerForTenant, logger, idleUnloadTimeout)));
     }
 }
