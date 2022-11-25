@@ -69,7 +69,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
     IProjectionStoreBuilder _projectionStoreBuilder;
-    IEventTypes _eventTypes;
     IEmbeddings _embeddingStoreBuilder;
     ITenantScopedProviders _services;
 
@@ -126,11 +125,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     internal IAggregateRootTypes AggregateRootTypes => _unregisteredAggregateRoots;
     
     /// <inheritdoc />
-    public IEventTypes EventTypes
-    {
-        get => _eventTypes;
-        private set => _eventTypes = value;
-    }
+    public IEventTypes EventTypes { get; }
 
     /// <inheritdoc />
     public IEventStoreBuilder EventStore
@@ -335,11 +330,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             _callContextResolver,
             _unregisteredEventTypes,
             loggerFactory);
-        Aggregates = new AggregatesBuilder(
-            _eventStore,
-            _unregisteredEventTypes,
-            tenant => Services.ForTenant(tenant),
-            loggerFactory);
+        Aggregates = new AggregatesBuilder(tenant => Services.ForTenant(tenant));
         EventHorizons = new EventHorizons(
             methodCaller,
             executionContext,

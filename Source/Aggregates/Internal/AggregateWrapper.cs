@@ -35,7 +35,6 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the aggregate root instance.</param>
     /// <param name="eventStore">The <see cref="IEventStore" /> used for committing the <see cref="UncommittedAggregateEvents" /> when actions are performed on the <typeparamref name="TAggregate">aggregate</typeparamref>. </param>
     /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
-    /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/> used for getting an aggregate root instance.</param>
     /// <param name="serviceProvider">The tenant scoped <see cref="IServiceProvider"/>.</param>
     /// <param name="logger">The <see cref="ILogger" />.</param>
     public AggregateWrapper(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IServiceProvider serviceProvider, ILogger<AggregateWrapper<TAggregate>> logger)
@@ -43,7 +42,6 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
         _eventSourceId = eventSourceId;
         _eventTypes = eventTypes;
         _eventStore = eventStore;
-        // _aggregateRoots = aggregateRoots;
         _serviceProvider = serviceProvider;
         _logger = logger;
     }

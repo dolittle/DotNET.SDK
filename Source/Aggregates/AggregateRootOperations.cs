@@ -71,7 +71,4 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
             throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, e);
         }
     }
-
-    // static ClusterIdentity GetClusterIdentity(TenantId tenantId,EventSourceId eventSourceId) =>
-    //     ClusterIdentity.Create($"{tenantId}:{eventSourceId}", AggregateRootMetadata<TAggregate>.GetAggregateRootId().Value.ToString());
 }
