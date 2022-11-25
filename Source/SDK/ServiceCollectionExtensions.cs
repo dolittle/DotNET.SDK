@@ -3,23 +3,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Builders;
 using Dolittle.SDK.Proto;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Proto;
 using Proto.Cluster;
-using Proto.Cluster.Partition;
-using Proto.Cluster.Seed;
-using Proto.Cluster.SingleNode;
-using Proto.DependencyInjection;
 using Proto.OpenTelemetry;
-using Proto.Remote.GrpcNet;
 
 namespace Dolittle.SDK;
 
@@ -54,7 +46,7 @@ public static class ServiceCollectionExtensions
         return aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
             .Select(kind => kind.WithProps(props => props.WithTracing()));
     }
-    
+
     static IServiceCollection AddDolittleOptions(this IServiceCollection services)
     {
         services
@@ -63,20 +55,20 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    
 
     static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default,
         ConfigureDolittleClient configureClient = default)
     {
         var dolittleClient = DolittleClient.Setup(setupClient);
+
         return services
+            .AddSingleton(provider => ConfigureWithDefaultsFromServiceProvider(provider, configureClient))
             .AddSingleton(dolittleClient)
             .AddSingleton(dolittleClient.EventTypes)
-            .AddHostedService(provider =>
-                new DolittleClientService(
-                    dolittleClient,
-                    ConfigureWithDefaultsFromServiceProvider(provider, configureClient),
-                    provider.GetRequiredService<ILogger<DolittleClientService>>()));
+            .AddHostedService(provider => new DolittleClientService(
+                dolittleClient,
+                provider.GetRequiredService<DolittleClientConfiguration>(),
+                provider.GetRequiredService<ILogger<DolittleClientService>>()));
     }
 
     static DolittleClientConfiguration ConfigureWithDefaultsFromServiceProvider(IServiceProvider provider, ConfigureDolittleClient configureClient = default)

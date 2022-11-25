@@ -19,6 +19,8 @@ namespace Dolittle.SDK.Aggregates.Actors;
 
 delegate Task<IServiceProvider> GetServiceProviderForTenant(TenantId tenantId);
 
+delegate TimeSpan AggregateUnloadTimeout();
+
 class Perform<TAggregate> where TAggregate : AggregateRoot
 {
     public Perform(Func<TAggregate, Task> callback, CancellationToken cancellationToken)
@@ -40,12 +42,13 @@ public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoo
     EventSourceId? _eventSourceId;
 
     // ReSharper disable once StaticMemberInGenericType
-    static readonly TimeSpan _idleUnloadTimeout = TimeSpan.FromSeconds(20);
+    readonly TimeSpan _idleUnloadTimeout;
 
-    internal AggregateActor(GetServiceProviderForTenant getServiceProvider, ILogger<AggregateActor<TAggregate>> logger)
+    internal AggregateActor(GetServiceProviderForTenant getServiceProvider, ILogger<AggregateActor<TAggregate>> logger, TimeSpan idleUnloadTimeout)
     {
         _getServiceProvider = getServiceProvider;
         _logger = logger;
+        _idleUnloadTimeout = idleUnloadTimeout;
     }
 
     public Task ReceiveAsync(IContext context)
@@ -53,15 +56,21 @@ public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoo
         return context.Message switch
         {
             Started => OnStarted(context),
+            Stopping => OnStopping(context),
             ReceiveTimeout => OnReceiveTimeout(context),
             Perform<TAggregate> msg => OnPerform(msg, context),
             _ => Task.CompletedTask
         };
     }
 
-    Task OnReceiveTimeout(IContext context)
+    Task OnStopping(IContext _)
     {
         _logger.UnloadingAggregate(typeof(TAggregate));
+        return Task.CompletedTask;
+    }
+
+    static Task OnReceiveTimeout(IContext context)
+    {
         context.Poison(context.Self);
         return Task.CompletedTask;
     }
@@ -75,7 +84,10 @@ public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoo
             _eventSourceId = eventSourceId;
             var serviceProvider = await _getServiceProvider(tenantId);
             _aggregateWrapper = ActivatorUtilities.CreateInstance<AggregateWrapper<TAggregate>>(serviceProvider, _eventSourceId);
-            context.SetReceiveTimeout(_idleUnloadTimeout);
+            if (_idleUnloadTimeout > TimeSpan.Zero)
+            {
+                context.SetReceiveTimeout(_idleUnloadTimeout);
+            }
         }
         catch (Exception e)
         {
@@ -101,6 +113,14 @@ public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoo
         {
             Activity.Current?.RecordError(e);
             context.Respond(new Try<bool>(e));
+        }
+        finally
+        {
+            if (_idleUnloadTimeout == TimeSpan.Zero) // 0 means instantly unload
+            {
+                // ReSharper disable once MethodHasAsyncOverload - awaiting this will deadlock
+                context.Poison(context.Self);
+            }
         }
     }
 }
