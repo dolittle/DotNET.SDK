@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../tests.props" />
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Source\Aggregates\Aggregates.csproj" />
+    </ItemGroup>
+
+</Project>

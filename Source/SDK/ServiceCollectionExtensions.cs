@@ -2,10 +2,16 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.Proto;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Proto.Cluster;
+using Proto.OpenTelemetry;
 
 namespace Dolittle.SDK;
 
@@ -21,11 +27,24 @@ public static class ServiceCollectionExtensions
     /// <param name="setupClient">The optional <see cref="SetupDolittleClient"/> callback.</param>
     /// <param name="configureClient">The optional <see cref="ConfigureDolittleClient"/> callback.</param>
     /// <returns>The <see cref="IServiceCollection"/> for continuation.</returns>
-    public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient = default, ConfigureDolittleClient configureClient = default)
+    public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient = default,
+        ConfigureDolittleClient configureClient = default)
     {
         return services
             .AddDolittleOptions()
-            .AddDolittleClient(setupClient, configureClient);
+            .AddDolittleClient(setupClient, configureClient)
+            .AddProtoInfra(GetClusterKinds);
+    }
+
+    static IEnumerable<ClusterKind> GetClusterKinds(IServiceProvider serviceProvider)
+    {
+        var client = serviceProvider.GetRequiredService<IDolittleClient>() as DolittleClient;
+        var aggregateTypes = client
+            .AggregateRootTypes
+            .Types;
+
+        return aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
+            .Select(kind => kind.WithProps(props => props.WithTracing()));
     }
 
     static IServiceCollection AddDolittleOptions(this IServiceCollection services)
@@ -36,33 +55,37 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default, ConfigureDolittleClient configureClient = default)
+
+    static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default,
+        ConfigureDolittleClient configureClient = default)
     {
         var dolittleClient = DolittleClient.Setup(setupClient);
+
         return services
+            .AddSingleton(provider => ConfigureWithDefaultsFromServiceProvider(provider, configureClient))
             .AddSingleton(dolittleClient)
-            .AddHostedService(provider =>
-                new DolittleClientService(
-                    dolittleClient,
-                    ConfigureWithDefaultsFromServiceProvider(provider, configureClient),
-                    provider.GetRequiredService<ILogger<DolittleClientService>>()));
+            .AddSingleton(dolittleClient.EventTypes)
+            .AddHostedService(provider => new DolittleClientService(
+                dolittleClient,
+                provider.GetRequiredService<DolittleClientConfiguration>(),
+                provider.GetRequiredService<ILogger<DolittleClientService>>()));
     }
 
     static DolittleClientConfiguration ConfigureWithDefaultsFromServiceProvider(IServiceProvider provider, ConfigureDolittleClient configureClient = default)
     {
         var config = provider.GetService<IOptions<Configurations.Dolittle>>()?.Value;
-        
+
         var clientConfig = config is not null
             ? DolittleClientConfiguration.FromConfiguration(config)
             : new DolittleClientConfiguration();
 
         configureClient?.Invoke(clientConfig);
-        
+
         if (clientConfig.ServiceProvider is null)
         {
             clientConfig.WithServiceProvider(provider);
         }
-        
+
         return clientConfig;
     }
 }
