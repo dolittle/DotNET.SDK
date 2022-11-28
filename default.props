@@ -4,4 +4,10 @@
     <PropertyGroup>
         <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+    
 </Project>
