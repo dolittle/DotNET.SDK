@@ -38,7 +38,6 @@ static class AggregateRootMetadata<TAggregateRoot>
     /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
-    /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
     public static AggregateRootId GetAggregateRootId()
     {
@@ -53,7 +52,6 @@ static class AggregateRootMetadata<TAggregateRoot>
     /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
-    /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
     static AggregateRootType? GetAggregateRootType()
     {
