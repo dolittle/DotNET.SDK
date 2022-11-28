@@ -95,7 +95,14 @@ public class ModelBuilder : IModelBuilder
                 }
                 buildResults.AddFailure(sb.ToString());
             });
-        var ids = singlyBoundTypes.Select(_ => _.Key).Concat(singlyBoundProcessorBuilders.Select(_ => _.Key)).ToHashSet();
+
+        var ids = new HashSet<Guid>();
+        foreach (var id in singlyBoundTypes.Select(_ => _.Key).Concat(singlyBoundProcessorBuilders.Select(_ => _.Key)))
+        {
+            ids.Add(id);
+        }
+
+        // var ids = singlyBoundTypes.Select(_ => _.Key).Concat(singlyBoundProcessorBuilders.Select(_ => _.Key)).ToHashSet();
 
         foreach (var id in ids)
         {

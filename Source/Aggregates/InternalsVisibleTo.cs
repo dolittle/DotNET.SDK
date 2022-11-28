@@ -4,4 +4,4 @@
 using System.Runtime.CompilerServices;
 
 [assembly:InternalsVisibleTo("Dolittle.SDK")]
-[assembly:InternalsVisibleTo("Aggregates")]
+[assembly:InternalsVisibleTo("Dolittle.SDK.Aggregates.Tests")]

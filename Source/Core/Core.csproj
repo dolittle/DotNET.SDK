@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../netstandard.props" />
+
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK.Core</AssemblyName>
+        <RootNamespace>Dolittle.SDK</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Artifacts\Artifacts.csproj" />
+    </ItemGroup>
+
+</Project>

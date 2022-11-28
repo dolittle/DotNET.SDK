@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 // See https://www.mking.net/blog/error-cs0518-isexternalinit-not-defined
-#if NETCOREAPP3_0 || NETCOREAPP3_1
+#if NETSTANDARD2_0 || NETCOREAPP3_0 || NETCOREAPP3_1
 
 using System.ComponentModel;
 

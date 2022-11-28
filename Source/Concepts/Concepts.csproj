@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../default.props" />
+  <Import Project="../../netstandard.props" />
 
   <PropertyGroup>
-    <AssemblyName>Dolittle.SDK.Concepts</AssemblyName>
+      <AssemblyName>Dolittle.SDK.Concepts</AssemblyName>
   </PropertyGroup>
 
 </Project>

@@ -29,16 +29,26 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
         _extras = extras;
     }
 
-    /// <inheritdoc />
-    public override bool Equals(object obj)
+    protected bool Equals(Identifier<TId, TExtras> other) => base.Equals(other) && EqualityComparer<TExtras>.Default.Equals(_extras, other._extras);
+
+    public override bool Equals(object? obj)
     {
-        return base.Equals(obj)
-            && obj is Identifier<TId, TExtras> other
-            && _extras.Equals(other._extras);
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((Identifier<TId, TExtras>)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (base.GetHashCode() * 397) ^ EqualityComparer<TExtras>.Default.GetHashCode(_extras);
+        }
     }
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Id, _extras);
+    // public override int GetHashCode() => HashCode.Combine(Id, _extras);
     
     /// <inheritdoc />
     public override string ToString() => $"{Tag}({Id.Value} {ExtrasAsString()})";

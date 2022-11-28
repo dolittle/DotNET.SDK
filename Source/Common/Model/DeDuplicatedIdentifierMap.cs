@@ -21,8 +21,11 @@ public class DeDuplicatedIdentifierMap<TValue> : IdentifierMap<TValue>
     /// <param name="onDuplicate">The <see cref="OnDuplicateBindingsCallback{TValue}"/> to perform on duplicated bindings.</param>
     public DeDuplicatedIdentifierMap(IdentifierMap<TValue> map, OnDuplicateBindingsCallback<TValue> onDuplicate = default)
     {
-        foreach (var (identifierId, bindings) in map)
+        foreach (var kv in map)
         {
+            var identifierId = kv.Key;
+            var bindings = kv.Value;
+            
             var countedBindings = bindings.GroupBy(binding => binding, (binding, bindings) => new CountedBindings(binding, bindings.Count())).ToArray();
             PerformCallbackOnDuplicateBindings(countedBindings, onDuplicate);
             Add(identifierId, countedBindings.Select(_ => _.Binding).ToList());

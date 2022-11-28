@@ -92,5 +92,10 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
 
     /// <inheritdoc />
     public override int GetHashCode()
-        => HashCode.Combine(Id, Generation);
+    {
+        unchecked
+        {
+            return (EqualityComparer<TId>.Default.GetHashCode(Id) * 397) ^ Generation.GetHashCode();
+        }
+    }
 }

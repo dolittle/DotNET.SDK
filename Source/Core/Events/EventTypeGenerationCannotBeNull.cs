@@ -17,5 +17,6 @@ public class EventTypeGenerationCannotBeNull : Exception
     public EventTypeGenerationCannotBeNull()
         : base($"The {nameof(Generation)} of an {nameof(EventType)} cannot be null")
     {
+        
     }
 }
