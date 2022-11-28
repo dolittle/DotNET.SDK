@@ -2,6 +2,12 @@
 
     <Import Project="../../tests.props" />
 
+    <PropertyGroup>
+        <RootNamespace>Dolittle.SDK.Aggregates</RootNamespace>
+        <AssemblyName>Dolittle.SDK.Aggregates.Tests</AssemblyName>
+    </PropertyGroup>
+
+
     <ItemGroup>
       <ProjectReference Include="..\..\Source\Aggregates\Aggregates.csproj" />
     </ItemGroup>

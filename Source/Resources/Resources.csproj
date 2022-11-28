@@ -8,6 +8,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="OpenTelemetry" Version="$(OpenTelemetryVersion)" />
         <PackageReference Include="MongoDB.Driver" Version="$(MongoDBDriverVersion)" />
         <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="$(MongoDBOpenTelemetryVersion)" />
         <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
