@@ -1,7 +1,7 @@
 name: .NET Library CI/CD
 
 env:
-  PRERELEASE_BRANCHES: gandalf # Comma separated list of prerelease branch names. 'alpha,rc, ...'
+  PRERELEASE_BRANCHES: elrond # Comma separated list of prerelease branch names. 'alpha,rc, ...'
   NUGET_OUTPUT: Artifacts/NuGet
   COVERAGE_FOLDER: Coverage
 
