@@ -141,6 +141,32 @@ class SomeProjection
             .WithArguments("Projection", "projectionId", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
+    
+    [Fact]
+    public async Task FixesAggregates()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+
+[AggregateRoot(alias: ""Foo"", id: ""invalid-id"")]
+class SomeAggregate
+{
+}";
+
+        var expected = @"
+using Dolittle.SDK.Aggregates;
+
+[AggregateRoot(alias: ""Foo"", id: ""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeAggregate
+{
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+
+        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+            .WithSpan(4, 2, 4, 47)
+            .WithArguments("AggregateRoot", "id", @"""invalid-id""");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
 
 }
 
