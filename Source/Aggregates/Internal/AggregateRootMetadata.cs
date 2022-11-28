@@ -57,7 +57,7 @@ static class AggregateRootMetadata<TAggregateRoot>
     {
         var aggregateRootType = typeof(TAggregateRoot);
         var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
-        return aggregateRootAttribute?.Type;
+        return aggregateRootAttribute?.GetIdentifier(aggregateRootType);
     }
 
     static IReadOnlyDictionary<Type, MethodInfo> CreateMethodsPerEventType(Type aggregateRootType)
