@@ -20,16 +20,14 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
 {
-    const string Title = "Missing identity in attribute";
-    const string InvalidTitle = "Invalid identity in attribute";
-    const string MessageFormat = "Attribute '{0}' is missing an identity";
-    const string InvalidMessageFormat = "Attribute '{0}' {1}: '{2}' is not a valid Guid";
-
+    const string Title = "Invalid identity in attribute";
+    const string MessageFormat = "Attribute '{0}' {1}: '{2}' is not a valid Guid";
     const string Description = "Add a Guid identity";
 
-    internal static readonly DiagnosticDescriptor MissingIdentityRule =
+
+    internal static readonly DiagnosticDescriptor InvalidIdentityRule =
         new(
-            DiagnosticIds.AnnotationMissingIdentityRuleId,
+            DiagnosticIds.AnnotationInvalidIdentityRuleId,
             Title,
             MessageFormat,
             DiagnosticCategories.Sdk,
@@ -37,17 +35,7 @@ public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
             isEnabledByDefault: true,
             description: Description);
 
-    internal static readonly DiagnosticDescriptor InvalidIdentityRule =
-        new(
-            DiagnosticIds.AnnotationInvalidIdentityRuleId,
-            InvalidTitle,
-            InvalidMessageFormat,
-            DiagnosticCategories.Sdk,
-            DiagnosticSeverity.Warning,
-            isEnabledByDefault: true,
-            description: Description);
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(MissingIdentityRule, InvalidIdentityRule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InvalidIdentityRule);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -81,46 +69,14 @@ public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
     void CheckAttributeIdentity(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context)
     {
         var identityParameter = symbol.Parameters[0];
-        if (attribute.TryGetArgumentValue(identityParameter, out var id))
+        if (!attribute.TryGetArgumentValue(identityParameter, out var id)) return;
+        var identityText = id.GetText().ToString();
+
+        if (!Guid.TryParse(identityText.Trim('"'), out _))
         {
-            var text = id.GetText();
-            if (!Guid.TryParse(text.ToString().Trim('"'), out _))
-            {
-                var properties = ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
-                context.ReportDiagnostic(Diagnostic.Create(InvalidIdentityRule, attribute.GetLocation(), properties,
-                    attribute.Name.ToString(), identityParameter.Name, text.ToString()));
-            }
-        }
-        else
-        {
-            context.ReportDiagnostic(Diagnostic.Create(MissingIdentityRule, attribute.GetLocation(), attribute.Name.ToString()));
+            var properties = ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
+            context.ReportDiagnostic(Diagnostic.Create(InvalidIdentityRule, attribute.GetLocation(), properties,
+                attribute.Name.ToString(), identityParameter.Name, identityText));
         }
     }
-
-    // void SemanticAnalysis(SemanticModelAnalysisContext context)
-    // {
-    //     context.SemanticModel.
-    //     
-    //     Console.WriteLine(runId+": " + context);
-    // }
-
-    // static void CodeBlockAction(CodeBlockAnalysisContext codeBlockContext)
-    // {
-    //     // We only care about method bodies.
-    //     if (codeBlockContext.OwningSymbol is)
-    //     {
-    //         return;
-    //     }
-    //
-    //     // Report diagnostic for void non-virtual methods with empty method bodies.
-    //     var method = (IMethodSymbol)codeBlockContext.OwningSymbol;
-    //     var block = (BlockSyntax)codeBlockContext.CodeBlock.ChildNodes().FirstOrDefault(n => n.Kind() == SyntaxKind.Block);
-    //     if (method.ReturnsVoid && !method.IsVirtual && block != null && block.Statements.Count == 0)
-    //     {
-    //         var tree = block.SyntaxTree;
-    //         var location = method.Locations.First(l => tree.Equals(l.SourceTree));
-    //         var diagnostic = Diagnostic.Create(Rule, location, method.Name);
-    //         codeBlockContext.ReportDiagnostic(diagnostic);
-    //     }
-    // }
 }

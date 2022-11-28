@@ -8,6 +8,5 @@ public static class DiagnosticIds
     /// <summary>
     /// Annotation missing the required ID.
     /// </summary>
-    public const string AnnotationMissingIdentityRuleId = "SDK0001";
-    public const string AnnotationInvalidIdentityRuleId = "SDK0002";
+    public const string AnnotationInvalidIdentityRuleId = "SDK0001";
 }
