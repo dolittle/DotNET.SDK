@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Aggregates;
 using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Tenancy;
-using FluentAssertions;
 
-namespace Aggregates;
+namespace Dolittle.SDK.Aggregates;
 
 public class ClusterIdentityMapperTests
 {

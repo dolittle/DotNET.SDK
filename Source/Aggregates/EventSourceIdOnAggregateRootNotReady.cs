@@ -15,8 +15,11 @@ public class EventSourceIdOnAggregateRootNotReady : Exception
     /// Initializes a new instance of the <see cref="EventSourceIdOnAggregateRootNotReady"/> class.
     /// </summary>
     /// <param name="aggregateRootType">The <see cref="Type"/> of the aggregate root.</param>
+#pragma warning disable CS0618
     public EventSourceIdOnAggregateRootNotReady(Type aggregateRootType)
         : base($"Event Source has not yet been set on the {aggregateRootType} aggregate root instance. This typically happens when trying to use the {nameof(AggregateRoot.EventSourceId)} property in the constructor." +
             $" If this is important then all you need to do is to include in the public constructor a parameter with the {typeof(EventSourceId)} type and use that in the bast constructor, then the {nameof(AggregateRoot.EventSourceId)} property will be accessible in the constructor.")
-    {}
+    {
+    }
 }
+#pragma warning restore CS0618
