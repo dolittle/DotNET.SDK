@@ -89,6 +89,58 @@ class SomeEvent
             .WithArguments("EventType", "eventTypeId", @"""""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
+    
+    [Fact]
+    public async Task FixesEventHandlers()
+    {
+        var test = @"
+using Dolittle.SDK.Events.Handling;
+
+[EventHandler(alias: ""Foo"", eventHandlerId: ""invalid-id"")]
+class SomeHandler
+{
+}";
+
+        var expected = @"
+using Dolittle.SDK.Events.Handling;
+
+[EventHandler(alias: ""Foo"", eventHandlerId: ""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeHandler
+{
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+
+        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+            .WithSpan(4, 2, 4, 58)
+            .WithArguments("EventHandler", "eventHandlerId", @"""invalid-id""");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
+    
+    [Fact]
+    public async Task FixesProjections()
+    {
+        var test = @"
+using Dolittle.SDK.Projections;
+
+[Projection(alias: ""Foo"", projectionId: ""invalid-id"")]
+class SomeProjection
+{
+}";
+
+        var expected = @"
+using Dolittle.SDK.Projections;
+
+[Projection(alias: ""Foo"", projectionId: ""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeProjection
+{
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+
+        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+            .WithSpan(4, 2, 4, 54)
+            .WithArguments("Projection", "projectionId", @"""invalid-id""");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
 
 }
 

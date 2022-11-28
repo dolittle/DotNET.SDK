@@ -62,11 +62,13 @@ public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
         if (context.SemanticModel.GetSymbolInfo(attribute).Symbol is not IMethodSymbol symbol) return;
         if (!symbol.IsDolittleType()) return;
 
+
         switch (symbol.ToDisplayString())
         {
             case "Dolittle.SDK.Events.EventTypeAttribute.EventTypeAttribute(string, uint, string)":
             case "Dolittle.SDK.Events.Handling.EventHandlerAttribute.EventHandlerAttribute(string, bool, string, string)":
             case "Dolittle.SDK.Aggregates.AggregateRootAttribute.AggregateRootAttribute(string, string)":
+            case "Dolittle.SDK.Projections.ProjectionAttribute.ProjectionAttribute(string, string, string)":
                 CheckAttributeIdentity(attribute, symbol, context);
                 return;
 
