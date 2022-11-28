@@ -102,8 +102,6 @@ public class ModelBuilder : IModelBuilder
             ids.Add(id);
         }
 
-        // var ids = singlyBoundTypes.Select(_ => _.Key).Concat(singlyBoundProcessorBuilders.Select(_ => _.Key)).ToHashSet();
-
         foreach (var id in ids)
         {
             var (coexistentTypes, conflictingTypes) = SplitCoexistingAndConflictingBindings(singlyBoundTypes, id);
