@@ -16,13 +16,13 @@ public class AnnotationIdentityCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AnnotationInvalidIdentityRuleId);
 
-    public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+    public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var document = context.Document;
         var diagnostic = context.Diagnostics[0];
         if (!diagnostic.Properties.TryGetValue("identityParameter", out var identityParameterName))
         {
-            return;
+            return Task.CompletedTask;
         }
 
         switch (diagnostic.Id)
@@ -34,9 +34,9 @@ public class AnnotationIdentityCodeFixProvider : CodeFixProvider
                         nameof(AnnotationIdentityCodeFixProvider) + ".AddIdentity"),
                     diagnostic);
                 break;
-            default:
-                break;
         }
+
+        return Task.CompletedTask;
     }
 
 
