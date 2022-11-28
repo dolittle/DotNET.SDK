@@ -55,12 +55,6 @@ jobs:
         run: dotnet dotcover test --dcXML=coverage.xml
       - name: Create Cobertura test coverage report
         run: reportgenerator -reports:CoverageReport.xml -targetdir:./ -reporttypes:Cobertura -filefilters:'-*.g.cs'
-      - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v2.7.5
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_PROJECT_TOKEN }}
-        with:
-          coverageLocations: ${{github.workspace}}/Cobertura.xml:cobertura
       - name: Create release notes
         id: create-release-notes
         if: ${{ steps.context.outputs.should-publish == 'true' }}
