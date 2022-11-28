@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Internal;
@@ -19,6 +20,7 @@ public abstract class AggregateRoot
 {
     readonly List<AppliedEvent> _appliedEvents = new();
     EventSourceId? _eventSourceId;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
     /// </summary>
@@ -29,6 +31,7 @@ public abstract class AggregateRoot
     {
         EventSourceId = eventSourceId;
     }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
     /// </summary>
@@ -73,7 +76,7 @@ public abstract class AggregateRoot
     /// Gets the <see cref="IEnumerable{T}" /> of applied events to commit.
     /// </summary>
     public IEnumerable<AppliedEvent> AppliedEvents => _appliedEvents;
-    
+
     bool IsStateless { get; }
 
     /// <summary>
@@ -161,7 +164,19 @@ public abstract class AggregateRoot
     /// </summary>
     /// <param name="batches">The <see cref="IAsyncEnumerator{T}"/> batches of <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> used for cancelling the rehydration.</param>
-    public async Task Rehydrate(IAsyncEnumerable<CommittedAggregateEvents> batches, CancellationToken cancellationToken)
+    public Task Rehydrate(IAsyncEnumerable<CommittedAggregateEvents> batches, CancellationToken cancellationToken)
+    {
+        return RehydrateInternal(batches, AggregateRootExtensions.GetHandleMethodsFor(GetType()), cancellationToken);
+    }
+
+    /// <summary>
+    /// Rehydrates the aggregate root with the <see cref="CommittedAggregateEvents"/> for this aggregate.
+    /// </summary>
+    /// <param name="batches">The <see cref="IAsyncEnumerator{T}"/> batches of <see cref="CommittedAggregateEvents"/> to rehydrate with.</param>
+    /// <param name="onMethods">Mutation (On) methods</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> used for cancelling the rehydration.</param>
+    internal async Task RehydrateInternal(IAsyncEnumerable<CommittedAggregateEvents> batches, IReadOnlyDictionary<Type, MethodInfo> onMethods,
+        CancellationToken cancellationToken)
     {
         var hasBatches = false;
         var expectedVersion = AggregateRootVersion.Initial;
@@ -175,17 +190,23 @@ public abstract class AggregateRoot
             {
                 break;
             }
+
             foreach (var @event in batch)
             {
                 Version = @event.AggregateRootVersion + 1;
-                InvokeOnMethod(@event.Content);
+                var eventContent = @event.Content;
+                if (onMethods.TryGetValue(eventContent.GetType(), out var handleMethod))
+                {
+                    handleMethod.Invoke(this, new[] { eventContent });
+                }
             }
         }
+
         if (!hasBatches)
         {
             throw new NoCommittedAggregateEventsBatches(AggregateRootId, EventSourceId);
         }
-        
+
         Version = expectedVersion;
         cancellationToken.ThrowIfCancellationRequested();
     }
@@ -226,5 +247,10 @@ public abstract class AggregateRoot
         {
             throw new EventWasAppliedToOtherEventSource(events.EventSource, EventSourceId);
         }
+    }
+    
+    internal void ClearAppliedEvents()
+    {
+        _appliedEvents.Clear();
     }
 }

@@ -2,10 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/csharp/
 
-using System;
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = Host.CreateDefaultBuilder()

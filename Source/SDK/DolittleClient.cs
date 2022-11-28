@@ -10,6 +10,7 @@ using System.Net.Http;
 #endif
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Builders;
@@ -68,7 +69,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
     IProjectionStoreBuilder _projectionStoreBuilder;
-    IEventTypes _eventTypes;
     IEmbeddings _embeddingStoreBuilder;
     ITenantScopedProviders _services;
 
@@ -106,6 +106,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     {
         _buildResults = buildResults;
         _unregisteredEventTypes = unregisteredEventTypes;
+        EventTypes = _unregisteredEventTypes;
         _unregisteredAggregateRoots = unregisteredAggregateRoots;
         _unregisteredEventFilters = unregisteredEventFilters;
         _unregisteredEventHandlers = unregisteredEventHandlers;
@@ -121,12 +122,10 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <inheritdoc />
     public Task Connected => _connectedCompletionSource.Task;
 
+    internal IAggregateRootTypes AggregateRootTypes => _unregisteredAggregateRoots;
+    
     /// <inheritdoc />
-    public IEventTypes EventTypes
-    {
-        get => GetOrThrowIfNotConnected(_eventTypes);
-        private set => _eventTypes = value;
-    }
+    public IEventTypes EventTypes { get; }
 
     /// <inheritdoc />
     public IEventStoreBuilder EventStore
@@ -322,7 +321,6 @@ public class DolittleClient : IDisposable, IDolittleClient
         _eventsToProtobufConverter = new EventToProtobufConverter(serializer);
         _eventToSDKConverter = new EventToSDKConverter(serializer);
 
-        EventTypes = _unregisteredEventTypes;
         EventStore = new EventStoreBuilder(
             methodCaller,
             _eventsToProtobufConverter,
@@ -333,12 +331,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             _callContextResolver,
             _unregisteredEventTypes,
             loggerFactory);
-        Aggregates = new AggregatesBuilder(
-            _eventStore,
-            _unregisteredEventTypes,
-            new AggregateRoots(loggerFactory.CreateLogger<AggregateRoots>()),
-            tenant => Services.ForTenant(tenant),
-            loggerFactory);
+        Aggregates = new AggregatesBuilder(tenant => Services.ForTenant(tenant));
         EventHorizons = new EventHorizons(
             methodCaller,
             executionContext,
@@ -378,7 +371,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             new AggregateRootsClient(
                 methodCaller,
                 executionContext,
-                loggerFactory.CreateLogger<AggregateRoots>()),   
+                loggerFactory.CreateLogger<AggregateRootsClient>()),   
             _clientCancellationTokenSource.Token).ConfigureAwait(false);
         StartEventProcessors(methodCaller, pingInterval, executionContext, loggerFactory);
     }

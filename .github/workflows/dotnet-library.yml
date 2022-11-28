@@ -1,7 +1,7 @@
 name: .NET Library CI/CD
 
 env:
-  PRERELEASE_BRANCHES: boromir # Comma separated list of prerelease branch names. 'alpha,rc, ...'
+  PRERELEASE_BRANCHES: elrond # Comma separated list of prerelease branch names. 'alpha,rc, ...'
   NUGET_OUTPUT: Artifacts/NuGet
   COVERAGE_FOLDER: Coverage
 
@@ -18,11 +18,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup .Net
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: |
+            6.0.x
+            7.0.x
       - name: Setup dotCover
         run: dotnet tool install JetBrains.dotCover.GlobalTool -g
       - name: Setup report generator
@@ -55,12 +57,6 @@ jobs:
         run: dotnet dotcover test --dcXML=coverage.xml
       - name: Create Cobertura test coverage report
         run: reportgenerator -reports:CoverageReport.xml -targetdir:./ -reporttypes:Cobertura -filefilters:'-*.g.cs'
-      - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v2.7.5
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_PROJECT_TOKEN }}
-        with:
-          coverageLocations: ${{github.workspace}}/Cobertura.xml:cobertura
       - name: Create release notes
         id: create-release-notes
         if: ${{ steps.context.outputs.should-publish == 'true' }}
@@ -72,7 +68,7 @@ jobs:
           output-format: msbuild
       - name: Create packages
         if: ${{ steps.context.outputs.should-publish == 'true' }}
-        run: dotnet pack --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:Version=${{ steps.increment-version.outputs.next-version }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:PackageReleaseNotes="${{ steps.create-release-notes.outputs.plaintext }}"
+        run: dotnet pack --configuration Release -o ${{ env.NUGET_OUTPUT }} -p:Version=${{ steps.increment-version.outputs.next-version }} -p:PackageVersion=${{ steps.increment-version.outputs.next-version }} -p:PackageReleaseNotes="${{ steps.create-release-notes.outputs.plaintext }}"
 
       - name: Prepend to Changelog
         if: ${{ steps.context.outputs.should-publish == 'true' && steps.context.outputs.release-type != 'prerelease' }}

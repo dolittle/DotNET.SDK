@@ -30,6 +30,7 @@ public interface IConfigurationBuilder
     /// <returns>the client configuration builder for continuation.</returns>
     /// <remarks>If not specified, host 'localhost' and port 50053 will be used.</remarks>
     public IConfigurationBuilder WithRuntimeOn(string host, ushort port);
+
     /// <summary>
     /// Sets the <see cref="ILoggerFactory"/> to use for creating instances of <see cref="ILogger"/> for the client configuration.
     /// </summary>
@@ -58,6 +59,13 @@ public interface IConfigurationBuilder
     /// <param name="interval">The ping interval.</param>
     /// <returns>the client configuration builder for continuation.</returns>
     public IConfigurationBuilder WithPingInterval(TimeSpan interval);
+
+    /// <summary>
+    /// Sets how long should the aggregates be kept in memory when not in use.
+    /// </summary>
+    /// <param name="timeout">Duration to keep aggregates in memory when idle. -1 ms to never unload them.</param>
+    /// <returns></returns>
+    public IConfigurationBuilder WithAggregateIdleTimout(TimeSpan timeout);
 
     /// <summary>
     /// Configures the root <see cref="IServiceProvider"/> for the <see cref="IDolittleClient"/>.

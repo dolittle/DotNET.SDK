@@ -3,6 +3,7 @@
 
 #nullable enable
 using System;
+using System.Threading;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Microservices;
@@ -38,6 +39,11 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public TimeSpan PingInterval { get; private set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
+    /// How long should the aggregates be kept in memory when not in use.
+    /// </summary>
+    public TimeSpan AggregateIdleTimeout { get; private set; } = TimeSpan.FromSeconds(20);
+
+    /// <summary>
     /// Gets the event serializer provider.
     /// </summary>
     public Func<JsonSerializerSettings> EventSerializerProvider { get; private set; } = () => new JsonSerializerSettings();
@@ -61,7 +67,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// Gets the <see cref="ConfigureTenantServices"/> callback.
     /// </summary>
     public ConfigureTenantServices? ConfigureTenantServices { get; private set; }
-    
+
     /// <summary>
     /// Gets the <see cref="CreateTenantServiceProvider"/> factory.
     /// </summary>
@@ -75,7 +81,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public static DolittleClientConfiguration FromConfiguration(Configurations.Dolittle config)
     {
         var result = new DolittleClientConfiguration();
-        
+
         if (!string.IsNullOrEmpty(config.Runtime.Host))
         {
             result.RuntimeHost = config.Runtime.Host!;
@@ -89,6 +95,14 @@ public class DolittleClientConfiguration : IConfigurationBuilder
         if (config.PingInterval.HasValue)
         {
             result.PingInterval = TimeSpan.FromSeconds(config.PingInterval.Value);
+        }
+
+        if (config.AggregateIdleTimout.HasValue)
+        {
+            result.AggregateIdleTimeout =
+                config.AggregateIdleTimout.Value == -1
+                    ? Timeout.InfiniteTimeSpan
+                    : TimeSpan.FromSeconds(config.AggregateIdleTimout.Value);
         }
 
         if (!string.IsNullOrEmpty(config.HeadVersion))
@@ -107,14 +121,14 @@ public class DolittleClientConfiguration : IConfigurationBuilder
 
         return result;
     }
-    
+
     /// <inheritdoc />
     public IConfigurationBuilder WithVersion(Version version)
     {
         Version = version;
         return this;
     }
-    
+
     /// <inheritdoc />
     public IConfigurationBuilder WithRuntimeOn(string host, ushort port)
     {
@@ -164,10 +178,17 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     }
 
     /// <inheritdoc />
+    public IConfigurationBuilder WithAggregateIdleTimout(TimeSpan timeout)
+    {
+        AggregateIdleTimeout = timeout;
+        return this;
+    }
+
+    /// <inheritdoc />
     public IConfigurationBuilder WithServiceProvider(IServiceProvider serviceProvider)
     {
         ServiceProvider = serviceProvider;
-        
+
         return this;
     }
 

@@ -7,6 +7,9 @@ using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
 
+/// <summary>
+/// Configuration options for OpenTelemetry tracing and logging
+/// </summary>
 public record OpenTelemetrySettings
 {
     /// <summary>

@@ -26,7 +26,7 @@ public static class ActivityExtensions
         activity.SetTag(EventType, eventType.Id.Value);
         if (eventType.HasAlias)
         {
-            activity.SetTag(EventTypeAlias, eventType.Alias.Value);
+            activity.SetTag(EventTypeAlias, eventType.Alias!.Value);
         }
 
         return activity;

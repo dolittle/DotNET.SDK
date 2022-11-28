@@ -1,3 +1,25 @@
+# [19.0.0] - 2022-11-25 [PR: #173](https://github.com/dolittle/DotNET.SDK/pull/173)
+## Summary
+
+Major performance improvements to aggregates. They are now sequentially handled in actors and kept in-memory for subsequent operations.
+Upgraded to dotnet 7
+Improved trace coverage with additional traced defaults (MongoDB, AspNetCore)
+
+### Added
+
+- Dotnet 7 builds
+- Dependency on Proto.Cluster
+- Additional tracing out of the box (MongoDB, AspNetCore)
+
+### Fixed
+
+- Concurrent operations on aggregates are no longer going to throw, and will instead be handled sequentially.
+
+### Removed
+
+- Dotnet 5 builds
+
+
 # [18.1.1] - 2022-10-31 [PR: #164](https://github.com/dolittle/DotNET.SDK/pull/164)
 ## Summary
 

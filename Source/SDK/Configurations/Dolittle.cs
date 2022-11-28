@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #nullable enable
+using System;
+
 namespace Dolittle.SDK.Configurations;
 
 /// <summary>
@@ -23,6 +25,11 @@ public class Dolittle
     /// The ping interval to use for reverse call clients.
     /// </summary>
     public ushort? PingInterval { get; set; }
+
+    /// <summary>
+    /// How many seconds should the aggregates be kept in memory when not in use. -1 is forever, 0 will instantly remove them. 
+    /// </summary>
+    public int? AggregateIdleTimout { get; set; }
 
     /// <summary>
     /// The OpenTelemetry configuration.

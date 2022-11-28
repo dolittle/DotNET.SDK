@@ -2,11 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Aggregates.Internal;
-using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store.Builders;
 using Dolittle.SDK.Tenancy;
-using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Aggregates.Builders;
 
@@ -15,30 +11,18 @@ namespace Dolittle.SDK.Aggregates.Builders;
 /// </summary>
 public class AggregatesBuilder : IAggregatesBuilder
 {
-    readonly IEventTypes _eventTypes;
-    readonly IAggregateRoots _aggregateRoots;
     readonly Func<TenantId, IServiceProvider> _getServiceProvider;
-    readonly IEventStoreBuilder _eventStoreBuilder;
-    readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregatesBuilder"/> class.
     /// </summary>
-    /// <param name="eventStoreBuilder">The <see cref="IEventStoreBuilder" />.</param>
-    /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
-    /// <param name="aggregateRoots">The <see cref="IAggregateRoots"/>.</param>
     /// <param name="getServiceProvider">The <see cref="Func{TResult}"/> for getting the tenant scoped <see cref="IServiceProvider"/> for a <see cref="TenantId"/>.</param>
-    /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
-    public AggregatesBuilder(IEventStoreBuilder eventStoreBuilder, IEventTypes eventTypes, IAggregateRoots aggregateRoots, Func<TenantId, IServiceProvider> getServiceProvider, ILoggerFactory loggerFactory)
+    public AggregatesBuilder(Func<TenantId, IServiceProvider> getServiceProvider)
     {
-        _eventTypes = eventTypes;
-        _aggregateRoots = aggregateRoots;
         _getServiceProvider = getServiceProvider;
-        _eventStoreBuilder = eventStoreBuilder;
-        _loggerFactory = loggerFactory;
     }
 
     /// <inheritdoc />
     public IAggregates ForTenant(TenantId tenant)
-        => new Aggregates(_eventStoreBuilder.ForTenant(tenant), _eventTypes, _aggregateRoots, _getServiceProvider(tenant), _loggerFactory);
+        => new Aggregates(_getServiceProvider(tenant));
 }

@@ -1,33 +1,13 @@
 <Project>
-    <Import Project="versions.props"/>
+    <Import Project="base.props"/>
     
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <LangVersion>latest</LangVersion>
-        <RepositoryUrl>https://github.com/dolittle/DotNET.SDK</RepositoryUrl>
-        <PackageProjectUrl>https://dolittle.io</PackageProjectUrl>
-        <PackageReleaseNotes>https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md</PackageReleaseNotes>
-        <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
-        <NoWarn>$(NoWarn);SYSLIB1002;SYSLIB1006;SYSLIB1007</NoWarn>
-        <Nullable>enable</Nullable>
-
-        <Description>Dolittle is a decentralized, distributed, event-driven microservice platform built to harness the power of events.</Description>
-        <PackageTags>Dolittle;Events;Event Sourcing;Domain Driven Design;Event Driven Architecture;Line of Business;ES;DDD;EDA;LOB</PackageTags>
-        <PackageIcon>logo.png</PackageIcon>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Copyright>Copyright Dolittle</Copyright>
-        <Authors>all contributors</Authors>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Nullable>enable</Nullable>
+        <TargetFrameworks>netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
     
-    <ItemGroup>
-        <None Include="$(MSBuildThisFileDirectory)/Assets/logo.png" Pack="true" PackagePath="/logo.png" />
-        <None Include="$(MSBuildThisFileDirectory)/Assets/PACKAGE-README.md" Pack="true" PackagePath="/README.md" />
-    </ItemGroup>
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
     
-    <ItemGroup>
-        <Compile Include="$(MSBuildThisFileDirectory)/LegacySupport/IsExternalInit.cs" Condition="'$(TargetFramework)' == 'netcoreapp3.0' OR '$(TargetFramework)' == 'netcoreapp3.1'" />
-    </ItemGroup>
 </Project>

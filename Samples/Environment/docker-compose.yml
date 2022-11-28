@@ -4,30 +4,34 @@ services:
     image: dolittle/mongodb
     hostname: mongo
     volumes:
-      - ${PWD}/data:/data
+      - ./data:/data
     ports:
       - 27017:27017
  
   runtime-basic:
-    image: dolittle/runtime:5.3.5
+    image: dolittle/runtime:8.7.2
+    environment:
+      DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION: "V7"
     volumes:
-      - ${PWD}/resources-basic.json:/app/.dolittle/resources.json
-      - ${PWD}/tenants.json:/app/.dolittle/tenants.json
-      - ${PWD}/microservices.json:/app/.dolittle/microservices.json
-      - ${PWD}/event-horizon-consents.json:/app/.dolittle/event-horizon-consents.json
-      - ${PWD}/appsettings.json:/app/appsettings.json
+      - ./resources-basic.json:/app/.dolittle/resources.json
+      - ./tenants.json:/app/.dolittle/tenants.json
+      - ./microservices.json:/app/.dolittle/microservices.json
+      - ./event-horizon-consents.json:/app/.dolittle/event-horizon-consents.json
+      - ./appsettings.json:/app/appsettings.json
     ports:
       - 9700:9700
       - 50052:50052
       - 50053:50053
 
   runtime-eventhorizon:
-    image: dolittle/runtime:5.3.5
+    image: dolittle/runtime:8.7.2
+    environment:
+      DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION: "V7"
     volumes:
-      - ${PWD}/resources-eventhorizon.json:/app/.dolittle/resources.json
-      - ${PWD}/tenants.json:/app/.dolittle/tenants.json
-      - ${PWD}/microservices.json:/app/.dolittle/microservices.json
-      - ${PWD}/appsettings.json:/app/appsettings.json
+      - ./resources-eventhorizon.json:/app/.dolittle/resources.json
+      - ./tenants.json:/app/.dolittle/tenants.json
+      - ./microservices.json:/app/.dolittle/microservices.json
+      - ./appsettings.json:/app/appsettings.json
     ports:
       - 9701:9700
       - 50054:50052
