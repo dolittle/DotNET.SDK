@@ -23,7 +23,7 @@ class SomeEvent
         {
             Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
                 .WithLocation(4, 2)
-                .WithArguments("EventType","\"\"")
+                .WithArguments("EventType", "\"\"")
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -42,7 +42,7 @@ class SomeEvent
         {
             Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
                 .WithLocation(2, 2)
-                .WithArguments("Dolittle.SDK.Events.EventType","\"\""),
+                .WithArguments("Dolittle.SDK.Events.EventType", "\"\""),
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -89,7 +89,7 @@ class SomeEvent
         {
             Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
                 .WithSpan(2, 2, 2, 80)
-                .WithArguments("Dolittle.SDK.Events.EventType","\"c6f87322-be67-4aaf\"")
+                .WithArguments("Dolittle.SDK.Events.EventType", "\"c6f87322-be67-4aaf\"")
         };
 
         await VerifyAnalyzerAsync(test, expected);

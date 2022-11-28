@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
-using Roslynator.Testing.CSharp.Xunit;
 
-namespace Dolittle.SDK.Analyzers.CodeFixes;
+namespace Dolittle.SDK.Analyzers;
 
 public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<TAnalyzer>
     where TCodeFix : CodeFixProvider, new()
@@ -36,25 +34,5 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
             },
             FixedCode = expectedResult,
         }.RunAsync(CancellationToken.None);
-        // var verifier = new CSharpCodeFixVerifier<TAnalyzer, TCodeFix, XUnitVerifier>();
-        // verifier.
-        //
-        // return CodeFixVerifier<TAnalyzer, TCodeFix>.VerifyCodeFixAsync(source, diagnosticResult, expectedResult);
-
-        // var expected = new ExpectedTestState(expectedResult);
-        // var data = new CompilerDiagnosticFixTestData(DiagnosticId, source);
-        //
-        //
-        //
-        //
-        // return VerifyFixAsync(
-        //     data,
-        //     expected,
-        //     Options.WithMetadataReferences(
-        //         Options.MetadataReferences.AddRange(
-        //             MetadataReference.CreateFromFile(typeof(Aggregates.AggregateRootType).Assembly.Location),
-        //             MetadataReference.CreateFromFile(typeof(AnnotationIdentityCodeFixProvider).Assembly.Location)))
-        //         .,
-        //     );
     }
 }
