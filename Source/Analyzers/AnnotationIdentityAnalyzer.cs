@@ -11,12 +11,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dolittle.SDK.Analyzers;
 
 /// <summary>
-/// Analyzer for reporting code block diagnostics.
-/// It reports diagnostics for all redundant methods which have an empty method body and are not virtual/override.
+/// Annotation analyzer for Dolittle SDK.
+/// Ensures that all identities are valid Guids
 /// </summary>
-/// <remarks>
-/// For analyzers that requires analyzing symbols or syntax nodes across a code block, see <see cref="CodeBlockStartedAnalyzer"/>.
-/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
 {
