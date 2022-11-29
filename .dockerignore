@@ -1,0 +1,6 @@
+bin/
+obj/
+out/
+TestResults/
+Source/Analyzers/
+Source/Analyzers/*
