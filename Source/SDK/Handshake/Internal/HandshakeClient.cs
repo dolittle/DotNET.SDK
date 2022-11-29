@@ -2,10 +2,23 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.Artifacts.Contracts;
+using Dolittle.Runtime.Client.Contracts;
 using Dolittle.Runtime.Handshake.Contracts;
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Artifacts;
+using Dolittle.SDK.Common.ClientSetup;
+using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.Embeddings;
+using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Filters;
+using Dolittle.SDK.Events.Handling;
 using Dolittle.SDK.Failures;
+using Dolittle.SDK.Projections;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Services;
 using Google.Protobuf.WellKnownTypes;
@@ -35,7 +48,7 @@ public class HandshakeClient : IPerformHandshake
     }
 
     /// <inheritdoc />
-    public async Task<HandshakeResult> Perform(uint attemptNum, TimeSpan timeSpent, Version headVersion, CancellationToken cancellationToken)
+    public async Task<HandshakeResult> Perform(uint attemptNum, TimeSpan timeSpent, Version headVersion, IClientBuildResults buildResults, CancellationToken cancellationToken)
     {
         try
         {
@@ -49,8 +62,8 @@ public class HandshakeClient : IPerformHandshake
                 SdkVersion = sdkVersion.ToProtobuf(),
                 HeadVersion = headVersion.ToProtobuf(),
                 Attempt = attemptNum,
-                TimeSpent = timeSpent.ToDuration()
-                
+                TimeSpent = timeSpent.ToDuration(),
+                BuildResults = ToProtobuf(buildResults)
             };
             var response = await _caller.Call(_method, request, cancellationToken).ConfigureAwait(false);
             if (response.Failure != null)
@@ -78,4 +91,42 @@ public class HandshakeClient : IPerformHandshake
             throw;
         }
     }
+
+    static BuildResults ToProtobuf(IClientBuildResults buildResults)
+    {
+        var protobuf = new BuildResults();
+        protobuf.AggregateRoots.AddRange(GetBuildResultsFor<AggregateRootType>(buildResults, _ => _.Generation));
+        protobuf.EventTypes.AddRange(GetBuildResultsFor<EventType>(buildResults, _ => _.Generation));
+        protobuf.EventHandlers.AddRange(GetBuildResultsFor<EventHandlerModelId>(buildResults, _ => 0));
+        protobuf.Filters.AddRange(GetBuildResultsFor<FilterModelId>(buildResults, _ => 0));
+        protobuf.Projections.AddRange(GetBuildResultsFor<ProjectionModelId>(buildResults, _ => 0));
+        protobuf.Embeddings.AddRange(GetBuildResultsFor<EmbeddingModelId>(buildResults, _ => 0));
+        protobuf.Other.AddRange(buildResults.AllNonIdentifiable.Select(_ => _.ToProtobuf()));
+        return protobuf;
+    }
+
+    static IEnumerable<ArtifactBuildResult> GetBuildResultsFor<TIdentifier>(IClientBuildResults buildResults, Func<TIdentifier, Generation> getGeneration)
+        where TIdentifier : class, IIdentifier
+        => buildResults.GetFor<TIdentifier>().Select(_ => ToProtobuf(_, getGeneration));
+
+    static ArtifactBuildResult ToProtobuf<TIdentifier>(IdentifiableClientBuildResult buildResult, Func<TIdentifier, Generation> getGeneration)
+        where TIdentifier : class, IIdentifier
+    {
+        var result = new ArtifactBuildResult
+        {
+            Aritfact = new Artifact
+            {
+                Id = buildResult.Identifier.Id.ToProtobuf(),
+                Generation = getGeneration((buildResult.Identifier as TIdentifier)!).Value
+            },
+            BuildResult = buildResult.Result.ToProtobuf()
+        };
+        if (!string.IsNullOrEmpty(buildResult.Identifier.Alias))
+        {
+            result.Alias = buildResult.Identifier.Alias;
+        }
+
+        return result;
+    }
+
 }

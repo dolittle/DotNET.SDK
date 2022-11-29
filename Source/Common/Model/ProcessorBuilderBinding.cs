@@ -16,5 +16,5 @@ public record ProcessorBuilderBinding<TBuilder>(IIdentifier Identifier, TBuilder
 {
     /// <inheritdoc />
     public override string ToString()
-        => $"Processor Builder binding from {Identifier} to {ProcessorBuilder}";
+        => $"processor Builder binding from {Identifier} to {ProcessorBuilder}";
 }

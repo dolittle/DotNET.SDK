@@ -20,10 +20,10 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     readonly DecoratedTypeBindingsToModelAdder<AggregateRootAttribute, AggregateRootType, AggregateRootId> _decoratedTypeBindings;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="AggregateRootsBuilder"/> class.
     /// </summary>
-    /// <param name="modelBuilder"></param>
-    /// <param name="buildResults"></param>
+    /// <param name="modelBuilder">The <see cref="IModelBuilder"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     public AggregateRootsBuilder(IModelBuilder modelBuilder, IClientBuildResults buildResults)
     {
         _decoratedTypeBindings = new DecoratedTypeBindingsToModelAdder<AggregateRootAttribute, AggregateRootType, AggregateRootId>(
@@ -55,9 +55,13 @@ public class AggregateRootsBuilder : IAggregateRootsBuilder
     /// Builds the aggregate roots by registering them with the Runtime.
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public static IUnregisteredAggregateRoots Build(IModel model)
+    public static IUnregisteredAggregateRoots Build(IModel model, IClientBuildResults buildResults)
     {
-        var bindings = model.GetTypeBindings<AggregateRootType, AggregateRootId>();
+        var bindings = model.GetTypeBindings<AggregateRootType, AggregateRootId>().ToArray();
+        foreach (var binding in bindings)
+        {
+            buildResults.AddInformation(binding.Identifier, $"Successfully bound to type {binding.Type}");            
+        }
         return new UnregisteredAggregateRoots(new UniqueBindings<AggregateRootType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));
     }
 }

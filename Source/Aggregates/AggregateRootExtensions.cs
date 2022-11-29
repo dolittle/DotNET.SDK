@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
 
@@ -44,13 +45,11 @@ public static class AggregateRootExtensions
     public static AggregateRootId GetAggregateRootId(this AggregateRoot aggregateRoot)
     {
         var aggregateRootType = aggregateRoot.GetType();
-        var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
-        if (aggregateRootAttribute == null)
+        if (!aggregateRootType.TryGetIdentifier<AggregateRootType>(out var identifier))
         {
             throw new MissingAggregateRootAttribute(aggregateRootType);
         }
-
-        return aggregateRootAttribute.Type.Id;
+        return identifier.Id;
     }
     
     internal static IReadOnlyDictionary<Type, MethodInfo> GetHandleMethodsFor(Type aggregateRootType)

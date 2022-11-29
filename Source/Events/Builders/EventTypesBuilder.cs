@@ -38,11 +38,6 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <inheritdoc />
     public IEventTypesBuilder Associate(Type type, EventType eventType)
     {
-        Register(type);
-        if (!eventType.HasAlias)
-        {
-            eventType = new EventType(eventType.Id, eventType.Generation, type.Name);
-        }
         _modelBuilder.BindIdentifierToType<EventType, EventTypeId>(eventType, type);
         return this;
     }
@@ -87,9 +82,13 @@ public class EventTypesBuilder : IEventTypesBuilder
     /// <summary>
     /// Builds the <see cref="IEventTypes"/>.
     /// </summary>
-    public static IUnregisteredEventTypes Build(IModel model)
+    public static IUnregisteredEventTypes Build(IModel model, IClientBuildResults buildResults)
     {
-        var bindings = model.GetTypeBindings<EventType, EventTypeId>();
+        var bindings = model.GetTypeBindings<EventType, EventTypeId>().ToArray();
+        foreach (var binding in bindings)
+        {
+            buildResults.AddInformation(binding.Identifier, $"Successfully bound to type {binding.Type}");
+        }
         return new UnregisteredEventTypes(new UniqueBindings<EventType, Type>(bindings.ToDictionary(_ => _.Identifier, _ => _.Type)));
     }
 }

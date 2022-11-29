@@ -17,4 +17,3 @@ public class DishPrepared
     public string Dish { get; }
     public string Chef { get; }
 }
-

@@ -15,7 +15,8 @@ public class FailureBuildResult : ClientBuildResult
     /// </summary>
     /// <param name="message">The build message.</param>
     /// <param name="fix">The fix message.</param>
-    public FailureBuildResult(string message, string fix = default) : base(LogLevel.Warning, string.IsNullOrEmpty(fix) ? message : $"{message}. {fix}", true)
+    public FailureBuildResult(string message, string fix = default)
+        : base(LogLevel.Warning, string.IsNullOrEmpty(fix) ? message : $"{message}. {fix}", true)
     {
     }
 }

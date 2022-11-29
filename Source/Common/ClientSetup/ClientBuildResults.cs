@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Dolittle.SDK.Common.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Common.ClientSetup;
@@ -13,6 +15,15 @@ namespace Dolittle.SDK.Common.ClientSetup;
 public class ClientBuildResults : IClientBuildResults
 {
     readonly List<ClientBuildResult> _results = new();
+    readonly List<IdentifiableClientBuildResult> _identifiableResults = new();
+
+    /// <inheritdoc />
+    public IEnumerable<ClientBuildResult> AllNonIdentifiable => _results;
+
+    /// <inheritdoc />
+    public IEnumerable<IdentifiableClientBuildResult> GetFor<TId>()
+        where TId : class, IIdentifier
+        => _identifiableResults.Where(_ => _.Identifier is TId);
 
     /// <inheritdoc />
     public void Add(ClientBuildResult result)
@@ -29,12 +40,24 @@ public class ClientBuildResults : IClientBuildResults
         => Add(ClientBuildResult.Information(message));
 
     /// <inheritdoc />
+    public void AddInformation(IIdentifier id, string message)
+        => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Information(message)));
+
+    /// <inheritdoc />
     public void AddFailure(string message, string fix = "")
         => Add(ClientBuildResult.Failure(message, fix));
 
     /// <inheritdoc />
+    public void AddFailure(IIdentifier id, string message, string fix = "")
+        => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Failure(message, fix)));
+
+    /// <inheritdoc />
     public void AddError(Exception error)
         => Add(ClientBuildResult.Error(error));
+
+    /// <inheritdoc />
+    public void AddError(IIdentifier id,  Exception error)
+        => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Error(error)));
 
     /// <inheritdoc />
     public bool Failed { get; private set; }
@@ -46,5 +69,22 @@ public class ClientBuildResults : IClientBuildResults
         {
             result.Log(logger);
         }
+        
+        foreach (var group in _identifiableResults.GroupBy(_ => _.Identifier))
+        {
+            foreach (var result in group)
+            {
+                result.Log(logger);
+            }
+        }
+    }
+    
+    void Add(IdentifiableClientBuildResult result)
+    {
+        if (result.Result.IsFailed)
+        {
+            Failed = true;
+        }
+        _identifiableResults.Add(result);
     }
 }

@@ -11,7 +11,7 @@ public class and_a_projection_state_with_lower_case_property_is_returned : given
 {
     static Key key;
     static given.a_decorated_projection_type_with_lower_case_property stored_state;
-    static ScopedProjectionId scoped_projection_id;
+    static ProjectionModelId scoped_projection_id;
     static given.a_decorated_projection_type_with_lower_case_property result;
     
     Establish context = () =>

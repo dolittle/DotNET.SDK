@@ -47,7 +47,7 @@ public class AggregateRootType : Artifact<AggregateRootId>
     /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="AggregateRootType"/>.</param>
     /// <param name="alias"><see cref="AggregateRootAlias">Alias</see> of the <see cref="AggregateRootType"/>.</param>
     public AggregateRootType(AggregateRootId id, Generation generation, AggregateRootAlias alias)
-        : base(id, generation)
+        : base(id, generation, alias)
     {
         ThrowIfAggregateRootTypeIdIsNull(id);
         ThrowIfGenerationIsNull(generation);

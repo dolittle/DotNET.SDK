@@ -45,11 +45,11 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     /// <inheritdoc />
     public IEventHandlersBuilder Register(Type type)
     {
-        if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
+        if (!_decoratedTypeBindings.TryAdd(type, out var identifier))
         {
             return this;
         }
-        _modelBuilder.BindIdentifierToProcessorBuilder(decorator.GetIdentifier(), new ConventionTypeEventHandlerBuilder(type, decorator));
+        _modelBuilder.BindIdentifierToProcessorBuilder(identifier, new ConventionTypeEventHandlerBuilder(type, identifier));
         return this;
     }
 
@@ -57,11 +57,11 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     public IEventHandlersBuilder Register<TEventHandler>(TEventHandler eventHandlerInstance)
         where TEventHandler : class
     {
-        if (!_decoratedTypeBindings.TryAdd(eventHandlerInstance.GetType(), out var decorator))
+        if (!_decoratedTypeBindings.TryAdd(eventHandlerInstance.GetType(), out var identifier))
         {
             return this;
         }
-        _modelBuilder.BindIdentifierToProcessorBuilder(decorator.GetIdentifier(), new ConventionInstanceEventHandlerBuilder(eventHandlerInstance, decorator));
+        _modelBuilder.BindIdentifierToProcessorBuilder(identifier, new ConventionInstanceEventHandlerBuilder(eventHandlerInstance, identifier));
         return this;
     }
 
@@ -69,9 +69,9 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     public IEventHandlersBuilder RegisterAllFrom(Assembly assembly)
     {
         var addedEventHandlerBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
-        foreach (var (type, decorator) in addedEventHandlerBindings)
+        foreach (var (type, identifier) in addedEventHandlerBindings)
         {
-            _modelBuilder.BindIdentifierToProcessorBuilder(decorator.GetIdentifier(), new ConventionTypeEventHandlerBuilder(type, decorator));
+            _modelBuilder.BindIdentifierToProcessorBuilder(identifier, new ConventionTypeEventHandlerBuilder(type, identifier));
         }
 
         return this;
@@ -86,38 +86,38 @@ public class EventHandlersBuilder : IEventHandlersBuilder
     public static IUnregisteredEventHandlers Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var eventHandlers = new UniqueBindings<EventHandlerModelId, IEventHandler>();
-        foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>())
+        foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ConventionTypeEventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            if (builder.TryBuild((EventHandlerModelId)identifier, eventTypes, buildResults, out var eventHandler))
             {
-                eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
+                eventHandlers.Add((EventHandlerModelId)identifier, eventHandler);
             }
             else
             {
-                buildResults.AddFailure($"Failed to build Event Handler for '{builder.EventHandlerType}'. It will not be registered");
+                buildResults.AddFailure(identifier, "Event handler will not be registered");
             }
         }
-        foreach (var (_, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
+        foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ConventionInstanceEventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            if (builder.TryBuild((EventHandlerModelId)identifier, eventTypes, buildResults, out var eventHandler))
             {
-                eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
+                eventHandlers.Add((EventHandlerModelId)identifier, eventHandler);
             }
             else
             {
-                buildResults.AddFailure($"Failed to build Event Handler for instance of '{builder.EventHandlerType}'. It will not be registered");
+                buildResults.AddFailure(identifier, "Event handler will not be registered");
             }
         }
-        foreach (var (_, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
+        foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<EventHandlerBuilder>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var eventHandler))
+            if (builder.TryBuild((EventHandlerModelId)identifier, eventTypes, buildResults, out var eventHandler))
             {
-                eventHandlers.Add(new EventHandlerModelId(eventHandler.Identifier, eventHandler.ScopeId), eventHandler);
+                eventHandlers.Add((EventHandlerModelId)identifier, eventHandler);
             }
             
             else
             {
-                buildResults.AddFailure($"Failed to build Event Handler '{builder.ModelId.Id}' in Scope '{builder.ModelId.Scope}'. It will not be registered");
+                buildResults.AddFailure(identifier, "Event handler will not be registered");
             }
         }
         return new UnregisteredEventHandlers(

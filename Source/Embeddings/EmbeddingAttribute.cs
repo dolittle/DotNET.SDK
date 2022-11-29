@@ -11,21 +11,18 @@ namespace Dolittle.SDK.Embeddings;
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class EmbeddingAttribute : Attribute, IDecoratedTypeDecorator<EmbeddingModelId>
-{
+{ 
+    readonly EmbeddingId _id;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EmbeddingAttribute"/> class.
     /// </summary>
     /// <param name="embeddingId">The unique identifier of the embedding.</param>
     public EmbeddingAttribute(string embeddingId)
     {
-        Identifier = Guid.Parse(embeddingId);
+        _id = embeddingId;
     }
 
-    /// <summary>
-    /// Gets the unique identifier for this embedding.
-    /// </summary>
-    public EmbeddingId Identifier { get; }
-
     /// <inheritdoc />
-    public EmbeddingModelId GetIdentifier() => new(Identifier);
+    public EmbeddingModelId GetIdentifier(Type decoratedType) => new(_id, decoratedType.Name);
 }

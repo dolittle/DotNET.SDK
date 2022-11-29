@@ -18,9 +18,9 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
     /// Initializes a new instance of the <see cref="ConventionTypeEventHandlerBuilder"/> class.
     /// </summary>
     /// <param name="eventHandlerType">The <see cref="Type" /> of the event handler.</param>
-    /// <param name="decorator">The <see cref="EventHandlerAttribute"/>.</param>
-    public ConventionTypeEventHandlerBuilder(System.Type eventHandlerType, EventHandlerAttribute decorator)
-        : base(decorator, eventHandlerType)
+    /// <param name="identifier">The <see cref="EventHandlerAttribute"/>.</param>
+    public ConventionTypeEventHandlerBuilder(System.Type eventHandlerType, EventHandlerModelId identifier)
+        : base(identifier, eventHandlerType)
     {
     }
     
@@ -38,6 +38,7 @@ public class ConventionTypeEventHandlerBuilder : ConventionEventHandlerBuilder, 
 
     /// <inheritdoc/>
     public override bool TryBuild(
+        EventHandlerModelId identifier,
         IEventTypes eventTypes,
         IClientBuildResults buildResults,
         out IEventHandler eventHandler)

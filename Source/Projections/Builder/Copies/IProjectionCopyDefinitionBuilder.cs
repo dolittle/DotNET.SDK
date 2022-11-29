@@ -26,8 +26,9 @@ public interface IProjectionCopyDefinitionBuilder<TReadModel>
     /// <summary>
     /// Builds the <see cref="ProjectionCopies"/>.
     /// </summary>
+    /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="definition">The built <see cref="ProjectionCopies"/>.</param>
     /// <returns>True if successfully built, false if not.</returns>
-    bool TryBuild(IClientBuildResults buildResults, out ProjectionCopies definition);
+    bool TryBuild(ProjectionModelId identifier, IClientBuildResults buildResults, out ProjectionCopies definition);
 }

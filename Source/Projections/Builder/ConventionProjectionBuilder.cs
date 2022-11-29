@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     where TProjection : class, new()
 {
-    readonly ProjectionAttribute _decorator;
+    readonly ProjectionModelId _identifier;
     readonly Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> _copyToMongoDbBuilder;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
@@ -28,11 +28,11 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// <summary>
     /// Initializes an instance of the <see cref="ConventionProjectionBuilder{TProjection}"/> class.
     /// </summary>
-    /// <param name="decorator">The <see cref="ProjectionAttribute"/> decorator.</param>
+    /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="copyToMongoDbBuilder">The <see cref="Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder{TProjection}"/>.</param>
-    public ConventionProjectionBuilder(ProjectionAttribute decorator, Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
+    public ConventionProjectionBuilder(ProjectionModelId identifier,  Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
     {
-        _decorator = decorator;
+        _identifier = identifier;
         _copyToMongoDbBuilder = copyToMongoDbBuilder;
     }
 
@@ -48,39 +48,42 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             && _projectionType == otherBuilder._projectionType;
     }
     
+    
+    /// <inheritdoc />
+    public override int GetHashCode()
+        => HashCode.Combine(_identifier, _projectionType);
+    
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
     {
         projection = default;
-        buildResults.AddInformation($"Building projection {_decorator.Identifier} processing events in scope {_decorator.Scope} from type {_projectionType}");
+        buildResults.AddInformation(identifier, $"Building from type {_projectionType}");
         
         if (!HasParameterlessConstructor())
         {
-            buildResults.AddFailure($"The projection class {_projectionType} has no default/parameterless constructor");
+            buildResults.AddFailure(identifier, $"The projection class {_projectionType} has no default/parameterless constructor", "It must only have one, parameterless, constructor");
             return false;
         }
         
         if (HasMoreThanOneConstructor())
         {
-            buildResults.AddFailure($"The projection class {_projectionType} has more than one constructor", "It must only have one, parameterless, constructor");
+            buildResults.AddFailure(identifier, $"The projection class {_projectionType} has more than one constructor", "It must only have one, parameterless, constructor");
             return false;
         }
 
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TProjection>>();
-        if (!TryBuildOnMethods(eventTypes, eventTypesToMethods, buildResults))
+        if (!TryBuildOnMethods(identifier, eventTypes, eventTypesToMethods, buildResults))
         {
             return false;
         }
-        if (!_copyToMongoDbBuilder.TryBuildFromReadModel(buildResults, out var copyToMongoDB))
+
+        if (!_copyToMongoDbBuilder.TryBuildFromReadModel(identifier, buildResults, out var copyToMongoDB))
         {
-            buildResults.AddFailure($"Failed to build projection copies definition for projection {_decorator.Identifier} using conventions from projection type {_projectionType}");
+            buildResults.AddFailure(identifier, $"Failed to build projection copies definition using conventions from projection type {_projectionType}");
             return false;
         }
         
-        projection = _decorator.HasAlias
-            ? new Projection<TProjection>(_decorator.Identifier, _decorator.Alias, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB))
-            : new Projection<TProjection>(_decorator.Identifier, _projectionType.Name, _decorator.Scope, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
-        
+        projection = new Projection<TProjection>(_identifier, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
         return true;
     }
     
@@ -91,13 +94,14 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     bool HasMoreThanOneConstructor() => _projectionType.GetConstructors().Length > 1;
     
     bool TryBuildOnMethods(
+        ProjectionModelId identifier,
         IEventTypes eventTypes,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
         IClientBuildResults buildResults)
     {
         var allMethods = _projectionType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
-        var hasWrongMethods = !TryAddDecoratedOnMethods(allMethods, eventTypesToMethods, buildResults)
-            || !TryAddConventionOnMethods(allMethods, eventTypes, eventTypesToMethods, buildResults);
+        var hasWrongMethods = !TryAddDecoratedOnMethods(identifier, allMethods, eventTypesToMethods, buildResults)
+            || !TryAddConventionOnMethods(identifier, allMethods, eventTypes, eventTypesToMethods, buildResults);
 
         if (hasWrongMethods)
         {
@@ -108,12 +112,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         {
             return true;
         }
-        buildResults.AddFailure($"There are no projection methods to register in projection {_projectionType}. A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
+        buildResults.AddFailure(identifier, $"There are no projection methods to register in projection {_projectionType}", $"A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
         return false;
 
     }
 
     bool TryAddDecoratedOnMethods(
+        ProjectionModelId identifier,
         IEnumerable<MethodInfo> methods,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
         IClientBuildResults buildResults)
@@ -124,7 +129,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             var shouldAddHandler = true;
             var eventType = (method.GetCustomAttributes(typeof(OnAttribute), true)[0] as OnAttribute)?.EventType;
 
-            if (!TryGetKeySelector(method, buildResults, out var keySelector))
+            if (!TryGetKeySelector(identifier, method, buildResults, out var keySelector))
             {
                 shouldAddHandler = false;
             }
@@ -132,10 +137,10 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             if (!TryGetEventParameterType(method, out var eventParameterType))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure($"Projection method {method} on projection {_projectionType} has no parameters, but is decorated with [{nameof(OnAttribute)}]. A projection method should take in as parameters an event and a {nameof(ProjectionContext)}");
+                buildResults.AddFailure(identifier, $"{method} has no parameters, but is decorated with [{nameof(OnAttribute)}]", "A projection method should take in as parameters an event and a {nameof(ProjectionContext)}");
             }
 
-            if (!ParametersAreOkay(method, buildResults))
+            if (!ParametersAreOkay(identifier, method, buildResults))
             {
                 shouldAddHandler = false;
             }
@@ -143,12 +148,12 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             if (eventParameterType != typeof(object))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure($"Projection method {method} on projection {_projectionType} should only handle an event of type object");
+                buildResults.AddFailure(identifier, $"{method} should only handle an event of type object");
             }
 
             if (!method.IsPublic)
             {
-                buildResults.AddFailure($"Method {method} on projection {_projectionType} has the signature of an projection method, but is not public. Projection methods needs to be public");
+                buildResults.AddFailure(identifier, $"{method} has the signature of an projection method, but is not public.","Projection methods needs to be public");
                 shouldAddHandler = false;
             }
 
@@ -162,13 +167,14 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 continue;
             }
             allMethodsAdded = false;
-            buildResults.AddFailure($"Event type {eventType} is already handled in projection {_decorator.Identifier}");
+            buildResults.AddFailure(identifier, $"Multiple handlers for {eventType}");
         }
 
         return allMethodsAdded;
     }
 
     bool TryAddConventionOnMethods(
+        ProjectionModelId identifier,
         IEnumerable<MethodInfo> methods,
         IEventTypes eventTypes,
         IDictionary<EventType, IProjectionMethod<TProjection>> eventTypesToMethods,
@@ -177,27 +183,27 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         var allMethodsAdded = true;
         foreach (var method in methods.Where(_ => !IsDecoratedOnMethod(_) && _.Name == MethodName))
         {
-            var shouldAddHandler = TryGetKeySelector(method, buildResults, out var keySelector);
+            var shouldAddHandler = TryGetKeySelector(identifier, method, buildResults, out var keySelector);
 
             if (!TryGetEventParameterType(method, out var eventParameterType))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure($"Projection method {method} on projection {_projectionType} has no parameters. An projection method should take in as parameters an event and an {nameof(ProjectionContext)}");
+                buildResults.AddFailure(identifier, $"{method} has no parameters.", $"A projection method should take in as parameters an event and an {nameof(ProjectionContext)}");
             }
 
             if (eventParameterType == typeof(object))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure($"Projection method {method} on projection {_projectionType} cannot handle an untyped event when not decorated with [{nameof(OnAttribute)}]");
+                buildResults.AddFailure(identifier, $"{method} cannot handle an untyped event when not decorated with [{nameof(OnAttribute)}]", $"Decorate method with [{nameof(OnAttribute)}]");
             }
 
             if (!eventTypes.HasFor(eventParameterType))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure($"Projection method {method} on projection {_projectionType} handles event of type {eventParameterType}, but it is not associated to any event type");
+                buildResults.AddFailure(identifier, $"{method} handles event of type {eventParameterType}, but it is not associated to any event type");
             }
 
-            if (!ParametersAreOkay(method, buildResults))
+            if (!ParametersAreOkay(identifier, method, buildResults))
             {
                 shouldAddHandler = false;
             }
@@ -205,7 +211,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             if (!method.IsPublic)
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure($"Method {method} on projection {_projectionType} has the signature of an projection method, but is not public. Projection methods needs to be public");
+                buildResults.AddFailure(identifier, $"{method} has the signature of an projection method, but is not public.", "Projection methods needs to be public");
             }
 
             if (!shouldAddHandler)
@@ -220,7 +226,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 continue;
             }
             allMethodsAdded = false;
-            buildResults.AddFailure($"Event type {eventParameterType} is already handled in projection {_decorator.Identifier}");
+            buildResults.AddFailure(identifier, $"Multiple handlers for {eventParameterType}");
         }
 
         return allMethodsAdded;
@@ -291,30 +297,30 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         throw new InvalidProjectionMethodReturnType(method.ReturnType);
     }
 
-    bool ParametersAreOkay(MethodInfo method, IClientBuildResults buildResults)
+    bool ParametersAreOkay(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults)
     {
         var okay = true;
         if (!SecondMethodParameterIsProjectionContext(method))
         {
             okay = false;
-            buildResults.AddFailure($"Projection method {method} on projection {_projectionType} needs to have two parameters where the second parameter is {typeof(ProjectionContext)}");
+            buildResults.AddFailure(identifier, $"{method} needs to have two parameters where the second parameter is {typeof(ProjectionContext)}");
         }
 
         if (!MethodHasNoExtraParameters(method))
         {
             okay = false;
-            buildResults.AddFailure($"Projection method {method} on projection {_projectionType} needs to only have two parameters where the first is the event to handle and the second is {typeof(ProjectionContext)}");
+            buildResults.AddFailure(identifier, $"{method} needs to only have two parameters where the first is the event to handle and the second is {typeof(ProjectionContext)}");
         }
 
         if (!MethodReturnsAsyncVoid(method) && (MethodReturnsVoid(method) || MethodReturnsResultType(method) || MethodReturnsTask(method) || MethodReturnsTaskResultType(method)))
         {
             return okay;
         }
-        buildResults.AddFailure($"Projection method {method} on projection {_projectionType} needs to return either {typeof(void)}, {typeof(ProjectionResultType)}, {typeof(Task)}, {typeof(Task<ProjectionResultType>)}");
+        buildResults.AddFailure(identifier, $"{method} needs to return either {typeof(void)}, {typeof(ProjectionResultType)}, {typeof(Task)}, {typeof(Task<ProjectionResultType>)}");
         return false;
     }
 
-    bool TryGetKeySelector(MethodInfo method, IClientBuildResults buildResults, out KeySelector keySelector)
+    bool TryGetKeySelector(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults, out KeySelector keySelector)
     {
         keySelector = null;
         var attributes = method
@@ -322,13 +328,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             .OfType<IKeySelectorAttribute>().ToArray();
         if (attributes.Length > 1)
         {
-            buildResults.AddFailure($"Method {method} on projection {_projectionType} has more than one key selector attributes", "Use only one key selector");
+            buildResults.AddFailure(identifier, $"{method} has more than one key selector attributes", "Use only one key selector");
             return false;
         }
 
         if (!attributes.Any())
         {
-            buildResults.AddFailure($"Method {method} on projection {_projectionType} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}], [{nameof(KeyFromEventSourceAttribute)}], [{nameof(StaticKeyAttribute)}] or [{nameof(KeyFromEventOccurredAttribute)}]");
+            buildResults.AddFailure(identifier, $"{method} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}], [{nameof(KeyFromEventSourceAttribute)}], [{nameof(StaticKeyAttribute)}] or [{nameof(KeyFromEventOccurredAttribute)}]");
             return false;
         }
 

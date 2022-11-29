@@ -13,8 +13,9 @@ public interface IValidateMongoDBCollectionName
     /// <summary>
     /// Validates the <see cref="MongoDBCopyCollectionName"/>.
     /// </summary>
+    /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="buildResult">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="collectionName">The <see cref="MongoDBCopyCollectionName"/>.</param>
     /// <returns>True if the <see cref="MongoDBCopyCollectionName"/> is valid, false if not.</returns>
-    bool Validate(IClientBuildResults buildResult, MongoDBCopyCollectionName collectionName);
+    bool Validate(ProjectionModelId identifier, IClientBuildResults buildResult, MongoDBCopyCollectionName collectionName);
 }

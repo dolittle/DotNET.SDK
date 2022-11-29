@@ -36,7 +36,7 @@ public class EmbeddingBuilder : IEmbeddingBuilder, ICanTryBuildEmbedding
             throw new ReadModelAlreadyDefinedForEmbedding(_embeddingId, typeof(TReadModel));
         }
 
-        _modelBuilder.BindIdentifierToType<EmbeddingModelId, EmbeddingId>(new EmbeddingModelId(_embeddingId), typeof(TReadModel));
+        _modelBuilder.BindIdentifierToType<EmbeddingModelId, EmbeddingId>(new EmbeddingModelId(_embeddingId, null), typeof(TReadModel));
         var builder = new EmbeddingBuilderForReadModel<TReadModel>(_embeddingId);
         _methodsBuilder = builder;
         return builder;

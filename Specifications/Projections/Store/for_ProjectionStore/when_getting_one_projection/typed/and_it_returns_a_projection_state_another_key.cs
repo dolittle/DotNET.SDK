@@ -12,7 +12,7 @@ public class and_it_returns_a_projection_state_another_key : given.all_dependenc
 {
     static Key key_in_request;
     static given.a_decorated_projection_type stored_state;
-    static ScopedProjectionId scoped_projection_id;
+    static ProjectionModelId scoped_projection_id;
     static Exception result;
     
     Establish context = () =>

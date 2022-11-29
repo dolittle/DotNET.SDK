@@ -50,10 +50,10 @@ public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
 
         switch (symbol.ToDisplayString())
         {
-            case "Dolittle.SDK.Events.EventTypeAttribute.EventTypeAttribute(string, uint, string)":
-            case "Dolittle.SDK.Events.Handling.EventHandlerAttribute.EventHandlerAttribute(string, bool, string, string)":
-            case "Dolittle.SDK.Aggregates.AggregateRootAttribute.AggregateRootAttribute(string, string)":
-            case "Dolittle.SDK.Projections.ProjectionAttribute.ProjectionAttribute(string, string, string)":
+            case "Dolittle.SDK.Events.EventTypeAttribute.EventTypeAttribute(string, uint, string?)":
+            case "Dolittle.SDK.Events.Handling.EventHandlerAttribute.EventHandlerAttribute(string, bool, string?, string?)":
+            case "Dolittle.SDK.Aggregates.AggregateRootAttribute.AggregateRootAttribute(string, string?)":
+            case "Dolittle.SDK.Projections.ProjectionAttribute.ProjectionAttribute(string, string?, string?)":
             case "Dolittle.SDK.Embeddings.EmbeddingAttribute.EmbeddingAttribute(string)":
                 CheckAttributeIdentity(attribute, symbol, context);
                 return;

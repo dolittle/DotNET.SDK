@@ -24,6 +24,6 @@ public interface IMongoDBCopyDefinitionFromReadModelBuilder
     /// </summary>
     /// <typeparam name="TReadModel">The <see cref="Type"/> of the projection read model.</typeparam>
     /// <returns>True if successfully built copy definition, false if not.</returns>
-    bool TryBuild<TReadModel>(IClientBuildResults buildResults, IProjectionCopyToMongoDBBuilder<TReadModel> copyToMongoDBBuilder)
+    bool TryBuild<TReadModel>(ProjectionModelId identifier, IClientBuildResults buildResults, IProjectionCopyToMongoDBBuilder<TReadModel> copyToMongoDBBuilder)
         where TReadModel : class, new();
 }

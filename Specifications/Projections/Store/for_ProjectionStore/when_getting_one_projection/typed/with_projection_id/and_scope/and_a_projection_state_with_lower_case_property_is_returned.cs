@@ -32,7 +32,7 @@ public class and_a_projection_state_with_lower_case_property_is_returned : given
 
     It should_call_get_one_with = () => method_caller.Verify(_ => _.Call(
         Moq.It.IsAny<ProjectionsGetOne>(),
-        request_like(key, new ScopedProjectionId(another_id, another_scope)),
+        request_like(key, another_id, another_scope),
         Moq.It.IsAny<CancellationToken>()));
     
     It should_only_call_it_once = () => method_caller.VerifyNoOtherCalls();

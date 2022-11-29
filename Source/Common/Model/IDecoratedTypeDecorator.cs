@@ -15,6 +15,7 @@ public interface IDecoratedTypeDecorator<out TIdentifier>
     /// <summary>
     /// Gets the <typeparamref name="TIdentifier"/>.
     /// </summary>
+    /// <param name="decoratedType">The decorated <see cref="Type"/>.</param>
     /// <returns>The <typeparamref name="TIdentifier"/>.</returns>
-    TIdentifier GetIdentifier();
+    TIdentifier GetIdentifier(Type decoratedType);
 }

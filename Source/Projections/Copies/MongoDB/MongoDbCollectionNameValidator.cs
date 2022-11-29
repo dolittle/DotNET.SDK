@@ -17,32 +17,32 @@ public class MongoDbCollectionNameValidator : IValidateMongoDBCollectionName
     const string FailureBuildResultBeginning = "Projection MongoDB collection name cannot";
 
     /// <inheritdoc />
-    public bool Validate(IClientBuildResults buildResult, MongoDBCopyCollectionName collectionName)
+    public bool Validate(ProjectionModelId identifier, IClientBuildResults buildResult, MongoDBCopyCollectionName collectionName)
     {
         var succeeded = true;
         if (string.IsNullOrEmpty(collectionName))
         {
-            buildResult.AddFailure($"{FailureBuildResultBeginning} be null or empty");
+            buildResult.AddFailure(identifier, $"{FailureBuildResultBeginning} be null or empty");
             return false;
         }
         if (collectionName.Value.StartsWith("system.", StringComparison.InvariantCulture))
         {
-            buildResult.AddFailure($"{FailureBuildResultBeginning} start with system.");
+            buildResult.AddFailure(identifier, $"{FailureBuildResultBeginning} start with 'system'.");
             succeeded = false;
         }
         if (collectionName.Value.Contains('$'))
         {
-            buildResult.AddFailure($"{FailureBuildResultBeginning} contain '$' dollar character");
+            buildResult.AddFailure(identifier, $"{FailureBuildResultBeginning} contain '$' dollar character");
             succeeded = false;
         }
         if (collectionName.Value.Contains('\0'))
         {
-            buildResult.AddFailure($"{FailureBuildResultBeginning} contain '\0' null character");
+            buildResult.AddFailure(identifier, $"{FailureBuildResultBeginning} contain '\0' null character");
             succeeded = false;
         }
         if (collectionName.Value.Length >= 64)
         {
-            buildResult.AddFailure($"{FailureBuildResultBeginning} contain more than 63 characters");
+            buildResult.AddFailure(identifier, $"{FailureBuildResultBeginning} contain more than 63 characters");
             succeeded = false;
         }
         
