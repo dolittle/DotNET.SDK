@@ -126,17 +126,9 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
         if (!hasAttribute)
         {
-            var props = new Dictionary<string, string?>
-            {
-                { "class", aggregateClass.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) },
-                { "attribute", attributeType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) }
-            }.ToImmutableDictionary();
-
-
             context.ReportDiagnostic(Diagnostic.Create(
                 DescriptorRules.Aggregate.MissingAttribute,
                 aggregateClass.Locations[0],
-                props,
                 aggregateClass.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
             ));
         }
@@ -155,7 +147,13 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             var typeInfo = semanticModel.GetTypeInfo(argument.Expression);
             if (typeInfo.Type is not { } type) continue;
             if (handledEventTypes.Contains(type)) continue; // On-handler already exists
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToString()));
+            
+            var props = new Dictionary<string, string?>
+            {
+                { "eventType", type.ToString() },
+            }.ToImmutableDictionary();
+            
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), props, type.ToString()));
         }
     }
 

@@ -62,7 +62,7 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
         return existing.WithAttributeLists(
             existing.AttributeLists.Any()
                 ? existing.AttributeLists.Add(attributeListSyntax)
-                : SyntaxFactory.SingletonList(attributeListSyntax));
+                : SyntaxFactory.SingletonList(attributeListSyntax)).WithTrailingTrivia(existing.GetTrailingTrivia());
     }
 
     protected static bool TryGetTargetNode<TNode>(
