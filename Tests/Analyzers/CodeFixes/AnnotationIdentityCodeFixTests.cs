@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
-public class AnnotationIdentityCodeFixTests : CodeFixProviderTests<AnnotationIdentityAnalyzer, AnnotationIdentityCodeFixProvider>
+public class AttributeIdentityCodeFixTests : CodeFixProviderTests<AttributeIdentityAnalyzer, AttributeIdentityCodeFixProvider>
 {
     [Fact]
-    public async Task FixAnnotationWithInvalidIdentity()
+    public async Task FixAttributeWithInvalidIdentity()
     {
         var test = @"
 using Dolittle.SDK.Events;
@@ -28,14 +28,14 @@ class SomeEvent
     public string Name {get; set;}
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 15)
             .WithArguments("EventType", "eventTypeId", @"""""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
 
     [Fact]
-    public async Task FixesAnnotationWithInvalidIdentityWithNamedArguments()
+    public async Task FixesAttributeWithInvalidIdentityWithNamedArguments()
     {
         var test = @"
 using Dolittle.SDK.Events;
@@ -56,14 +56,14 @@ class SomeEvent
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 28)
             .WithArguments("EventType", "eventTypeId", @"""""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
     
     [Fact]
-    public async Task FixesAnnotationWithInvalidIdentityWithNamedArgumentsInNonDefaultPosition()
+    public async Task FixesAttributeWithInvalidIdentityWithNamedArgumentsInNonDefaultPosition()
     {
         var test = @"
 using Dolittle.SDK.Events;
@@ -84,7 +84,7 @@ class SomeEvent
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 42)
             .WithArguments("EventType", "eventTypeId", @"""""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
@@ -110,7 +110,7 @@ class SomeHandler
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 58)
             .WithArguments("EventHandler", "eventHandlerId", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
@@ -136,7 +136,7 @@ class SomeProjection
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 54)
             .WithArguments("Projection", "projectionId", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
@@ -162,7 +162,7 @@ class SomeAggregate
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 47)
             .WithArguments("AggregateRoot", "id", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
@@ -188,7 +188,7 @@ class SomeAggregate
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 
-        var diagnosticResult = Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 38)
             .WithArguments("Embedding", "embeddingId", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);

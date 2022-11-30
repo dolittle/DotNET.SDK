@@ -18,6 +18,13 @@ namespace Dolittle.SDK.Analyzers;
 
 public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyzer, new()
 {
+    /// <summary>
+    /// Verify that the analyzer does not produce any diagnostics for this source
+    /// </summary>
+    /// <param name="source">The source to test against</param>
+    /// <returns></returns>
+    protected Task VerifyAnalyzerFindsNothingAsync(string source) => VerifyAnalyzerAsync(source, DiagnosticResult.EmptyDiagnosticResults);
+    
     protected Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<TAnalyzer, XUnitVerifier>

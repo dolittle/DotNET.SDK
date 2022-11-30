@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -19,6 +20,10 @@ static class Utils
 
     public static bool TryGetArgumentValue(this AttributeSyntax attribute, IParameterSymbol parameterSymbol, out ExpressionSyntax expressionSyntax) =>
         attribute.TryGetArgumentValue(parameterSymbol.Name, parameterSymbol.Ordinal, out expressionSyntax);
+
+
+    public static bool HasAttribute(this ITypeSymbol eventType, INamedTypeSymbol attributeType) =>
+        eventType.GetAttributes().Any(attribute => attribute.AttributeClass?.Equals(attributeType) == true);
 
 
     public static bool TryGetArgumentValue(this AttributeSyntax attribute, string parameterName, int parameterOrdinal, out ExpressionSyntax expressionSyntax)

@@ -6,7 +6,32 @@ namespace Dolittle.SDK.Analyzers;
 public static class DiagnosticIds
 {
     /// <summary>
-    /// Annotation missing the required ID.
+    /// Attribute missing the required ID.
     /// </summary>
-    public const string AnnotationInvalidIdentityRuleId = "SDK0001";
+    public const string AttributeInvalidIdentityRuleId = "SDK0001";
+
+    /// <summary>
+    /// Attribute missing the required ID.
+    /// </summary>
+    public const string EventMissingAttributeRuleId = "SDK0002";
+
+    /// <summary>
+    /// Aggregate missing the required Attribute.
+    /// </summary>
+    public const string AggregateMissingAttributeRuleId = "AGG0001";
+
+    /// <summary>
+    /// Aggregate missing a corresponding on-method.
+    /// </summary>
+    public const string AggregateMissingMutationRuleId = "AGG0002";
+
+    /// <summary>
+    /// Aggregate On-method has an invalid signature.
+    /// </summary>
+    public const string AggregateMutationHasIncorrectNumberOfParametersRuleId = "AGG0003";
+
+    /// <summary>
+    /// Aggregate on-method has an incorrect number of parameters
+    /// </summary>
+    public const string AggregateMutationShouldBePrivateRuleId = "AGG0004";
 }

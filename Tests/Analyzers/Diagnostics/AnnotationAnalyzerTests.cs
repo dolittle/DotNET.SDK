@@ -2,12 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
-using System;
 using System.Threading.Tasks;
 
-namespace Dolittle.SDK.Analyzers;
+namespace Dolittle.SDK.Analyzers.Diagnostics;
 
-public class AnnotationAnalyzerUnitTests : AnalyzerTest<AnnotationIdentityAnalyzer>
+public class AttributeAnalyzerTests : AnalyzerTest<AttributeIdentityAnalyzer>
 {
     [Fact]
     public async Task ShouldDetectEventTypeWithUsing()
@@ -22,7 +21,7 @@ class SomeEvent
 }";
         DiagnosticResult[] expected =
         {
-            Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+            Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(4, 2, 4, 15)
                 .WithArguments("EventType", "eventTypeId", "\"\"")
         };
@@ -41,7 +40,7 @@ class SomeEvent
 }";
         DiagnosticResult[] expected =
         {
-            Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+            Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 35)
                 .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "\"\""),
         };
@@ -59,7 +58,7 @@ class SomeEvent
     public string Name {get; set;}
 }";
 
-        await VerifyAnalyzerAsync(test, Array.Empty<DiagnosticResult>());
+        await VerifyAnalyzerFindsNothingAsync(test);
     }
 
     [Fact]
@@ -72,7 +71,7 @@ class SomeEvent
     public string Name {get; set;}
 }";
 
-        await VerifyAnalyzerAsync(test, Array.Empty<DiagnosticResult>());
+        await VerifyAnalyzerFindsNothingAsync(test);
     }
 
     [Fact]
@@ -86,7 +85,7 @@ class SomeEvent
 }";
         DiagnosticResult[] expected =
         {
-            Diagnostic(AnnotationIdentityAnalyzer.InvalidIdentityRule)
+            Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 80)
                 .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "\"c6f87322-be67-4aaf\"")
         };
@@ -95,7 +94,7 @@ class SomeEvent
     }
 
     [Fact]
-    public async Task ShouldIgnoreIrrelevantAnnotations()
+    public async Task ShouldIgnoreIrrelevantAttributes()
     {
         var test = @"
 [System.Serializable]
@@ -104,6 +103,6 @@ class SomeEvent
     public string Name {get; set;}
 }";
 
-        await VerifyAnalyzerAsync(test, Array.Empty<DiagnosticResult>());
+        await VerifyAnalyzerFindsNothingAsync(test);
     }
 }

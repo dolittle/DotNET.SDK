@@ -13,10 +13,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AnnotationIdentityCodeFixProvider)), Shared]
-public class AnnotationIdentityCodeFixProvider : CodeFixProvider
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeIdentityCodeFixProvider)), Shared]
+public class AttributeIdentityCodeFixProvider : CodeFixProvider
 {
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AnnotationInvalidIdentityRuleId);
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AttributeInvalidIdentityRuleId);
 
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
@@ -29,11 +29,11 @@ public class AnnotationIdentityCodeFixProvider : CodeFixProvider
 
         switch (diagnostic.Id)
         {
-            case DiagnosticIds.AnnotationInvalidIdentityRuleId:
+            case DiagnosticIds.AttributeInvalidIdentityRuleId:
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Generate identity", ct => GenerateIdentity(context, document, identityParameterName!, ct),
-                        nameof(AnnotationIdentityCodeFixProvider) + ".AddIdentity"),
+                        nameof(AttributeIdentityCodeFixProvider) + ".AddIdentity"),
                     diagnostic);
                 break;
         }

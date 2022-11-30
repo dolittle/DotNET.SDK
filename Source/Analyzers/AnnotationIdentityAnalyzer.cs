@@ -11,28 +11,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Dolittle.SDK.Analyzers;
 
 /// <summary>
-/// Annotation analyzer for Dolittle SDK.
+/// Attribute analyzer for Dolittle SDK.
 /// Ensures that all identities are valid Guids
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
+public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 {
-    const string Title = "Invalid identity in attribute";
-    const string MessageFormat = "Attribute '{0}' {1}: '{2}' is not a valid Guid";
-    const string Description = "Add a Guid identity";
-
-
-    internal static readonly DiagnosticDescriptor InvalidIdentityRule =
-        new(
-            DiagnosticIds.AnnotationInvalidIdentityRuleId,
-            Title,
-            MessageFormat,
-            DiagnosticCategories.Sdk,
-            DiagnosticSeverity.Warning,
-            isEnabledByDefault: true,
-            description: Description);
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(InvalidIdentityRule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(DescriptorRules.InvalidIdentity);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -48,13 +33,13 @@ public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
         if (!symbol.IsDolittleType()) return;
 
 
-        switch (symbol.ToDisplayString())
+        switch (symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
         {
-            case "Dolittle.SDK.Events.EventTypeAttribute.EventTypeAttribute(string, uint, string?)":
-            case "Dolittle.SDK.Events.Handling.EventHandlerAttribute.EventHandlerAttribute(string, bool, string?, string?)":
-            case "Dolittle.SDK.Aggregates.AggregateRootAttribute.AggregateRootAttribute(string, string?)":
-            case "Dolittle.SDK.Projections.ProjectionAttribute.ProjectionAttribute(string, string?, string?)":
-            case "Dolittle.SDK.Embeddings.EmbeddingAttribute.EmbeddingAttribute(string)":
+            case "EventTypeAttribute":
+            case "EventHandlerAttribute":
+            case "AggregateRootAttribute":
+            case "ProjectionAttribute":
+            case "EmbeddingAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
                 return;
 
@@ -72,7 +57,7 @@ public class AnnotationIdentityAnalyzer : DiagnosticAnalyzer
         if (!Guid.TryParse(identityText.Trim('"'), out _))
         {
             var properties = ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
-            context.ReportDiagnostic(Diagnostic.Create(InvalidIdentityRule, attribute.GetLocation(), properties,
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.InvalidIdentity, attribute.GetLocation(), properties,
                 attribute.Name.ToString(), identityParameter.Name, identityText));
         }
     }
