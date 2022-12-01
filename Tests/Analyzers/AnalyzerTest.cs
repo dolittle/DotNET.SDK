@@ -7,7 +7,8 @@ using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Handling;
 using Dolittle.SDK.Projections;
-// using Microsoft.CodeAnalysis;
+using Dolittle.SDK.Tenancy;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -34,11 +35,13 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
                 Sources = { source },
                 AdditionalReferences =
                 {
-                    Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(AggregateRootAttribute).Assembly.Location),
-                    Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(EventTypeAttribute).Assembly.Location),
-                    Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(ProjectionAttribute).Assembly.Location),
-                    Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(EventHandlerAttribute).Assembly.Location),
-                    Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(typeof(EmbeddingAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(AggregateRootAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(EventTypeAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(ProjectionAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(EventHandlerAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(EmbeddingAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Tenant).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(IDolittleClient).Assembly.Location),
                 },
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
             }

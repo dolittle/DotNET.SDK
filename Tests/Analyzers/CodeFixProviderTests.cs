@@ -4,6 +4,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.Runtime.Tenancy.Contracts;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Events;
@@ -35,6 +36,8 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
                     MetadataReference.CreateFromFile(typeof(ProjectionAttribute).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(EventHandlerAttribute).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(EmbeddingAttribute).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Tenant).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(IDolittleClient).Assembly.Location),
                 },
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net60
             },

@@ -16,17 +16,11 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AggregateAnalyzer : DiagnosticAnalyzer
 {
-    record Types(INamedTypeSymbol AggregateRoot, INamedTypeSymbol AggregateAttribute, INamedTypeSymbol EventAttribute)
+    record Types(INamedTypeSymbol AggregateRoot, INamedTypeSymbol AggregateAttribute)
     {
         public INamedTypeSymbol AggregateRoot { get; } = AggregateRoot;
         public INamedTypeSymbol AggregateAttribute { get; } = AggregateAttribute;
-        public INamedTypeSymbol EventAttribute { get; } = EventAttribute;
     }
-
-
-    const string AggregateRootBaseClass = "Dolittle.SDK.Aggregates.AggregateRoot";
-    const string AggregateRootAttribute = "Dolittle.SDK.Aggregates.AggregateRootAttribute";
-    const string EventTypeAttribute = "Dolittle.SDK.Events.EventTypeAttribute";
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
@@ -65,7 +59,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         CheckAggregateRootAttributePresent(context, aggregateType, types.AggregateAttribute);
 
 
-        var handledEvents = CheckOnMethods(context, aggregateType, types);
+        var handledEvents = CheckOnMethods(context, aggregateType);
         CheckApplyInvocations(context, aggregateSyntax, handledEvents);
 
         // if (namedType.BaseType?.Equals(aggregateType) == true &&
@@ -77,7 +71,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     }
 
 
-    static HashSet<ITypeSymbol> CheckOnMethods(SymbolAnalysisContext context, INamedTypeSymbol aggregateType, Types types)
+    static HashSet<ITypeSymbol> CheckOnMethods(SymbolAnalysisContext context, INamedTypeSymbol aggregateType)
     {
         var members = aggregateType.GetMembers();
         var onMethods = members.Where(_ => _.Name.Equals("On")).OfType<IMethodSymbol>().ToArray();
@@ -105,7 +99,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 var eventType = parameters[0].Type;
                 eventTypesHandled.Add(eventType);
 
-                if (!eventType.HasAttribute(types.EventAttribute))
+                if (!eventType.HasEventTypeAttribute())
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DescriptorRules.Events.MissingAttribute,
@@ -147,36 +141,31 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             var typeInfo = semanticModel.GetTypeInfo(argument.Expression);
             if (typeInfo.Type is not { } type) continue;
             if (handledEventTypes.Contains(type)) continue; // On-handler already exists
-            
+
             var props = new Dictionary<string, string?>
             {
                 { "eventType", type.ToString() },
             }.ToImmutableDictionary();
-            
+
             context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), props, type.ToString()));
         }
     }
 
     static Types? GetRelevantTypes(Compilation compilation)
     {
-        var aggregateBaseClass = compilation.GetTypeByMetadataName(AggregateRootBaseClass);
+        var aggregateBaseClass = compilation.GetTypeByMetadataName(DolittleTypes.AggregateRootBaseClass);
         if (aggregateBaseClass == null)
         {
             return default;
         }
 
-        var aggregateRootAttribute = compilation.GetTypeByMetadataName(AggregateRootAttribute);
+        var aggregateRootAttribute = compilation.GetTypeByMetadataName(DolittleTypes.AggregateRootAttribute);
         if (aggregateRootAttribute == null)
         {
             return default;
         }
 
-        var eventTypeAttribute = compilation.GetTypeByMetadataName(EventTypeAttribute);
-        if (eventTypeAttribute == null)
-        {
-            return default;
-        }
 
-        return new Types(aggregateBaseClass, aggregateRootAttribute, eventTypeAttribute);
+        return new Types(aggregateBaseClass, aggregateRootAttribute);
     }
 }

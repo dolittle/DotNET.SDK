@@ -8,8 +8,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers;
 
-static class Utils
+static class AnalysisExtensions
 {
+
+
     public static bool IsDolittleType(this ISymbol symbol)
     {
         var symbolNamespace = symbol.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -18,13 +20,24 @@ static class Utils
                || symbolNamespace.StartsWith("Dolittle.SDK", StringComparison.Ordinal);
     }
 
+    public static bool HasEventTypeAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.EventTypeAttribute);
+    public static bool HasAggregateRootAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.AggregateRootAttribute);
+    public static bool HasEventHandlerAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.EventHandlerAttribute);
+
+    public static bool HasAttribute(this ITypeSymbol type, string attributeName)
+    {
+        if (type is null) throw new ArgumentNullException(nameof(type));
+        if (attributeName is null) throw new ArgumentNullException(nameof(attributeName));
+
+        return type.GetAttributes().Any(_ =>
+        {
+            var attributeClassName = _.AttributeClass?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+            return attributeClassName == attributeName;
+        });
+    }
+
     public static bool TryGetArgumentValue(this AttributeSyntax attribute, IParameterSymbol parameterSymbol, out ExpressionSyntax expressionSyntax) =>
         attribute.TryGetArgumentValue(parameterSymbol.Name, parameterSymbol.Ordinal, out expressionSyntax);
-
-
-    public static bool HasAttribute(this ITypeSymbol eventType, INamedTypeSymbol attributeType) =>
-        eventType.GetAttributes().Any(attribute => attribute.AttributeClass?.Equals(attributeType) == true);
-
 
     public static bool TryGetArgumentValue(this AttributeSyntax attribute, string parameterName, int parameterOrdinal, out ExpressionSyntax expressionSyntax)
     {

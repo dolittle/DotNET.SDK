@@ -31,7 +31,18 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
                     CodeAction.Create(
                         "Generate attribute",
                         ct => GenerateIdentityAttribute(context, document,"AggregateRoot", ct),
-                        nameof(AttributeMissingCodeFixProvider) + ".AddAttribute"),
+                        nameof(AttributeMissingCodeFixProvider) + ".AddAggregateAttribute"),
+                    diagnostic);
+                break;
+        }
+        switch (diagnostic.Id)
+        {
+            case DiagnosticIds.EventMissingAttributeRuleId:
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        "Generate attribute",
+                        ct => GenerateIdentityAttribute(context, document,DolittleTypes.EventTypeAttribute, ct),
+                        nameof(AttributeMissingCodeFixProvider) + ".AddEventAttribute"),
                     diagnostic);
                 break;
         }
