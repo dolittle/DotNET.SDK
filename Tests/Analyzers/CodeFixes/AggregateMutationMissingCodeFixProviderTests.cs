@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
-public class AggregateMutatationMissingCodeFixProviderTests : CodeFixProviderTests<AggregateAnalyzer, AggregateMutationCodeFixProvider>
+public class AggregateMutationMissingCodeFixProviderTests : CodeFixProviderTests<AggregateAnalyzer, AggregateMutationCodeFixProvider>
 {
     [Fact]
     public async Task ShouldFixMissingMutationFromConstructor()
@@ -36,7 +36,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeAggregate: AggregateRoot
+class SomeAggregate : AggregateRoot
 {
     public string Name { get; set; }
 
@@ -44,8 +44,9 @@ class SomeAggregate: AggregateRoot
     {
         Apply(new NameUpdated(name));
     }
-private void On(NameUpdated @event) => throw new System.NotImplementedException();
-}"; // TODO: Solve Roslyn whitespace issues
+
+    private void On(NameUpdated @event) => throw new System.NotImplementedException();
+}";
         var diagnosticResult = Diagnostic(DescriptorRules.Aggregate.MissingMutation)
             .WithSpan(15, 9, 15, 37)
             .WithArguments("NameUpdated");

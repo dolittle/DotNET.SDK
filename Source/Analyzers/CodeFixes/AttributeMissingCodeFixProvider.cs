@@ -47,7 +47,7 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
         if (!TryGetTargetNode(context, root, out ClassDeclarationSyntax classSyntax)) return document; // Target not found
 
         var updatedRoot = root.ReplaceNode(classSyntax, GenerateIdentityAttribute(classSyntax, attributeClass));
-        return document.WithSyntaxRoot(updatedRoot);
+        return document.WithSyntaxRoot(updatedRoot.WithLfLineEndings());
     }
 
     static ClassDeclarationSyntax GenerateIdentityAttribute(ClassDeclarationSyntax existing, string attributeClass)
@@ -62,7 +62,7 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
         return existing.WithAttributeLists(
             existing.AttributeLists.Any()
                 ? existing.AttributeLists.Add(attributeListSyntax)
-                : SyntaxFactory.SingletonList(attributeListSyntax)).WithTrailingTrivia(existing.GetTrailingTrivia());
+                : SyntaxFactory.SingletonList(attributeListSyntax));
     }
 
     protected static bool TryGetTargetNode<TNode>(

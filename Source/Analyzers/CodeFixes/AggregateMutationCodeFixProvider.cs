@@ -34,8 +34,7 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
             case DiagnosticIds.AggregateMissingMutationRuleId:
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        "Generate On-method",
-                        ct => GenerateStub(context, document, eventType!, ct),
+                        "Generate On-method", ct => GenerateStub(context, document, eventType!, ct),
                         nameof(AggregateMutationCodeFixProvider) + ".AddMutation"),
                     diagnostic);
                 break;
@@ -51,12 +50,12 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
         var member = SyntaxFactory.ParseMemberDeclaration($"private void On({eventType} @event) => throw new System.NotImplementedException();");
         if (member is not MethodDeclarationSyntax method) return document;
 
-
         var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().First(declaration => declaration.Span.Contains(context.Span));
 
-        var trivia = classDeclaration.Members.First().GetTrailingTrivia();
-        
-        var replacedNode = root.ReplaceNode(classDeclaration, classDeclaration.AddMembers(method.WithTrailingTrivia(trivia)));
-        return document.WithSyntaxRoot(replacedNode);
+        var replacedNode = root.ReplaceNode(classDeclaration,
+            Formatter.Format(classDeclaration.AddMembers(method.WithLeadingTrivia(SyntaxFactory.LineFeed)),
+                document.Project.Solution.Workspace));
+
+        return document.WithSyntaxRoot(replacedNode.WithLfLineEndings());
     }
 }
