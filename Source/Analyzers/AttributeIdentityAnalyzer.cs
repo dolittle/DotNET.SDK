@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,10 +18,14 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 {
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(DescriptorRules.InvalidIdentity);
+    readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity);
 
     public override void Initialize(AnalysisContext context)
     {
+        _identities.Clear();
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.RegisterSyntaxNodeAction(CheckHasIdentity, ImmutableArray.Create(SyntaxKind.Attribute));
@@ -53,12 +58,26 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         var identityParameter = symbol.Parameters[0];
         if (!attribute.TryGetArgumentValue(identityParameter, out var id)) return;
         var identityText = id.GetText().ToString();
+        var attributeName = attribute.Name.ToString();
 
-        if (!Guid.TryParse(identityText.Trim('"'), out _))
+        if (!Guid.TryParse(identityText.Trim('"'), out var identifier))
         {
             var properties = ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
             context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.InvalidIdentity, attribute.GetLocation(), properties,
-                attribute.Name.ToString(), identityParameter.Name, identityText));
+                attributeName, identityParameter.Name, identityText));
+        }
+        else
+        {
+            var key = (attributeName, identifier);
+            if (!_identities.TryAdd(key, attribute))
+            {
+                // Only reports secondary sightings, not the first one
+                ReportDuplicateIdentity(attribute, context, identifier);
+            }
         }
     }
+
+    static void ReportDuplicateIdentity(AttributeSyntax attribute, SyntaxNodeAnalysisContext context, Guid identifier) =>
+        context.ReportDiagnostic(
+            Diagnostic.Create(DescriptorRules.DuplicateIdentity, attribute.GetLocation(), attribute.Name.ToString(), identifier.ToString()));
 }

@@ -61,13 +61,6 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
         var handledEvents = CheckOnMethods(context, aggregateType);
         CheckApplyInvocations(context, aggregateSyntax, handledEvents);
-
-        // if (namedType.BaseType?.Equals(aggregateType) == true &&
-        //     !namedType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat).Equals(AllowedInternalImplementationTypeName))
-        // {
-        //     var diagnostic = Diagnostic.Create(Rule, namedType.Locations[0], namedType.Name, DontInheritInterfaceTypeName);
-        //     context.ReportDiagnostic(diagnostic);
-        // }
     }
 
 
