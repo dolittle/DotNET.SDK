@@ -9,4 +9,8 @@ static class DolittleTypes
     public const string EventTypeAttribute = "Dolittle.SDK.Events.EventTypeAttribute";
     public const string AggregateRootAttribute = "Dolittle.SDK.Aggregates.AggregateRootAttribute";
     public const string EventHandlerAttribute = "Dolittle.SDK.Events.Handling.EventHandlerAttribute";
+    
+    public const string ICommitEventsInterface = "Dolittle.SDK.Events.Store.ICommitEvents";
+    
+    
 }

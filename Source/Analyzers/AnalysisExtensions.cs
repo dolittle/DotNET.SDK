@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -36,6 +38,16 @@ static class AnalysisExtensions
         });
     }
 
+    public static bool ContainingTypeHasInterface(this IMethodSymbol methodSymbol, string qualifiedInterface) =>
+        methodSymbol.ContainingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat).Equals(qualifiedInterface) ||
+        methodSymbol.ContainingType.AllInterfaces.Any(_ => _.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) == qualifiedInterface);
+    
+    public static ImmutableDictionary<string, string?> ToTargetClassProps(this ITypeSymbol type) =>
+        new Dictionary<string, string?>
+        {
+            { "targetClass", type.ToString() },
+        }.ToImmutableDictionary();
+    
     public static bool TryGetArgumentValue(this AttributeSyntax attribute, IParameterSymbol parameterSymbol, out ExpressionSyntax expressionSyntax) =>
         attribute.TryGetArgumentValue(parameterSymbol.Name, parameterSymbol.Ordinal, out expressionSyntax);
 

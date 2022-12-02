@@ -151,7 +151,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMissingAttribute()
+    public async Task ShouldFindMissingAggregateAttribute()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -180,6 +180,45 @@ class SomeAggregate: AggregateRoot
             Diagnostic(DescriptorRules.Aggregate.MissingAttribute)
                 .WithSpan(9, 7, 9, 20)
                 .WithArguments("SomeAggregate")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ShouldFindMissingEventAttribute()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+namespace Test;
+
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    private void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Events.MissingAttribute)
+                .WithSpan(16, 9, 16, 37)
+                .WithArguments("Test.NameUpdated"),
+            Diagnostic(DescriptorRules.Events.MissingAttribute)
+                .WithSpan(19, 21, 19, 39)
+                .WithArguments("Test.NameUpdated")
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -249,7 +288,7 @@ class SomeAggregate: AggregateRoot
 
         await VerifyAnalyzerAsync(test, expected);
     }
-    
+
     [Fact]
     public async Task ShouldFindMissingMutation()
     {
@@ -287,7 +326,7 @@ public class SomeAggregate : AggregateRoot
 
         await VerifyAnalyzerAsync(test, expected);
     }
-    
+
     [Fact]
     public async Task ShouldFindMissingMutationFromVariable()
     {

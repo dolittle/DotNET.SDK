@@ -24,7 +24,7 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
     {
         var document = context.Document;
         var diagnostic = context.Diagnostics[0];
-        if (!diagnostic.Properties.TryGetValue("eventType", out var eventType))
+        if (!diagnostic.Properties.TryGetValue("targetClass", out var eventType))
         {
             return Task.CompletedTask;
         }

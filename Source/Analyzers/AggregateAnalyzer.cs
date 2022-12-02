@@ -104,7 +104,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Diagnostic.Create(
                         DescriptorRules.Events.MissingAttribute,
                         parameters[0].DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(),
-                        eventType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat))
+                        eventType.ToTargetClassProps(),
+                        eventType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat))
                     );
                 }
             }
@@ -140,16 +141,19 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             var argument = invocation.ArgumentList.Arguments[0];
             var typeInfo = semanticModel.GetTypeInfo(argument.Expression);
             if (typeInfo.Type is not { } type) continue;
-            if (handledEventTypes.Contains(type)) continue; // On-handler already exists
-
-            var props = new Dictionary<string, string?>
+            if (!type.HasEventTypeAttribute())
             {
-                { "eventType", type.ToString() },
-            }.ToImmutableDictionary();
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(), type.ToTargetClassProps(), type.ToString()));
+            }
 
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), props, type.ToString()));
+            if (!handledEventTypes.Contains(type))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToTargetClassProps(), type.ToString()));
+            }
         }
     }
+
+    
 
     static Types? GetRelevantTypes(Compilation compilation)
     {
