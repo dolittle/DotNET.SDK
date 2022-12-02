@@ -17,15 +17,15 @@ static class DescriptorRules
             isEnabledByDefault: true,
             description: "Add a Guid identity");
 
-    // internal static readonly DiagnosticDescriptor MissingIdentifierAttribute =
-    //     new(
-    //         DiagnosticIds.AggregateMissingAttributeRuleId,
-    //         title: "Class does not have the correct identifying attribute",
-    //         messageFormat: "'{0}' is missing {1}",
-    //         DiagnosticCategories.Sdk,
-    //         DiagnosticSeverity.Error,
-    //         isEnabledByDefault: true,
-    //         description: "Mark the class with an attribute to assign an identifier to it");
+    internal static readonly DiagnosticDescriptor DuplicateIdentity =
+        new(
+            DiagnosticIds.IdentityIsNotUniqueRuleId,
+            title: "Identifier is not unique",
+            messageFormat: "{0} '{1}' is not unique",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Assign a unique identity in the attribute");
     
     internal static class Events
     {
