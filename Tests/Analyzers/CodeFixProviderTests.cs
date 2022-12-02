@@ -4,12 +4,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Runtime.Tenancy.Contracts;
-using Dolittle.SDK.Aggregates;
-using Dolittle.SDK.Embeddings;
-using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Handling;
-using Dolittle.SDK.Projections;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
@@ -24,21 +18,11 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
 {
     protected Task VerifyCodeFixAsync(string source, string expectedResult, DiagnosticResult diagnosticResult)
     {
-        return new CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>
+        var test = new CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>
         {
             TestCode = source,
             TestState =
             {
-                AdditionalReferences =
-                {
-                    MetadataReference.CreateFromFile(typeof(AggregateRootAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(EventTypeAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(ProjectionAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(EventHandlerAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(EmbeddingAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Tenant).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(IDolittleClient).Assembly.Location),
-                },
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net60
             },
             ExpectedDiagnostics =
@@ -46,6 +30,12 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
                 diagnosticResult
             },
             FixedCode = expectedResult,
-        }.RunAsync(CancellationToken.None);
+        };
+        foreach (var assembly in AssembliesUnderTest.Assemblies)
+        {
+            test.TestState.AdditionalReferences.Add(MetadataReference.CreateFromFile(assembly.Location));
+        }
+        
+        return test.RunAsync(CancellationToken.None);
     }
 }

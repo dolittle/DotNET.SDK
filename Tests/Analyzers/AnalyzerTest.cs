@@ -2,12 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
-using Dolittle.SDK.Aggregates;
-using Dolittle.SDK.Embeddings;
-using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Handling;
-using Dolittle.SDK.Projections;
-using Dolittle.SDK.Tenancy;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
@@ -25,7 +19,7 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
     /// <param name="source">The source to test against</param>
     /// <returns></returns>
     protected Task VerifyAnalyzerFindsNothingAsync(string source) => VerifyAnalyzerAsync(source, DiagnosticResult.EmptyDiagnosticResults);
-    
+
     protected Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
     {
         var test = new CSharpAnalyzerTest<TAnalyzer, XUnitVerifier>
@@ -33,20 +27,14 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
             TestState =
             {
                 Sources = { source },
-                AdditionalReferences =
-                {
-                    MetadataReference.CreateFromFile(typeof(AggregateRootAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(EventTypeAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(ProjectionAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(EventHandlerAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(EmbeddingAttribute).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Tenant).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(IDolittleClient).Assembly.Location),
-                },
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
             }
         };
         test.TestState.ExpectedDiagnostics.AddRange(expected);
+        foreach (var assembly in AssembliesUnderTest.Assemblies)
+        {
+            test.TestState.AdditionalReferences.Add(MetadataReference.CreateFromFile(assembly.Location));
+        }
 
         return test.RunAsync();
     }
@@ -56,7 +44,7 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
         return AnalyzerVerifier<TAnalyzer>.Diagnostic();
     }
 
-    protected DiagnosticResult Diagnostic(Microsoft.CodeAnalysis.DiagnosticDescriptor descriptor)
+    protected DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor)
     {
         return AnalyzerVerifier<TAnalyzer>.Diagnostic(descriptor);
     }

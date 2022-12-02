@@ -104,7 +104,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Diagnostic.Create(
                         DescriptorRules.Events.MissingAttribute,
                         parameters[0].DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(),
-                        eventType.ToTargetClassProps(),
+                        eventType.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute),
                         eventType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat))
                     );
                 }
@@ -143,12 +143,12 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             if (typeInfo.Type is not { } type) continue;
             if (!type.HasEventTypeAttribute())
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(), type.ToTargetClassProps(), type.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(), type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), type.ToString()));
             }
 
             if (!handledEventTypes.Contains(type))
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToTargetClassProps(), type.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToTargetClassAndAttributeProps(DolittleTypes.AggregateRootAttribute), type.ToString()));
             }
         }
     }

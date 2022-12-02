@@ -12,8 +12,6 @@ namespace Dolittle.SDK.Analyzers;
 
 static class AnalysisExtensions
 {
-
-
     public static bool IsDolittleType(this ISymbol symbol)
     {
         var symbolNamespace = symbol.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -41,13 +39,20 @@ static class AnalysisExtensions
     public static bool ContainingTypeHasInterface(this IMethodSymbol methodSymbol, string qualifiedInterface) =>
         methodSymbol.ContainingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat).Equals(qualifiedInterface) ||
         methodSymbol.ContainingType.AllInterfaces.Any(_ => _.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) == qualifiedInterface);
-    
+
+    public static ImmutableDictionary<string, string?> ToTargetClassAndAttributeProps(this ITypeSymbol type, string attributeClass) =>
+        new Dictionary<string, string?>
+        {
+            { "targetClass", type.ToString() },
+            { "attributeClass", attributeClass },
+        }.ToImmutableDictionary();
+
     public static ImmutableDictionary<string, string?> ToTargetClassProps(this ITypeSymbol type) =>
         new Dictionary<string, string?>
         {
             { "targetClass", type.ToString() },
         }.ToImmutableDictionary();
-    
+
     public static bool TryGetArgumentValue(this AttributeSyntax attribute, IParameterSymbol parameterSymbol, out ExpressionSyntax expressionSyntax) =>
         attribute.TryGetArgumentValue(parameterSymbol.Name, parameterSymbol.Ordinal, out expressionSyntax);
 

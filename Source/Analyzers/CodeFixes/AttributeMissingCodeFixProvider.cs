@@ -16,33 +16,28 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeMissingCodeFixProvider)), Shared]
 public class AttributeMissingCodeFixProvider : CodeFixProvider
 {
+    /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
         ImmutableArray.Create(DiagnosticIds.AggregateMissingAttributeRuleId, DiagnosticIds.EventMissingAttributeRuleId);
 
+    /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var document = context.Document;
         var diagnostic = context.Diagnostics[0];
 
+        if (!diagnostic.Properties.TryGetValue("targetClass", out var className) || className is null) return Task.CompletedTask;
+        if (!diagnostic.Properties.TryGetValue("attributeClass", out var attributeName) || attributeName is null) return Task.CompletedTask;
+
         switch (diagnostic.Id)
         {
             case DiagnosticIds.AggregateMissingAttributeRuleId:
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Generate attribute",
-                        ct => GenerateIdentityAttribute(context, document,"AggregateRoot", ct),
-                        nameof(AttributeMissingCodeFixProvider) + ".AddAggregateAttribute"),
-                    diagnostic);
-                break;
-        }
-        switch (diagnostic.Id)
-        {
             case DiagnosticIds.EventMissingAttributeRuleId:
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Generate attribute",
-                        ct => GenerateIdentityAttribute(context, document,DolittleTypes.EventTypeAttribute, ct),
-                        nameof(AttributeMissingCodeFixProvider) + ".AddEventAttribute"),
+                        ct => GenerateIdentityAttribute(context, document, className, attributeName, ct),
+                        nameof(AttributeMissingCodeFixProvider) + ".AddAggregateAttribute"),
                     diagnostic);
                 break;
         }
@@ -51,44 +46,62 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
     }
 
 
-    static async Task<Document> GenerateIdentityAttribute(CodeFixContext context, Document document, string attributeClass, CancellationToken cancellationToken)
+    static async Task<Solution> GenerateIdentityAttribute(CodeFixContext context, Document document, string targetClass, string attributeClass,
+        CancellationToken cancellationToken)
     {
-        var root = await context.Document.GetSyntaxRootAsync(cancellationToken);
-        if (root is null) return document;
-        if (!TryGetTargetNode(context, root, out ClassDeclarationSyntax classSyntax)) return document; // Target not found
+        var semanticModel = await context.Document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel is null) return document.Project.Solution;
+        var targetType = semanticModel.Compilation.GetTypeByMetadataName(targetClass);
+        if (targetType is null) return document.Project.Solution;
+        var attributeType = semanticModel.Compilation.GetTypeByMetadataName(attributeClass);
+        if (attributeType is null) return document.Project.Solution;
 
-        var updatedRoot = root.ReplaceNode(classSyntax, GenerateIdentityAttribute(classSyntax, attributeClass));
-        return document.WithSyntaxRoot(updatedRoot.WithLfLineEndings());
+
+        // Add the attribute of attributeType to targetType, even if it is in another project
+        var targetTypeSyntaxReference = targetType.DeclaringSyntaxReferences[0];
+        if (await targetTypeSyntaxReference.GetSyntaxAsync(cancellationToken) is not TypeDeclarationSyntax classSyntax)
+            return document.Project.Solution;
+
+        var updatedSyntax = WithIdentityAttribute(classSyntax, attributeType);
+
+        var targetDocument = document.Project.Solution.GetDocument(targetTypeSyntaxReference.SyntaxTree);
+        if (targetDocument is null) return document.Project.Solution;
+
+        if (await targetDocument.GetSyntaxRootAsync(cancellationToken) is not CompilationUnitSyntax existingRoot) return document.Project.Solution;
+
+        var updatedRoot = existingRoot
+            .ReplaceNode(classSyntax, updatedSyntax);
+        
+        // Add missing using statements to the updated root
+        updatedRoot = updatedRoot.AddMissingUsingDirectives(attributeType.ContainingNamespace);
+
+        var updatedDocument = targetDocument.WithSyntaxRoot(updatedRoot);
+        
+        return updatedDocument.Project.Solution;
     }
 
-    static ClassDeclarationSyntax GenerateIdentityAttribute(ClassDeclarationSyntax existing, string attributeClass)
+
+
+    static TypeDeclarationSyntax WithIdentityAttribute(TypeDeclarationSyntax existing, INamedTypeSymbol attributeClass)
     {
-        var newIdentity = SyntaxFactory.ParseExpression("\"" + IdentityGenerator.Generate() + "\"");
-
-        var attribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(attributeClass), SyntaxFactory.AttributeArgumentList(
-            SyntaxFactory.SingletonSeparatedList(
-                SyntaxFactory.AttributeArgument(newIdentity))));
-        var attributeListSyntax = SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(attribute));
-
-        return existing.WithAttributeLists(
-            existing.AttributeLists.Any()
-                ? existing.AttributeLists.Add(attributeListSyntax)
-                : SyntaxFactory.SingletonList(attributeListSyntax));
+        var attributeSyntax = CreateIdentifierAttribute(attributeClass);
+        return existing.AddAttributeLists(SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(attributeSyntax)));
     }
 
-    protected static bool TryGetTargetNode<TNode>(
-        CodeFixContext context,
-        SyntaxNode root,
-        out TNode node) where TNode : SyntaxNode
+    static AttributeSyntax CreateIdentifierAttribute(INamedTypeSymbol attributeClass)
     {
-#pragma warning disable CS8601
-        node = root
-            .FindNode(context.Span, false, getInnermostNodeForTie: true)?
-            .FirstAncestorOrSelf<TNode>(ascendOutOfTrivia: true);
-#pragma warning restore CS8601
-        return node is not null;
-    }
+        var attributeList = SyntaxFactory.ParseAttributeArgumentList($"(\"{IdentityGenerator.Generate()}" + "\")");
+        var identifier = attributeClass.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+        if (identifier.EndsWith("Attribute"))
+        {
+            identifier = identifier.Substring(0, identifier.Length - "Attribute".Length);
+        }
 
+        // Adds the AttributeArgumentList to the existing type
+        var attributeSyntax = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(identifier),
+            attributeList);
+        return attributeSyntax;
+    }
 
     public override FixAllProvider GetFixAllProvider()
     {
