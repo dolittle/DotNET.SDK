@@ -124,6 +124,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(
                 DescriptorRules.Aggregate.MissingAttribute,
                 aggregateClass.Locations[0],
+                aggregateClass.ToTargetClassAndAttributeProps(DolittleTypes.AggregateRootAttribute),
                 aggregateClass.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
             ));
         }
