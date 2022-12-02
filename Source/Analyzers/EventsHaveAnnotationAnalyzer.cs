@@ -40,12 +40,11 @@ public class EventsHaveAnnotationAnalyzer : DiagnosticAnalyzer
         var typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
         if (typeInfo.Type is null) return;
         if (typeInfo.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Equals("object")) return;
-        
+
         // Check if the argument to the invocation argument has the Dolittle.SDK.Events.EventTypeAttribute attribute
         if (typeInfo.Type.HasEventTypeAttribute()) return; // All good
 
-        context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(), typeInfo.Type.Name));
+        context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(),
+            typeInfo.Type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), typeInfo.Type.Name));
     }
-
-    
 }
