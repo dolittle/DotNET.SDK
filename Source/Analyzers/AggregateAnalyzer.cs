@@ -149,7 +149,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
             if (!handledEventTypes.Contains(type))
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToTargetClassAndAttributeProps(DolittleTypes.AggregateRootAttribute), type.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToMinimalTypeNameProps(), type.ToString()));
             }
         }
     }

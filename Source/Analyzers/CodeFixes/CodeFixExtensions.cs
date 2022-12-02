@@ -17,8 +17,12 @@ static class Extensions
 
     public static CompilationUnitSyntax AddMissingUsingDirectives(this CompilationUnitSyntax root, params INamespaceSymbol[] namespaces)
     {
+        return root.AddMissingUsingDirectives(namespaces.Select(_ => _.ToDisplayString()).ToArray());
+    }
+    public static CompilationUnitSyntax AddMissingUsingDirectives(this CompilationUnitSyntax root, params string[] namespaces)
+    {
         var usingDirectives = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToList();
-        var nonImportedNamespaces = namespaces.Select(_ => _.ToDisplayString()).ToImmutableHashSet();
+        var nonImportedNamespaces = namespaces.ToImmutableHashSet();
 
         foreach (var usingDirective in usingDirectives)
         {

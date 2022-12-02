@@ -24,7 +24,7 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
     {
         var document = context.Document;
         var diagnostic = context.Diagnostics[0];
-        if (!diagnostic.Properties.TryGetValue("targetClass", out var eventType))
+        if (!diagnostic.Properties.TryGetValue("typeName", out var eventType))
         {
             return Task.CompletedTask;
         }
@@ -45,9 +45,9 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
 
     async Task<Document> GenerateStub(CodeFixContext context, Document document, string eventType, CancellationToken ct)
     {
-        var root = await context.Document.GetSyntaxRootAsync(ct);
-        if (root is null) return document;
-        var member = SyntaxFactory.ParseMemberDeclaration($"private void On({eventType} @event) => throw new System.NotImplementedException();");
+        if(await context.Document.GetSyntaxRootAsync(ct) is not CompilationUnitSyntax root) return document;
+        
+        var member = SyntaxFactory.ParseMemberDeclaration($"private void On({eventType} @event) => throw new NotImplementedException();");
         if (member is not MethodDeclarationSyntax method) return document;
 
         var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().First(declaration => declaration.Span.Contains(context.Span));
@@ -56,6 +56,6 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
             Formatter.Format(classDeclaration.AddMembers(method.WithLeadingTrivia(SyntaxFactory.LineFeed)),
                 document.Project.Solution.Workspace));
 
-        return document.WithSyntaxRoot(replacedNode.WithLfLineEndings());
+        return document.WithSyntaxRoot(replacedNode.AddMissingUsingDirectives("System").WithLfLineEndings());
     }
 }

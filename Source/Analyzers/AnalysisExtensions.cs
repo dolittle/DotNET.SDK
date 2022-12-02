@@ -40,6 +40,12 @@ static class AnalysisExtensions
         methodSymbol.ContainingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat).Equals(qualifiedInterface) ||
         methodSymbol.ContainingType.AllInterfaces.Any(_ => _.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) == qualifiedInterface);
 
+    public static ImmutableDictionary<string, string?> ToMinimalTypeNameProps(this ITypeSymbol type) =>
+        new Dictionary<string, string?>
+        {
+            { "typeName", type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) },
+        }.ToImmutableDictionary();
+    
     public static ImmutableDictionary<string, string?> ToTargetClassAndAttributeProps(this ITypeSymbol type, string attributeClass) =>
         new Dictionary<string, string?>
         {
