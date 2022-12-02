@@ -24,6 +24,7 @@
         <ProjectReference Include="..\..\Source\Embeddings\Embeddings.csproj" />
         <ProjectReference Include="..\..\Source\Events.Handling\Events.Handling.csproj" />
         <ProjectReference Include="..\..\Source\Projections\Projections.csproj" />
+        <ProjectReference Include="..\..\Source\SDK\SDK.csproj" />
     </ItemGroup>
 
 </Project>
