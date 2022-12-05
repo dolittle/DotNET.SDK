@@ -69,8 +69,6 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
     static HashSet<ITypeSymbol> CheckOnMethods(SymbolAnalysisContext context, INamedTypeSymbol aggregateType)
     {
-        var fieldsDefaultToPrivate = context.FieldsArePrivateByDefault();
-
         var members = aggregateType.GetMembers();
         var onMethods = members.Where(_ => _.Name.Equals("On")).OfType<IMethodSymbol>().ToArray();
         var eventTypesHandled = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
@@ -79,21 +77,10 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         {
             if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax) continue;
 
-            if (!fieldsDefaultToPrivate)
+            if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
             {
-                if (!syntax.Modifiers.Any(SyntaxKind.PrivateKeyword))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
-                        onMethod.ToDisplayString()));
-                }
-            }
-            else
-            {
-                if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
-                        onMethod.ToDisplayString()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
+                    onMethod.ToDisplayString()));
             }
 
             var parameters = onMethod.Parameters;
