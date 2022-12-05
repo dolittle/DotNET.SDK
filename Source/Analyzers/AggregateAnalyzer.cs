@@ -10,9 +10,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dolittle.SDK.Analyzers;
 
+#pragma warning disable CS1574, CS1584, CS1581, CS1580
 /// <summary>
 /// Analyzer for <see cref="Dolittle.SDK.Aggregates.AggregateRoot"/>.
 /// </summary>
+#pragma warning restore CS1574, CS1584, CS1581, CS1580
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AggregateAnalyzer : DiagnosticAnalyzer
 {
@@ -32,6 +34,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Events.MissingAttribute
         );
 
+    /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -53,7 +56,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     {
         // Check if the symbol has the aggregate root base class
         var aggregateType = (INamedTypeSymbol)context.Symbol;
-        if (aggregateType.BaseType?.Equals(types.AggregateRoot) != true) return;
+        if (aggregateType.BaseType?.Equals(types.AggregateRoot, SymbolEqualityComparer.Default) != true) return;
         if (aggregateType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not ClassDeclarationSyntax aggregateSyntax) return;
 
         CheckAggregateRootAttributePresent(context, aggregateType, types.AggregateAttribute);
@@ -66,18 +69,31 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
     static HashSet<ITypeSymbol> CheckOnMethods(SymbolAnalysisContext context, INamedTypeSymbol aggregateType)
     {
+        var fieldsDefaultToPrivate = context.FieldsArePrivateByDefault();
+
         var members = aggregateType.GetMembers();
         var onMethods = members.Where(_ => _.Name.Equals("On")).OfType<IMethodSymbol>().ToArray();
-        var eventTypesHandled = new HashSet<ITypeSymbol>();
+        var eventTypesHandled = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var onMethod in onMethods)
         {
             if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax) continue;
 
-            if (!syntax.Modifiers.Any(SyntaxKind.PrivateKeyword))
+            if (!fieldsDefaultToPrivate)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
-                    onMethod.ToDisplayString()));
+                if (!syntax.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
+                        onMethod.ToDisplayString()));
+                }
+            }
+            else
+            {
+                if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
+                        onMethod.ToDisplayString()));
+                }
             }
 
             var parameters = onMethod.Parameters;
@@ -107,10 +123,9 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         return eventTypesHandled;
     }
 
-
     static void CheckAggregateRootAttributePresent(SymbolAnalysisContext context, INamedTypeSymbol aggregateClass, INamedTypeSymbol attributeType)
     {
-        var hasAttribute = aggregateClass.GetAttributes().Any(attribute => attribute.AttributeClass?.Equals(attributeType) == true);
+        var hasAttribute = aggregateClass.GetAttributes().Any(attribute => attribute.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) == true);
 
         if (!hasAttribute)
         {
@@ -137,17 +152,18 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             if (typeInfo.Type is not { } type) continue;
             if (!type.HasEventTypeAttribute())
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(), type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), type.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(),
+                    type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), type.ToString()));
             }
 
             if (!handledEventTypes.Contains(type))
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToMinimalTypeNameProps(), type.ToString()));
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToMinimalTypeNameProps(),
+                    type.ToString()));
             }
         }
     }
 
-    
 
     static Types? GetRelevantTypes(Compilation compilation)
     {

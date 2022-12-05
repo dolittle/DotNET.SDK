@@ -15,11 +15,16 @@ using Microsoft.CodeAnalysis.Formatting;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
+/// <summary>
+/// Adds On-method for the specific event type
+/// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AggregateMutationCodeFixProvider)), Shared]
 public class AggregateMutationCodeFixProvider : CodeFixProvider
 {
+    /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AggregateMissingMutationRuleId);
 
+    /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var document = context.Document;
@@ -45,8 +50,8 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
 
     async Task<Document> GenerateStub(CodeFixContext context, Document document, string eventType, CancellationToken ct)
     {
-        if(await context.Document.GetSyntaxRootAsync(ct) is not CompilationUnitSyntax root) return document;
-        
+        if (await context.Document.GetSyntaxRootAsync(ct) is not CompilationUnitSyntax root) return document;
+
         var member = SyntaxFactory.ParseMemberDeclaration($"private void On({eventType} @event) => throw new NotImplementedException();");
         if (member is not MethodDeclarationSyntax method) return document;
 

@@ -20,9 +20,11 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 {
     readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
 
+    /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity);
 
+    /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         _identities.Clear();

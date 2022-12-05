@@ -13,6 +13,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
+/// <summary>
+/// Generates a valid Guid identity for a given Dolittle identity attribute
+/// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeIdentityCodeFixProvider)), Shared]
 public class AttributeIdentityCodeFixProvider : CodeFixProvider
 {
@@ -46,6 +49,7 @@ public class AttributeIdentityCodeFixProvider : CodeFixProvider
         CancellationToken cancellationToken)
     {
         var root = await context.Document.GetSyntaxRootAsync(cancellationToken);
+        if (root is null) return document;
         if (!TryGetTargetNode(context, root, out AttributeSyntax attribute)) return document; // Target not found
         var updatedRoot = root.ReplaceNode(attribute, GenerateIdentity(attribute, identityParameterName));
         return document.WithSyntaxRoot(updatedRoot);
@@ -65,7 +69,7 @@ public class AttributeIdentityCodeFixProvider : CodeFixProvider
                     SyntaxFactory.AttributeArgument(newIdentity))));
     }
 
-    protected static bool TryGetTargetNode<TNode>(
+    static bool TryGetTargetNode<TNode>(
         CodeFixContext context,
         SyntaxNode root,
         out TNode node) where TNode : SyntaxNode

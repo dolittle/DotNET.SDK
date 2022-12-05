@@ -14,6 +14,10 @@ public static class DiagnosticIds
     /// Attribute missing the required ID.
     /// </summary>
     public const string EventMissingAttributeRuleId = "SDK0002";
+    
+    /// <summary>
+    /// Identity is shared between multiple targets.
+    /// </summary>
     public const string IdentityIsNotUniqueRuleId = "SDK0003";
 
     /// <summary>

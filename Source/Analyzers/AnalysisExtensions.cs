@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dolittle.SDK.Analyzers;
 
@@ -18,6 +19,31 @@ static class AnalysisExtensions
 
         return symbolNamespace.StartsWith("global::Dolittle.SDK", StringComparison.Ordinal)
                || symbolNamespace.StartsWith("Dolittle.SDK", StringComparison.Ordinal);
+    }
+
+    public static bool FieldsArePrivateByDefault(this SymbolAnalysisContext context) =>
+        context.Options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue("dotnet_naming_symbols.private_fields.required_modifiers",
+            out var requiredPrivate) && string.IsNullOrEmpty(requiredPrivate);
+
+    /// <summary>
+    /// Checks if base class of the type is Dolittle.SDK.Aggregates.AggregateRoot
+    /// </summary>
+    /// <param name="typeSymbol">The checked class</param>
+    /// <returns></returns>
+    public static bool IsAggregateRoot(this INamedTypeSymbol typeSymbol)
+    {
+        var baseType = typeSymbol.BaseType;
+        while (baseType != null)
+        {
+            if (baseType.ToString() == DolittleTypes.AggregateRootBaseClass)
+            {
+                return true;
+            }
+
+            baseType = baseType.BaseType;
+        }
+
+        return false;
     }
 
     public static bool HasEventTypeAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.EventTypeAttribute);
@@ -45,7 +71,7 @@ static class AnalysisExtensions
         {
             { "typeName", type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) },
         }.ToImmutableDictionary();
-    
+
     public static ImmutableDictionary<string, string?> ToTargetClassAndAttributeProps(this ITypeSymbol type, string attributeClass) =>
         new Dictionary<string, string?>
         {
