@@ -52,12 +52,6 @@ public class EventProcessors : IEventProcessors
         where TRequest : class
         where TResponse : class
     {
-#if NETCOREAPP3_1
-        if (++_eventProcessoCounter >= 100)
-        {
-            _logger.LogWarning("There are more than 100 event processors registered, this might cause your application to hang when using netcoreapp 3.1. Please reduce the amount of event processors or upgrade your app to use net5 or later version of .NET");
-        }
-#endif
         var processor = Task.Run(() => RunProcessorForeverUntilCancelled(eventProcessor, protocol, cancellationToken));
         _processingCoordinator.RegisterProcessor(processor);
     }
