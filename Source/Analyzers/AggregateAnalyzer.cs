@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -129,6 +130,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     static void CheckApplyInvocations(SymbolAnalysisContext context, ClassDeclarationSyntax aggregateClassSyntax,
         ISet<ITypeSymbol> handledEventTypes)
     {
+        // TODO: refactor analyzer to prevent creating a new SemanticModel for each class
         var semanticModel = context.Compilation.GetSemanticModel(aggregateClassSyntax.SyntaxTree);
         foreach (var invocation in aggregateClassSyntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
         {

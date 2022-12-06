@@ -8,7 +8,12 @@ namespace Dolittle.SDK.Analyzers.Suppressors;
 static class SuppressionDescriptors
 {
     public static readonly SuppressionDescriptor IDE0051Unused = new(
-        "DSD0001",
+        "SDK_IDE0051",
         "IDE0051",
+        "On-methods are used internally by the aggregate to mutate it's state");
+    
+    public static readonly SuppressionDescriptor UnusedMemberLocal = new(
+        "SDK_UnusedMember.Local",
+        "UnusedMember.Local",
         "On-methods are used internally by the aggregate to mutate it's state");
 }
