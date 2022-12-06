@@ -41,5 +41,5 @@ public class SubscribeResponse
     /// <summary>
     /// Gets the <see cref="Failure"/> describing why the subscription failed, if it failed.
     /// </summary>
-    public Failure Failure { get; }
+    public Failure? Failure { get; }
 }

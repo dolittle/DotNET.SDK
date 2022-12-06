@@ -17,8 +17,10 @@ static class FailureExtensions
     /// </summary>
     /// <param name="failure"><see cref="PbFailure" /> to convert.</param>
     /// <returns>The converted <see cref="Failure"/>.</returns>
-    public static Failure ToSDK(this PbFailure failure)
+    public static Failure? ToSDK(this PbFailure? failure)
     {
+        if (failure is null) return null;
+
         return !failure.Id.TryTo<FailureId>(out var id, out _)
             ? new Failure(FailureId.Undocumented, failure.Reason)
             : new Failure(id, failure.Reason);
