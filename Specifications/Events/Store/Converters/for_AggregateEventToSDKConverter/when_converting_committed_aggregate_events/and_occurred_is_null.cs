@@ -6,6 +6,7 @@ using Dolittle.SDK.Protobuf;
 using Machine.Specifications;
 using PbCommittedAggregateEvent = Dolittle.Runtime.Events.Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent;
 using PbCommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.CommittedAggregateEvents;
+#pragma warning disable CS0612
 
 namespace Dolittle.SDK.Events.Store.Converters.for_AggregateEventToSDKConverter.when_converting_committed_aggregate_events;
 

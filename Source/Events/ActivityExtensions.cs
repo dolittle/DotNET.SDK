@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Dolittle.SDK.Events.Store;
 
 namespace Dolittle.SDK.Events;

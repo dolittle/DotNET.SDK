@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Aggregates.Internal;
@@ -22,7 +23,7 @@ public static class AggregateRootExtensions
     /// <param name="event">The event to get On-method for.</param>
     /// <param name="method">The outputted <see cref="MethodInfo" />.</param>
     /// <returns>A value indicating whether there was an On-method for the event.</returns>
-    public static bool TryGetOnMethod(this AggregateRoot aggregateRoot, object @event, out MethodInfo method)
+    public static bool TryGetOnMethod(this AggregateRoot aggregateRoot, object @event, [NotNullWhen(true)] out MethodInfo? method)
     {
         var eventType = @event.GetType();
         var handleMethods = GetHandleMethodsFor(aggregateRoot.GetType());
@@ -52,11 +53,16 @@ public static class AggregateRootExtensions
         return identifier.Id;
     }
     
+    
+#pragma warning disable CS8602 // Only used internally with the correct type. 
+#pragma warning disable CS8603 // Analyzers are not able to check that this is always valid
     internal static IReadOnlyDictionary<Type, MethodInfo> GetHandleMethodsFor(Type aggregateRootType)
         => typeof(AggregateRootHandleMethods<>)
             .MakeGenericType(aggregateRootType)
             .GetRuntimeField("MethodsPerEventType")
             .GetValue(null) as IReadOnlyDictionary<Type, MethodInfo>;
+#pragma warning restore CS8603
+#pragma warning restore CS8602
 
     internal static IReadOnlyDictionary<Type, MethodInfo> GetHandleMethodsFor<TAggregateRoot>() where TAggregateRoot : AggregateRoot
         => AggregateRootMetadata<TAggregateRoot>.MethodsPerEventType;

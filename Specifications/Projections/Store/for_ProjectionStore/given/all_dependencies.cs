@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Projections.Contracts;
-using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Store.Converters;

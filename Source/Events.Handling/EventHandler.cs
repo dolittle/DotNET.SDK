@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Diagnostics;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Dolittle.SDK.Execution;
-using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Events.Handling;
 

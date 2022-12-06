@@ -3,7 +3,6 @@
 
 using System.Threading;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Store;
 using Machine.Specifications;
 
 namespace Dolittle.SDK.Aggregates.for_AggregateRoot.when_reapplying;

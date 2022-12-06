@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Events.Store.Converters;
 using Newtonsoft.Json;
 using PbCurrentState = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentState;
@@ -16,12 +17,12 @@ namespace Dolittle.SDK.Projections.Store.Converters;
 public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
 {
     /// <inheritdoc/>
-    public bool TryConvert<TProjection>(PbCurrentState source, out CurrentState<TProjection> state, out Exception error)
+    public bool TryConvert<TProjection>(PbCurrentState source, out CurrentState<TProjection> state, [NotNullWhen(false)] out Exception? error)
         where TProjection : class, new()
         => TryDeserializeWithSettings(source, out state, out error);
 
     /// <inheritdoc/>
-    public bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
+    public bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, [NotNullWhen(false)] out Exception? error)
         where TProjection : class, new()
     {
         error = null;
@@ -62,7 +63,7 @@ public class ProjectionsToSDKConverter : IConvertProjectionsToSDK
         return true;
     }
 
-    static bool TryGetCurrentStateType(PbCurrentStateType pbType, out CurrentStateType type, out Exception error)
+    static bool TryGetCurrentStateType(PbCurrentStateType pbType, out CurrentStateType type, [NotNullWhen(false)] out Exception? error)
     {
         switch (pbType)
         {

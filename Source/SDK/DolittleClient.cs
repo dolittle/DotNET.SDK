@@ -123,7 +123,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     public Task Connected => _connectedCompletionSource.Task;
 
     internal IAggregateRootTypes AggregateRootTypes => _unregisteredAggregateRoots;
-    
+
     /// <inheritdoc />
     public IEventTypes EventTypes { get; }
 
@@ -188,7 +188,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// </summary>
     /// <param name="setup">The optional <see cref="SetupDolittleClient"/> callback.</param>
     /// <returns>The built <see cref="IDolittleClient"/>.</returns>
-    public static IDolittleClient Setup(SetupDolittleClient setup = default)
+    public static IDolittleClient Setup(SetupDolittleClient? setup = default)
     {
         var builder = new SetupBuilder();
         setup?.Invoke(builder);
@@ -222,11 +222,15 @@ public class DolittleClient : IDisposable, IDolittleClient
             {
                 throw new CannotConnectDolittleClientMultipleTimes();
             }
-            
+
             AddDefaultsFromServiceProviderInConfiguration(configuration);
-            
+
             var loggerFactory = configuration.LoggerFactory;
-            _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
+            if (loggerFactory is not null)
+            {
+                _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
+            }
+
             _grpcChannel = GrpcChannel.ForAddress(
                 $"http://{configuration.RuntimeHost}:{configuration.RuntimePort}",
                 new GrpcChannelOptions
@@ -242,13 +246,14 @@ public class DolittleClient : IDisposable, IDolittleClient
 #endif
                 });
             var methodCaller = new MethodCaller(_grpcChannel, configuration.RuntimeHost, configuration.RuntimePort);
-            var (executionContext, tenants, otlpEndpoint) = await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
+            var (executionContext, tenants, otlpEndpoint) =
+                await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
             Tenants = tenants;
 
             await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext, tenants).ConfigureAwait(false);
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
-            
+
             IsConnected = true;
             _connectedCompletionSource.SetResult(true);
             return this;
@@ -259,7 +264,8 @@ public class DolittleClient : IDisposable, IDolittleClient
         }
     }
 
-    Task<ConnectionResult> ConnectToRuntime(IPerformMethodCalls methodCaller, DolittleClientConfiguration configuration, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    Task<ConnectionResult> ConnectToRuntime(IPerformMethodCalls methodCaller, DolittleClientConfiguration configuration, ILoggerFactory loggerFactory,
+        CancellationToken cancellationToken)
     {
         var runtimeConnector = new DolittleRuntimeConnector(
             configuration.RuntimeHost,
@@ -269,7 +275,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             new TenantsClient(methodCaller, loggerFactory.CreateLogger<TenantsClient>()),
             _buildResults,
             loggerFactory.CreateLogger<DolittleRuntimeConnector>());
-        
+
         return runtimeConnector.ConnectForever(cancellationToken);
     }
 
@@ -331,7 +337,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             _callContextResolver,
             _unregisteredEventTypes,
             loggerFactory);
-        Aggregates = new AggregatesBuilder(tenant => Services.ForTenant(tenant));
+        Aggregates = new AggregatesBuilder(Services.ForTenant);
         EventHorizons = new EventHorizons(
             methodCaller,
             executionContext,
@@ -371,7 +377,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             new AggregateRootsClient(
                 methodCaller,
                 executionContext,
-                loggerFactory.CreateLogger<AggregateRootsClient>()),   
+                loggerFactory.CreateLogger<AggregateRootsClient>()),
             _clientCancellationTokenSource.Token).ConfigureAwait(false);
         StartEventProcessors(methodCaller, pingInterval, executionContext, loggerFactory);
     }
@@ -388,7 +394,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             reverseCallClientsCreator,
             _processingCoordinator,
             loggerFactory.CreateLogger<EventProcessors>());
-        
+
         var eventProcessingConverter = new EventProcessingConverter(_eventToSDKConverter);
         _unregisteredEventHandlers.Register(
             eventProcessors,
@@ -437,10 +443,10 @@ public class DolittleClient : IDisposable, IDolittleClient
         {
             var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
             config.WithLogging(loggerFactory ?? LoggerFactory.Create(_ =>
-                {
-                    _.SetMinimumLevel(LogLevel.Information);
-                    _.AddConsole();
-                }));
+            {
+                _.SetMinimumLevel(LogLevel.Information);
+                _.AddConsole();
+            }));
         }
 
         if (config.TenantServiceProviderFactory is null)

@@ -77,8 +77,6 @@ static class AggregateRootMetadata<TAggregateRoot>
 #pragma warning disable CS0618
     static Func<IServiceProvider, EventSourceId, Try<TAggregateRoot>> CreateConstruct(Type aggregateRootType)
     {
-        Func<IServiceProvider, EventSourceId, Try<TAggregateRoot>> construct;
-
         if (!TryGetConstructor(aggregateRootType, out var constructor, out var e))
         {
             // Not instantiatable

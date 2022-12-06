@@ -20,14 +20,14 @@ public class JsonSerializerExceptionCatcher
     /// <summary>
     /// Gets the <see cref="Exception"/> that caused the serializer operation to fail.
     /// </summary>
-    public Exception Error { get; private set; }
+    public Exception? Error { get; private set; }
 
     /// <summary>
     /// Error handler for <see cref="JsonSerializerSettings"/>.
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="eventArgs">The event data.</param>
-    public void OnError(object sender, ErrorEventArgs eventArgs)
+    public void OnError(object? sender, ErrorEventArgs eventArgs)
     {
         Failed = true;
         Error = eventArgs.ErrorContext.Error;

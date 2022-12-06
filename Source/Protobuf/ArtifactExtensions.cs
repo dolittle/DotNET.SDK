@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Artifacts;
 using PbArtifact = Dolittle.Artifacts.Contracts.Artifact;
 
@@ -36,7 +37,7 @@ public static class ArtifactExtensions
     /// <typeparam name="TArtifact">The <see cref="Type" /> of the <see cref="Artifact{TId}" />.</typeparam>
     /// <typeparam name="TId">The <see cref="Type" /> of the <see cref="ArtifactId" />.</typeparam>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    public static bool TryTo<TArtifact, TId>(this PbArtifact source, out TArtifact artifact, out Exception error)
+    public static bool TryTo<TArtifact, TId>(this PbArtifact source, [NotNullWhen(true)] out TArtifact? artifact, [NotNullWhen(false)] out Exception? error)
         where TArtifact : Artifact<TId>
         where TId : ArtifactId
     {
@@ -109,7 +110,7 @@ public static class ArtifactExtensions
     /// <param name="artifact">When the method returns, a tuple with <see cref="ArtifactId" /> and <see cref="Generation" /> if conversion was successful, otherwise null.</param>
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    public static bool TryToArtifact(this PbArtifact source, out (ArtifactId Id, Generation Generation) artifact, out Exception error)
+    public static bool TryToArtifact(this PbArtifact source, out (ArtifactId Id, Generation Generation) artifact, [NotNullWhen(false)] out Exception? error)
     {
         artifact = default;
         if (!source.Id.TryTo<ArtifactId>(out var id, out error))

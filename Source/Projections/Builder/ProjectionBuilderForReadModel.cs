@@ -123,7 +123,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default)
+    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>>? callback = default)
     {
         _projectionCopyDefinitionBuilder.CopyToMongoDB(callback);
         return this;

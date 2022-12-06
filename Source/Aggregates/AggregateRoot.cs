@@ -12,7 +12,7 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
 
 namespace Dolittle.SDK.Aggregates;
-
+#pragma warning disable CS0618 // Refers to EventSourceId which is marked obsolete for clients. Should still be used internally
 /// <summary>
 /// Represents the aggregate root.
 /// </summary>

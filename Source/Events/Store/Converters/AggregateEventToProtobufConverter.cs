@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Protobuf;
 using PbUncommittedAggregateEvent = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents.Types.UncommittedAggregateEvent;
 using PbUncommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.UncommittedAggregateEvents;
@@ -25,7 +26,7 @@ public class AggregateEventToProtobufConverter : IConvertAggregateEventsToProtob
     }
 
     /// <inheritdoc/>
-    public bool TryConvert(UncommittedAggregateEvents source, out PbUncommittedAggregateEvents events, out Exception error)
+    public bool TryConvert(UncommittedAggregateEvents? source, [NotNullWhen(true)] out PbUncommittedAggregateEvents? events, [NotNullWhen(false)] out Exception? error)
     {
         events = default;
 
@@ -57,7 +58,7 @@ public class AggregateEventToProtobufConverter : IConvertAggregateEventsToProtob
         return true;
     }
 
-    bool TryConvert(UncommittedAggregateEvent source, out PbUncommittedAggregateEvent @event, out Exception error)
+    bool TryConvert(UncommittedAggregateEvent? source, [NotNullWhen(true)] out PbUncommittedAggregateEvent? @event, [NotNullWhen(false)] out Exception? error)
     {
         @event = default;
 

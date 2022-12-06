@@ -5,7 +5,6 @@ using System;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Loggers;
 using Docker.DotNet;
-using Docker.DotNet.Models;
 
 namespace Dolittle.Benchmarks.Harness;
 

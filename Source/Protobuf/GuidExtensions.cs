@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.Protobuf.Contracts;
 using Dolittle.SDK.Concepts;
 using Google.Protobuf;
@@ -34,7 +35,7 @@ public static class GuidExtensions
     /// <param name="id">When the method returns, the converted <see cref="Guid"/> if conversion was successful, otherwise the default value.</param>
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    public static bool TryToGuid(this Uuid source, out Guid id, out Exception error)
+    public static bool TryToGuid(this Uuid source, out Guid id, [NotNullWhen(false)] out Exception? error)
     {
         id = default;
         if (source == null || source.Value == null)
@@ -78,7 +79,7 @@ public static class GuidExtensions
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <typeparam name="T">Type to convert to.</typeparam>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    public static bool TryTo<T>(this Uuid source, out T id, out Exception error)
+    public static bool TryTo<T>(this Uuid source, out T id, [NotNullWhen(false)] out Exception? error)
         where T : ConceptAs<Guid>
     {
         if (TryToGuid(source, out var value, out error))

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Protobuf;
@@ -27,7 +28,7 @@ public class EventProcessingConverter : IEventProcessingConverter
     }
 
     /// <inheritdoc/>
-    public bool TryToSDK(PbCommittedEvent source, out CommittedEvent @event, out Exception error)
+    public bool TryToSDK(PbCommittedEvent source, out CommittedEvent @event, [NotNullWhen(false)] out Exception? error)
         => _eventToSDKConverter.TryConvert(source, out @event, out error);
 
     /// <inheritdoc/>
@@ -35,7 +36,7 @@ public class EventProcessingConverter : IEventProcessingConverter
         => TryToSDK(source, out var @event, out var error) ? @event : throw error;
 
     /// <inheritdoc/>
-    public bool TryToSDK(PbStreamEvent source, out StreamEvent @event, out Exception error)
+    public bool TryToSDK(PbStreamEvent source, out StreamEvent @event, [NotNullWhen(false)] out Exception? error)
     {
         @event = default;
 

@@ -4,14 +4,13 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <IsTestProject>true</IsTestProject>
-        <NoWarn>IDE0044;IDE0051;IDE0052;IDE0060</NoWarn>
+        <NoWarn>IDE0044;IDE0051;IDE0052;IDE0060;CS0618</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-<!--        <PackageReference Include="Coverlet.MsBuild" Version="2.9.0"/>-->
-        <PackageReference Include="Machine.Specifications" Version="1.0.0" />
+        <PackageReference Include="Machine.Specifications" Version="1.1.0" />
         <PackageReference Include="Machine.Specifications.Should" Version="1.0.0" />
-        <PackageReference Include="moq" Version="4.13.*" />
+        <PackageReference Include="moq" Version="4.18.3" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftDotNetTestVersion)" />
         <PackageReference Include="Machine.Specifications.Runner.VisualStudio" Version="$(MachineSpecificationsRunnerVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />

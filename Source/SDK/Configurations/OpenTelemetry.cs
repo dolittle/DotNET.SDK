@@ -11,10 +11,10 @@ public class OpenTelemetry
     /// <summary>
     /// The endpoint that the Client should send OpenTelemetry data to.
     /// </summary>
-    public string Endpoint { get; set; }
+    public string? Endpoint { get; set; }
     
     /// <summary>
     /// The ServiceName that the Client will report in OpenTelemetry data.
     /// </summary>
-    public string ServiceName { get; set; }
+    public string? ServiceName { get; set; }
 }

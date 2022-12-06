@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.Execution.Contracts;
 using Dolittle.SDK.Protobuf;
 using Dolittle.Security.Contracts;
@@ -15,15 +16,15 @@ namespace Dolittle.SDK.Events.Store.Converters.given;
 
 delegate void TrySerialize(
     object content,
-    out string json,
-    out Exception error);
+    [NotNullWhen(true)] out string json,
+    [NotNullWhen(false)] out Exception error);
 
 delegate void TryDeserialize(
     EventType eventType,
     EventLogSequenceNumber sequenceNumber,
     string source,
-    out object content,
-    out Exception error);
+    [NotNullWhen(true)] out object content,
+    [NotNullWhen(false)] out Exception error);
 
 public class a_content_serializer_and_an_execution_context
 {
@@ -90,7 +91,7 @@ public class a_content_serializer_and_an_execution_context
                 EventLogSequenceNumber sequenceNumber,
                 string source,
                 out object content,
-                out Exception error) =>
+                [NotNullWhen(false)] out Exception error) =>
             {
                 deserialized_event_types.Add(eventType);
                 deserialized_sequence_numbers.Add(sequenceNumber);
@@ -115,7 +116,7 @@ public class a_content_serializer_and_an_execution_context
                 EventLogSequenceNumber sequenceNumber,
                 string source,
                 out object content,
-                out Exception error) =>
+                [NotNullWhen(false)] out Exception error) =>
             {
                 deserialized_event_types.Add(eventType);
                 deserialized_sequence_numbers.Add(sequenceNumber);
@@ -136,7 +137,7 @@ public class a_content_serializer_and_an_execution_context
             .Callback(new TrySerialize((
                 object content,
                 out string json,
-                out Exception error) =>
+                [NotNullWhen(false)] out Exception error) =>
             {
                 serialized_contents.Add(content);
                 json = toReturn;
@@ -155,7 +156,7 @@ public class a_content_serializer_and_an_execution_context
             .Callback(new TrySerialize((
                 object content,
                 out string json,
-                out Exception error) =>
+                [NotNullWhen(false)] out Exception error) =>
             {
                 serialized_contents.Add(content);
                 json = "";

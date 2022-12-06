@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Converters;
 using Machine.Specifications;
@@ -12,7 +13,7 @@ using PbCommittedEvent = Dolittle.Runtime.Events.Contracts.CommittedEvent;
 
 namespace Dolittle.SDK.Events.Processing.for_EventProcessingConverter.given;
 
-delegate void TryConvert(PbCommittedEvent source, out CommittedEvent @event, out Exception error);
+delegate void TryConvert(PbCommittedEvent source, out CommittedEvent @event, [NotNullWhen(false)] out Exception error);
 
 public class a_converter
 {
@@ -39,7 +40,7 @@ public class a_converter
             .Callback(new TryConvert((
                 PbCommittedEvent source,
                 out CommittedEvent @event,
-                out Exception error) =>
+                [NotNullWhen(false)] out Exception error) =>
             {
                 converted_events.Add(source);
                 @event = sdkEvent;

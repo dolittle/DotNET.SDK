@@ -29,7 +29,7 @@ public class ProjectionCopyDefinitionBuilder<TReadModel> : IProjectionCopyDefini
     }
 
     /// <inheritdoc />
-    public IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default)
+    public IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>>? callback = default)
     {
         _copyToMongoDB = true;
         callback?.Invoke(_copyToMongoDBBuilder);

@@ -33,7 +33,7 @@ class Perform<TAggregate> where TAggregate : AggregateRoot
     public CancellationToken CancellationToken { get; }
 }
 
-public class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
+class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
 {
     readonly GetServiceProviderForTenant _getServiceProvider;
     readonly ILogger<AggregateActor<TAggregate>> _logger;

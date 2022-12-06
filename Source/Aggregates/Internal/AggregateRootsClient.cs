@@ -61,7 +61,7 @@ public class AggregateRootsClient
         };
         if (aggregateRootType.HasAlias)
         {
-            request.Alias = aggregateRootType.Alias;
+            request.Alias = aggregateRootType.Alias!.Value;
         }
         return request;
     }
