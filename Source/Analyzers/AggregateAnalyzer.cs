@@ -78,7 +78,9 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         {
             if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax) continue;
 
-            if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
+            if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword)
+                || syntax.Modifiers.Any(SyntaxKind.InternalKeyword)
+                || syntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
                     onMethod.ToDisplayString()));
@@ -113,7 +115,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
     static void CheckAggregateRootAttributePresent(SymbolAnalysisContext context, INamedTypeSymbol aggregateClass, INamedTypeSymbol attributeType)
     {
-        var hasAttribute = aggregateClass.GetAttributes().Any(attribute => attribute.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) == true);
+        var hasAttribute = aggregateClass.GetAttributes()
+            .Any(attribute => attribute.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) == true);
 
         if (!hasAttribute)
         {
