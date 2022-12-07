@@ -8,10 +8,10 @@ using Microsoft.CodeAnalysis.CSharp.Testing.XUnit;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
-
 namespace Dolittle.SDK.Analyzers;
 
-public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyzer, new()
+public abstract class DefaultAnalysisSuppressorTest<TSuppressor>
+    where TSuppressor : DiagnosticSuppressor, new()
 {
     /// <summary>
     /// Verify that the analyzer does not produce any diagnostics for this source
@@ -22,13 +22,14 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
 
     protected Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
     {
-        var test = new CSharpAnalyzerTest<TAnalyzer, XUnitVerifier>
+        var test = new CSharpAnalyzerTest<TSuppressor, XUnitVerifier>
         {
             TestState =
             {
                 Sources = { source },
                 ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
             },
+            CompilerDiagnostics = CompilerDiagnostics.Suggestions
         };
         test.TestState.ExpectedDiagnostics.AddRange(expected);
         foreach (var assembly in AssembliesUnderTest.Assemblies)
@@ -41,11 +42,11 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
 
     protected DiagnosticResult Diagnostic()
     {
-        return AnalyzerVerifier<TAnalyzer>.Diagnostic();
+        return AnalyzerVerifier<TSuppressor>.Diagnostic();
     }
 
     protected DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor)
     {
-        return AnalyzerVerifier<TAnalyzer>.Diagnostic(descriptor);
+        return AnalyzerVerifier<TSuppressor>.Diagnostic(descriptor);
     }
 }

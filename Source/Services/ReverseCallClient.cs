@@ -44,8 +44,8 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
     readonly SemaphoreSlim _writeResponseSemaphore = new(1);
     readonly object _connectLock = new();
     readonly object _handleLock = new();
-    IClientStreamWriter<TClientMessage> _clientToServer;
-    IAsyncStreamReader<TServerMessage> _serverToClient;
+    IClientStreamWriter<TClientMessage>? _clientToServer;
+    IAsyncStreamReader<TServerMessage>? _serverToClient;
     bool _connecting;
     bool _connectionEstablished;
     bool _startedHandling;

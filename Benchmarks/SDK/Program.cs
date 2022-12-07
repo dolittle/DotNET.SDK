@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using BenchmarkDotNet.Running;
-using Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant;
 using Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 
 namespace Dolittle.Benchmarks.SDK;

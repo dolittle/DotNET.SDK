@@ -3,7 +3,13 @@
 
 namespace Dolittle.SDK.Analyzers;
 
+/// <summary>
+/// Supported diagnostic categoriges
+/// </summary>
 public static class DiagnosticCategories
 {
+    /// <summary>
+    /// Analyzer specific to the Dolittle SDK domain types
+    /// </summary>
     public const string Sdk = "Dolittle.SDK";
 }

@@ -30,7 +30,9 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
             CultureInfo.InvariantCulture, null);
     };
 
+#pragma warning disable CS1998
     public static async IAsyncEnumerable<CommittedAggregateEvents> build_committed_events(EventSourceId eventSource, AggregateRootId aggregateRootId, ExecutionContext executionContext)
+#pragma warning restore CS1998
     {
         var events = Enumerable.Range(0, 3)
             .Select(i =>
@@ -39,7 +41,8 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
                 {
                     0 => first_event,
                     1 => second_event,
-                    2 => third_event
+                    2 => third_event,
+                    _ => throw new ArgumentOutOfRangeException(nameof(i), i, null)
                 };
 
                 return build_committed_event(
@@ -55,7 +58,9 @@ public abstract class committed_events_and_two_aggregate_roots : two_aggregate_r
         yield return new CommittedAggregateEvents(eventSource, aggregateRootId, 3, events.ToList());
     }
 
+#pragma warning disable CS1998
     public static async IAsyncEnumerable<CommittedAggregateEvents> build_committed_events_batches(EventSourceId eventSource, AggregateRootId aggregateRootId, ExecutionContext executionContext)
+#pragma warning restore CS1998
     {
         foreach (ulong i in Enumerable.Range(0, 3))
         {

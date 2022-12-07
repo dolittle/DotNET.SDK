@@ -19,5 +19,5 @@ public interface IConvertEventsToProtobuf
     /// <param name="events">When the method returns, the converted <see cref="IReadOnlyList{T}"/> of type <see cref="PbUncommittedEvent"/>. if conversion was successful, otherwise null.</param>
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    bool TryConvert(UncommittedEvents source, out IReadOnlyList<PbUncommittedEvent> events, out Exception error);
+    bool TryConvert(UncommittedEvents? source, out IReadOnlyList<PbUncommittedEvent>? events, out Exception? error);
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Dolittle.SDK.Protobuf;
 
@@ -25,7 +26,8 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
     }
 
     /// <inheritdoc/>
-    public bool TryConvert(Runtime.Events.Contracts.CommittedAggregateEvents source, out CommittedAggregateEvents events, out Exception error)
+    public bool TryConvert(Runtime.Events.Contracts.CommittedAggregateEvents? source, [NotNullWhen(true)] out CommittedAggregateEvents? events,
+        [NotNullWhen(false)] out Exception? error)
     {
         events = default;
 
@@ -55,10 +57,9 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
         IEnumerable<Runtime.Events.Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent> source,
         EventSourceId eventSourceId,
         AggregateRootId aggregateRootId,
-        out List<CommittedAggregateEvent> events,
-        out Exception error)
+        [NotNullWhen(true)] out List<CommittedAggregateEvent>? events,
+        [NotNullWhen(false)] out Exception? error)
     {
-        events = default;
         var list = new List<CommittedAggregateEvent>();
         var committedEvents = source.ToArray();
         for (ulong i = 0; i < (ulong)committedEvents.Length; i++)
@@ -67,6 +68,7 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
 
             if (!TryConvert(sourceEvent, eventSourceId, aggregateRootId, out var @event, out error))
             {
+                events = default;
                 return false;
             }
 
@@ -82,8 +84,8 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
         Runtime.Events.Contracts.CommittedAggregateEvents.Types.CommittedAggregateEvent source,
         EventSourceId eventSourceId,
         AggregateRootId aggregateRootId,
-        out CommittedAggregateEvent result,
-        out Exception error)
+        [NotNullWhen(true)] out CommittedAggregateEvent? result,
+        [NotNullWhen(false)] out Exception? error)
     {
         result = default;
 
@@ -135,5 +137,10 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
             content,
             source.Public);
         return true;
+    }
+
+    object NotNullWhen(bool b)
+    {
+        throw new NotImplementedException();
     }
 }

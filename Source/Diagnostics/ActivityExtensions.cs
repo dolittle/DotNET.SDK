@@ -12,6 +12,12 @@ namespace Diagnostics;
 /// </summary>
 public static class ActivityExtensions
 {
+    /// <summary>
+    /// Record an exception
+    /// Sets status to error and adds the exception to the activity.
+    /// </summary>
+    /// <param name="activity"></param>
+    /// <param name="e">The Exception</param>
     public static void RecordError(this Activity activity, Exception e)
     {
         activity

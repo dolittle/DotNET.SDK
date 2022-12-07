@@ -6,6 +6,9 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Dolittle.SDK.Analyzers;
 
+/// <summary>
+/// Replaces EOL trivia with elastic LF endings
+/// </summary>
 public class LineEndingsRewriter : CSharpSyntaxRewriter
 {
     public override SyntaxTrivia VisitTrivia(SyntaxTrivia trivia)

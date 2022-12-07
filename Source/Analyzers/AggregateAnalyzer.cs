@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -77,7 +78,9 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         {
             if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax) continue;
 
-            if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
+            if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword)
+                || syntax.Modifiers.Any(SyntaxKind.InternalKeyword)
+                || syntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
                     onMethod.ToDisplayString()));
@@ -112,7 +115,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
     static void CheckAggregateRootAttributePresent(SymbolAnalysisContext context, INamedTypeSymbol aggregateClass, INamedTypeSymbol attributeType)
     {
-        var hasAttribute = aggregateClass.GetAttributes().Any(attribute => attribute.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) == true);
+        var hasAttribute = aggregateClass.GetAttributes()
+            .Any(attribute => attribute.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) == true);
 
         if (!hasAttribute)
         {
@@ -129,6 +133,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     static void CheckApplyInvocations(SymbolAnalysisContext context, ClassDeclarationSyntax aggregateClassSyntax,
         ISet<ITypeSymbol> handledEventTypes)
     {
+        // TODO: refactor analyzer to prevent creating a new SemanticModel for each class
         var semanticModel = context.Compilation.GetSemanticModel(aggregateClassSyntax.SyntaxTree);
         foreach (var invocation in aggregateClassSyntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
         {

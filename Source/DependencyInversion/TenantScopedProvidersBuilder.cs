@@ -35,9 +35,13 @@ public class TenantScopedProvidersBuilder
     /// </summary>
     /// <param name="configureServicesForTenant">The <see cref="ConfigureTenantServices"/> callback.</param>
     /// <returns>The builder for continuation.</returns>
-    public TenantScopedProvidersBuilder AddTenantServices(ConfigureTenantServices configureServicesForTenant)
+    public TenantScopedProvidersBuilder AddTenantServices(ConfigureTenantServices? configureServicesForTenant)
     {
-        _configureServicesForTenantCallbacks.Add(configureServicesForTenant);
+        if (configureServicesForTenant is not null)
+        {
+            _configureServicesForTenantCallbacks.Add(configureServicesForTenant);
+        }
+
         return this;
     }
 
@@ -56,6 +60,7 @@ public class TenantScopedProvidersBuilder
         {
             configure?.Invoke(tenant, services);
         }
+
         services.AddSingleton(tenant);
         return _factory(_serviceProvider, tenant, services);
     }

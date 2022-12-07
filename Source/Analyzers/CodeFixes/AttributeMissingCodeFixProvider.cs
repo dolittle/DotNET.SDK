@@ -13,6 +13,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
+/// <summary>
+/// Adds the missing attribute to the target type
+/// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeMissingCodeFixProvider)), Shared]
 public class AttributeMissingCodeFixProvider : CodeFixProvider
 {
@@ -71,15 +74,14 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
 
         var updatedRoot = existingRoot
             .ReplaceNode(classSyntax, updatedSyntax);
-        
+
         // Add missing using statements to the updated root
         updatedRoot = updatedRoot.AddMissingUsingDirectives(attributeType.ContainingNamespace);
 
         var updatedDocument = targetDocument.WithSyntaxRoot(updatedRoot);
-        
+
         return updatedDocument.Project.Solution;
     }
-
 
 
     static TypeDeclarationSyntax WithIdentityAttribute(TypeDeclarationSyntax existing, INamedTypeSymbol attributeClass)
@@ -101,10 +103,5 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
         var attributeSyntax = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(identifier),
             attributeList);
         return attributeSyntax;
-    }
-
-    public override FixAllProvider GetFixAllProvider()
-    {
-        return WellKnownFixAllProviders.BatchFixer;
     }
 }

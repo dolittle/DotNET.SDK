@@ -21,7 +21,7 @@ public interface IProjectionCopyDefinitionBuilder<TReadModel>
     /// </summary>
     /// <param name="callback">The optional callback for building the <see cref="ProjectionCopyToMongoDB"/>.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>> callback = default);
+    IProjectionCopyDefinitionBuilder<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>>? callback = default);
 
     /// <summary>
     /// Builds the <see cref="ProjectionCopies"/>.

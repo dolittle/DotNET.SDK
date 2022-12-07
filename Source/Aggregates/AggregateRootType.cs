@@ -16,7 +16,7 @@ public class AggregateRootType : Artifact<AggregateRootId>
     /// </summary>
     /// <param name="id">The <see cref="AggregateRootId">unique identifier</see> of the <see cref="AggregateRootType"/>.</param>
     public AggregateRootType(AggregateRootId id)
-        : this(id, Generation.First, null)
+        : this(id, Generation.First)
     {
     }
 
@@ -46,8 +46,8 @@ public class AggregateRootType : Artifact<AggregateRootId>
     /// <param name="id">The <see cref="AggregateRootId">unique identifier</see> of the <see cref="AggregateRootType"/>.</param>
     /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="AggregateRootType"/>.</param>
     /// <param name="alias"><see cref="AggregateRootAlias">Alias</see> of the <see cref="AggregateRootType"/>.</param>
-    public AggregateRootType(AggregateRootId id, Generation generation, AggregateRootAlias alias)
-        : base(id, generation, alias)
+    public AggregateRootType(AggregateRootId id, Generation generation, AggregateRootAlias? alias)
+        : base(id, generation, alias?.Value)
     {
         ThrowIfAggregateRootTypeIdIsNull(id);
         ThrowIfGenerationIsNull(generation);
@@ -57,7 +57,7 @@ public class AggregateRootType : Artifact<AggregateRootId>
     /// <summary>
     /// Gets the alias for the Aggregate Root.
     /// </summary>
-    public AggregateRootAlias? Alias { get; }
+    public new AggregateRootAlias? Alias { get; }
 
     /// <summary>
     /// Gets a value indicating whether the Aggregate Root has an alias or not.

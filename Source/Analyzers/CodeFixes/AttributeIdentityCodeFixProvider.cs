@@ -19,8 +19,10 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeIdentityCodeFixProvider)), Shared]
 public class AttributeIdentityCodeFixProvider : CodeFixProvider
 {
+    /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AttributeInvalidIdentityRuleId);
 
+    /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var document = context.Document;
@@ -80,11 +82,5 @@ public class AttributeIdentityCodeFixProvider : CodeFixProvider
             .FirstAncestorOrSelf<TNode>(ascendOutOfTrivia: true);
 #pragma warning restore CS8601
         return node is not null;
-    }
-
-
-    public override FixAllProvider GetFixAllProvider()
-    {
-        return WellKnownFixAllProviders.BatchFixer;
     }
 }

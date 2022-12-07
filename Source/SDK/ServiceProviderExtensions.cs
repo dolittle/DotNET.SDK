@@ -23,7 +23,7 @@ public static class ServiceProviderExtensions
     /// <param name="configureClient">The optional <see cref="ConfigureDolittleClient"/> callback.</param>
     /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> used if the <see cref="IDolittleClient"/> needs to connect.</param>
     /// <returns>A <see cref="Task{TResult}"/> that, when resolved, returns the connected <see cref="IDolittleClient"/>.</returns>
-    public static async Task<IDolittleClient> GetDolittleClient(this IServiceProvider provider, ConfigureDolittleClient configureClient = default,  CancellationToken cancellationToken = default)
+    public static async Task<IDolittleClient> GetDolittleClient(this IServiceProvider provider, ConfigureDolittleClient? configureClient = default,  CancellationToken cancellationToken = default)
     {
         var client = provider.GetService<IDolittleClient>() ?? throw new DolittleClientNotSetup();
         if (client.IsConnected)

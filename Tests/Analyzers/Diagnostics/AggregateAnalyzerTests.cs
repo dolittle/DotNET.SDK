@@ -132,7 +132,7 @@ class SomeAggregate: AggregateRoot
         Apply(new NameUpdated(name));
     }
 
-    private void On()
+    void On()
     {
     }
 }";

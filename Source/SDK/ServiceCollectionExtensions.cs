@@ -27,8 +27,8 @@ public static class ServiceCollectionExtensions
     /// <param name="setupClient">The optional <see cref="SetupDolittleClient"/> callback.</param>
     /// <param name="configureClient">The optional <see cref="ConfigureDolittleClient"/> callback.</param>
     /// <returns>The <see cref="IServiceCollection"/> for continuation.</returns>
-    public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient setupClient = default,
-        ConfigureDolittleClient configureClient = default)
+    public static IServiceCollection AddDolittle(this IServiceCollection services, SetupDolittleClient? setupClient = default,
+        ConfigureDolittleClient? configureClient = default)
     {
         return services
             .AddDolittleOptions()
@@ -38,7 +38,7 @@ public static class ServiceCollectionExtensions
 
     static IEnumerable<ClusterKind> GetClusterKinds(IServiceProvider serviceProvider)
     {
-        var client = serviceProvider.GetRequiredService<IDolittleClient>() as DolittleClient;
+        var client = (DolittleClient)serviceProvider.GetRequiredService<IDolittleClient>();
         var aggregateTypes = client
             .AggregateRootTypes
             .Types;
@@ -56,8 +56,8 @@ public static class ServiceCollectionExtensions
     }
 
 
-    static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient setupClient = default,
-        ConfigureDolittleClient configureClient = default)
+    static IServiceCollection AddDolittleClient(this IServiceCollection services, SetupDolittleClient? setupClient = default,
+        ConfigureDolittleClient? configureClient = default)
     {
         var dolittleClient = DolittleClient.Setup(setupClient);
 
@@ -71,7 +71,7 @@ public static class ServiceCollectionExtensions
                 provider.GetRequiredService<ILogger<DolittleClientService>>()));
     }
 
-    static DolittleClientConfiguration ConfigureWithDefaultsFromServiceProvider(IServiceProvider provider, ConfigureDolittleClient configureClient = default)
+    static DolittleClientConfiguration ConfigureWithDefaultsFromServiceProvider(IServiceProvider provider, ConfigureDolittleClient? configureClient = default)
     {
         var config = provider.GetService<IOptions<Configurations.Dolittle>>()?.Value;
 

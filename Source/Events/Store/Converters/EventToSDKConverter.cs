@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Protobuf;
 
 namespace Dolittle.SDK.Events.Store.Converters;
@@ -24,7 +25,7 @@ public class EventToSDKConverter : IConvertEventsToSDK
     }
 
     /// <inheritdoc/>
-    public bool TryConvert(Runtime.Events.Contracts.CommittedEvent source, out CommittedEvent @event, out Exception error)
+    public bool TryConvert(Runtime.Events.Contracts.CommittedEvent? source, [NotNullWhen(true)] out CommittedEvent? @event, [NotNullWhen(false)] out Exception? error)
     {
         @event = null;
 
@@ -99,7 +100,7 @@ public class EventToSDKConverter : IConvertEventsToSDK
     }
 
     /// <inheritdoc/>
-    public bool TryConvert(IReadOnlyList<Runtime.Events.Contracts.CommittedEvent> source, out CommittedEvents events, out Exception error)
+    public bool TryConvert(IReadOnlyList<Runtime.Events.Contracts.CommittedEvent> source, [NotNullWhen(true)] out CommittedEvents? events, [NotNullWhen(false)] out Exception? error)
     {
         events = default;
 

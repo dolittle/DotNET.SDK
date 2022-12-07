@@ -25,5 +25,5 @@ public class CancellationTokenObservable<T> : IObservable<T>
 
     /// <inheritdoc/>
     public IDisposable Subscribe(IObserver<T> observer)
-        => _token.Register(() => observer.OnCompleted());
+        => _token.Register(observer.OnCompleted);
 }

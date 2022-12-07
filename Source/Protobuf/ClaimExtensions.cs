@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Dolittle.SDK.Security;
 using PbClaim = Dolittle.Security.Contracts.Claim;
@@ -44,7 +45,7 @@ public static class ClaimExtensions
     /// <param name="claims">When the method returns, the converted <see cref="Claims"/> if conversion was successful, otherwise null.</param>
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    public static bool TryToClaims(this IEnumerable<PbClaim> source, out Claims claims, out Exception error)
+    public static bool TryToClaims(this IEnumerable<PbClaim> source, out Claims claims, [NotNullWhen(false)] out Exception? error)
     {
         claims = null;
         if (source == null)

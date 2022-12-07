@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace Dolittle.SDK.Events.Store.Converters;
@@ -26,7 +27,7 @@ public class EventContentSerializer : ISerializeEventContent
     }
 
     /// <inheritdoc/>
-    public bool TrySerialize(object content, out string json, out Exception error)
+    public bool TrySerialize(object content, [NotNullWhen(true)] out string? json, [NotNullWhen(false)] out Exception? error)
     {
         if (!TrySerializeWithSettings(content, out json, out var serializationError))
         {
@@ -39,10 +40,10 @@ public class EventContentSerializer : ISerializeEventContent
     }
 
     /// <inheritdoc/>
-    public bool TryDeserialize(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, out object content, out Exception error)
+    public bool TryDeserialize(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, [NotNullWhen(true)] out object? content, [NotNullWhen(false)] out Exception? error)
         => TryDeserializeWithSettings(eventType, sequenceNumber, json, out content, out error);
 
-    bool TrySerializeWithSettings(object content, out string json, out Exception serializationError)
+    bool TrySerializeWithSettings(object content, [NotNullWhen(true)] out string? json, [NotNullWhen(false)] out Exception? serializationError)
     {
         var exceptionCatcher = new JsonSerializerExceptionCatcher();
         var serializerSettings = _jsonSerializerSettingsProvider();
@@ -63,7 +64,8 @@ public class EventContentSerializer : ISerializeEventContent
         }
     }
 
-    bool TryDeserializeWithSettings(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, out object content, out Exception deserializationError)
+    bool TryDeserializeWithSettings(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, [NotNullWhen(true)] out object? content,
+        [NotNullWhen(false)] out Exception? deserializationError)
     {
         var exceptionCatcher = new JsonSerializerExceptionCatcher();
         var serializerSettings = _jsonSerializerSettingsProvider();
@@ -75,7 +77,7 @@ public class EventContentSerializer : ISerializeEventContent
             content = JsonConvert.DeserializeObject(json, type, serializerSettings);
 
             deserializationError = exceptionCatcher.Failed
-                ? new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error, type)
+                ? new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error!, type)
                 : null;
         }
         else
@@ -83,7 +85,7 @@ public class EventContentSerializer : ISerializeEventContent
             content = JsonConvert.DeserializeObject(json, serializerSettings);
 
             deserializationError = exceptionCatcher.Failed
-                ? new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error)
+                ? new CouldNotDeserializeEventContent(eventType, sequenceNumber, json, exceptionCatcher.Error!)
                 : null;
         }
 

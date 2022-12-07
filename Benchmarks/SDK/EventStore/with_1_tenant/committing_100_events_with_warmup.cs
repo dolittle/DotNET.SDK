@@ -3,8 +3,6 @@
 
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Dolittle.SDK.Events.Store;
-using Dolittle.SDK.Tenancy;
 
 namespace Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 

@@ -9,17 +9,22 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dolittle.SDK.Analyzers;
 
+/// <summary>
+/// Analyzes all calls to ICommitEvents.Commit, CommitEvent and CommitPublicEvent
+/// and checks that the parameter object  has the EventType attribute
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class EventsHaveAnnotationAnalyzer : DiagnosticAnalyzer
 {
+    /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(DescriptorRules.Events.MissingAttribute);
 
+    /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        // Analyze all calls to ICommitEvents.Commit, CommitEvent and CommitPublicEvent
-        // and check that the parameter object  has the EventType attribute
+
         context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.InvocationExpression);
     }
 
