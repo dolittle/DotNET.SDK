@@ -37,7 +37,7 @@ public interface IEventHandler
     /// <summary>
     /// Gets the alias of the event handler.
     /// </summary>
-    EventHandlerAlias Alias { get; }
+    EventHandlerAlias? Alias { get; }
 
     /// <summary>
     /// Gets a value indicating whether the event handler has an alias or not.

@@ -13,5 +13,5 @@ public class and_type_has_no_read_model_binding : given.all_dependencies
 
     Because of = () => result = Catch.Exception(() =>  projection_store.Of<given.a_decorated_projection_type>());
 
-    It should_fail_because_no_projection_read_model_binding_exists = () => result.ShouldBeOfExactType<MissingUniqueBindingForValue<ScopedProjectionId, Type>>();
+    It should_fail_because_no_projection_read_model_binding_exists = () => result.ShouldBeOfExactType<MissingUniqueBindingForValue<ProjectionModelId, Type>>();
 }

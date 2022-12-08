@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Linq;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
@@ -48,9 +47,9 @@ public class EventFiltersBuilder : IEventFiltersBuilder
     public static IUnregisteredEventFilters Build(IModel model, IClientBuildResults buildResults)
     {
         var filters = new UniqueBindings<FilterModelId, ICanRegisterEventFilterProcessor>();
-        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildFilter>().Select(_ => _.ProcessorBuilder))
+        foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ICanTryBuildFilter>())
         {
-            if (builder.TryBuild(buildResults, out var filter))
+            if (builder.TryBuild((FilterModelId)identifier, buildResults, out var filter))
             {
                 filters.Add(filter.Identifier, filter);
             }

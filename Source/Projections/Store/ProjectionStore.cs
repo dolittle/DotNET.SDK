@@ -61,19 +61,19 @@ public class ProjectionStore : IProjectionStore
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
         where TReadModel : class, new()
-        => new ProjectionOf<TReadModel>(this, new ScopedProjectionId(projectionId, ScopeId.Default));
+        => new ProjectionOf<TReadModel>(this, projectionId, ScopeId.Default);
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
         where TReadModel : class, new()
-        => new ProjectionOf<TReadModel>(this, new ScopedProjectionId(projectionId, scopeId));
+        => new ProjectionOf<TReadModel>(this, projectionId, scopeId);
 
     /// <inheritdoc/>
     public Task<TProjection> Get<TProjection>(Key key, CancellationToken cancellation = default)
         where TProjection : class, new()
     {
-        var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
-        return Get<TProjection>(key, projectionId, scopeId, cancellation);
+        var identifier = _projectionAssociations.GetFor<TProjection>();
+        return Get<TProjection>(key, identifier.Id, identifier.Scope, cancellation);
     }
 
     /// <inheritdoc/>
@@ -93,8 +93,8 @@ public class ProjectionStore : IProjectionStore
     public Task<CurrentState<TProjection>> GetState<TProjection>(Key key, CancellationToken cancellation = default)
         where TProjection : class, new()
     {
-        var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
-        return GetState<TProjection>(key, projectionId, scopeId, cancellation);
+        var identifier = _projectionAssociations.GetFor<TProjection>();
+        return GetState<TProjection>(key, identifier.Id, identifier.Scope, cancellation);
     }
 
     /// <inheritdoc />
@@ -138,8 +138,8 @@ public class ProjectionStore : IProjectionStore
     public Task<IEnumerable<TProjection>> GetAll<TProjection>(CancellationToken cancellation = default)
         where TProjection : class, new()
     {
-        var (projectionId, scopeId) = _projectionAssociations.GetFor<TProjection>();
-        return GetAll<TProjection>(projectionId, scopeId, cancellation);
+        var identifier = _projectionAssociations.GetFor<TProjection>();
+        return GetAll<TProjection>(identifier.Id, identifier.Scope, cancellation);
     }
 
     /// <inheritdoc/>
@@ -167,7 +167,7 @@ public class ProjectionStore : IProjectionStore
         var batchNumber = 0;
         await foreach (var response in _caller.Call(
                            _getAllInBatchesMethod,
-                           _requestCreator.CreateGetAll(new ScopedProjectionId(projectionId, scopeId), _executionContext),
+                           _requestCreator.CreateGetAll(projectionId, scopeId, _executionContext),
                            cancellation))
         {
             response.Failure.ThrowIfFailureIsSet();
@@ -198,7 +198,7 @@ public class ProjectionStore : IProjectionStore
     {
         var response = await _caller.Call(
             _getOneMethod,
-            _requestCreator.CreateGetOne(key, new ScopedProjectionId(projectionId, scopeId),_executionContext),
+            _requestCreator.CreateGetOne(key, projectionId, scopeId,_executionContext),
             cancellation).ConfigureAwait(false);
         response.Failure.ThrowIfFailureIsSet();
 

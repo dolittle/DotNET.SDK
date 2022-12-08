@@ -14,6 +14,7 @@ public class when_creating
     static EventHandlerId identifier;
     static ScopeId scope_id;
     static bool partitioned;
+    static EventHandlerAlias alias;
     static IEnumerable<EventType> event_types;
     static IDictionary<EventType, IEventHandlerMethod> event_handler_methods;
     static EventHandler event_handler;
@@ -23,6 +24,7 @@ public class when_creating
         identifier = "e869d29e-e89b-4228-b345-36ec472d9aab";
         scope_id = "455b99e2-7647-4851-b77c-3bee89902ac3";
         partitioned = true;
+        alias = "some alias";
         event_types = new[]
         {
             new EventType("1b9680f7-92bd-4e1f-ac4b-1aae55944209"),
@@ -34,7 +36,7 @@ public class when_creating
                 _ => new EventHandlerMethod((@event, eventContext) => Task.CompletedTask) as IEventHandlerMethod));
     };
 
-    Because of = () => event_handler = new EventHandler(identifier, scope_id, partitioned, event_handler_methods);
+    Because of = () => event_handler = new EventHandler(new EventHandlerModelId(identifier, partitioned, scope_id, alias), event_handler_methods);
 
     It should_not_be_null = () => event_handler.ShouldNotBeNull();
     It should_have_the_correct_partitioned_value = () => event_handler.Partitioned.ShouldEqual(partitioned);

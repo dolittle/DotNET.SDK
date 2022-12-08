@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
-#nullable enable
 using System.Diagnostics;
 using Diagnostics;
 
@@ -13,8 +12,8 @@ public static class ActivityExtensions
     /// <summary>
     /// Set parent execution context if spanId is present
     /// </summary>
-    /// <param name="activity"></param>
-    /// <param name="context"></param>
+    /// <param name="activity">Current activity</param>
+    /// <param name="context">Current Dolittle <see cref="ExecutionContext"/></param>
     /// <returns></returns>
     public static Activity SetParentExecutionContext(this Activity activity, ExecutionContext context)
     {
@@ -29,7 +28,9 @@ public static class ActivityExtensions
     /// <summary>
     /// Starts a new activity, with this execution context as parent
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="context">Current Dolittle <see cref="ExecutionContext"/></param>
+    /// <param name="name">Activity name</param>
+    /// <param name="activityKind">ActivityKind, defaults to internal</param>
     /// <returns></returns>
     public static Activity? StartChildActivity(this ExecutionContext context, string name, ActivityKind activityKind = ActivityKind.Internal) =>
         Tracing.ActivitySource.StartActivity(name, activityKind, context.ToActivityContext());
@@ -37,7 +38,7 @@ public static class ActivityExtensions
     /// <summary>
     /// Extracts the activity context if spanId is populated
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="context">Current Dolittle <see cref="ExecutionContext"/></param>
     /// <returns></returns>
     public static ActivityContext ToActivityContext(this ExecutionContext context) =>
         context.SpanId is null

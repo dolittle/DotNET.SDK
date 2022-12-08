@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Common.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Common.ClientSetup;
@@ -11,7 +12,6 @@ namespace Dolittle.SDK.Common.ClientSetup;
 /// </summary>
 public abstract class ClientBuildResult
 {
-    readonly string _message;
     readonly Exception _error;
     readonly LogLevel _logLevel;
 
@@ -25,11 +25,11 @@ public abstract class ClientBuildResult
     protected ClientBuildResult(LogLevel logLevel, string message, bool failed, Exception error = default)
     {
         _logLevel = logLevel;
-        _message = message;
+        Message = message;
         _error = error;
         IsFailed = failed;
     }
-    
+
     /// <summary>
     /// Creates an <see cref="InformationBuildResult"/>.
     /// </summary>
@@ -52,6 +52,12 @@ public abstract class ClientBuildResult
     /// <returns>The <see cref="ErrorBuildResult"/>.</returns>
     public static ErrorBuildResult Error(Exception error) => new(error);
     
+    
+    /// <summary>
+    /// Gets the message.
+    /// </summary>
+    public string Message { get; }
+    
     /// <summary>
     /// Gets a value indicating whether this is a failed result.
     /// </summary>
@@ -66,7 +72,15 @@ public abstract class ClientBuildResult
     /// <param name="logger">The provided <see cref="ILogger"/>to log the message to.</param>
     public void Log(ILogger logger)
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
-        => logger.Log(_logLevel, 0, _error, _message);
+        => logger.Log(_logLevel, 0, _error, Message);
+    
+    /// <summary>
+    /// Logs the build message.
+    /// </summary>
+    /// <param name="logger">The provided <see cref="ILogger"/>to log the message to.</param>
+    public void Log(ILogger logger, IIdentifier identifier)
+        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
+        => logger.Log(_logLevel, 0, _error, $"{identifier}\n\t{Message}");
 #pragma warning restore CA2254
 #pragma warning restore CA1848
 }

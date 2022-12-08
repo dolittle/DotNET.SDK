@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Diagnostics;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Dolittle.SDK.Execution;
-using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Events.Handling;
 
@@ -23,41 +22,22 @@ public class EventHandler : IEventHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandler"/> class.
     /// </summary>
-    /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="partitioned">The value indicating whether the <see cref="EventHandler" /> is partitioned.</param>
+    /// <param name="identifier">The <see cref="EventHandlerModelId" />.</param>
     /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
     public EventHandler(
-        EventHandlerId identifier,
-        ScopeId scopeId,
-        bool partitioned,
+        EventHandlerModelId identifier,
         IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
     {
-        Identifier = identifier;
-        ScopeId = scopeId;
-        Partitioned = partitioned;
+        Identifier = identifier.Id;
+        ScopeId = identifier.Scope;
+        Partitioned = identifier.Partitioned;
         _eventHandlerMethods = eventHandlerMethods;
+        if (!string.IsNullOrEmpty(identifier.Alias))
+        {
+            Alias = identifier.Alias;
+        }
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EventHandler"/> class.
-    /// </summary>
-    /// <param name="identifier">The <see cref="EventHandlerId" />.</param>
-    /// <param name="alias">The <see cref="EventHandlerAlias"/>.</param>
-    /// <param name="scopeId">The <see cref="ScopeId" />.</param>
-    /// <param name="partitioned">The value indicating whether the <see cref="EventHandler" /> is partitioned.</param>
-    /// <param name="eventHandlerMethods">The event handler methods by <see cref="EventType" />.</param>
-    public EventHandler(
-        EventHandlerId identifier,
-        EventHandlerAlias alias,
-        ScopeId scopeId,
-        bool partitioned,
-        IDictionary<EventType, IEventHandlerMethod> eventHandlerMethods)
-        : this(identifier, scopeId, partitioned, eventHandlerMethods)
-    {
-        Alias = alias;
-        HasAlias = true;
-    }
 
     /// <inheritdoc/>
     public EventHandlerId Identifier { get; }
@@ -72,10 +52,10 @@ public class EventHandler : IEventHandler
     public IEnumerable<EventType> HandledEvents => _eventHandlerMethods.Keys;
 
     /// <inheritdoc />
-    public EventHandlerAlias Alias { get; }
+    public EventHandlerAlias? Alias { get; }
 
     /// <inheritdoc />
-    public bool HasAlias { get; }
+    public bool HasAlias => Alias is not null; 
 
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)

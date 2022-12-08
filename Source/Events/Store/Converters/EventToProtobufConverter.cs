@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Protobuf;
 
 namespace Dolittle.SDK.Events.Store.Converters;
@@ -25,7 +26,7 @@ public class EventToProtobufConverter : IConvertEventsToProtobuf
     }
 
     /// <inheritdoc/>
-    public bool TryConvert(UncommittedEvents source, out IReadOnlyList<Runtime.Events.Contracts.UncommittedEvent> events, out Exception error)
+    public bool TryConvert(UncommittedEvents? source, [NotNullWhen(true)] out IReadOnlyList<Runtime.Events.Contracts.UncommittedEvent>? events, [NotNullWhen(false)] out Exception? error)
     {
         events = default;
 
@@ -51,7 +52,7 @@ public class EventToProtobufConverter : IConvertEventsToProtobuf
         return true;
     }
 
-    bool TryConvert(UncommittedEvent source, out Runtime.Events.Contracts.UncommittedEvent @event, out Exception error)
+    bool TryConvert(UncommittedEvent? source, [NotNullWhen(true)] out Runtime.Events.Contracts.UncommittedEvent? @event, [NotNullWhen(false)] out Exception? error)
     {
         @event = default;
 

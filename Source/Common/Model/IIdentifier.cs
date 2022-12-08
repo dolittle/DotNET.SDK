@@ -36,6 +36,11 @@ public interface IIdentifier
     /// Gets the globally unique id for the identifier.
     /// </summary>
     Guid Id { get; }
+    
+    /// <summary>
+    /// Gets the alias for the identifier.
+    /// </summary>
+    string? Alias { get; }
 
     /// <summary>
     /// Determines whether or not this identifier can coexist with another identifier.

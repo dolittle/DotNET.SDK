@@ -23,7 +23,7 @@ public static class MongoDatabaseExtensions
     /// <param name="settings">The optional <see cref="MongoCollectionSettings"/> used when getting the <see cref="IMongoCollection{TDocument}"/>.</param>
     /// <typeparam name="TSchema">The <see cref="Type"/> of the projection read model. </typeparam>
     /// <returns>The <see cref="IMongoCollection{TDocument}"/> for <typeparamref name="TSchema"/>.</returns>
-    public static IMongoCollection<TSchema> GetCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings settings = default)
+    public static IMongoCollection<TSchema> GetCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings? settings = default)
         where TSchema : class
     {
         DolittleMongoConventions.EnsureConventionsAreRegistered();
@@ -38,7 +38,7 @@ public static class MongoDatabaseExtensions
     /// <param name="settings">The optional <see cref="MongoCollectionSettings"/> used when getting the <see cref="IMongoCollection{TDocument}"/>.</param>
     /// <typeparam name="TSchema">The <see cref="Type"/> of the projection read model. </typeparam>
     /// <returns>The <see cref="IMongoCollection{TDocument}"/> for <typeparamref name="TSchema"/>.</returns>
-    public static IMongoCollection<BsonDocument> GetDocumentCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings settings = default)
+    public static IMongoCollection<BsonDocument> GetDocumentCollection<TSchema>(this IMongoDatabase database, MongoCollectionSettings? settings = default)
         where TSchema : class
     {
         DolittleMongoConventions.EnsureConventionsAreRegistered();

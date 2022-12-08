@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
@@ -28,6 +29,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     readonly Version _headVersion;
     readonly IPerformHandshake _handshakePerformer;
     readonly ITenants _tenants;
+    readonly IClientBuildResults _buildResults;
     readonly ILogger _logger;
 
     /// <summary>
@@ -38,6 +40,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
     /// <param name="headVersion">The <see cref="Version"/> of the Head.</param>
     /// <param name="handshakePerformer">The <see cref="IPerformHandshake"/>.</param>
     /// <param name="tenants">The <see cref="ITenants"/>.</param>
+    /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="logger">The <see cref="ILogger"/>.</param>
     public DolittleRuntimeConnector(
         string runtimeHost,
@@ -45,6 +48,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
         Version headVersion,
         IPerformHandshake handshakePerformer,
         ITenants tenants,
+        IClientBuildResults buildResults,
         ILogger logger)
     {
         _runtimeHost = runtimeHost;
@@ -52,6 +56,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
         _headVersion = headVersion;
         _handshakePerformer = handshakePerformer;
         _tenants = tenants;
+        _buildResults = buildResults;
         _logger = logger;
     }
 
@@ -86,7 +91,7 @@ public class DolittleRuntimeConnector : IConnectToDolittleRuntime
             try
             {
                 _logger.ConnectingToDolittleRuntime();
-                var handshakeResult = await _handshakePerformer.Perform(attempts++, DateTimeOffset.Now - startTime, _headVersion, cancellationToken).ConfigureAwait(false);
+                var handshakeResult = await _handshakePerformer.Perform(attempts++, DateTimeOffset.Now - startTime, _headVersion, _buildResults, cancellationToken).ConfigureAwait(false);
                 return (CreateExecutionContextFromHandshake(handshakeResult), handshakeResult);
             }
             catch (RpcException ex) when (ex.Status.StatusCode == StatusCode.Unimplemented)

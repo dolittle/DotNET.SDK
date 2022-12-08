@@ -17,14 +17,16 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
     where TExtras : IEquatable<TExtras>
 {
     readonly TExtras _extras;
-    
+
     /// <summary>
     /// Initializes an instance of the <see cref="Identifier{TId,TExtras}"/> class.
     /// </summary>
     /// <param name="tag">The tag name of this identifier.</param>
     /// <param name="id">The globally unique id for the identifier.</param>
+    /// <param name="alias">The alias of this identifier.</param>
     /// <param name="extras">The extra data for the identifier.</param>
-    protected Identifier(string tag, TId id, TExtras extras) : base(tag, id)
+    protected Identifier(string tag, TId id, string? alias, TExtras extras)
+        : base(tag, id, alias)
     {
         _extras = extras;
     }
@@ -41,7 +43,7 @@ public abstract class Identifier<TId, TExtras> : Identifier<TId>
     public override int GetHashCode() => HashCode.Combine(Id, _extras);
     
     /// <inheritdoc />
-    public override string ToString() => $"{Tag}({Id.Value} {ExtrasAsString()})";
+    public override string ToString() => $"{Title}({Id.Value} {ExtrasAsString()})";
 
     string ExtrasAsString()
         => _extras == null ? string.Empty : $"{typeof(TExtras).Name}: {_extras}";
@@ -59,10 +61,12 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     /// </summary>
     /// <param name="tag">The tag name of this identifier.</param>
     /// <param name="id">The globally unique id for the identifier.</param>
-    protected Identifier(string tag, TId id)
+    /// <param name="alias">The alias of this identifier.</param>
+    protected Identifier(string tag, TId id, string? alias)
     {
         Tag = tag;
         Id = id;
+        Alias = alias;
     }
 
     /// <inheritdoc />
@@ -70,6 +74,9 @@ public abstract class Identifier<TId> : IIdentifier<TId>
 
     /// <inheritdoc />
     Guid IIdentifier.Id => Id.Value;
+
+    /// <inheritdoc />
+    public string? Alias { get; }
     
     /// <summary>
     /// Gets the tag name.
@@ -100,5 +107,10 @@ public abstract class Identifier<TId> : IIdentifier<TId>
     public override int GetHashCode() => EqualityComparer<TId>.Default.GetHashCode(Id);
 
     /// <inheritdoc />
-    public override string ToString() => $"{Tag}({Id.Value})";
+    public override string ToString() => $"{Title}({Id.Value})";
+
+    /// <summary>
+    /// Gets the beginning part used in the <see cref="ToString"/> method.
+    /// </summary>
+    protected string Title => string.IsNullOrEmpty(Alias) ? Tag : $"{Tag} {Alias}";
 }

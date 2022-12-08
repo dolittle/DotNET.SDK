@@ -18,10 +18,9 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     readonly IModelBuilder _modelBuilder;
     readonly EventHandlerMethodsBuilder _methodsBuilder;
 
-    EventHandlerAlias _alias;
-    bool _hasAlias;
     bool _partitioned = true;
     ScopeId _scopeId = ScopeId.Default;
+    EventHandlerAlias? _alias;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerBuilder"/> class.
@@ -39,19 +38,23 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <summary>
     /// Gets the <see cref="EventHandlerModelId"/>.
     /// </summary>
-    public EventHandlerModelId ModelId => new(_eventHandlerId, _scopeId);
+    public EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, _alias);
     
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
     {
+        Unbind();
         _partitioned = true;
+        Bind();
         return _methodsBuilder;
     }
 
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Unpartitioned()
     {
+        Unbind();
         _partitioned = false;
+        Bind();
         return _methodsBuilder;
     }
 
@@ -67,31 +70,30 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <inheritdoc />
     public IEventHandlerBuilder WithAlias(EventHandlerAlias alias)
     {
+        Unbind();
         _alias = alias;
-        _hasAlias = true;
+        Bind();
         return this;
     }
 
     /// <inheritdoc />
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
+    public bool TryBuild(EventHandlerModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
     {
         eventHandler = default;
         var eventTypesToMethods = new Dictionary<EventType, IEventHandlerMethod>();
-        if (!_methodsBuilder.TryAddEventHandlerMethods(eventTypes, eventTypesToMethods, buildResults))
+        if (!_methodsBuilder.TryAddEventHandlerMethods(identifier, eventTypes, eventTypesToMethods, buildResults))
         {
-            buildResults.AddFailure($"Failed to build event handler {_eventHandlerId}. One or more event handler methods could not be built");
+            buildResults.AddFailure(identifier, "One or more event handler methods could not be built");
             return false;
         }
 
         if (eventTypesToMethods.Count < 1)
         {
-            buildResults.AddFailure($"Failed to build event handler {_eventHandlerId}. No event handler methods are configured for event handler");
+            buildResults.AddFailure(identifier, "No event types to handle");
             return false;
         }
 
-        eventHandler = _hasAlias
-            ? new EventHandler(_eventHandlerId, _alias, _scopeId, _partitioned, eventTypesToMethods)
-            : new EventHandler(_eventHandlerId, _scopeId, _partitioned, eventTypesToMethods);
+        eventHandler = new EventHandler(identifier, eventTypesToMethods);
         return true;
     }
     
@@ -105,7 +107,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
 
     /// <inheritdoc />
     public override int GetHashCode() =>
-        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _hasAlias, _partitioned, _scopeId);
+        HashCode.Combine(_eventHandlerId, _methodsBuilder, _alias, _partitioned, _scopeId);
 
     void Bind()
     {

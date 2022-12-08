@@ -38,7 +38,6 @@ static class AggregateRootMetadata<TAggregateRoot>
     /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
-    /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
     public static AggregateRootId GetAggregateRootId()
     {
@@ -53,13 +52,12 @@ static class AggregateRootMetadata<TAggregateRoot>
     /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
-    /// <param name="aggregateRoot">The <see cref="AggregateRoot" />.</param>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
     static AggregateRootType? GetAggregateRootType()
     {
         var aggregateRootType = typeof(TAggregateRoot);
         var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<AggregateRootAttribute>();
-        return aggregateRootAttribute?.Type;
+        return aggregateRootAttribute?.GetIdentifier(aggregateRootType);
     }
 
     static IReadOnlyDictionary<Type, MethodInfo> CreateMethodsPerEventType(Type aggregateRootType)
@@ -79,8 +77,6 @@ static class AggregateRootMetadata<TAggregateRoot>
 #pragma warning disable CS0618
     static Func<IServiceProvider, EventSourceId, Try<TAggregateRoot>> CreateConstruct(Type aggregateRootType)
     {
-        Func<IServiceProvider, EventSourceId, Try<TAggregateRoot>> construct;
-
         if (!TryGetConstructor(aggregateRootType, out var constructor, out var e))
         {
             // Not instantiatable

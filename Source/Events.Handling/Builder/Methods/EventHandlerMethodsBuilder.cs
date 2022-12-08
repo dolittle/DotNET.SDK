@@ -73,11 +73,12 @@ public class EventHandlerMethodsBuilder : IEventHandlerMethodsBuilder
     /// <summary>
     /// Builds the event handler methods.
     /// </summary>
+    /// <param name="identifier">The <see cref="EventHandlerModelId"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="eventTypesToMethods">The output <see cref="IDictionary{TKey, TValue}" /> of <see cref="EventType" /> to <see cref="IEventHandlerMethod" /> map.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults" />.</param>
     /// <returns>Whether all the event handler methods could be built.</returns>
-    public bool TryAddEventHandlerMethods(IEventTypes eventTypes, IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods, IClientBuildResults buildResults)
+    public bool TryAddEventHandlerMethods(EventHandlerModelId identifier, IEventTypes eventTypes, IDictionary<EventType, IEventHandlerMethod> eventTypesToMethods, IClientBuildResults buildResults)
     {
         var okay = true;
         foreach (var (eventType, method) in _handleMethodAndArtifacts)
@@ -87,7 +88,7 @@ public class EventHandlerMethodsBuilder : IEventHandlerMethodsBuilder
                 continue;
             }
             okay = false;
-            buildResults.AddFailure($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
+            buildResults.AddFailure(identifier, $"Event handler already handles event with event type {eventType}");
         }
         foreach (var (type, method) in _handleMethodAndTypes)
         {
@@ -97,7 +98,7 @@ public class EventHandlerMethodsBuilder : IEventHandlerMethodsBuilder
                 continue;
             }
             okay = false;
-            buildResults.AddFailure($"Event handler {_eventHandlerId} already handles event with event type {eventType}");
+            buildResults.AddFailure(identifier, $"Event handler already handles {type} {eventType}");
         }
         return okay;
     }

@@ -13,8 +13,9 @@ public interface ICanTryBuildEventHandler
     /// <summary>
     /// Builds event handler.
     /// </summary>
+    /// <param name="identifier">The <see cref="EventHandlerModelId"/>.</param>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="eventHandler">The built <see cref="IEventHandler"/>.</param>
-    bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler);
+    bool TryBuild(EventHandlerModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler);
 }

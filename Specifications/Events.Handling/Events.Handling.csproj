@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="../../specs.props"/>
+    <Import Project="../../specs.props" />
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.Events.Handling.Specs</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Events.Handling</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

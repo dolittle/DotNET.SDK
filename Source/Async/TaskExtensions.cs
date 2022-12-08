@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Dolittle.SDK.Async;
@@ -70,7 +71,7 @@ public static class TaskExtensions
     /// <param name="task">The <see cref="Task" />.</param>
     /// <param name="exception">The <see cref="Exception" />.</param>
     /// <returns>A value indicating whether the <see cref="Task" /> had an <see cref="Exception" />.</returns>
-    public static bool TryGetException(this Task task, out Exception exception)
+    public static bool TryGetException(this Task task, [NotNullWhen(true)] out Exception? exception)
     {
         exception = task.Exception;
         return exception != null;
@@ -82,7 +83,7 @@ public static class TaskExtensions
     /// <param name="task">The <see cref="Task" />.</param>
     /// <param name="exception">The <see cref="Exception" />.</param>
     /// <returns>A value indicating whether the <see cref="Task" /> had an <see cref="Exception" />.</returns>
-    public static bool TryGetInnerMostException(this Task task, out Exception exception)
+    public static bool TryGetInnerMostException(this Task task, [NotNullWhen(true)] out Exception? exception)
     {
         var hasException = task.TryGetException(out exception);
         while (exception?.InnerException != null) exception = exception.InnerException;

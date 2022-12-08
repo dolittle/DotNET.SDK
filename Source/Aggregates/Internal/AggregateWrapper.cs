@@ -12,6 +12,7 @@ using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Microsoft.Extensions.Logging;
+#pragma warning disable CS0618 // Refers to EventSourceId which is marked obsolete for clients. Should still be used internally
 
 namespace Dolittle.SDK.Aggregates.Internal;
 
@@ -110,7 +111,6 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// <summary>
     /// Gets all the <see cref="IEnumerable{T}"/> of <see cref="EventType"/> that the aggregates handles
     /// </summary>
-    /// <param name="aggregateRoot"></param>
     /// <param name="eventTypes"></param>
     /// <returns></returns>
     static IEnumerable<EventType> GetEventTypes(IEventTypes eventTypes)
@@ -144,14 +144,14 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
         var eventType = appliedEvent.EventType;
         if (appliedEvent.HasEventType)
         {
-            ThrowIfWrongEventType(@event, eventType);
+            ThrowIfWrongEventType(@event, eventType!);
         }
         else
         {
             eventType = _eventTypes.GetFor(@event.GetType());
         }
 
-        return new UncommittedAggregateEvent(eventType, @event, appliedEvent.Public);
+        return new UncommittedAggregateEvent(eventType!, @event, appliedEvent.Public);
     }
 
     void ThrowIfWrongEventType(object @event, EventType eventType)

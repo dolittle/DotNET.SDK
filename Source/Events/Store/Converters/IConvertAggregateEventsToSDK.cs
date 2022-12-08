@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using PbCommittedAggregateEvents = Dolittle.Runtime.Events.Contracts.CommittedAggregateEvents;
 
 namespace Dolittle.SDK.Events.Store.Converters;
@@ -18,5 +19,5 @@ public interface IConvertAggregateEventsToSDK
     /// <param name="events">When the method returns, the converted <see cref="CommittedAggregateEvents"/> if conversion was successful, otherwise null.</param>
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    bool TryConvert(PbCommittedAggregateEvents source, out CommittedAggregateEvents events, out Exception error);
+    bool TryConvert(PbCommittedAggregateEvents? source,  [NotNullWhen(true)]  out CommittedAggregateEvents? events, [NotNullWhen(false)] out Exception? error);
 }

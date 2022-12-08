@@ -33,7 +33,7 @@ public class and_it_returns_a_projection_state_another_key : given.all_dependenc
 
     It should_call_get_one_with = () => method_caller.Verify(_ => _.Call(
         Moq.It.IsAny<ProjectionsGetOne>(),
-        request_like(key_in_request, new ScopedProjectionId(another_id, another_scope)), 
+        request_like(key_in_request, another_id, another_scope), 
         Moq.It.IsAny<CancellationToken>()));
     
     It should_only_call_it_once = () => method_caller.VerifyNoOtherCalls();

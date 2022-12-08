@@ -35,7 +35,7 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
     public IEmbeddingBuilder Create(EmbeddingId embeddingId)
     {
         var builder = new EmbeddingBuilder(embeddingId, _modelBuilder);
-        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding>(new EmbeddingModelId(embeddingId), builder);
+        _modelBuilder.BindIdentifierToProcessorBuilder<ICanTryBuildEmbedding>(new EmbeddingModelId(embeddingId, null), builder);
         return builder;
     }
 
@@ -66,15 +66,15 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
 
         return this;
     }
-    void BindBuilder(Type type, EmbeddingAttribute decorator)
+    void BindBuilder(Type type, EmbeddingModelId identifier)
         =>  _modelBuilder.BindIdentifierToProcessorBuilder(
-            decorator.GetIdentifier(),
-            CreateConventionEmbeddingBuilderFor(type, decorator));
+            identifier,
+            CreateConventionEmbeddingBuilderFor(type, identifier));
     
-    static ICanTryBuildEmbedding CreateConventionEmbeddingBuilderFor(Type type, EmbeddingAttribute decorator)
+    static ICanTryBuildEmbedding CreateConventionEmbeddingBuilderFor(Type type, EmbeddingModelId identifier)
         => Activator.CreateInstance(
                 typeof(ConventionEmbeddingBuilder<>).MakeGenericType(type),
-                decorator)
+                identifier)
             as ICanTryBuildEmbedding;
 
     /// <summary>
@@ -90,7 +90,7 @@ public class EmbeddingsBuilder : IEmbeddingsBuilder
         {
             if (builder.TryBuild(eventTypes, buildResults, out var embedding))
             {
-                embeddings.Add(new EmbeddingModelId(embedding.Identifier), embedding);
+                embeddings.Add(new EmbeddingModelId(embedding.Identifier, null), embedding);
             }
         }
         var identifiers = model.GetTypeBindings<EmbeddingModelId, EmbeddingId>();

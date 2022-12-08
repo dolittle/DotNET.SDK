@@ -46,7 +46,7 @@ public class EventType : Artifact<EventTypeId>
     /// <param name="generation"><see cref="Generation">Generation</see> of the <see cref="EventType"/>.</param>
     /// <param name="alias"><see cref="EventTypeAlias">Alias</see> of the <see cref="EventType"/>.</param>
     public EventType(EventTypeId id, Generation generation, EventTypeAlias alias)
-        : base(id, generation)
+        : base(id, generation, alias)
     {
         ThrowIfEventTypeIdIsNull(id);
         ThrowIfGenerationIsNull(generation);

@@ -19,5 +19,5 @@ public record TypeBinding<TIdentifier, TId>(TIdentifier Identifier, Type Type) :
 {
     /// <inheritdoc />
     public override string ToString()
-        => $"Type binding from identifier {Identifier} to type {Type.Name}";
+        => $"type binding from {Identifier} to type {Type}";
 }

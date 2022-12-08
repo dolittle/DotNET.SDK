@@ -36,12 +36,12 @@ public class Try<TResult>
     /// <summary>
     /// Gets the <typeparamref name="TResult">result</typeparamref>.
     /// </summary>
-    public TResult Result { get; }
+    public TResult? Result { get; }
 
     /// <summary>
     /// Gets the <see cref="Exception" /> that caused the operation to fail.
     /// </summary>
-    public Exception Exception { get; }
+    public Exception? Exception { get; }
 
     /// <summary>
     /// Implicitly convert <see cref="Try{TResult}" /> to <see cref="Try{TResult}.Success" />.

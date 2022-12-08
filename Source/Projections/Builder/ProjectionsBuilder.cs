@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
@@ -55,11 +54,11 @@ public class ProjectionsBuilder : IProjectionsBuilder
     /// <inheritdoc />
     public IProjectionsBuilder Register(Type type)
     {
-        if (!_decoratedTypeBindings.TryAdd(type, out var decorator))
+        if (!_decoratedTypeBindings.TryAdd(type, out var identifier))
         {
             return this;
         }
-        BindBuilder(type, decorator);
+        BindConventionBuilder(type, identifier);
         return this;
     }
 
@@ -69,21 +68,21 @@ public class ProjectionsBuilder : IProjectionsBuilder
         var addedEventHandlerBindings = _decoratedTypeBindings.AddFromAssembly(assembly);
         foreach (var (type, decorator) in addedEventHandlerBindings)
         {
-            BindBuilder(type, decorator);
+            BindConventionBuilder(type, decorator);
         }
 
         return this;
     }
 
-    void BindBuilder(Type type, ProjectionAttribute decorator)
+    void BindConventionBuilder(Type type, ProjectionModelId identifier)
         =>  _modelBuilder.BindIdentifierToProcessorBuilder(
-            decorator.GetIdentifier(),
-            CreateConventionProjectionBuilderFor(type, decorator));
+            identifier,
+            CreateConventionProjectionBuilderFor(type, identifier));
 
-    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType, ProjectionAttribute decorator)
+    ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType, ProjectionModelId identifier)
         => Activator.CreateInstance(
                 typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType),
-                decorator,
+                identifier,
                 CreateForMethodForReadModel(readModelType).Invoke(_copyToMongoDbBuilderFactory, Array.Empty<object>()))
             as ICanTryBuildProjection;
     
@@ -104,18 +103,19 @@ public class ProjectionsBuilder : IProjectionsBuilder
     public static IUnregisteredProjections Build(IModel model, IEventTypes eventTypes, IClientBuildResults buildResults)
     {
         var projections = new UniqueBindings<ProjectionModelId, IProjection>();
-        foreach (var builder in model.GetProcessorBuilderBindings<ICanTryBuildProjection>().Select(_ => _.ProcessorBuilder))
+        foreach (var (identifier, builder) in model.GetProcessorBuilderBindings<ICanTryBuildProjection>())
         {
-            if (builder.TryBuild(eventTypes, buildResults, out var projection))
+            
+            if (builder.TryBuild((ProjectionModelId)identifier, eventTypes, buildResults, out var projection))
             {
-                projections.Add(new ProjectionModelId(projection.Identifier, projection.ScopeId), projection);
+                projections.Add((ProjectionModelId)identifier, projection);
             }
         }
         var identifiers = model.GetTypeBindings<ProjectionModelId, ProjectionId>();
         var readModelTypes = new ProjectionReadModelTypes();
-        foreach (var (identifier, type) in identifiers)
+        foreach (var identifier in identifiers)
         {
-            readModelTypes.Add(new ScopedProjectionId(identifier.Id, identifier.Scope), type);
+            readModelTypes.Add(identifier.Identifier, identifier.Type);
         }
         return new UnregisteredProjections(projections, readModelTypes);
     }

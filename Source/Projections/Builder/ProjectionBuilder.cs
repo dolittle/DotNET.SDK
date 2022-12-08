@@ -65,14 +65,14 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     }
 
     /// <inheritdoc/>
-    public bool TryBuild(IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
     {
         projection = default;
         if (_methodsBuilder != null)
         {
-            return _methodsBuilder.TryBuild(eventTypes, buildResults, out projection);
+            return _methodsBuilder.TryBuild(identifier, eventTypes, buildResults, out projection);
         }
-        buildResults.AddFailure($"Failed to build projection {_projectionId}. No read model defined for projection.");
+        buildResults.AddFailure(identifier, $"No read model defined for projection.");
         return false;
 
     }

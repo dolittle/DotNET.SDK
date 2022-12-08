@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using PbCurrentState = Dolittle.Runtime.Projections.Contracts.ProjectionCurrentState;
 
 namespace Dolittle.SDK.Projections.Store.Converters;
@@ -20,7 +21,7 @@ public interface IConvertProjectionsToSDK
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    bool TryConvert<TProjection>(PbCurrentState source, out CurrentState<TProjection> state, out Exception error)
+    bool TryConvert<TProjection>(PbCurrentState source, out CurrentState<TProjection> state, [NotNullWhen(false)] out Exception? error)
         where TProjection : class, new();
 
     /// <summary>
@@ -31,6 +32,6 @@ public interface IConvertProjectionsToSDK
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, out Exception error)
+    bool TryConvert<TProjection>(IEnumerable<PbCurrentState> source, out IEnumerable<CurrentState<TProjection>> states, [NotNullWhen(false)] out Exception? error)
         where TProjection : class, new();
 }

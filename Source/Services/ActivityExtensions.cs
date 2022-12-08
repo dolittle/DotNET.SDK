@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using Dolittle.Protobuf.Contracts;
-using Dolittle.SDK.Execution;
 using Google.Protobuf;
 using ExecutionContext = Dolittle.Execution.Contracts.ExecutionContext;
 

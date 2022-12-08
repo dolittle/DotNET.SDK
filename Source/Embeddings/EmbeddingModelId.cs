@@ -14,8 +14,9 @@ public class EmbeddingModelId : Identifier<EmbeddingId>
     /// Initializes a new instance of the <see cref="EmbeddingModelId"/> class.
     /// </summary>
     /// <param name="id">The <see cref="EmbeddingId"/>.</param>
-    public EmbeddingModelId(EmbeddingId id)
-        : base("Embedding", id)
+    /// <param name="alias">The optional embedding alias.</param>
+    public EmbeddingModelId(EmbeddingId id, string? alias = default)
+        : base("Embedding", id, alias)
     {
     }
 }

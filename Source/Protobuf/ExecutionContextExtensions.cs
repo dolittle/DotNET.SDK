@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Microservices;
@@ -42,7 +43,7 @@ public static class ExecutionContextExtensions
     /// <param name="executionContext">When the method returns, the converted <see cref="ExecutionContext"/> if conversion was successful, otherwise null.</param>
     /// <param name="error">When the method returns, null if the conversion was successful, otherwise the error that caused the failure.</param>
     /// <returns>A value indicating whether or not the conversion was successful.</returns>
-    public static bool TryToExecutionContext(this PbExecutionContext source, out ExecutionContext executionContext, out Exception error)
+    public static bool TryToExecutionContext(this PbExecutionContext source, out ExecutionContext executionContext, [NotNullWhen(false)] out Exception? error)
     {
         executionContext = default;
 

@@ -2,14 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Autofac.Extensions.DependencyInjection;
-using DnsClient.Internal;
 using Dolittle.SDK;
-using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Extensions.AspNet;
-using Dolittle.SDK.Tenancy;
-using Lamar;
-using Lamar.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
