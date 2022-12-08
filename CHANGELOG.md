@@ -1,3 +1,30 @@
+# [20.0.0] - 2022-12-8 [PR: #183](https://github.com/dolittle/DotNET.SDK/pull/183)
+## Summary
+
+Improves the overall developer experience in multiple ways and enables visibility of application errors in Studio through the Runtime.
+
+### Added
+
+- Roslyn Analyzers:
+  - Identity Attributes
+    - Added check that all identities are unique within the type
+    - Added check that the identity is a valid Guid
+    - Added code fixes to autogenerate valid Id's
+  - Aggregates
+    - Will check that every object used either in Apply or On is a valid event (with annotation)
+    - Added code fix to add attributes to classes missing EventType
+    - Added the ability to auto-generate On-method (mutation) for a given Apply
+    - Added checks that the On-methods have the correct visibility
+  - EventStore
+    - Checks that objects being committed are valid events (with annotation)
+    - Added code fix to add annotation if it is missing
+- Sends application model build results to the Runtime in the handshake.
+
+### Changed
+
+- Multiple internal/infrastructure APIs to enable the new additions to the application model and build results
+
+
 # [19.0.0] - 2022-11-25 [PR: #173](https://github.com/dolittle/DotNET.SDK/pull/173)
 ## Summary
 
