@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -19,12 +20,6 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AggregateAnalyzer : DiagnosticAnalyzer
 {
-    record Types(INamedTypeSymbol AggregateRoot, INamedTypeSymbol AggregateAttribute)
-    {
-        public INamedTypeSymbol AggregateRoot { get; } = AggregateRoot;
-        public INamedTypeSymbol AggregateAttribute { get; } = AggregateAttribute;
-    }
-
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
@@ -40,35 +35,27 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterCompilationStartAction(compilationContext =>
-        {
-            var types = GetRelevantTypes(compilationContext.Compilation);
-            if (types is null) return;
-
-
-            // Register an action that accesses the immutable state and reports diagnostics.
-            compilationContext.RegisterSymbolAction(
-                symbolContext => { AnalyzeAggregates(symbolContext, types); }, SymbolKind.NamedType);
-        });
+        context.RegisterSyntaxNodeAction(AnalyzeAggregates, ImmutableArray.Create(SyntaxKind.ClassDeclaration));
     }
 
 
-    static void AnalyzeAggregates(SymbolAnalysisContext context, Types types)
+    static void AnalyzeAggregates(SyntaxNodeAnalysisContext context)
     {
         // Check if the symbol has the aggregate root base class
-        var aggregateType = (INamedTypeSymbol)context.Symbol;
-        if (aggregateType.BaseType?.Equals(types.AggregateRoot, SymbolEqualityComparer.Default) != true) return;
-        if (aggregateType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not ClassDeclarationSyntax aggregateSyntax) return;
+        var aggregateSyntax = (ClassDeclarationSyntax)context.Node;
+        // Check if the symbol has the aggregate root base class
+        var aggregateSymbol = context.SemanticModel.GetDeclaredSymbol(aggregateSyntax);
+        if (aggregateSymbol?.IsAggregateRoot() != true) return;
 
-        CheckAggregateRootAttributePresent(context, aggregateType, types.AggregateAttribute);
+        CheckAggregateRootAttributePresent(context, aggregateSymbol);
 
 
-        var handledEvents = CheckOnMethods(context, aggregateType);
+        var handledEvents = CheckOnMethods(context, aggregateSymbol);
         CheckApplyInvocations(context, aggregateSyntax, handledEvents);
     }
 
 
-    static HashSet<ITypeSymbol> CheckOnMethods(SymbolAnalysisContext context, INamedTypeSymbol aggregateType)
+    static HashSet<ITypeSymbol> CheckOnMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
     {
         var members = aggregateType.GetMembers();
         var onMethods = members.Where(_ => _.Name.Equals("On")).OfType<IMethodSymbol>().ToArray();
@@ -113,10 +100,10 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         return eventTypesHandled;
     }
 
-    static void CheckAggregateRootAttributePresent(SymbolAnalysisContext context, INamedTypeSymbol aggregateClass, INamedTypeSymbol attributeType)
+    static void CheckAggregateRootAttributePresent(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateClass)
     {
         var hasAttribute = aggregateClass.GetAttributes()
-            .Any(attribute => attribute.AttributeClass?.Equals(attributeType, SymbolEqualityComparer.Default) == true);
+            .Any(attribute => attribute.AttributeClass?.ToDisplayString().Equals(DolittleTypes.AggregateRootAttribute, StringComparison.Ordinal) == true);
 
         if (!hasAttribute)
         {
@@ -130,11 +117,10 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     }
 
 
-    static void CheckApplyInvocations(SymbolAnalysisContext context, ClassDeclarationSyntax aggregateClassSyntax,
+    static void CheckApplyInvocations(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax aggregateClassSyntax,
         ISet<ITypeSymbol> handledEventTypes)
     {
-        // TODO: refactor analyzer to prevent creating a new SemanticModel for each class
-        var semanticModel = context.Compilation.GetSemanticModel(aggregateClassSyntax.SyntaxTree);
+        var semanticModel = context.SemanticModel;
         foreach (var invocation in aggregateClassSyntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
         {
             if (invocation.Expression is not IdentifierNameSyntax { Identifier.Text: "Apply" }) continue;
@@ -154,24 +140,5 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                     type.ToString()));
             }
         }
-    }
-
-
-    static Types? GetRelevantTypes(Compilation compilation)
-    {
-        var aggregateBaseClass = compilation.GetTypeByMetadataName(DolittleTypes.AggregateRootBaseClass);
-        if (aggregateBaseClass == null)
-        {
-            return default;
-        }
-
-        var aggregateRootAttribute = compilation.GetTypeByMetadataName(DolittleTypes.AggregateRootAttribute);
-        if (aggregateRootAttribute == null)
-        {
-            return default;
-        }
-
-
-        return new Types(aggregateBaseClass, aggregateRootAttribute);
     }
 }
