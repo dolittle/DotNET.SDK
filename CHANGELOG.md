@@ -1,3 +1,13 @@
+# [20.0.1] - 2022-12-12 [PR: #190](https://github.com/dolittle/DotNET.SDK/pull/190)
+## Summary
+
+Fixes a critical bug in the DolittleClient preventing all clients to crash.
+
+### Fixed
+
+- Bug in starting up DolittleClient
+
+
 # [20.0.0] - 2022-12-8 [PR: #183](https://github.com/dolittle/DotNET.SDK/pull/183)
 ## Summary
 
