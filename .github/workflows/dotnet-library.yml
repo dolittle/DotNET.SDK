@@ -53,10 +53,10 @@ jobs:
         run: dotnet build
       - name: Test
         run: dotnet test --configuration Release --no-build
-      - name: Create test coverage report
-        run: dotnet dotcover test --dcXML=coverage.xml
-      - name: Create Cobertura test coverage report
-        run: reportgenerator -reports:CoverageReport.xml -targetdir:./ -reporttypes:Cobertura -filefilters:'-*.g.cs'
+#      - name: Create test coverage report
+#        run: dotnet dotcover test --dcXML=coverage.xml
+#      - name: Create Cobertura test coverage report
+#        run: reportgenerator -reports:CoverageReport.xml -targetdir:./ -reporttypes:Cobertura -filefilters:'-*.g.cs'
       - name: Create release notes
         id: create-release-notes
         if: ${{ steps.context.outputs.should-publish == 'true' }}
