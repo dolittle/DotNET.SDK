@@ -1,3 +1,9 @@
+# [20.0.2] - 2022-12-13 [PR: #192](https://github.com/dolittle/DotNET.SDK/pull/192)
+### Fixed
+
+- Does not shortcut rehydration for stateless aggregates. Fixes invalid AggregateRootVersion for subsequent commits on stateless aggregates ( aggregates without mutations)
+
+
 # [20.0.1] - 2022-12-12 [PR: #190](https://github.com/dolittle/DotNET.SDK/pull/190)
 ## Summary
 
