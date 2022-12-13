@@ -98,15 +98,12 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     {
         var eventSourceId = aggregateRoot.EventSourceId;
         _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
-        if (AggregateRootMetadata<TAggregate>.IsStateLess)
-        {
-            return Task.CompletedTask;
-        }
-
         var eventTypesToFetch = GetEventTypes(_eventTypes);
         var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
         return aggregateRoot.RehydrateInternal(committedEventsBatches, AggregateRootMetadata<TAggregate>.MethodsPerEventType, cancellationToken);
     }
+
+    static bool IsStateLess => AggregateRootMetadata<TAggregate>.IsStateLess;
 
     /// <summary>
     /// Gets all the <see cref="IEnumerable{T}"/> of <see cref="EventType"/> that the aggregates handles
@@ -114,7 +111,9 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// <param name="eventTypes"></param>
     /// <returns></returns>
     static IEnumerable<EventType> GetEventTypes(IEventTypes eventTypes)
-        => AggregateRootMetadata<TAggregate>.MethodsPerEventType.Keys.Select(eventTypes.GetFor);
+        => IsStateLess
+            ? Enumerable.Empty<EventType>()
+            :  AggregateRootMetadata<TAggregate>.MethodsPerEventType.Keys.Select(eventTypes.GetFor);
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)
     {
