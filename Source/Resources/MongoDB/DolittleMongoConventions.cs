@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
 namespace Dolittle.SDK.Resources.MongoDB;
@@ -29,6 +30,7 @@ public static class DolittleMongoConventions
                 return;
             }
             _isRegistered = true;
+            // BsonSerializer.RegisterSerializationProvider(new ConceptSerializationProvider());
             var pack = new ConventionPack();
             pack.AddClassMapConvention("Ignore extra elements", _ => _.SetIgnoreExtraElements(true));
             ConventionRegistry.Register("Dolittle Conventions", pack,  _ => true);
