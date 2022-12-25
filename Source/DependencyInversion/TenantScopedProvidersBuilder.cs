@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
+using BaselineTypeDiscovery;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -56,6 +58,7 @@ public class TenantScopedProvidersBuilder
     IServiceProvider CreateTenantContainer(TenantId tenant)
     {
         var services = new ServiceCollection();
+        DiscoverTenantScopedServices(services);
         foreach (var configure in _configureServicesForTenantCallbacks)
         {
             configure?.Invoke(tenant, services);
@@ -63,5 +66,58 @@ public class TenantScopedProvidersBuilder
 
         services.AddSingleton(tenant);
         return _factory(_serviceProvider, tenant, services);
+    }
+
+    static void DiscoverTenantScopedServices(IServiceCollection services)
+    {
+        ForAllAllScannedAssemblies(assembly =>
+        {
+            foreach (var type in GetExportedTypes(assembly))
+            {
+                var attribute = type.GetCustomAttribute<PerTenantAttribute>();
+                if (attribute is null)
+                {
+                    continue;
+                }
+                var implementors = type.GetInterfaces().Where(_ => _ != typeof(IDisposable)).ToList();
+                if (attribute.RegisterAsSelf)
+                {
+                    implementors.Add(type);
+                }
+
+                foreach (var serviceType in implementors)
+                {
+                    services.Add(new ServiceDescriptor(serviceType, type, attribute.Lifetime));
+                }
+            }
+        });
+    }
+
+    static IEnumerable<Type> GetExportedTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.ExportedTypes;
+        }
+        catch
+        {
+            return Enumerable.Empty<Type>();
+        }
+    }
+    
+    static void ForAllAllScannedAssemblies(Action<Assembly> registerAllFromAssembly)
+    {
+        foreach (var assembly in GetAllAssemblies())
+        {
+            registerAllFromAssembly(assembly);
+        }
+    }
+
+    static IEnumerable<Assembly> GetAllAssemblies()
+    {
+        return AssemblyFinder.FindAssemblies(
+            _ => { },
+            _ => true,
+            false);
     }
 }

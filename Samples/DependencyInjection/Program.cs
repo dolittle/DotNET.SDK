@@ -15,11 +15,12 @@ builder.Host
     // .UseServiceProviderFactory(new AutofacServiceProviderFactory())
     // Use Lamar
     // .UseLamar(_ => _.For<ICreateTenantContainers>().Use<LamarTenantContainerCreator>())
-    .UseDolittle(configureClientConfiguration: _ => _
-        .WithTenantServices((tenant, services) => services
-            .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>()
-            .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
-            .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
+    // .UseDolittle(configureClientConfiguration: _ => _
+    //     .WithTenantServices((tenant, services) => services
+    //         .AddSingleton<ITenantScopedSingletonService, TenantScopedSingletonService>()
+    //         .AddScoped<ITenantScopedScopedService, TenantScopedScopedService>()
+    //         .AddTransient<ITenantScopedTransientService, TenantScopedTransientService>()));
+    .UseDolittle();
 builder.Services
     .AddSingleton<IGlobalSingletonService, GlobalSingletonService>()
     .AddScoped<IGlobalScopedService, GlobalScopedService>()
