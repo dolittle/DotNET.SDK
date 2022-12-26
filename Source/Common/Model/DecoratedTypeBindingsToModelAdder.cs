@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
@@ -61,9 +62,9 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     public IEnumerable<(Type, TIdentifier)> AddFromAssembly(Assembly assembly)
     {
         var result = new List<(Type, TIdentifier)>();
-        try
+        foreach (var type in GetExportedTypes(assembly))
         {
-            foreach (var type in assembly.ExportedTypes)
+            try
             {
                 if (!type.TryGetIdentifier<TIdentifier>(out var identifier))
                 {
@@ -72,9 +73,10 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
                 AddBinding(identifier, type);
                 result.Add((type, identifier));
             }
-        }
-        catch
-        {
+            catch (Exception ex)
+            {
+                _buildResults.AddFailure($"Failed to add binding for identifier type {typeof(TIdentifier)} for type {type}. Exception: {ex}");
+            }
         }
         return result;
     }
@@ -82,5 +84,17 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
     void AddBinding(TIdentifier identifier, Type type)
     {
         _modelBuilder.BindIdentifierToType<TIdentifier, TId>(identifier, type);
+    }
+
+    static IEnumerable<Type> GetExportedTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.ExportedTypes;
+        }
+        catch
+        {
+            return Enumerable.Empty<Type>();
+        }
     }
 }
