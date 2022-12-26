@@ -30,7 +30,7 @@ public static class DolittleMongoConventions
                 return;
             }
             _isRegistered = true;
-            // BsonSerializer.RegisterSerializationProvider(new ConceptSerializationProvider());
+            BsonSerializer.RegisterSerializationProvider(new ConceptSerializationProvider());
             var pack = new ConventionPack();
             pack.AddClassMapConvention("Ignore extra elements", _ => _.SetIgnoreExtraElements(true));
             ConventionRegistry.Register("Dolittle Conventions", pack,  _ => true);
