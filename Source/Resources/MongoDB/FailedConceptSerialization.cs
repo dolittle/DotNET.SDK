@@ -18,4 +18,14 @@ public class FailedConceptSerialization : Exception
         : base(msg)
     {
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FailedConceptSerialization"/> class.
+    /// </summary>
+    /// <param name="msg">Message to display.</param>
+    /// <param name="error">The error.</param>
+    public FailedConceptSerialization(string msg, Exception error)
+        : base(msg, error)
+    {
+    }
 }

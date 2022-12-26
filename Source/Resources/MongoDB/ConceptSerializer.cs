@@ -60,7 +60,17 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
             value = GetDeserializedValue(valueType, ref bsonReader);
         }
 
-        return (T)ValueType.GetConstructors().Single(_ => _.GetParameters().Length == 1).Invoke(new[]{value});
+        try
+        {
+            return (T)ValueType
+                .GetConstructors()
+                .Single(_ => _.GetParameters().Length == 1 && _.GetParameters().First().ParameterType == valueType)
+                .Invoke(new[] { value });
+        }
+        catch (Exception ex)
+        {
+            throw new FailedConceptSerialization($"Failed to create concept {ValueType}", ex);
+        }
     }
 
     /// <inheritdoc/>
