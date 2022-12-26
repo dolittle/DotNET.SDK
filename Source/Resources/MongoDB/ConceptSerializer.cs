@@ -36,10 +36,8 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
     public T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
         var bsonReader = context.Reader;
-
         var actualType = args.NominalType;
         var bsonType = bsonReader.GetCurrentBsonType();
-
         var valueType = actualType.GetConceptValueType();
 
         object value;
