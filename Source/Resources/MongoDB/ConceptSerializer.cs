@@ -39,9 +39,7 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
         var actualType = args.NominalType;
         var bsonType = bsonReader.GetCurrentBsonType();
         var valueType = actualType.GetConceptValueType();
-
         object value;
-
         // It should be a Concept object
         if (bsonType == BsonType.Document)
         {
@@ -68,10 +66,10 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
     /// <inheritdoc/>
     public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
     {
+        var bsonWriter = context.Writer;
         var nominalType = args.NominalType;
         var underlyingValueType = nominalType.GetConceptValueType();
-        var underlyingValue = value.GetType().GetTypeInfo().GetProperty(nameof(ConceptAs<string>.Value))!.GetValue(value, null);
-        var bsonWriter = context.Writer;
+        var underlyingValue = GetUnderlyingValue(nominalType, underlyingValueType, value);
         BsonSerializer.Serialize(bsonWriter, underlyingValueType, underlyingValue);
     }
 
@@ -84,7 +82,16 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
         => Deserialize(context, args)!;
 
     static object GetDeserializedValue(Type valueType, ref IBsonReader bsonReader)
+        => BsonSerializer.Deserialize(bsonReader, valueType);
+
+    static object? GetUnderlyingValue(Type nominalType, Type underlyingValueType, object? value)
     {
-        return BsonSerializer.Deserialize(bsonReader, valueType);
+        if (value is not null)
+        {
+            return nominalType.GetTypeInfo().GetProperty(nameof(ConceptAs<string>.Value))!.GetValue(value, null);
+        }
+        return underlyingValueType.GetTypeInfo().IsValueType
+            ? Activator.CreateInstance(underlyingValueType)
+            : null;
     }
 }
