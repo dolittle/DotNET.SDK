@@ -38,7 +38,10 @@ public class CommitForAggregateBuilder
     /// <returns>The <see cref="UncommittedEventBuilder" /> for continuation.</returns>
     public CommitForAggregateWithEventSourceBuilder WithEventSource(EventSourceId eventSourceId)
     {
-        if (_builder != default) throw new EventBuilderMethodAlreadyCalled("WithEventSource");
+        if (_builder != default)
+        {
+            throw new EventBuilderMethodAlreadyCalled("WithEventSource");
+        }
         _builder = new CommitForAggregateWithEventSourceBuilder(_aggregateEvents, _eventTypes, _aggregateRootId, eventSourceId);
         return _builder;
     }

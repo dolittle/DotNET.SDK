@@ -60,6 +60,9 @@ public class EventCommitter : ICommitEvents
     {
         var uncommittedEventBuilder = isPublic ? builder.CreatePublicEvent(content) : builder.CreateEvent(content);
         var eventBuilder = uncommittedEventBuilder.FromEventSource(eventSourceId);
-        if (eventType != default) eventBuilder.WithEventType(eventType);
+        if (eventType != default)
+        {
+            eventBuilder.WithEventType(eventType);
+        }
     }
 }
