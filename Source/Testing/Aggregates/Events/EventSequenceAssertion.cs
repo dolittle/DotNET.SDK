@@ -73,13 +73,14 @@ public class EventSequenceAssertion<T>
     /// Asserts that there are a certain number of events in the sequence.
     /// </summary>
     /// <param name="expectedNum">THe expected number of events.</param>
-    public void CountOf(int expectedNum)
+    public EventSequenceAssertion<T> CountOf(int expectedNum)
     {
         var numConformingEvents = _conformingEvents.Count;
         if (numConformingEvents != expectedNum)
         {
             _throwError($"there are {numConformingEvents} conforming events, expected {expectedNum}");
         }
+        return this;
     }
     
     /// <summary>
