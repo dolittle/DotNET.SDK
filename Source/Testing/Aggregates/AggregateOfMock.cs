@@ -21,7 +21,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     readonly ConcurrentDictionary<EventSourceId, object> _aggregateLocks = new();
     readonly ConcurrentDictionary<EventSourceId, TAggregate> _aggregates = new();
     readonly Dictionary<EventSourceId, List<AppliedEvent>> _eventsToApply = new();
-
+    
     /// <summary>
     /// Initializes an instance of the <see cref="AggregateOfMock{T}"/> class.
     /// </summary>
@@ -30,16 +30,16 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     {
         _createAggregateRoot = createAggregateRoot;
     }
+    
+    /// <summary>
+    /// Gets all the aggregates that have had operations performed on them.
+    /// </summary>
+    public IEnumerable<TAggregate> Aggregates => _aggregates.Values;
 
     /// <inheritdoc />
     public IAggregateRootOperations<TAggregate> Get(EventSourceId eventSourceId)
     {
-        var aggregate = _aggregates.GetOrAdd(eventSourceId, eventSourceId =>
-        {
-            _aggregateLocks.TryAdd(eventSourceId, new object());
-            return _createAggregateRoot(eventSourceId);
-        });
-         
+        var aggregate = GetOrAddAggregate(eventSourceId);
         var operations = new AggregateRootOperationsMock<TAggregate>(
             _aggregateLocks[eventSourceId],
             aggregate,
@@ -53,11 +53,13 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
         }
         return operations;
     }
+
     /// <summary>
-    /// Adds events that should be applied to the aggregate before an action is performed
+    /// Adds events that should be applied to the aggregate before an action is performed.
     /// </summary>
-    /// <param name="events"></param>
-    /// <returns></returns>
+    /// <param name="eventSource">The <see cref="EventSourceId"/> to add the events for.</param>
+    /// <param name="events">The events to apply.</param>
+    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
     public AggregateOfMock<TAggregate> WithEventsFor(EventSourceId eventSource, params AppliedEvent[] events)
     {
         if (!_eventsToApply.TryGetValue(eventSource, out var appliedEvents))
@@ -68,4 +70,38 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
         appliedEvents.AddRange(events);
         return this;
     }
+
+    /// <summary>
+    /// Adds events that should be applied to the aggregate before an action is performed
+    /// </summary>
+    /// <param name="eventSource">The <see cref="EventSourceId"/> to add the events for.</param>
+    /// <param name="events">The events to apply.</param>
+    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
+    public AggregateOfMock<TAggregate> WithEventsFor(EventSourceId eventSource, params object[] events)
+        => WithEventsFor(eventSource, events.Select(_ => new AppliedEvent(_)));
+
+    /// <summary>
+    /// Tries to get the <typeparamref name="TAggregate"/> with the given <see cref="EventSourceId"/>.
+    /// </summary>
+    /// <param name="eventSource">The <see cref="EventSourceId"/> of the aggregate.</param>
+    /// <param name="aggregate">The aggregate.</param>
+    /// <returns>True if operations has been performed on aggregate, false if not.</returns>
+    public bool TryGetAggregate(EventSourceId eventSource, out TAggregate aggregate)
+        => _aggregates.TryGetValue(eventSource, out aggregate);
+
+    /// <summary>
+    /// Gets the aggregate with the given <see cref="EventSourceId"/>.
+    /// </summary>
+    /// <param name="eventSource">The <see cref="EventSourceId"/> of the aggregate</param>
+    /// <returns>The <typeparamref name="TAggregate"/>.</returns>
+    public TAggregate GetAggregate(EventSourceId eventSource)
+        => GetOrAddAggregate(eventSource);
+
+    TAggregate GetOrAddAggregate(EventSourceId eventSource)
+        => _aggregates.GetOrAdd(eventSource, eventSourceId =>
+        {
+            _aggregateLocks.TryAdd(eventSourceId, new object());
+            return _createAggregateRoot(eventSourceId);
+        });
 }
+

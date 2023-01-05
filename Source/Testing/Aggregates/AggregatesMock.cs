@@ -19,15 +19,7 @@ public class AggregatesMock : IAggregates
     /// </summary>
     /// <returns>The <see cref="AggregatesMock"/>.</returns>
     public static AggregatesMock Create() => new();
-    /// <summary>
-    /// Creates a new instance of <see cref="AggregateOfMock{T}"/>.
-    /// </summary>
-    /// <param name="factory">The factory to create a <typeparamref name="TAggregate"/>.</param>
-    /// <typeparam name="TAggregate">The <see cref="Type"/> of the <see cref="AggregateRoot"/>.</typeparam>
-    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
-    public static AggregateOfMock<TAggregate> Of<TAggregate>(Func<EventSourceId, TAggregate> factory)
-        where TAggregate : AggregateRoot => new(factory);
-    
+
     readonly ConcurrentDictionary<Type, object> _aggregatesOf = new();
     readonly ConcurrentDictionary<Type, Func<EventSourceId, object>> _aggregatesFactory = new();
 
@@ -43,7 +35,26 @@ public class AggregatesMock : IAggregates
     public IAggregateOf<TAggregateRoot> Of<TAggregateRoot>()
         where TAggregateRoot : AggregateRoot
         => GetOrAddAggregateOfMock<TAggregateRoot>();
+    
+    /// <summary>
+    /// Gets the <see cref="AggregateOfMock{T}"/>.
+    /// </summary>
+    /// <param name="factory">The factory to create a <typeparamref name="TAggregate"/>.</param>
+    /// <typeparam name="TAggregate">The <see cref="Type"/> of the <see cref="AggregateRoot"/>.</typeparam>
+    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
+    public AggregateOfMock<TAggregate> Of<TAggregate>(Func<EventSourceId, TAggregate> factory)
+        where TAggregate : AggregateRoot
+        => (_aggregatesOf.GetOrAdd(typeof(TAggregate), _ =>
+        {
+            WithAggregateFactoryFor(factory);
+            return new AggregateOfMock<TAggregate>(factory);
+        }) as AggregateOfMock<TAggregate>)!;
 
+    /// <summary>
+    /// Explain how to create an aggregate of the <typeparamref name="TAggregate"/>.
+    /// </summary>
+    /// <param name="factory">The function for creating the <typeparamref name="TAggregate"/>.</param>
+    /// <typeparam name="TAggregate">The <see cref="Type"/> of the <see cref="AggregateRoot"/>.</typeparam>
     public void WithAggregateFactoryFor<TAggregate>(Func<EventSourceId, TAggregate> factory)
         where TAggregate : AggregateRoot
     {

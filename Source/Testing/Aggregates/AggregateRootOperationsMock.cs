@@ -27,9 +27,9 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootOperationsMock{TAggregate}"/> class.
     /// </summary>
-    /// <param name="concurrencyLock">The lock object used for accessing </param>
-    /// <param name="aggregateRoot"></param>
-    /// <param name="createAggregate"></param>
+    /// <param name="concurrencyLock">The lock object used for accessing the aggregate without conflicting with other concurrent operations.</param>
+    /// <param name="aggregateRoot">The <see cref="AggregateRoot"/>.</param>
+    /// <param name="createAggregate">The callback for creating a new clean aggregate.</param>
     /// <param name="persistOldAggregate"></param>
     public AggregateRootOperationsMock(
         object concurrencyLock,
