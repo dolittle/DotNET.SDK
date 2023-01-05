@@ -29,10 +29,15 @@ public class EventSequenceAssertion<T>
     /// <param name="isPublic">Whether the events to check </param>
     /// <param name="throwError">THe callback for throwing error</param>
     public EventSequenceAssertion(IList<AppliedEvent> sequence, bool isPublic, OnDolittleAssertionFailed? throwError = default)
+        : this(sequence, evt => evt.Event is T && evt.Public == isPublic, throwError ?? DolittleAssertionFailed.Throw)
+    {
+    }
+    
+    EventSequenceAssertion(IList<AppliedEvent> sequence, Func<AppliedEvent, bool> isWantedEvent, OnDolittleAssertionFailed throwError)
     {
         _allEvents = sequence;
-        _throwError = throwError ?? DolittleAssertionFailed.Throw;
-        _isWantedEvent = evt => evt.Event is T && evt.Public == isPublic;
+        _throwError = throwError;
+        _isWantedEvent = isWantedEvent;
         _conformingEvents = sequence.Where(_isWantedEvent).Select(_ => (T)_.Event).ToList();
     }
     
@@ -51,7 +56,7 @@ public class EventSequenceAssertion<T>
         => new(_conformingEvents.Last());
 
     /// <summary>
-    /// Asserts that an event of the specified type is present anywhere in the sequence, allowing further assertions against the last instance.
+    /// Asserts that the event of the specified type that is the given number exists, allowing further assertions against that instance.
     /// </summary>
     /// <returns>An EventValueAssertion{T} to allow assertions against the event instance.</returns>
     public EventValueAssertion<T> Number(int num)
@@ -64,6 +69,19 @@ public class EventSequenceAssertion<T>
         return new EventValueAssertion<T>(_conformingEvents[num - 1]);
     }
 
+    /// <summary>
+    /// Asserts that there are a certain number of events in the sequence.
+    /// </summary>
+    /// <param name="expectedNum">THe expected number of events.</param>
+    public void CountOf(int expectedNum)
+    {
+        var numConformingEvents = _conformingEvents.Count;
+        if (numConformingEvents != expectedNum)
+        {
+            _throwError($"there are {numConformingEvents} conforming events, expected {expectedNum}");
+        }
+    }
+    
     /// <summary>
     /// Asserts that an event of the specified type is the first event in the sequence, allowing further assertions against the instance.
     /// </summary>
@@ -101,11 +119,21 @@ public class EventSequenceAssertion<T>
     /// Asserts that each event of the specified type conforms to the given predicate. 
     /// </summary>
     /// <param name="predicate">The predicate that each event should conform to.</param>
-    public void WhereEachConformsTo(Func<T, bool> predicate)
+    public void WhereAll(params Action<T>[] assertions)
     {
-        if (!_conformingEvents.All(predicate))
+        foreach (var @event in _conformingEvents)
         {
-            _throwError("not all events conforms to predicate.");
+            foreach (var assertion in assertions)
+            {
+                assertion(@event);
+            }
         }
     }
+
+    /// <summary>
+    /// Asserts that each event of the specified type conforms to the given predicate. 
+    /// </summary>
+    /// <param name="predicate">The predicate that each event should conform to.</param>
+    public EventSequenceAssertion<T> Where(Func<T, bool> predicate)
+        => new(_allEvents, _ => _isWantedEvent(_) && predicate((T) _.Event), _throwError);
 }
