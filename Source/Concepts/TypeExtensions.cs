@@ -15,7 +15,7 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="type">The <see cref="Type"/> to check.</param>
     /// <returns>True if it is a <see cref="ConceptAs{TValue}"/> false if not.</returns>
-    public static bool IsConcept(this Type? type) => type is not null && ConceptMap.IsConcept(type);
+    public static bool IsConcept(this Type type) => type is not null && ConceptMap.IsConcept(type);
         /// <summary>
     /// Get the type of the value inside a <see cref="ConceptAs{T}"/>.
     /// </summary>
