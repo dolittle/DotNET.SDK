@@ -70,7 +70,7 @@ public static class AggregateRootAssertions
     static void ShouldNotHaveEvent<T>(this AggregateRoot aggregateRoot, bool isPublic)
         where T : class
     {
-        if (!aggregateRoot.AppliedEvents.Where(_ => _.Public == isPublic).Select(_ => _.Event).OfType<T>().Any())
+        if (aggregateRoot.AppliedEvents.Where(_ => _.Public == isPublic).Select(_ => _.Event).OfType<T>().Any())
         {
             aggregateRoot.Throw($"there are one or more {(isPublic ? "public": "")} {typeof(T)} events.");
         }
