@@ -9,6 +9,6 @@ public class StatelessAggregateRoot : AggregateRoot
     
 }
 
-[EventType()]
-public record EventCausingNoStateChange;
-
+// [EventType()]
+// public record EventCausingNoStateChange;
+//
