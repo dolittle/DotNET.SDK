@@ -20,8 +20,8 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     readonly Func<EventSourceId, TAggregate> _createAggregateRoot;
     readonly ConcurrentDictionary<EventSourceId, object> _aggregateLocks = new();
     readonly ConcurrentDictionary<EventSourceId, TAggregate> _aggregates = new();
-    readonly Dictionary<EventSourceId, List<AppliedEvent>> _eventsToApply = new();
-    
+    readonly ConcurrentDictionary<EventSourceId, int> _numEventsBeforeLastOperation = new();
+
     /// <summary>
     /// Initializes an instance of the <see cref="AggregateOfMock{T}"/> class.
     /// </summary>
@@ -30,7 +30,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     {
         _createAggregateRoot = createAggregateRoot;
     }
-    
+
     /// <summary>
     /// Gets all the aggregates that have had operations performed on them.
     /// </summary>
@@ -40,45 +40,13 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     public IAggregateRootOperations<TAggregate> Get(EventSourceId eventSourceId)
     {
         var aggregate = GetOrAddAggregate(eventSourceId);
-        var operations = new AggregateRootOperationsMock<TAggregate>(
+        return new AggregateRootOperationsMock<TAggregate>(
             _aggregateLocks[eventSourceId],
             aggregate,
             () => _createAggregateRoot(eventSourceId),
-            oldAggregate => _aggregates[eventSourceId] = oldAggregate);
-
-        if (_eventsToApply.TryGetValue(eventSourceId, out var eventsToApply) && eventsToApply.Any())
-        {
-            operations.WithEvents(eventsToApply.ToArray());
-            eventsToApply.Clear();
-        }
-        return operations;
+            oldAggregate => _aggregates[eventSourceId] = oldAggregate,
+            numEventsBeforeLastOperation => _numEventsBeforeLastOperation[eventSourceId] = numEventsBeforeLastOperation);
     }
-
-    /// <summary>
-    /// Adds events that should be applied to the aggregate before an action is performed.
-    /// </summary>
-    /// <param name="eventSource">The <see cref="EventSourceId"/> to add the events for.</param>
-    /// <param name="events">The events to apply.</param>
-    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
-    public AggregateOfMock<TAggregate> WithEventsFor(EventSourceId eventSource, params AppliedEvent[] events)
-    {
-        if (!_eventsToApply.TryGetValue(eventSource, out var appliedEvents))
-        {
-            appliedEvents = new List<AppliedEvent>();
-            _eventsToApply[eventSource] = appliedEvents;
-        }
-        appliedEvents.AddRange(events);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds events that should be applied to the aggregate before an action is performed
-    /// </summary>
-    /// <param name="eventSource">The <see cref="EventSourceId"/> to add the events for.</param>
-    /// <param name="events">The events to apply.</param>
-    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
-    public AggregateOfMock<TAggregate> WithEventsFor(EventSourceId eventSource, params object[] events)
-        => WithEventsFor(eventSource, events.Select(_ => new AppliedEvent(_)));
 
     /// <summary>
     /// Tries to get the <typeparamref name="TAggregate"/> with the given <see cref="EventSourceId"/>.
@@ -97,6 +65,14 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     public TAggregate GetAggregate(EventSourceId eventSource)
         => GetOrAddAggregate(eventSource);
 
+    /// <summary>
+    /// Gets <see cref="AggregateRootAssertion{TAggregate}"/> for the stored aggregate with an event sequence to assert on as if it only performed the last operation.
+    /// </summary>
+    /// <param name="eventSource">The event source of the aggregate.</param>
+    /// <returns>The <see cref="AggregateRootAssertion{TAggregate}"/>.</returns>
+    public AggregateRootAssertion<TAggregate> AfterLastOperationOn(EventSourceId eventSource)
+        => new(GetOrAddAggregate(eventSource), _numEventsBeforeLastOperation.GetOrAdd(eventSource, 0));
+    
     TAggregate GetOrAddAggregate(EventSourceId eventSource)
         => _aggregates.GetOrAdd(eventSource, eventSourceId =>
         {
