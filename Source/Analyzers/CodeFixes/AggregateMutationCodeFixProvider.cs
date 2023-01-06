@@ -52,15 +52,25 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
     {
         if (await context.Document.GetSyntaxRootAsync(ct) is not CompilationUnitSyntax root) return document;
 
-        var member = SyntaxFactory.ParseMemberDeclaration($"private void On({eventType} @event) => throw new NotImplementedException();");
+        var member = SyntaxFactory.ParseMemberDeclaration($"void On({eventType} evt) {{  }}\n\n");
         if (member is not MethodDeclarationSyntax method) return document;
+
 
         var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().First(declaration => declaration.Span.Contains(context.Span));
 
         var replacedNode = root.ReplaceNode(classDeclaration,
-            Formatter.Format(classDeclaration.AddMembers(method.WithLeadingTrivia(SyntaxFactory.LineFeed)),
-                document.Project.Solution.Workspace));
+            Formatter.Format(WithMutationMethod(classDeclaration, method), document.Project.Solution.Workspace));
 
-        return document.WithSyntaxRoot(replacedNode.AddMissingUsingDirectives("System").WithLfLineEndings());
+        return document.WithSyntaxRoot(replacedNode.WithLfLineEndings());
+    }
+
+    static SyntaxNode WithMutationMethod(ClassDeclarationSyntax classDeclaration, MethodDeclarationSyntax method)
+    {
+        var lastOnMethod = classDeclaration.Members
+            .LastOrDefault(m => m is MethodDeclarationSyntax { Identifier.Text: "On" });
+        var methodDeclarationSyntax = method.WithLeadingTrivia(SyntaxFactory.LineFeed);
+        return lastOnMethod is null
+            ? classDeclaration.AddMembers(methodDeclarationSyntax)
+            : classDeclaration.InsertNodesAfter(lastOnMethod, new[] { methodDeclarationSyntax });
     }
 }
