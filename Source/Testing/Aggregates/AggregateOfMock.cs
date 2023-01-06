@@ -48,6 +48,14 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     }
 
     /// <summary>
+    /// Gets the <see cref="AggregateRootOperationsMock{TAggregate}"/> for the aggregate.
+    /// </summary>
+    /// <param name="eventSourceId">The event source id.</param>
+    /// <returns>The <see cref="AggregateRootOperationsMock{TAggregate}"/>.</returns>
+    public AggregateRootOperationsMock<TAggregate> GetMock(EventSourceId eventSourceId)
+        => (AggregateRootOperationsMock<TAggregate>) Get(eventSourceId);
+
+    /// <summary>
     /// Tries to get the <typeparamref name="TAggregate"/> with the given <see cref="EventSourceId"/>.
     /// </summary>
     /// <param name="eventSource">The <see cref="EventSourceId"/> of the aggregate.</param>
@@ -65,18 +73,18 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
         => GetOrAddAggregate(eventSource);
 
     /// <summary>
-    /// Gets <see cref="AggregateRootAssertion{TAggregate}"/> for the stored aggregate with an event sequence to assert on as if it only performed the last operation.
+    /// Gets <see cref="AggregateRootAssertion"/> for the stored aggregate with an event sequence to assert on as if it only performed the last operation.
     /// </summary>
     /// <param name="eventSource">The event source of the aggregate.</param>
-    /// <returns>The <see cref="AggregateRootAssertion{TAggregate}"/>.</returns>
+    /// <returns>The <see cref="AggregateRootAssertion"/>.</returns>
     public AggregateRootAssertion AfterLastOperationOn(EventSourceId eventSource)
         => new(GetOrAddAggregate(eventSource), _numEventsBeforeLastOperation.GetOrAdd(eventSource, 0));
 
     /// <summary>
-    /// Gets <see cref="AggregateRootAssertion{TAggregate}"/> for the stored aggregate.
+    /// Gets <see cref="AggregateRootAssertion"/> for the stored aggregate.
     /// </summary>
     /// <param name="eventSource">The event source of the aggregate.</param>
-    /// <returns>The <see cref="AggregateRootAssertion{TAggregate}"/>.</returns>
+    /// <returns>The <see cref="AggregateRootAssertion"/>.</returns>
     public AggregateRootAssertion AssertThat(EventSourceId eventSource)
         => new(GetOrAddAggregate(eventSource));
     
