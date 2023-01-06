@@ -22,7 +22,7 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     readonly TAggregate _aggregateRoot;
     readonly Func<TAggregate> _createAggregate;
     readonly Action<TAggregate> _persistOldAggregate;
-    readonly List<AppliedEvent> _eventsToApply = new();
+    readonly Action<int> _persistNumEventsBeforeLastOperation;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootOperationsMock{TAggregate}"/> class.
@@ -31,16 +31,19 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <param name="aggregateRoot">The <see cref="AggregateRoot"/>.</param>
     /// <param name="createAggregate">The callback for creating a new clean aggregate.</param>
     /// <param name="persistOldAggregate"></param>
+    /// <param name="persistNumEventsBeforeLastOperation"></param>
     public AggregateRootOperationsMock(
         object concurrencyLock,
         TAggregate aggregateRoot,
         Func<TAggregate> createAggregate,
-        Action<TAggregate> persistOldAggregate)
+        Action<TAggregate> persistOldAggregate,
+        Action<int> persistNumEventsBeforeLastOperation)
     {
         _concurrencyLock = concurrencyLock;
         _aggregateRoot = aggregateRoot;
         _createAggregate = createAggregate;
         _persistOldAggregate = persistOldAggregate;
+        _persistNumEventsBeforeLastOperation = persistNumEventsBeforeLastOperation;
     }
 
     /// <inheritdoc />
@@ -59,9 +62,8 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
             var previousAppliedEvents = new ReadOnlyCollection<AppliedEvent>(_aggregateRoot.AppliedEvents.ToList());
             try
             {
-                ApplyEvents(_aggregateRoot, _eventsToApply);
-                _eventsToApply.Clear();
                 method(_aggregateRoot).GetAwaiter().GetResult();
+                _persistNumEventsBeforeLastOperation(previousAppliedEvents.Count);
                 return Task.CompletedTask;
             }
             catch
@@ -72,17 +74,6 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
                 throw;
             }
         }
-    }
-
-    /// <summary>
-    /// Adds events that should be applied to the aggregate before an action is performed
-    /// </summary>
-    /// <param name="events"></param>
-    /// <returns></returns>
-    public AggregateRootOperationsMock<TAggregate> WithEvents(params AppliedEvent[] events)
-    {
-        _eventsToApply.AddRange(events);
-        return this;
     }
 
     static void ApplyEvents(TAggregate aggregate, IEnumerable<AppliedEvent> events)
