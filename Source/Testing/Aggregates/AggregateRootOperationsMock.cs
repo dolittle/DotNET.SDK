@@ -54,6 +54,26 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
             return Task.CompletedTask;
         }, cancellationToken);
 
+    /// <summary>
+    /// Performs operation on aggregate synchronously.
+    /// </summary>
+    /// <param name="method">The method to perform.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public void PerformSync(Action<TAggregate> method, CancellationToken cancellationToken = default)
+        => Perform(_ =>
+        {
+            method(_);
+            return Task.CompletedTask;
+        }, cancellationToken).GetAwaiter().GetResult();
+    
+    /// <summary>
+    /// Performs operation on aggregate synchronously.
+    /// </summary>
+    /// <param name="method">The method to perform.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public void PerformSync(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
+        => Perform(method, cancellationToken).GetAwaiter().GetResult();
+    
     /// <inheritdoc />
     public Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {

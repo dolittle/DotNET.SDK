@@ -27,7 +27,7 @@ public class AggregateRootAssertion
         _aggregate = aggregate;
         _events = aggregate.AppliedEvents.Skip(eventsToSkip).ToArray();
     }
-    
+
     void Throw(string reason) => AggregateAssertionFailed.Throw(_aggregate, reason);
 
     /// <summary>
