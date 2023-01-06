@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
@@ -70,8 +69,16 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     /// </summary>
     /// <param name="eventSource">The event source of the aggregate.</param>
     /// <returns>The <see cref="AggregateRootAssertion{TAggregate}"/>.</returns>
-    public AggregateRootAssertion<TAggregate> AfterLastOperationOn(EventSourceId eventSource)
+    public AggregateRootAssertion AfterLastOperationOn(EventSourceId eventSource)
         => new(GetOrAddAggregate(eventSource), _numEventsBeforeLastOperation.GetOrAdd(eventSource, 0));
+
+    /// <summary>
+    /// Gets <see cref="AggregateRootAssertion{TAggregate}"/> for the stored aggregate.
+    /// </summary>
+    /// <param name="eventSource">The event source of the aggregate.</param>
+    /// <returns>The <see cref="AggregateRootAssertion{TAggregate}"/>.</returns>
+    public AggregateRootAssertion AssertThat(EventSourceId eventSource)
+        => new(GetOrAddAggregate(eventSource));
     
     TAggregate GetOrAddAggregate(EventSourceId eventSource)
         => _aggregates.GetOrAdd(eventSource, eventSourceId =>
