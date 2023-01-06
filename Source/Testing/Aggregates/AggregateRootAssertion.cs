@@ -12,18 +12,17 @@ namespace Dolittle.SDK.Testing.Aggregates;
 /// <summary>
 /// Represents the assertions that can be performed on an <see cref="AggregateRoot"/>.
 /// </summary>
-public class AggregateRootAssertion<TAggregate>
-    where TAggregate : AggregateRoot
+public class AggregateRootAssertion
 {
-    readonly TAggregate _aggregate;
+    readonly AggregateRoot _aggregate;
     readonly AppliedEvent[] _events;
     
     /// <summary>
-    /// Initializes a new instance of the <see cref="AggregateRootAssertion{TAggregate}"/> class.
+    /// Initializes a new instance of the <see cref="AggregateRootAssertion"/> class.
     /// </summary>
     /// <param name="aggregate">The <see cref="AggregateRoot"/>.</param>
     /// <param name="eventsToSkip">The optional number of applied events to disregard.</param>
-    public AggregateRootAssertion(TAggregate aggregate, int eventsToSkip = 0)
+    public AggregateRootAssertion(AggregateRoot aggregate, int eventsToSkip = 0)
     {
         _aggregate = aggregate;
         _events = aggregate.AppliedEvents.Skip(eventsToSkip).ToArray();
@@ -32,12 +31,12 @@ public class AggregateRootAssertion<TAggregate>
     void Throw(string reason) => AggregateAssertionFailed.Throw(_aggregate, reason);
 
     /// <summary>
-    /// Implicitly converts <see cref="AggregateRoot"/> to <see cref="AggregateRootAssertion{TAggregate}"/>.
+    /// Implicitly converts <see cref="AggregateRoot"/> to <see cref="AggregateRootAssertion"/>.
     /// </summary>
     /// <param name="aggregate">The <see cref="AggregateRoot"/> to convert.</param>
-    /// <returns>The <see cref="AggregateRootAssertion{TAggregate}"/>.</returns>
-    public static implicit operator AggregateRootAssertion<TAggregate>(TAggregate aggregate)
-        => new(aggregate);
+    /// <returns>The <see cref="AggregateRootAssertion"/>.</returns>
+    public static implicit operator AggregateRootAssertion(AggregateRoot aggregate)
+        => new(aggregate, 0);
     
     /// <summary>
     /// Starts the Fluent Interface by establishing an Event sequence to assert against.
@@ -112,18 +111,5 @@ public class AggregateRootAssertion<TAggregate>
             Throw($"expected {expectedNumberOfEvents} events, but {numEvents} events was applied.");
         }
     }
-
-    /// <summary>
-    /// Perform a set of assertions on the <typeparamref name="TAggregate"/> instance.
-    /// </summary>
-    /// <param name="assertions">The set of assertions to perform.</param>
-    public void Where(params Action<TAggregate>[] assertions)
-    {
-        foreach (var assertion in assertions)
-        {
-            assertion(_aggregate);
-        }
-    }
-
 }
 
