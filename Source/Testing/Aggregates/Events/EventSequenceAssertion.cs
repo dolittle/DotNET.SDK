@@ -88,30 +88,30 @@ public class EventSequenceAssertion<T>
     /// </summary>
     /// <returns>An EventValueAssertion{T} to allow assertions against the event instance.</returns>
     public EventValueAssertion<T> AtBeginning()
-        => ForVersion(0);
+        => AtSequenceNumber(0);
 
     /// <summary>
     /// Asserts that an event of the specified type is the last event in the sequence, allowing further assertions against the instance.
     /// </summary>
     /// <returns>An EventValueAssertion{T} to allow assertions against the event instance.</returns>
     public EventValueAssertion<T> AtEnd()
-        => ForVersion((uint)_allEvents.Count - 1);
+        => AtSequenceNumber(_allEvents.Count - 1);
 
     /// <summary>
-    /// Asserts that an event of the specified type is present at for the specified version of the aggregate, allowing further assertions against the instance.
+    /// Asserts that an event of the specified type is present at the specified index of the current event sequence of the aggregate, allowing further assertions against the instance.
     /// </summary>
-    /// <param name="version">Position in the stream.</param>
+    /// <param name="sequenceNumber">Position in the event sequence.</param>
     /// <returns>An EventValueAssertion{T} to allow assertions against the event instance.</returns>
-    public EventValueAssertion<T> ForVersion(AggregateRootVersion version)
+    public EventValueAssertion<T> AtSequenceNumber(int sequenceNumber)
     {
-        if (version.Value > (uint)_allEvents.Count)
+        if (sequenceNumber > _allEvents.Count)
         {
-            _throwError($"there cannot be an event for version {version} of aggregate as the current version was only {_allEvents.Count}");
+            _throwError($"there cannot be an event at sequence number {sequenceNumber} of aggregate as it is greater than the number of events {_allEvents.Count}");
         }
-        var evt = _allEvents[(int)version.Value];
+        var evt = _allEvents[sequenceNumber];
         if (!_isWantedEvent(evt))
         {
-            _throwError($"event for {version} of aggregate is not one of the wanted event.");
+            _throwError($"event at sequence number {sequenceNumber} of aggregate is not one of the wanted events.");
         }
         return new EventValueAssertion<T>((T)evt.Event);
     }
