@@ -82,8 +82,8 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
             var previousAppliedEvents = new ReadOnlyCollection<AppliedEvent>(_aggregateRoot.AppliedEvents.ToList());
             try
             {
-                method(_aggregateRoot).GetAwaiter().GetResult();
                 _persistNumEventsBeforeLastOperation(previousAppliedEvents.Count);
+                method(_aggregateRoot).GetAwaiter().GetResult();
                 return Task.CompletedTask;
             }
             catch
