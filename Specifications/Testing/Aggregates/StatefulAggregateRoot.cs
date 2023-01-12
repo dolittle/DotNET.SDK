@@ -29,7 +29,7 @@ public class StatefulAggregateRoot : AggregateRoot
         throw TheFailure;
     }
 
-    public void On(EventCausingStateChange evt)
+    void On(EventCausingStateChange evt)
     {
         TheState = evt.NewState;
     }
