@@ -67,6 +67,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     {
         var aggregate = GetOrAddAggregate(eventSourceId);
         return new AggregateRootOperationsMock<TAggregate>(
+            eventSourceId,
             _aggregateLocks[eventSourceId],
             aggregate,
             () => _createAggregateRoot(eventSourceId),

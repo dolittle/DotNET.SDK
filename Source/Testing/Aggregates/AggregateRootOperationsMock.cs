@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
@@ -18,6 +19,7 @@ namespace Dolittle.SDK.Testing.Aggregates;
 public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<TAggregate>
     where TAggregate : AggregateRoot
 {
+    readonly EventSourceId _eventSourceId;
     readonly object _concurrencyLock;
     readonly TAggregate _aggregateRoot;
     readonly Func<TAggregate> _createAggregate;
@@ -27,18 +29,21 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootOperationsMock{TAggregate}"/> class.
     /// </summary>
+    /// <param name="eventSourceId">The <see cref="EventSourceId"/>.</param>
     /// <param name="concurrencyLock">The lock object used for accessing the aggregate without conflicting with other concurrent operations.</param>
     /// <param name="aggregateRoot">The <see cref="AggregateRoot"/>.</param>
     /// <param name="createAggregate">The callback for creating a new clean aggregate.</param>
     /// <param name="persistOldAggregate"></param>
     /// <param name="persistNumEventsBeforeLastOperation"></param>
     public AggregateRootOperationsMock(
+        EventSourceId eventSourceId,
         object concurrencyLock,
         TAggregate aggregateRoot,
         Func<TAggregate> createAggregate,
         Action<TAggregate> persistOldAggregate,
         Action<int> persistNumEventsBeforeLastOperation)
     {
+        _eventSourceId = eventSourceId;
         _concurrencyLock = concurrencyLock;
         _aggregateRoot = aggregateRoot;
         _createAggregate = createAggregate;
@@ -86,12 +91,12 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
                 method(_aggregateRoot).GetAwaiter().GetResult();
                 return Task.CompletedTask;
             }
-            catch
+            catch (Exception ex)
             {
                 var oldAggregate = _createAggregate();
                 ApplyEvents(oldAggregate, previousAppliedEvents);
                 _persistOldAggregate(oldAggregate);
-                throw;
+                throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, ex);
             }
         }
     }
