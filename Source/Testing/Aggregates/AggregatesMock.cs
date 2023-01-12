@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Events;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
@@ -17,11 +18,34 @@ public class AggregatesMock : IAggregates
     /// <summary>
     /// Creates a new instance of <see cref="AggregatesMock"/>.
     /// </summary>
+    /// <param name="configureServices">The optional callback for configuring the <see cref="IServiceCollection"/> used to create the instances of the aggregate roots.</param>
     /// <returns>The <see cref="AggregatesMock"/>.</returns>
-    public static AggregatesMock Create() => new();
+    public static AggregatesMock Create(Action<IServiceCollection>? configureServices = default)
+    {
+        var services = new ServiceCollection();
+        configureServices?.Invoke(services);
+        return Create(services.BuildServiceProvider());
+    }
+    
+    /// <summary>
+    /// Creates a new instance of <see cref="AggregatesMock"/>.
+    /// </summary>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to create the instances of the aggregate roots.</param>
+    /// <returns>The <see cref="AggregatesMock"/>.</returns>
+    public static AggregatesMock Create(IServiceProvider serviceProvider) => new(serviceProvider);
 
     readonly ConcurrentDictionary<Type, object> _aggregatesOf = new();
-    readonly ConcurrentDictionary<Type, Func<EventSourceId, object>> _aggregatesFactory = new();
+
+    readonly IServiceProvider _serviceProvider;
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AggregatesMock"/> class.
+    /// </summary>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to create the instances of the aggregate roots.</param>
+    public AggregatesMock(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
 
     /// <inheritdoc />
     public IAggregateRootOperations<TAggregateRoot> Get<TAggregateRoot>(EventSourceId eventSourceId)
@@ -37,43 +61,19 @@ public class AggregatesMock : IAggregates
         => GetOrAddAggregateOfMock<TAggregateRoot>();
     
     /// <summary>
-    /// Gets the <see cref="AggregateOfMock{T}"/>.
+    /// Gets the <see cref="AggregateOfMock{TAggregate}"/>.
     /// </summary>
-    /// <param name="factory">The factory to create a <typeparamref name="TAggregate"/>.</param>
-    /// <typeparam name="TAggregate">The <see cref="Type"/> of the <see cref="AggregateRoot"/>.</typeparam>
-    /// <returns>The <see cref="AggregateOfMock{T}"/>.</returns>
-    public AggregateOfMock<TAggregate> Of<TAggregate>(Func<EventSourceId, TAggregate> factory)
-        where TAggregate : AggregateRoot
-        => (_aggregatesOf.GetOrAdd(typeof(TAggregate), _ =>
-        {
-            WithAggregateFactoryFor(factory);
-            return new AggregateOfMock<TAggregate>(factory);
-        }) as AggregateOfMock<TAggregate>)!;
-
-    /// <summary>
-    /// Explain how to create an aggregate of the <typeparamref name="TAggregate"/>.
-    /// </summary>
-    /// <param name="factory">The function for creating the <typeparamref name="TAggregate"/>.</param>
-    /// <typeparam name="TAggregate">The <see cref="Type"/> of the <see cref="AggregateRoot"/>.</typeparam>
-    public void WithAggregateFactoryFor<TAggregate>(Func<EventSourceId, TAggregate> factory)
-        where TAggregate : AggregateRoot
-    {
-        _aggregatesFactory[typeof(TAggregate)] = factory;
-    }
-
+    /// <typeparam name="TAggregateRoot">The <see cref="Type"/> of the <see cref="AggregateRoot"/>.</typeparam>
+    /// <returns>The <see cref="AggregateOfMock{TAggregate}"/>.</returns>
+    public AggregateOfMock<TAggregateRoot> OfMock<TAggregateRoot>()
+        where TAggregateRoot : AggregateRoot
+        => GetOrAddAggregateOfMock<TAggregateRoot>();
+    
     AggregateOfMock<TAggregateRoot> GetOrAddAggregateOfMock<TAggregateRoot>()
         where TAggregateRoot : AggregateRoot
     {
         var aggregateRootType = typeof(TAggregateRoot);
-        var aggregateOf = _aggregatesOf.GetOrAdd(aggregateRootType, aggregateType =>
-        {
-            if (!_aggregatesFactory.TryGetValue(aggregateType, out var factory))
-            {
-                throw new Exception($"No factory to create an aggregate for {aggregateType} has been given to the mock.");
-            }
-            return new AggregateOfMock<TAggregateRoot>(eventSource => (factory(eventSource) as TAggregateRoot)!);
-        });
-
+        var aggregateOf = _aggregatesOf.GetOrAdd(aggregateRootType, AggregateOfMock<TAggregateRoot>.Create(_serviceProvider));
         return (aggregateOf as AggregateOfMock<TAggregateRoot>)!;
     }
 }
