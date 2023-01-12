@@ -12,5 +12,9 @@ class aggregates_mock_with_services<TAggregate> : spec_for<TAggregate>
     where TAggregate : AggregateRoot
 {
     protected static Action<IServiceCollection> configure_services;
-    Establish context = () => create_aggregates_mock = () => AggregatesMock.Create(configure_services);
+    Establish context = () =>
+    {
+        configure_services = null;
+        create_aggregates_mock = () => AggregatesMock.Create(configure_services);
+    };
 }
