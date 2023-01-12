@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="for_Aggregates" />
+      <Folder Include="Aggregates\for_AggregatefMock" />
     </ItemGroup>
 
 </Project>

@@ -5,7 +5,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
@@ -21,6 +23,31 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     readonly ConcurrentDictionary<EventSourceId, TAggregate> _aggregates = new();
     readonly ConcurrentDictionary<EventSourceId, int> _numEventsBeforeLastOperation = new();
 
+    /// <summary>
+    /// Creates an instance of <see cref="AggregateOfMock{TAggregate}"/>.
+    /// </summary>
+    /// <param name="configureServices">The optional callback for configuring the <see cref="IServiceCollection"/> used to create the instances of <typeparamref name="TAggregate"/>.</param>
+    /// <returns>The <see cref="AggregateOfMock{TAggregate}"/>.</returns>
+    public static AggregateOfMock<TAggregate> Create(Action<IServiceCollection>? configureServices = default)
+    {
+        var services = new ServiceCollection();
+        configureServices?.Invoke(services);
+        return Create(services.BuildServiceProvider());
+    }
+    
+    /// <summary>
+    /// Creates an instance of <see cref="AggregateOfMock{TAggregate}"/> that uses the given <see cref="IServiceProvider"/> to create the aggregate intance.
+    /// </summary>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to create the instances of the <typeparamref name="TAggregate"/>.</param>
+    /// <returns>The <see cref="AggregateOfMock{TAggregate}"/>.</returns>
+    public static AggregateOfMock<TAggregate> Create(IServiceProvider serviceProvider)
+        => new(eventSource =>
+        {
+            var getAggregate = AggregateRootMetadata<TAggregate>.Construct(serviceProvider, eventSource);
+            getAggregate.ThrowIfFailed();
+            return getAggregate;
+        });
+    
     /// <summary>
     /// Initializes an instance of the <see cref="AggregateOfMock{T}"/> class.
     /// </summary>
@@ -87,12 +114,16 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     /// <returns>The <see cref="AggregateRootAssertion"/>.</returns>
     public AggregateRootAssertion AssertThat(EventSourceId eventSource)
         => new(GetOrAddAggregate(eventSource));
-    
+
     TAggregate GetOrAddAggregate(EventSourceId eventSource)
-        => _aggregates.GetOrAdd(eventSource, eventSourceId =>
+    {
+        if (_aggregates.ContainsKey(eventSource))
         {
-            _aggregateLocks.TryAdd(eventSourceId, new object());
-            return _createAggregateRoot(eventSourceId);
-        });
+            return _aggregates[eventSource];
+        }
+        var freshAggregate = _createAggregateRoot(eventSource);
+        _aggregateLocks.TryAdd(eventSource, new object());
+        return _aggregates.GetOrAdd(eventSource, freshAggregate);
+    }
 }
 
