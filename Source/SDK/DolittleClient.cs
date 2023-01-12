@@ -337,7 +337,10 @@ public class DolittleClient : IDisposable, IDolittleClient
             _callContextResolver,
             _unregisteredEventTypes,
             loggerFactory);
-        Aggregates = new AggregatesBuilder(Services.ForTenant);
+        // Important to not send in the method group because it will crash because it calls get on the Services-property before it is ready.
+#pragma warning disable IDE0200
+        Aggregates = new AggregatesBuilder(tenant => Services.ForTenant(tenant));
+#pragma warning restore IDE0200
         EventHorizons = new EventHorizons(
             methodCaller,
             executionContext,

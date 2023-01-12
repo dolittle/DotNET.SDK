@@ -55,10 +55,9 @@ public class AggregateMutationMissingCodeFixProviderTests : CodeFixProviderTests
 //     }
     
     [Fact]
-    public async Task ShouldCleanupRedundantNamespaces()
+    public async Task ShouldGenerateMutation()
     {
         var test = @"
-using System;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
@@ -77,7 +76,6 @@ class SomeAggregate: AggregateRoot
 }";
 
         var expected = @"
-using System;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
@@ -94,12 +92,101 @@ class SomeAggregate : AggregateRoot
         Apply(new NameUpdated(name));
     }
 
-    private void On(NameUpdated @event) => throw new NotImplementedException();
+    void On(NameUpdated evt) { }
 }";
         var diagnosticResult = Diagnostic(DescriptorRules.Aggregate.MissingMutation)
-            .WithSpan(16, 9, 16, 37)
+            .WithSpan(15, 9, 15, 37)
             .WithArguments("NameUpdated");
 
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
+    
+    [Fact]
+    public async Task ShouldGenerateMutationsInCorrectPlace()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameCreated(string Name);
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3c"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate : AggregateRoot
+{
+    public string? Name { get; set; }
+
+    public void UpdateName(string name)
+    {
+        if (Name is null)
+        {
+            Apply(new NameCreated(name));
+        }
+        else
+        {
+            Apply(new NameUpdated(name));
+        }
+    }
+
+    void On(NameCreated evt)
+    {
+        Name = evt.Name;
+    }
+
+    public void SomeMethod()
+    {
+        System.Console.WriteLine(""This should be after the mutations"");
+    }
+}";
+
+        var expected = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameCreated(string Name);
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3c"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate : AggregateRoot
+{
+    public string? Name { get; set; }
+
+    public void UpdateName(string name)
+    {
+        if (Name is null)
+        {
+            Apply(new NameCreated(name));
+        }
+        else
+        {
+            Apply(new NameUpdated(name));
+        }
+    }
+
+    void On(NameCreated evt)
+    {
+        Name = evt.Name;
+    }
+
+    void On(NameUpdated evt) { }
+
+    public void SomeMethod()
+    {
+        System.Console.WriteLine(""This should be after the mutations"");
+    }
+}";
+        var diagnosticResult = Diagnostic(DescriptorRules.Aggregate.MissingMutation)
+            .WithSpan(24, 13, 24, 41)
+            .WithArguments("NameUpdated");
+
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
+
 }
+

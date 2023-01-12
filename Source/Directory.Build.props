@@ -2,4 +2,7 @@
     <PropertyGroup>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(MSBuildProjectName).Specs;$(MSBuildProjectName).Tests;Dolittle.SDK.Testing" />
+    </ItemGroup>
 </Project>

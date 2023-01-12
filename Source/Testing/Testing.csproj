@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../default.props" />
+
+  <PropertyGroup>
+    <AssemblyName>Dolittle.SDK.Testing</AssemblyName>
+    <RootNamespace>Dolittle.SDK.Testing</RootNamespace>
+  </PropertyGroup>
+    
+  <ItemGroup>
+    <ProjectReference Include="../SDK/SDK.csproj" />
+  </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="moq" Version="4.18.3" PrivateAssets="all" />
+    </ItemGroup>
+
+</Project>

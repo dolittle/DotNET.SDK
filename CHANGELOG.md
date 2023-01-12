@@ -1,3 +1,30 @@
+# [20.1.0] - 2022-12-25 [PR: #194](https://github.com/dolittle/DotNET.SDK/pull/194)
+## Summary
+
+(See previous PR for changes https://github.com/dolittle/DotNET.SDK/pull/193)
+Make it possible to automatically discover and register tenant-scoped services. This is not meant to be a replacement for the 
+`WithTenantServices` method on the Dolittle configuration callback as that will still need to be used for services that requires more complicated registration, but the new attribute-based registration should suffice for most situations.
+### Added
+
+- `PerTenant` attribute that can be used to mark classes as PerTenant-scoped services. The `PerTenant` attribute has a couple of options in terms of `ServiceLifetime` (Transient by default) and whether the service should be registered as itself (off by default)
+
+
+# [20.0.2] - 2022-12-13 [PR: #192](https://github.com/dolittle/DotNET.SDK/pull/192)
+### Fixed
+
+- Does not shortcut rehydration for stateless aggregates. Fixes invalid AggregateRootVersion for subsequent commits on stateless aggregates ( aggregates without mutations)
+
+
+# [20.0.1] - 2022-12-12 [PR: #190](https://github.com/dolittle/DotNET.SDK/pull/190)
+## Summary
+
+Fixes a critical bug in the DolittleClient preventing all clients to crash.
+
+### Fixed
+
+- Bug in starting up DolittleClient
+
+
 # [20.0.0] - 2022-12-8 [PR: #183](https://github.com/dolittle/DotNET.SDK/pull/183)
 ## Summary
 
