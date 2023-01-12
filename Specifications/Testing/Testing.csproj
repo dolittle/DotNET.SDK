@@ -11,8 +11,4 @@
         <ProjectReference Include="../../Source/Testing/Testing.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Aggregates\for_AggregatefMock" />
-    </ItemGroup>
-
 </Project>
