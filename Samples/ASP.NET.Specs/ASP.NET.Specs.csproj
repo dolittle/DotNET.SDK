@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../specs.props" />
+
+    <PropertyGroup>
+        <AssemblyName>Dolittle.SDK.ASP.NET.Specs</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../ASP.NET/ASP.NET.csproj" />
+        <ProjectReference Include="..\..\Source\Testing\Testing.csproj" />
+    </ItemGroup>
+
+</Project>
