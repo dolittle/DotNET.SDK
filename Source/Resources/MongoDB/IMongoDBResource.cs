@@ -16,5 +16,5 @@ public interface IMongoDBResource
     /// </summary>
     /// <param name="databaseSettingsCallback">The <see cref="Action{T}"/> callback for creating <see cref="MongoDatabaseSettings"/> used to create the <see cref="IMongoDatabase"/>.</param>
     /// <returns>An <see cref="IMongoDatabase"/>.</returns>
-    IMongoDatabase GetDatabase(Action<MongoDatabaseSettings> databaseSettingsCallback = default);
+    IMongoDatabase GetDatabase(Action<MongoDatabaseSettings>? databaseSettingsCallback = default);
 }

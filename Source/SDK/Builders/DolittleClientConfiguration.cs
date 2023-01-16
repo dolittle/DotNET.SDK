@@ -7,6 +7,7 @@ using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
 
@@ -71,6 +72,11 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// Gets the <see cref="CreateTenantServiceProvider"/> factory.
     /// </summary>
     public CreateTenantServiceProvider? TenantServiceProviderFactory { get; private set; }
+    
+    /// <summary>
+    /// Gets the callback for configuring the <see cref="MongoDatabaseSettings"/>.
+    /// </summary>
+    public Action<MongoDatabaseSettings>? ConfigureMongoDatabaseSettings { get; private set; }
 
     /// <summary>
     /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
@@ -202,6 +208,13 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public IConfigurationBuilder WithTenantServiceProviderFactory(CreateTenantServiceProvider factory)
     {
         TenantServiceProviderFactory = factory;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IConfigurationBuilder WithMongoDatabaseSettings(Action<MongoDatabaseSettings> configureMongoDatabase)
+    {
+        ConfigureMongoDatabaseSettings = configureMongoDatabase;
         return this;
     }
 }

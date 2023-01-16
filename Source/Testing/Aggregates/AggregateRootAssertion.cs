@@ -5,7 +5,6 @@ using Dolittle.SDK.Aggregates;
 using System;
 using System.Linq;
 using Dolittle.SDK.Testing.Aggregates.Events;
-using Dolittle.SDK.Testing.Assertion;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
