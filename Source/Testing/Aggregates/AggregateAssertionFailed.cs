@@ -5,7 +5,7 @@ using System;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 
-namespace Dolittle.SDK.Testing.Assertion;
+namespace Dolittle.SDK.Testing.Aggregates;
 
 /// <summary>
 /// Exception that gets thrown when there is a Dolittle related assertion that failed.

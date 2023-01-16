@@ -3,4 +3,7 @@
 
 namespace Dolittle.SDK.Testing;
 
+/// <summary>
+/// The action to do when a Dolittle assertion failed.
+/// </summary>
 public delegate void OnDolittleAssertionFailed(string reason);
