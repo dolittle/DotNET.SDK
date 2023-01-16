@@ -15,6 +15,11 @@ public static class DolittleMongoConventions
     static bool _isRegistered;
     
     /// <summary>
+    /// The name of the Dolittle conventions pack.
+    /// </summary>
+    public const string ConventionPackName = "Dolittle Conventions";
+    
+    /// <summary>
     /// Ensured that the default Mongo Conventions are registered;
     /// </summary>
     public static void EnsureConventionsAreRegistered()
@@ -33,7 +38,7 @@ public static class DolittleMongoConventions
             BsonSerializer.RegisterSerializationProvider(new ConceptSerializationProvider());
             var pack = new ConventionPack();
             pack.AddClassMapConvention("Ignore extra elements", _ => _.SetIgnoreExtraElements(true));
-            ConventionRegistry.Register("Dolittle Conventions", pack,  _ => true);
+            ConventionRegistry.Register(ConventionPackName, pack,  _ => true);
         }
     }
 }
