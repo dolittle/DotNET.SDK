@@ -25,7 +25,6 @@ public abstract class AggregateRoot
     /// Initializes a new instance of the <see cref="AggregateRoot"/> class.
     /// </summary>
     /// <param name="eventSourceId">The <see cref="Events.EventSourceId" />.</param>
-    [Obsolete("This base constructor is deprecated and only used to set the EventSourceId property so that it could be used in the constructor")]
     protected AggregateRoot(EventSourceId eventSourceId)
         : this()
     {
@@ -55,7 +54,6 @@ public abstract class AggregateRoot
     /// <summary>
     /// Gets the <see cref="Events.EventSourceId" /> that the <see cref="AggregateRoot" /> applies events to.
     /// </summary>
-    [Obsolete("This will eventually be marked as internal. If you need to know the event source id in the aggregate root then include it in the constructor and keep it as a field")]
     public EventSourceId EventSourceId
     {
         get => _eventSourceId ?? throw new EventSourceIdOnAggregateRootNotReady(GetType());
