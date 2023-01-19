@@ -9,6 +9,7 @@ using System.Reflection;
 using BaselineTypeDiscovery;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dolittle.SDK.DependencyInversion;
 
@@ -63,34 +64,14 @@ public class TenantScopedProvidersBuilder
         {
             configure?.Invoke(tenant, services);
         }
-
         services.AddSingleton(tenant);
         return _factory(_serviceProvider, tenant, services);
     }
 
     static void DiscoverTenantScopedServices(IServiceCollection services)
     {
-        ForAllAllScannedAssemblies(assembly =>
-        {
-            foreach (var type in GetExportedTypes(assembly))
-            {
-                var attribute = type.GetCustomAttribute<PerTenantAttribute>();
-                if (attribute is null)
-                {
-                    continue;
-                }
-                var implementors = type.GetInterfaces().Where(_ => _ != typeof(IDisposable)).ToList();
-                if (attribute.RegisterAsSelf)
-                {
-                    implementors.Add(type);
-                }
-
-                foreach (var serviceType in implementors)
-                {
-                    services.Add(new ServiceDescriptor(serviceType, type, attribute.Lifetime));
-                }
-            }
-        });
+        ForAllAllScannedAssemblies(assembly => services
+            .Add(GetExportedTypes(assembly).SelectMany(_ => _.GetTenantScopedServiceDescriptors())));
     }
 
     static IEnumerable<Type> GetExportedTypes(Assembly assembly)
