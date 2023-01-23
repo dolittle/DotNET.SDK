@@ -16,11 +16,17 @@ static class ClusterIdentityMapper
 
     public static (TenantId, EventSourceId) GetTenantAndEventSourceId(ClusterIdentity clusterIdentity)
     {
-        if (clusterIdentity is null) throw new ArgumentNullException(nameof(clusterIdentity));
+        if (clusterIdentity is null)
+        {
+            throw new ArgumentNullException(nameof(clusterIdentity));
+        }
         var separator = clusterIdentity.Identity.IndexOf(":", StringComparison.Ordinal);
         
-        if(separator == -1) throw new ArgumentException("ClusterIdentity is not in the correct format", nameof(clusterIdentity));
-        
+        if(separator == -1)
+        {
+            throw new ArgumentException("ClusterIdentity is not in the correct format", nameof(clusterIdentity));
+        }
+
         TenantId tenantId = clusterIdentity.Identity[..separator];
         EventSourceId eventSourceId = clusterIdentity.Identity[(separator + 1)..];
 

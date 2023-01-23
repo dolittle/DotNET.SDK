@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.ExceptionServices;
 
 namespace Dolittle.SDK.Async;
 #pragma warning disable
@@ -77,4 +78,16 @@ public class Try<TResult>
     /// <param name="exception">The <see cref="System.Exception" /> to convert.</param>
     /// <return><see cref="Try{TResult}" />.</return>
     public static implicit operator Try<TResult>(Exception exception) => new(exception);
+    
+    
+    /// <summary>
+    /// Throws the <see cref="Exception"/> with its original stack trace information if this <see cref="Try"/> failed.
+    /// </summary>
+    public void ThrowIfFailed()
+    {
+        if (Exception is not null)
+        {
+            ExceptionDispatchInfo.Capture(Exception).Throw();
+        }
+    }
 }

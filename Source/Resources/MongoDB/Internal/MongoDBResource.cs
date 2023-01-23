@@ -29,7 +29,7 @@ public class MongoDBResource : IMongoDBResource
     }
 
     /// <inheritdoc />
-    public IMongoDatabase GetDatabase(Action<MongoDatabaseSettings> databaseSettingsCallback = default)
+    public IMongoDatabase GetDatabase(Action<MongoDatabaseSettings>? databaseSettingsCallback = default)
     {
         DolittleMongoConventions.EnsureConventionsAreRegistered();
         var databaseSettings = new MongoDatabaseSettings();

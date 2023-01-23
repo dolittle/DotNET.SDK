@@ -42,7 +42,10 @@ public class CommitForAggregateWithEventSourceBuilder
     /// <returns>The <see cref="CommitForAggregateWithEventSourceAndExpectedVersionBuilder" /> for continuation.</returns>
     public CommitForAggregateWithEventSourceAndExpectedVersionBuilder ExpectVersion(AggregateRootVersion expectedVersion)
     {
-        if (_builder != default) throw new EventBuilderMethodAlreadyCalled("ExpectVersion");
+        if (_builder != default)
+        {
+            throw new EventBuilderMethodAlreadyCalled("ExpectVersion");
+        }
         _builder = new CommitForAggregateWithEventSourceAndExpectedVersionBuilder(
             _aggregateEvents,
             _eventTypes,

@@ -5,6 +5,7 @@ using System;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
 
@@ -87,4 +88,11 @@ public interface IConfigurationBuilder
     /// <param name="factory">The <see cref="CreateTenantServiceProvider"/> factory.</param>
     /// <returns>The client for continuation.</returns>
     IConfigurationBuilder WithTenantServiceProviderFactory(CreateTenantServiceProvider factory);
+
+    /// <summary>
+    /// Configures the <see cref="MongoDatabaseSettings"/> used.
+    /// </summary>
+    /// <param name="configureMongoDatabase">The callback for configuring <see cref="MongoDatabaseSettings"/>.</param>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithMongoDatabaseSettings(Action<MongoDatabaseSettings> configureMongoDatabase);
 }

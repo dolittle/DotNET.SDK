@@ -465,7 +465,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     {
         var builder = new TenantScopedProvidersBuilder(config.ServiceProvider, config.TenantServiceProviderFactory)
             .AddTenantServices(AddBuilderServices)
-            .AddTenantServices((_, collection) => collection.AddScoped(services => services.GetRequiredService<IResources>().MongoDB.GetDatabase()))
+            .AddTenantServices((_, collection) => collection.AddScoped(services => services.GetRequiredService<IResources>().MongoDB.GetDatabase(config.ConfigureMongoDatabaseSettings)))
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
             .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)
