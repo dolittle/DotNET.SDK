@@ -1,3 +1,18 @@
+# [20.2.0] - 2023-1-23 [PR: #195](https://github.com/dolittle/DotNET.SDK/pull/195)
+## Summary
+
+Adds support for testing of Aggregate Roots in the Dolittle.SDK.Testing package (need to be referenced directly in test projects). Also adds a couple more quality-of-life tools to the SDK like MongoDB BSON serializer for ConceptAs types.
+
+### Added
+
+- Dolittle.SDK.Testing package with tools for testing Aggregate Roots
+- MongoDB Bson serializer for ConceptAs types
+- `WithMongoDatabaseSettings` method on Dolittle configuration builder for configuring `MongoDatabaseSettings`
+
+### Fixed
+- A bug with `PerTenant`-attribute where open-generic services would not be registered correctly
+
+
 # [20.1.0] - 2022-12-25 [PR: #194](https://github.com/dolittle/DotNET.SDK/pull/194)
 ## Summary
 
