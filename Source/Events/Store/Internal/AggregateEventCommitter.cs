@@ -63,7 +63,8 @@ public class AggregateEventCommitter : ICommitAggregateEvents
             _logger.CommittingAggregateEvents(uncommittedAggregateEvents.Count,
                 uncommittedAggregateEvents.AggregateRoot,
                 uncommittedAggregateEvents.EventSource,
-                uncommittedAggregateEvents.ExpectedAggregateRootVersion);
+                uncommittedAggregateEvents.ExpectedAggregateRootVersion,
+                _executionContext.Tenant);
 
             if (!_toProtobuf.TryConvert(uncommittedAggregateEvents, out var protobufEvents, out var error))
             {

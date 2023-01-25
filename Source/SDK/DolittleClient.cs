@@ -224,32 +224,29 @@ public class DolittleClient : IDisposable, IDolittleClient
             }
 
             AddDefaultsFromServiceProviderInConfiguration(configuration);
-
-            var loggerFactory = configuration.LoggerFactory;
-            if (loggerFactory is not null)
-            {
-                _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
-            }
-
+            var loggerFactory = configuration.LoggerFactory ?? LoggerFactory.Create(_ => _.AddConsole());
+            _buildResults.WriteTo(loggerFactory.CreateLogger<DolittleClient>());
             _grpcChannel = GrpcChannel.ForAddress(
-                $"http://{configuration.RuntimeHost}:{configuration.RuntimePort}",
-                new GrpcChannelOptions
-                {
-                    Credentials = ChannelCredentials.Insecure,
-                    MaxReceiveMessageSize = 32 * 1024 * 1024,
-                    MaxSendMessageSize = 32 * 1024 * 1024,
+            $"http://{configuration.RuntimeHost}:{configuration.RuntimePort}",
+            new GrpcChannelOptions
+            {
+                Credentials = ChannelCredentials.Insecure,
+                MaxReceiveMessageSize = 32 * 1024 * 1024,
+                MaxSendMessageSize = 32 * 1024 * 1024,
 #if NET5_0_OR_GREATER
-                    HttpHandler = new SocketsHttpHandler
-                    {
-                        EnableMultipleHttp2Connections = true
-                    }
+                HttpHandler = new SocketsHttpHandler
+                {
+                    EnableMultipleHttp2Connections = true
+                }
 #endif
-                });
+            });
             var methodCaller = new MethodCaller(_grpcChannel, configuration.RuntimeHost, configuration.RuntimePort);
             var (executionContext, tenants, otlpEndpoint) =
                 await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
             Tenants = tenants;
-
+#pragma warning disable CA1848
+            loggerFactory.CreateLogger<DolittleClient>().LogDebug("Configured tenants:\n{TenantListString}", string.Join('\n', tenants.Select(_ => $"\t{_.Id}")));
+#pragma warning restore CA1848
             await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext, tenants).ConfigureAwait(false);
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);

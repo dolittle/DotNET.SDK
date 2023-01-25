@@ -80,7 +80,6 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
         try
         {
             var (tenantId, eventSourceId) = GetIdentifiers(context);
-
             _eventSourceId = eventSourceId;
             var serviceProvider = await _getServiceProvider(tenantId);
             _aggregateWrapper = ActivatorUtilities.CreateInstance<AggregateWrapper<TAggregate>>(serviceProvider, _eventSourceId);
