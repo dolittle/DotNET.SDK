@@ -1,0 +1,1796 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 24 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet restore  /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970
+// command took 3.45s and exited with 0
+// start dotnet build -c Release  --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970
+// command took 6.61s and exited with 0
+// ***** Done, took 00:00:10 (10.2 sec)   *****
+// Found 24 benchmarks:
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 0 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 109667.00 ns, 109.6670 us/op
+WorkloadJitting  1: 1 op, 318481875.00 ns, 318.4819 ms/op
+
+WorkloadPilot    1: 2 op, 19673042.00 ns, 9.8365 ms/op
+WorkloadPilot    2: 3 op, 20662042.00 ns, 6.8873 ms/op
+WorkloadPilot    3: 4 op, 25643333.00 ns, 6.4108 ms/op
+WorkloadPilot    4: 5 op, 31885833.00 ns, 6.3772 ms/op
+WorkloadPilot    5: 6 op, 36771250.00 ns, 6.1285 ms/op
+WorkloadPilot    6: 7 op, 38938667.00 ns, 5.5627 ms/op
+WorkloadPilot    7: 8 op, 44112375.00 ns, 5.5140 ms/op
+WorkloadPilot    8: 9 op, 53683791.00 ns, 5.9649 ms/op
+WorkloadPilot    9: 10 op, 51875667.00 ns, 5.1876 ms/op
+WorkloadPilot   10: 11 op, 57800583.00 ns, 5.2546 ms/op
+WorkloadPilot   11: 12 op, 61211750.00 ns, 5.1010 ms/op
+WorkloadPilot   12: 13 op, 68558292.00 ns, 5.2737 ms/op
+WorkloadPilot   13: 14 op, 74481333.00 ns, 5.3201 ms/op
+WorkloadPilot   14: 15 op, 84773084.00 ns, 5.6515 ms/op
+WorkloadPilot   15: 16 op, 82129166.00 ns, 5.1331 ms/op
+WorkloadPilot   16: 32 op, 171208833.00 ns, 5.3503 ms/op
+WorkloadPilot   17: 64 op, 336457291.00 ns, 5.2571 ms/op
+WorkloadPilot   18: 128 op, 655872750.00 ns, 5.1240 ms/op
+
+WorkloadWarmup   1: 128 op, 712482375.00 ns, 5.5663 ms/op
+WorkloadWarmup   2: 128 op, 694214542.00 ns, 5.4236 ms/op
+WorkloadWarmup   3: 128 op, 722774000.00 ns, 5.6467 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 128 op, 740731708.00 ns, 5.7870 ms/op
+WorkloadActual   2: 128 op, 848001125.00 ns, 6.6250 ms/op
+WorkloadActual   3: 128 op, 958693667.00 ns, 7.4898 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 128 op, 740731708.00 ns, 5.7870 ms/op
+WorkloadResult   2: 128 op, 848001125.00 ns, 6.6250 ms/op
+WorkloadResult   3: 128 op, 958693667.00 ns, 7.4898 ms/op
+
+// AfterAll
+// Benchmark Process 36359 has exited with code 0.
+
+Mean = 6.634 ms, StdErr = 0.492 ms (7.41%), N = 3, StdDev = 0.851 ms
+Min = 5.787 ms, Q1 = 6.206 ms, Median = 6.625 ms, Q3 = 7.057 ms, Max = 7.490 ms
+IQR = 0.851 ms, LowerFence = 4.929 ms, UpperFence = 8.335 ms
+ConfidenceInterval = [-8.900 ms; 22.168 ms] (CI 99.9%), Margin = 15.534 ms (234.15% of Mean)
+Skewness = 0.01, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 1 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 146333.00 ns, 146.3330 us/op
+WorkloadJitting  1: 1 op, 555723458.00 ns, 555.7235 ms/op
+
+OverheadJitting  2: 1 op, 333.00 ns, 333.0000 ns/op
+WorkloadJitting  2: 1 op, 9586667.00 ns, 9.5867 ms/op
+
+OverheadJitting  3: 16 op, 157958.00 ns, 9.8724 us/op
+WorkloadJitting  3: 16 op, 88047084.00 ns, 5.5029 ms/op
+
+WorkloadPilot    1: 16 op, 95593167.00 ns, 5.9746 ms/op
+WorkloadPilot    2: 32 op, 161521375.00 ns, 5.0475 ms/op
+WorkloadPilot    3: 64 op, 360638625.00 ns, 5.6350 ms/op
+WorkloadPilot    4: 128 op, 704403625.00 ns, 5.5032 ms/op
+
+OverheadWarmup   1: 128 op, 2041.00 ns, 15.9453 ns/op
+OverheadWarmup   2: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadWarmup   3: 128 op, 542.00 ns, 4.2344 ns/op
+OverheadWarmup   4: 128 op, 583.00 ns, 4.5547 ns/op
+OverheadWarmup   5: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadWarmup   6: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadWarmup   7: 128 op, 709.00 ns, 5.5391 ns/op
+OverheadWarmup   8: 128 op, 667.00 ns, 5.2109 ns/op
+
+OverheadActual   1: 128 op, 583.00 ns, 4.5547 ns/op
+OverheadActual   2: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual   3: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual   4: 128 op, 708.00 ns, 5.5312 ns/op
+OverheadActual   5: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual   6: 128 op, 583.00 ns, 4.5547 ns/op
+OverheadActual   7: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual   8: 128 op, 459.00 ns, 3.5859 ns/op
+OverheadActual   9: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual  10: 128 op, 667.00 ns, 5.2109 ns/op
+OverheadActual  11: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual  12: 128 op, 333.00 ns, 2.6016 ns/op
+OverheadActual  13: 128 op, 2167.00 ns, 16.9297 ns/op
+OverheadActual  14: 128 op, 916.00 ns, 7.1562 ns/op
+OverheadActual  15: 128 op, 541.00 ns, 4.2266 ns/op
+OverheadActual  16: 128 op, 417.00 ns, 3.2578 ns/op
+OverheadActual  17: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual  18: 128 op, 4333.00 ns, 33.8516 ns/op
+OverheadActual  19: 128 op, 459.00 ns, 3.5859 ns/op
+OverheadActual  20: 128 op, 542.00 ns, 4.2344 ns/op
+
+WorkloadWarmup   1: 128 op, 705700209.00 ns, 5.5133 ms/op
+WorkloadWarmup   2: 128 op, 715277625.00 ns, 5.5881 ms/op
+WorkloadWarmup   3: 128 op, 718025375.00 ns, 5.6096 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 128 op, 751079667.00 ns, 5.8678 ms/op
+WorkloadActual   2: 128 op, 807913209.00 ns, 6.3118 ms/op
+WorkloadActual   3: 128 op, 876026083.00 ns, 6.8440 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 128 op, 751079167.00 ns, 5.8678 ms/op
+WorkloadResult   2: 128 op, 807912709.00 ns, 6.3118 ms/op
+WorkloadResult   3: 128 op, 876025583.00 ns, 6.8439 ms/op
+
+// AfterAll
+// Benchmark Process 36360 has exited with code 0.
+
+Mean = 6.341 ms, StdErr = 0.282 ms (4.45%), N = 3, StdDev = 0.489 ms
+Min = 5.868 ms, Q1 = 6.090 ms, Median = 6.312 ms, Q3 = 6.578 ms, Max = 6.844 ms
+IQR = 0.488 ms, LowerFence = 5.358 ms, UpperFence = 7.310 ms
+ConfidenceInterval = [-2.575 ms; 15.258 ms] (CI 99.9%), Margin = 8.916 ms (140.61% of Mean)
+Skewness = 0.06, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 2 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 129875.00 ns, 129.8750 us/op
+WorkloadJitting  1: 1 op, 304878500.00 ns, 304.8785 ms/op
+
+WorkloadPilot    1: 2 op, 102657042.00 ns, 51.3285 ms/op
+WorkloadPilot    2: 3 op, 144190042.00 ns, 48.0633 ms/op
+WorkloadPilot    3: 4 op, 201665542.00 ns, 50.4164 ms/op
+WorkloadPilot    4: 5 op, 269739625.00 ns, 53.9479 ms/op
+WorkloadPilot    5: 6 op, 303324625.00 ns, 50.5541 ms/op
+WorkloadPilot    6: 7 op, 420484125.00 ns, 60.0692 ms/op
+WorkloadPilot    7: 8 op, 457147292.00 ns, 57.1434 ms/op
+WorkloadPilot    8: 9 op, 502739834.00 ns, 55.8600 ms/op
+
+WorkloadWarmup   1: 9 op, 503762459.00 ns, 55.9736 ms/op
+WorkloadWarmup   2: 9 op, 525176875.00 ns, 58.3530 ms/op
+WorkloadWarmup   3: 9 op, 562414792.00 ns, 62.4905 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 9 op, 567357292.00 ns, 63.0397 ms/op
+WorkloadActual   2: 9 op, 538552292.00 ns, 59.8391 ms/op
+WorkloadActual   3: 9 op, 568983500.00 ns, 63.2204 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 9 op, 567357292.00 ns, 63.0397 ms/op
+WorkloadResult   2: 9 op, 538552292.00 ns, 59.8391 ms/op
+WorkloadResult   3: 9 op, 568983500.00 ns, 63.2204 ms/op
+
+// AfterAll
+// Benchmark Process 36361 has exited with code 0.
+
+Mean = 62.033 ms, StdErr = 1.098 ms (1.77%), N = 3, StdDev = 1.902 ms
+Min = 59.839 ms, Q1 = 61.439 ms, Median = 63.040 ms, Q3 = 63.130 ms, Max = 63.220 ms
+IQR = 1.691 ms, LowerFence = 58.903 ms, UpperFence = 65.666 ms
+ConfidenceInterval = [27.331 ms; 96.735 ms] (CI 99.9%), Margin = 34.702 ms (55.94% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 3 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 179167.00 ns, 179.1670 us/op
+WorkloadJitting  1: 1 op, 297685250.00 ns, 297.6852 ms/op
+
+WorkloadPilot    1: 2 op, 36564250.00 ns, 18.2821 ms/op
+WorkloadPilot    2: 3 op, 47005875.00 ns, 15.6686 ms/op
+WorkloadPilot    3: 4 op, 65305334.00 ns, 16.3263 ms/op
+WorkloadPilot    4: 5 op, 96943917.00 ns, 19.3888 ms/op
+WorkloadPilot    5: 6 op, 83632167.00 ns, 13.9387 ms/op
+WorkloadPilot    6: 7 op, 120096292.00 ns, 17.1566 ms/op
+WorkloadPilot    7: 8 op, 118731458.00 ns, 14.8414 ms/op
+WorkloadPilot    8: 9 op, 136989458.00 ns, 15.2211 ms/op
+WorkloadPilot    9: 10 op, 132291667.00 ns, 13.2292 ms/op
+WorkloadPilot   10: 11 op, 151725917.00 ns, 13.7933 ms/op
+WorkloadPilot   11: 12 op, 165544500.00 ns, 13.7954 ms/op
+WorkloadPilot   12: 13 op, 203533542.00 ns, 15.6564 ms/op
+WorkloadPilot   13: 14 op, 198593541.00 ns, 14.1853 ms/op
+WorkloadPilot   14: 15 op, 244020250.00 ns, 16.2680 ms/op
+WorkloadPilot   15: 16 op, 247274125.00 ns, 15.4546 ms/op
+WorkloadPilot   16: 32 op, 496094709.00 ns, 15.5030 ms/op
+WorkloadPilot   17: 64 op, 981325625.00 ns, 15.3332 ms/op
+
+WorkloadWarmup   1: 64 op, 1023720125.00 ns, 15.9956 ms/op
+WorkloadWarmup   2: 64 op, 1144484292.00 ns, 17.8826 ms/op
+WorkloadWarmup   3: 64 op, 1251835083.00 ns, 19.5599 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 64 op, 1336834500.00 ns, 20.8880 ms/op
+WorkloadActual   2: 64 op, 1376217167.00 ns, 21.5034 ms/op
+WorkloadActual   3: 64 op, 1501349500.00 ns, 23.4586 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 64 op, 1336834500.00 ns, 20.8880 ms/op
+WorkloadResult   2: 64 op, 1376217167.00 ns, 21.5034 ms/op
+WorkloadResult   3: 64 op, 1501349500.00 ns, 23.4586 ms/op
+
+// AfterAll
+// Benchmark Process 36362 has exited with code 0.
+
+Mean = 21.950 ms, StdErr = 0.775 ms (3.53%), N = 3, StdDev = 1.342 ms
+Min = 20.888 ms, Q1 = 21.196 ms, Median = 21.503 ms, Q3 = 22.481 ms, Max = 23.459 ms
+IQR = 1.285 ms, LowerFence = 19.268 ms, UpperFence = 24.409 ms
+ConfidenceInterval = [-2.537 ms; 46.437 ms] (CI 99.9%), Margin = 24.487 ms (111.56% of Mean)
+Skewness = 0.3, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 4 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 142750.00 ns, 142.7500 us/op
+WorkloadJitting  1: 1 op, 565853792.00 ns, 565.8538 ms/op
+
+OverheadJitting  2: 1 op, 209.00 ns, 209.0000 ns/op
+WorkloadJitting  2: 1 op, 294920041.00 ns, 294.9200 ms/op
+
+WorkloadPilot    1: 2 op, 561379791.00 ns, 280.6899 ms/op
+
+WorkloadWarmup   1: 2 op, 595065916.00 ns, 297.5330 ms/op
+WorkloadWarmup   2: 2 op, 577390958.00 ns, 288.6955 ms/op
+WorkloadWarmup   3: 2 op, 586372917.00 ns, 293.1865 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 2 op, 612969250.00 ns, 306.4846 ms/op
+WorkloadActual   2: 2 op, 603037208.00 ns, 301.5186 ms/op
+WorkloadActual   3: 2 op, 760599667.00 ns, 380.2998 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 2 op, 612969250.00 ns, 306.4846 ms/op
+WorkloadResult   2: 2 op, 603037208.00 ns, 301.5186 ms/op
+WorkloadResult   3: 2 op, 760599667.00 ns, 380.2998 ms/op
+
+// AfterAll
+// Benchmark Process 36363 has exited with code 0.
+
+Mean = 329.434 ms, StdErr = 25.473 ms (7.73%), N = 3, StdDev = 44.121 ms
+Min = 301.519 ms, Q1 = 304.002 ms, Median = 306.485 ms, Q3 = 343.392 ms, Max = 380.300 ms
+IQR = 39.391 ms, LowerFence = 244.916 ms, UpperFence = 402.478 ms
+ConfidenceInterval = [-475.492 ms; 1,134.361 ms] (CI 99.9%), Margin = 804.926 ms (244.34% of Mean)
+Skewness = 0.38, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 5 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 110166.00 ns, 110.1660 us/op
+WorkloadJitting  1: 1 op, 341689709.00 ns, 341.6897 ms/op
+
+WorkloadWarmup   1: 1 op, 53324417.00 ns, 53.3244 ms/op
+WorkloadWarmup   2: 1 op, 45537875.00 ns, 45.5379 ms/op
+WorkloadWarmup   3: 1 op, 44584042.00 ns, 44.5840 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 44307667.00 ns, 44.3077 ms/op
+WorkloadActual   2: 1 op, 48596292.00 ns, 48.5963 ms/op
+WorkloadActual   3: 1 op, 51213875.00 ns, 51.2139 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 44307667.00 ns, 44.3077 ms/op
+WorkloadResult   2: 1 op, 48596292.00 ns, 48.5963 ms/op
+WorkloadResult   3: 1 op, 51213875.00 ns, 51.2139 ms/op
+
+// AfterAll
+// Benchmark Process 36364 has exited with code 0.
+
+Mean = 48.039 ms, StdErr = 2.013 ms (4.19%), N = 3, StdDev = 3.487 ms
+Min = 44.308 ms, Q1 = 46.452 ms, Median = 48.596 ms, Q3 = 49.905 ms, Max = 51.214 ms
+IQR = 3.453 ms, LowerFence = 41.272 ms, UpperFence = 55.085 ms
+ConfidenceInterval = [-15.570 ms; 111.648 ms] (CI 99.9%), Margin = 63.609 ms (132.41% of Mean)
+Skewness = -0.16, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 6 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 114250.00 ns, 114.2500 us/op
+WorkloadJitting  1: 1 op, 791954958.00 ns, 791.9550 ms/op
+
+OverheadJitting  2: 1 op, 292.00 ns, 292.0000 ns/op
+WorkloadJitting  2: 1 op, 563654792.00 ns, 563.6548 ms/op
+
+WorkloadWarmup   1: 1 op, 538709458.00 ns, 538.7095 ms/op
+WorkloadWarmup   2: 1 op, 506689500.00 ns, 506.6895 ms/op
+WorkloadWarmup   3: 1 op, 555952334.00 ns, 555.9523 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 581069459.00 ns, 581.0695 ms/op
+WorkloadActual   2: 1 op, 567720875.00 ns, 567.7209 ms/op
+WorkloadActual   3: 1 op, 677430333.00 ns, 677.4303 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 581069459.00 ns, 581.0695 ms/op
+WorkloadResult   2: 1 op, 567720875.00 ns, 567.7209 ms/op
+WorkloadResult   3: 1 op, 677430333.00 ns, 677.4303 ms/op
+
+// AfterAll
+// Benchmark Process 36365 has exited with code 0.
+
+Mean = 608.740 ms, StdErr = 34.561 ms (5.68%), N = 3, StdDev = 59.861 ms
+Min = 567.721 ms, Q1 = 574.395 ms, Median = 581.069 ms, Q3 = 629.250 ms, Max = 677.430 ms
+IQR = 54.855 ms, LowerFence = 492.113 ms, UpperFence = 711.532 ms
+ConfidenceInterval = [-483.340 ms; 1,700.821 ms] (CI 99.9%), Margin = 1,092.081 ms (179.40% of Mean)
+Skewness = 0.36, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 7 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 119416.00 ns, 119.4160 us/op
+WorkloadJitting  1: 1 op, 365921834.00 ns, 365.9218 ms/op
+
+WorkloadWarmup   1: 1 op, 89684417.00 ns, 89.6844 ms/op
+WorkloadWarmup   2: 1 op, 95709667.00 ns, 95.7097 ms/op
+WorkloadWarmup   3: 1 op, 100076250.00 ns, 100.0763 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 78160792.00 ns, 78.1608 ms/op
+WorkloadActual   2: 1 op, 88412667.00 ns, 88.4127 ms/op
+WorkloadActual   3: 1 op, 125039625.00 ns, 125.0396 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 78160792.00 ns, 78.1608 ms/op
+WorkloadResult   2: 1 op, 88412667.00 ns, 88.4127 ms/op
+WorkloadResult   3: 1 op, 125039625.00 ns, 125.0396 ms/op
+
+// AfterAll
+// Benchmark Process 36366 has exited with code 0.
+
+Mean = 97.204 ms, StdErr = 14.229 ms (14.64%), N = 3, StdDev = 24.645 ms
+Min = 78.161 ms, Q1 = 83.287 ms, Median = 88.413 ms, Q3 = 106.726 ms, Max = 125.040 ms
+IQR = 23.439 ms, LowerFence = 48.128 ms, UpperFence = 141.885 ms
+ConfidenceInterval = [-352.412 ms; 546.821 ms] (CI 99.9%), Margin = 449.617 ms (462.55% of Mean)
+Skewness = 0.31, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 100, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 8 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 137792.00 ns, 137.7920 us/op
+WorkloadJitting  1: 1 op, 8561250.00 ns, 8.5612 ms/op
+
+OverheadJitting  2: 16 op, 157375.00 ns, 9.8359 us/op
+WorkloadJitting  2: 16 op, 84933792.00 ns, 5.3084 ms/op
+
+WorkloadPilot    1: 16 op, 86638667.00 ns, 5.4149 ms/op
+WorkloadPilot    2: 32 op, 170323000.00 ns, 5.3226 ms/op
+WorkloadPilot    3: 64 op, 383392542.00 ns, 5.9905 ms/op
+WorkloadPilot    4: 128 op, 731341750.00 ns, 5.7136 ms/op
+
+OverheadWarmup   1: 128 op, 1708.00 ns, 13.3438 ns/op
+OverheadWarmup   2: 128 op, 750.00 ns, 5.8594 ns/op
+OverheadWarmup   3: 128 op, 416.00 ns, 3.2500 ns/op
+OverheadWarmup   4: 128 op, 334.00 ns, 2.6094 ns/op
+OverheadWarmup   5: 128 op, 416.00 ns, 3.2500 ns/op
+OverheadWarmup   6: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadWarmup   7: 128 op, 417.00 ns, 3.2578 ns/op
+OverheadWarmup   8: 128 op, 542.00 ns, 4.2344 ns/op
+OverheadWarmup   9: 128 op, 542.00 ns, 4.2344 ns/op
+
+OverheadActual   1: 128 op, 459.00 ns, 3.5859 ns/op
+OverheadActual   2: 128 op, 416.00 ns, 3.2500 ns/op
+OverheadActual   3: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual   4: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual   5: 128 op, 625.00 ns, 4.8828 ns/op
+OverheadActual   6: 128 op, 291.00 ns, 2.2734 ns/op
+OverheadActual   7: 128 op, 541.00 ns, 4.2266 ns/op
+OverheadActual   8: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual   9: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual  10: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual  11: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual  12: 128 op, 416.00 ns, 3.2500 ns/op
+OverheadActual  13: 128 op, 416.00 ns, 3.2500 ns/op
+OverheadActual  14: 128 op, 459.00 ns, 3.5859 ns/op
+OverheadActual  15: 128 op, 250.00 ns, 1.9531 ns/op
+OverheadActual  16: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadActual  17: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadActual  18: 128 op, 1625.00 ns, 12.6953 ns/op
+OverheadActual  19: 128 op, 917.00 ns, 7.1641 ns/op
+OverheadActual  20: 128 op, 750.00 ns, 5.8594 ns/op
+
+WorkloadWarmup   1: 128 op, 716622167.00 ns, 5.5986 ms/op
+WorkloadWarmup   2: 128 op, 711263792.00 ns, 5.5567 ms/op
+WorkloadWarmup   3: 128 op, 742062542.00 ns, 5.7974 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 128 op, 806199750.00 ns, 6.2984 ms/op
+WorkloadActual   2: 128 op, 879775250.00 ns, 6.8732 ms/op
+WorkloadActual   3: 128 op, 865614709.00 ns, 6.7626 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 128 op, 806199313.00 ns, 6.2984 ms/op
+WorkloadResult   2: 128 op, 879774813.00 ns, 6.8732 ms/op
+WorkloadResult   3: 128 op, 865614272.00 ns, 6.7626 ms/op
+
+// AfterAll
+// Benchmark Process 36367 has exited with code 0.
+
+Mean = 6.645 ms, StdErr = 0.176 ms (2.65%), N = 3, StdDev = 0.305 ms
+Min = 6.298 ms, Q1 = 6.531 ms, Median = 6.763 ms, Q3 = 6.818 ms, Max = 6.873 ms
+IQR = 0.287 ms, LowerFence = 6.099 ms, UpperFence = 7.249 ms
+ConfidenceInterval = [1.081 ms; 12.209 ms] (CI 99.9%), Margin = 5.564 ms (83.74% of Mean)
+Skewness = -0.33, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 100, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 9 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 132125.00 ns, 132.1250 us/op
+WorkloadJitting  1: 1 op, 6055167.00 ns, 6.0552 ms/op
+
+OverheadJitting  2: 16 op, 150708.00 ns, 9.4192 us/op
+WorkloadJitting  2: 16 op, 84823416.00 ns, 5.3015 ms/op
+
+WorkloadPilot    1: 16 op, 85149292.00 ns, 5.3218 ms/op
+WorkloadPilot    2: 32 op, 173115334.00 ns, 5.4099 ms/op
+WorkloadPilot    3: 64 op, 328005458.00 ns, 5.1251 ms/op
+WorkloadPilot    4: 128 op, 763670541.00 ns, 5.9662 ms/op
+
+OverheadWarmup   1: 128 op, 2500.00 ns, 19.5312 ns/op
+OverheadWarmup   2: 128 op, 584.00 ns, 4.5625 ns/op
+OverheadWarmup   3: 128 op, 1000.00 ns, 7.8125 ns/op
+OverheadWarmup   4: 128 op, 666.00 ns, 5.2031 ns/op
+OverheadWarmup   5: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadWarmup   6: 128 op, 584.00 ns, 4.5625 ns/op
+OverheadWarmup   7: 128 op, 833.00 ns, 6.5078 ns/op
+OverheadWarmup   8: 128 op, 709.00 ns, 5.5391 ns/op
+
+OverheadActual   1: 128 op, 709.00 ns, 5.5391 ns/op
+OverheadActual   2: 128 op, 750.00 ns, 5.8594 ns/op
+OverheadActual   3: 128 op, 833.00 ns, 6.5078 ns/op
+OverheadActual   4: 128 op, 709.00 ns, 5.5391 ns/op
+OverheadActual   5: 128 op, 667.00 ns, 5.2109 ns/op
+OverheadActual   6: 128 op, 666.00 ns, 5.2031 ns/op
+OverheadActual   7: 128 op, 625.00 ns, 4.8828 ns/op
+OverheadActual   8: 128 op, 625.00 ns, 4.8828 ns/op
+OverheadActual   9: 128 op, 542.00 ns, 4.2344 ns/op
+OverheadActual  10: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual  11: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual  12: 128 op, 333.00 ns, 2.6016 ns/op
+OverheadActual  13: 128 op, 1000.00 ns, 7.8125 ns/op
+OverheadActual  14: 128 op, 583.00 ns, 4.5547 ns/op
+OverheadActual  15: 128 op, 875.00 ns, 6.8359 ns/op
+OverheadActual  16: 128 op, 750.00 ns, 5.8594 ns/op
+OverheadActual  17: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadActual  18: 128 op, 459.00 ns, 3.5859 ns/op
+OverheadActual  19: 128 op, 1208.00 ns, 9.4375 ns/op
+OverheadActual  20: 128 op, 1209.00 ns, 9.4453 ns/op
+
+WorkloadWarmup   1: 128 op, 731678375.00 ns, 5.7162 ms/op
+WorkloadWarmup   2: 128 op, 774643709.00 ns, 6.0519 ms/op
+WorkloadWarmup   3: 128 op, 812012666.00 ns, 6.3438 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 128 op, 903262041.00 ns, 7.0567 ms/op
+WorkloadActual   2: 128 op, 884821292.00 ns, 6.9127 ms/op
+WorkloadActual   3: 128 op, 911982083.00 ns, 7.1249 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 128 op, 903261374.50 ns, 7.0567 ms/op
+WorkloadResult   2: 128 op, 884820625.50 ns, 6.9127 ms/op
+WorkloadResult   3: 128 op, 911981416.50 ns, 7.1249 ms/op
+
+// AfterAll
+// Benchmark Process 36369 has exited with code 0.
+
+Mean = 7.031 ms, StdErr = 0.063 ms (0.89%), N = 3, StdDev = 0.108 ms
+Min = 6.913 ms, Q1 = 6.985 ms, Median = 7.057 ms, Q3 = 7.091 ms, Max = 7.125 ms
+IQR = 0.106 ms, LowerFence = 6.826 ms, UpperFence = 7.250 ms
+ConfidenceInterval = [5.055 ms; 9.008 ms] (CI 99.9%), Margin = 1.976 ms (28.11% of Mean)
+Skewness = -0.22, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 100, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 10 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 127250.00 ns, 127.2500 us/op
+WorkloadJitting  1: 1 op, 51085542.00 ns, 51.0855 ms/op
+
+WorkloadPilot    1: 2 op, 102593583.00 ns, 51.2968 ms/op
+WorkloadPilot    2: 3 op, 173365250.00 ns, 57.7884 ms/op
+WorkloadPilot    3: 4 op, 251966167.00 ns, 62.9915 ms/op
+WorkloadPilot    4: 5 op, 311318875.00 ns, 62.2638 ms/op
+WorkloadPilot    5: 6 op, 327871833.00 ns, 54.6453 ms/op
+WorkloadPilot    6: 7 op, 360758500.00 ns, 51.5369 ms/op
+WorkloadPilot    7: 8 op, 445235125.00 ns, 55.6544 ms/op
+WorkloadPilot    8: 9 op, 550600291.00 ns, 61.1778 ms/op
+
+WorkloadWarmup   1: 9 op, 493680708.00 ns, 54.8534 ms/op
+WorkloadWarmup   2: 9 op, 513812333.00 ns, 57.0903 ms/op
+WorkloadWarmup   3: 9 op, 512524583.00 ns, 56.9472 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 9 op, 538338708.00 ns, 59.8154 ms/op
+WorkloadActual   2: 9 op, 584312583.00 ns, 64.9236 ms/op
+WorkloadActual   3: 9 op, 579262500.00 ns, 64.3625 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 9 op, 538338708.00 ns, 59.8154 ms/op
+WorkloadResult   2: 9 op, 584312583.00 ns, 64.9236 ms/op
+WorkloadResult   3: 9 op, 579262500.00 ns, 64.3625 ms/op
+
+// AfterAll
+// Benchmark Process 36370 has exited with code 0.
+
+Mean = 63.034 ms, StdErr = 1.617 ms (2.57%), N = 3, StdDev = 2.801 ms
+Min = 59.815 ms, Q1 = 62.089 ms, Median = 64.362 ms, Q3 = 64.643 ms, Max = 64.924 ms
+IQR = 2.554 ms, LowerFence = 58.258 ms, UpperFence = 68.474 ms
+ConfidenceInterval = [11.927 ms; 114.141 ms] (CI 99.9%), Margin = 51.107 ms (81.08% of Mean)
+Skewness = -0.37, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 100, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 11 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 123166.00 ns, 123.1660 us/op
+WorkloadJitting  1: 1 op, 13369125.00 ns, 13.3691 ms/op
+
+OverheadJitting  2: 16 op, 138666.00 ns, 8.6666 us/op
+WorkloadJitting  2: 16 op, 193270750.00 ns, 12.0794 ms/op
+
+WorkloadPilot    1: 16 op, 196090417.00 ns, 12.2557 ms/op
+WorkloadPilot    2: 32 op, 414257541.00 ns, 12.9455 ms/op
+WorkloadPilot    3: 64 op, 849639042.00 ns, 13.2756 ms/op
+
+OverheadWarmup   1: 64 op, 1541.00 ns, 24.0781 ns/op
+OverheadWarmup   2: 64 op, 584.00 ns, 9.1250 ns/op
+OverheadWarmup   3: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadWarmup   4: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadWarmup   5: 64 op, 291.00 ns, 4.5469 ns/op
+OverheadWarmup   6: 64 op, 416.00 ns, 6.5000 ns/op
+OverheadWarmup   7: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadWarmup   8: 64 op, 416.00 ns, 6.5000 ns/op
+
+OverheadActual   1: 64 op, 417.00 ns, 6.5156 ns/op
+OverheadActual   2: 64 op, 541.00 ns, 8.4531 ns/op
+OverheadActual   3: 64 op, 334.00 ns, 5.2188 ns/op
+OverheadActual   4: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadActual   5: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadActual   6: 64 op, 458.00 ns, 7.1562 ns/op
+OverheadActual   7: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadActual   8: 64 op, 208.00 ns, 3.2500 ns/op
+OverheadActual   9: 64 op, 208.00 ns, 3.2500 ns/op
+OverheadActual  10: 64 op, 166.00 ns, 2.5938 ns/op
+OverheadActual  11: 64 op, 209.00 ns, 3.2656 ns/op
+OverheadActual  12: 64 op, 500.00 ns, 7.8125 ns/op
+OverheadActual  13: 64 op, 291.00 ns, 4.5469 ns/op
+OverheadActual  14: 64 op, 333.00 ns, 5.2031 ns/op
+OverheadActual  15: 64 op, 625.00 ns, 9.7656 ns/op
+OverheadActual  16: 64 op, 208.00 ns, 3.2500 ns/op
+OverheadActual  17: 64 op, 417.00 ns, 6.5156 ns/op
+OverheadActual  18: 64 op, 875.00 ns, 13.6719 ns/op
+OverheadActual  19: 64 op, 1125.00 ns, 17.5781 ns/op
+OverheadActual  20: 64 op, 208.00 ns, 3.2500 ns/op
+
+WorkloadWarmup   1: 64 op, 916987500.00 ns, 14.3279 ms/op
+WorkloadWarmup   2: 64 op, 986744500.00 ns, 15.4179 ms/op
+WorkloadWarmup   3: 64 op, 1123351334.00 ns, 17.5524 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 64 op, 1123163250.00 ns, 17.5494 ms/op
+WorkloadActual   2: 64 op, 1230586083.00 ns, 19.2279 ms/op
+WorkloadActual   3: 64 op, 1402772666.00 ns, 21.9183 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 64 op, 1123162938.00 ns, 17.5494 ms/op
+WorkloadResult   2: 64 op, 1230585771.00 ns, 19.2279 ms/op
+WorkloadResult   3: 64 op, 1402772354.00 ns, 21.9183 ms/op
+
+// AfterAll
+// Benchmark Process 36371 has exited with code 0.
+
+Mean = 19.565 ms, StdErr = 1.272 ms (6.50%), N = 3, StdDev = 2.204 ms
+Min = 17.549 ms, Q1 = 18.389 ms, Median = 19.228 ms, Q3 = 20.573 ms, Max = 21.918 ms
+IQR = 2.184 ms, LowerFence = 15.112 ms, UpperFence = 23.850 ms
+ConfidenceInterval = [-20.642 ms; 59.772 ms] (CI 99.9%), Margin = 40.207 ms (205.50% of Mean)
+Skewness = 0.15, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 100, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 12 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 140083.00 ns, 140.0830 us/op
+WorkloadJitting  1: 1 op, 267121584.00 ns, 267.1216 ms/op
+
+WorkloadPilot    1: 2 op, 534270917.00 ns, 267.1355 ms/op
+
+WorkloadWarmup   1: 2 op, 530030875.00 ns, 265.0154 ms/op
+WorkloadWarmup   2: 2 op, 534456500.00 ns, 267.2283 ms/op
+WorkloadWarmup   3: 2 op, 634313666.00 ns, 317.1568 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 2 op, 565939667.00 ns, 282.9698 ms/op
+WorkloadActual   2: 2 op, 645272708.00 ns, 322.6364 ms/op
+WorkloadActual   3: 2 op, 680260584.00 ns, 340.1303 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 2 op, 565939667.00 ns, 282.9698 ms/op
+WorkloadResult   2: 2 op, 645272708.00 ns, 322.6364 ms/op
+WorkloadResult   3: 2 op, 680260584.00 ns, 340.1303 ms/op
+
+// AfterAll
+// Benchmark Process 36373 has exited with code 0.
+
+Mean = 315.245 ms, StdErr = 16.910 ms (5.36%), N = 3, StdDev = 29.288 ms
+Min = 282.970 ms, Q1 = 302.803 ms, Median = 322.636 ms, Q3 = 331.383 ms, Max = 340.130 ms
+IQR = 28.580 ms, LowerFence = 259.933 ms, UpperFence = 374.254 ms
+ConfidenceInterval = [-219.080 ms; 849.571 ms] (CI 99.9%), Margin = 534.326 ms (169.50% of Mean)
+Skewness = -0.24, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 100, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 13 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 153750.00 ns, 153.7500 us/op
+WorkloadJitting  1: 1 op, 62490917.00 ns, 62.4909 ms/op
+
+WorkloadPilot    1: 2 op, 107957958.00 ns, 53.9790 ms/op
+WorkloadPilot    2: 3 op, 160623833.00 ns, 53.5413 ms/op
+WorkloadPilot    3: 4 op, 224461833.00 ns, 56.1155 ms/op
+WorkloadPilot    4: 5 op, 311624416.00 ns, 62.3249 ms/op
+WorkloadPilot    5: 6 op, 322916667.00 ns, 53.8194 ms/op
+WorkloadPilot    6: 7 op, 366718667.00 ns, 52.3884 ms/op
+WorkloadPilot    7: 8 op, 441006667.00 ns, 55.1258 ms/op
+WorkloadPilot    8: 9 op, 458257083.00 ns, 50.9175 ms/op
+WorkloadPilot    9: 10 op, 428450458.00 ns, 42.8450 ms/op
+WorkloadPilot   10: 11 op, 535997500.00 ns, 48.7270 ms/op
+
+WorkloadWarmup   1: 11 op, 535891375.00 ns, 48.7174 ms/op
+WorkloadWarmup   2: 11 op, 517195958.00 ns, 47.0178 ms/op
+WorkloadWarmup   3: 11 op, 614479625.00 ns, 55.8618 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 11 op, 556552667.00 ns, 50.5957 ms/op
+WorkloadActual   2: 11 op, 554570375.00 ns, 50.4155 ms/op
+WorkloadActual   3: 11 op, 587155000.00 ns, 53.3777 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 11 op, 556552667.00 ns, 50.5957 ms/op
+WorkloadResult   2: 11 op, 554570375.00 ns, 50.4155 ms/op
+WorkloadResult   3: 11 op, 587155000.00 ns, 53.3777 ms/op
+
+// AfterAll
+// Benchmark Process 36375 has exited with code 0.
+
+Mean = 51.463 ms, StdErr = 0.959 ms (1.86%), N = 3, StdDev = 1.661 ms
+Min = 50.415 ms, Q1 = 50.506 ms, Median = 50.596 ms, Q3 = 51.987 ms, Max = 53.378 ms
+IQR = 1.481 ms, LowerFence = 48.284 ms, UpperFence = 54.208 ms
+ConfidenceInterval = [21.166 ms; 81.760 ms] (CI 99.9%), Margin = 30.297 ms (58.87% of Mean)
+Skewness = 0.38, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 100, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 14 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 121625.00 ns, 121.6250 us/op
+WorkloadJitting  1: 1 op, 573591958.00 ns, 573.5920 ms/op
+
+OverheadJitting  2: 1 op, 208.00 ns, 208.0000 ns/op
+WorkloadJitting  2: 1 op, 563304834.00 ns, 563.3048 ms/op
+
+WorkloadWarmup   1: 1 op, 675570708.00 ns, 675.5707 ms/op
+WorkloadWarmup   2: 1 op, 636623458.00 ns, 636.6235 ms/op
+WorkloadWarmup   3: 1 op, 606679041.00 ns, 606.6790 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 613841917.00 ns, 613.8419 ms/op
+WorkloadActual   2: 1 op, 624617334.00 ns, 624.6173 ms/op
+WorkloadActual   3: 1 op, 607545209.00 ns, 607.5452 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 613841917.00 ns, 613.8419 ms/op
+WorkloadResult   2: 1 op, 624617334.00 ns, 624.6173 ms/op
+WorkloadResult   3: 1 op, 607545209.00 ns, 607.5452 ms/op
+
+// AfterAll
+// Benchmark Process 36376 has exited with code 0.
+
+Mean = 615.335 ms, StdErr = 4.985 ms (0.81%), N = 3, StdDev = 8.633 ms
+Min = 607.545 ms, Q1 = 610.694 ms, Median = 613.842 ms, Q3 = 619.230 ms, Max = 624.617 ms
+IQR = 8.536 ms, LowerFence = 597.889 ms, UpperFence = 632.034 ms
+ConfidenceInterval = [457.829 ms; 772.841 ms] (CI 99.9%), Margin = 157.506 ms (25.60% of Mean)
+Skewness = 0.17, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 100, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 15 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 134458.00 ns, 134.4580 us/op
+WorkloadJitting  1: 1 op, 99403875.00 ns, 99.4039 ms/op
+
+WorkloadPilot    1: 2 op, 162771917.00 ns, 81.3860 ms/op
+WorkloadPilot    2: 3 op, 236786041.00 ns, 78.9287 ms/op
+WorkloadPilot    3: 4 op, 348777500.00 ns, 87.1944 ms/op
+WorkloadPilot    4: 5 op, 477567458.00 ns, 95.5135 ms/op
+WorkloadPilot    5: 6 op, 536156875.00 ns, 89.3595 ms/op
+
+WorkloadWarmup   1: 6 op, 486333750.00 ns, 81.0556 ms/op
+WorkloadWarmup   2: 6 op, 466931416.00 ns, 77.8219 ms/op
+WorkloadWarmup   3: 6 op, 444465708.00 ns, 74.0776 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 6 op, 463289833.00 ns, 77.2150 ms/op
+WorkloadActual   2: 6 op, 454992625.00 ns, 75.8321 ms/op
+WorkloadActual   3: 6 op, 468880917.00 ns, 78.1468 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 6 op, 463289833.00 ns, 77.2150 ms/op
+WorkloadResult   2: 6 op, 454992625.00 ns, 75.8321 ms/op
+WorkloadResult   3: 6 op, 468880917.00 ns, 78.1468 ms/op
+
+// AfterAll
+// Benchmark Process 36377 has exited with code 0.
+
+Mean = 77.065 ms, StdErr = 0.672 ms (0.87%), N = 3, StdDev = 1.165 ms
+Min = 75.832 ms, Q1 = 76.524 ms, Median = 77.215 ms, Q3 = 77.681 ms, Max = 78.147 ms
+IQR = 1.157 ms, LowerFence = 74.788 ms, UpperFence = 79.417 ms
+ConfidenceInterval = [55.817 ms; 98.312 ms] (CI 99.9%), Margin = 21.248 ms (27.57% of Mean)
+Skewness = -0.13, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 1000, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 16 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 130791.00 ns, 130.7910 us/op
+WorkloadJitting  1: 1 op, 8485833.00 ns, 8.4858 ms/op
+
+OverheadJitting  2: 16 op, 166709.00 ns, 10.4193 us/op
+WorkloadJitting  2: 16 op, 105600917.00 ns, 6.6001 ms/op
+
+WorkloadPilot    1: 16 op, 103699250.00 ns, 6.4812 ms/op
+WorkloadPilot    2: 32 op, 205074458.00 ns, 6.4086 ms/op
+WorkloadPilot    3: 64 op, 405330250.00 ns, 6.3333 ms/op
+WorkloadPilot    4: 128 op, 843436834.00 ns, 6.5894 ms/op
+
+OverheadWarmup   1: 128 op, 1542.00 ns, 12.0469 ns/op
+OverheadWarmup   2: 128 op, 416.00 ns, 3.2500 ns/op
+OverheadWarmup   3: 128 op, 875.00 ns, 6.8359 ns/op
+OverheadWarmup   4: 128 op, 542.00 ns, 4.2344 ns/op
+OverheadWarmup   5: 128 op, 333.00 ns, 2.6016 ns/op
+OverheadWarmup   6: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadWarmup   7: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadWarmup   8: 128 op, 416.00 ns, 3.2500 ns/op
+
+OverheadActual   1: 128 op, 708.00 ns, 5.5312 ns/op
+OverheadActual   2: 128 op, 750.00 ns, 5.8594 ns/op
+OverheadActual   3: 128 op, 667.00 ns, 5.2109 ns/op
+OverheadActual   4: 128 op, 833.00 ns, 6.5078 ns/op
+OverheadActual   5: 128 op, 625.00 ns, 4.8828 ns/op
+OverheadActual   6: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual   7: 128 op, 625.00 ns, 4.8828 ns/op
+OverheadActual   8: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual   9: 128 op, 334.00 ns, 2.6094 ns/op
+OverheadActual  10: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual  11: 128 op, 625.00 ns, 4.8828 ns/op
+OverheadActual  12: 128 op, 334.00 ns, 2.6094 ns/op
+OverheadActual  13: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual  14: 128 op, 334.00 ns, 2.6094 ns/op
+OverheadActual  15: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual  16: 128 op, 584.00 ns, 4.5625 ns/op
+OverheadActual  17: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual  18: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual  19: 128 op, 1250.00 ns, 9.7656 ns/op
+OverheadActual  20: 128 op, 458.00 ns, 3.5781 ns/op
+
+WorkloadWarmup   1: 128 op, 898181291.00 ns, 7.0170 ms/op
+WorkloadWarmup   2: 128 op, 909996333.00 ns, 7.1093 ms/op
+WorkloadWarmup   3: 128 op, 969268625.00 ns, 7.5724 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 128 op, 1097335333.00 ns, 8.5729 ms/op
+WorkloadActual   2: 128 op, 1156649708.00 ns, 9.0363 ms/op
+WorkloadActual   3: 128 op, 1206453916.00 ns, 9.4254 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 128 op, 1097334833.00 ns, 8.5729 ms/op
+WorkloadResult   2: 128 op, 1156649208.00 ns, 9.0363 ms/op
+WorkloadResult   3: 128 op, 1206453416.00 ns, 9.4254 ms/op
+
+// AfterAll
+// Benchmark Process 36385 has exited with code 0.
+
+Mean = 9.012 ms, StdErr = 0.246 ms (2.73%), N = 3, StdDev = 0.427 ms
+Min = 8.573 ms, Q1 = 8.805 ms, Median = 9.036 ms, Q3 = 9.231 ms, Max = 9.425 ms
+IQR = 0.426 ms, LowerFence = 8.165 ms, UpperFence = 9.870 ms
+ConfidenceInterval = [1.225 ms; 16.798 ms] (CI 99.9%), Margin = 7.786 ms (86.40% of Mean)
+Skewness = -0.06, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 1000, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 17 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 143542.00 ns, 143.5420 us/op
+WorkloadJitting  1: 1 op, 9893250.00 ns, 9.8933 ms/op
+
+OverheadJitting  2: 16 op, 172334.00 ns, 10.7709 us/op
+WorkloadJitting  2: 16 op, 118687750.00 ns, 7.4180 ms/op
+
+WorkloadPilot    1: 16 op, 106464875.00 ns, 6.6541 ms/op
+WorkloadPilot    2: 32 op, 203772625.00 ns, 6.3679 ms/op
+WorkloadPilot    3: 64 op, 414235667.00 ns, 6.4724 ms/op
+WorkloadPilot    4: 128 op, 873787959.00 ns, 6.8265 ms/op
+
+OverheadWarmup   1: 128 op, 1542.00 ns, 12.0469 ns/op
+OverheadWarmup   2: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadWarmup   3: 128 op, 417.00 ns, 3.2578 ns/op
+OverheadWarmup   4: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadWarmup   5: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadWarmup   6: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadWarmup   7: 128 op, 667.00 ns, 5.2109 ns/op
+OverheadWarmup   8: 128 op, 375.00 ns, 2.9297 ns/op
+
+OverheadActual   1: 128 op, 792.00 ns, 6.1875 ns/op
+OverheadActual   2: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual   3: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual   4: 128 op, 583.00 ns, 4.5547 ns/op
+OverheadActual   5: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual   6: 128 op, 333.00 ns, 2.6016 ns/op
+OverheadActual   7: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadActual   8: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadActual   9: 128 op, 250.00 ns, 1.9531 ns/op
+OverheadActual  10: 128 op, 500.00 ns, 3.9062 ns/op
+OverheadActual  11: 128 op, 541.00 ns, 4.2266 ns/op
+OverheadActual  12: 128 op, 292.00 ns, 2.2812 ns/op
+OverheadActual  13: 128 op, 333.00 ns, 2.6016 ns/op
+OverheadActual  14: 128 op, 458.00 ns, 3.5781 ns/op
+OverheadActual  15: 128 op, 375.00 ns, 2.9297 ns/op
+OverheadActual  16: 128 op, 250.00 ns, 1.9531 ns/op
+OverheadActual  17: 128 op, 417.00 ns, 3.2578 ns/op
+OverheadActual  18: 128 op, 417.00 ns, 3.2578 ns/op
+OverheadActual  19: 128 op, 1750.00 ns, 13.6719 ns/op
+OverheadActual  20: 128 op, 625.00 ns, 4.8828 ns/op
+
+WorkloadWarmup   1: 128 op, 916311875.00 ns, 7.1587 ms/op
+WorkloadWarmup   2: 128 op, 1061287000.00 ns, 8.2913 ms/op
+WorkloadWarmup   3: 128 op, 1140001875.00 ns, 8.9063 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 128 op, 1220985792.00 ns, 9.5390 ms/op
+WorkloadActual   2: 128 op, 1154330417.00 ns, 9.0182 ms/op
+WorkloadActual   3: 128 op, 1185258000.00 ns, 9.2598 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 128 op, 1220985354.50 ns, 9.5389 ms/op
+WorkloadResult   2: 128 op, 1154329979.50 ns, 9.0182 ms/op
+WorkloadResult   3: 128 op, 1185257562.50 ns, 9.2598 ms/op
+
+// AfterAll
+// Benchmark Process 36387 has exited with code 0.
+
+Mean = 9.272 ms, StdErr = 0.150 ms (1.62%), N = 3, StdDev = 0.261 ms
+Min = 9.018 ms, Q1 = 9.139 ms, Median = 9.260 ms, Q3 = 9.399 ms, Max = 9.539 ms
+IQR = 0.260 ms, LowerFence = 8.748 ms, UpperFence = 9.790 ms
+ConfidenceInterval = [4.518 ms; 14.027 ms] (CI 99.9%), Margin = 4.754 ms (51.27% of Mean)
+Skewness = 0.05, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 1000, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 18 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 142000.00 ns, 142.0000 us/op
+WorkloadJitting  1: 1 op, 72235917.00 ns, 72.2359 ms/op
+
+WorkloadPilot    1: 2 op, 140788458.00 ns, 70.3942 ms/op
+WorkloadPilot    2: 3 op, 229397916.00 ns, 76.4660 ms/op
+WorkloadPilot    3: 4 op, 292334625.00 ns, 73.0837 ms/op
+WorkloadPilot    4: 5 op, 439740625.00 ns, 87.9481 ms/op
+WorkloadPilot    5: 6 op, 469539833.00 ns, 78.2566 ms/op
+WorkloadPilot    6: 7 op, 615921667.00 ns, 87.9888 ms/op
+
+WorkloadWarmup   1: 7 op, 586887000.00 ns, 83.8410 ms/op
+WorkloadWarmup   2: 7 op, 551130625.00 ns, 78.7329 ms/op
+WorkloadWarmup   3: 7 op, 588154666.00 ns, 84.0221 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 7 op, 605099958.00 ns, 86.4429 ms/op
+WorkloadActual   2: 7 op, 608176667.00 ns, 86.8824 ms/op
+WorkloadActual   3: 7 op, 612251875.00 ns, 87.4646 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 7 op, 605099958.00 ns, 86.4429 ms/op
+WorkloadResult   2: 7 op, 608176667.00 ns, 86.8824 ms/op
+WorkloadResult   3: 7 op, 612251875.00 ns, 87.4646 ms/op
+
+// AfterAll
+// Benchmark Process 36388 has exited with code 0.
+
+Mean = 86.930 ms, StdErr = 0.296 ms (0.34%), N = 3, StdDev = 0.513 ms
+Min = 86.443 ms, Q1 = 86.663 ms, Median = 86.882 ms, Q3 = 87.173 ms, Max = 87.465 ms
+IQR = 0.511 ms, LowerFence = 85.896 ms, UpperFence = 87.940 ms
+ConfidenceInterval = [77.580 ms; 96.280 ms] (CI 99.9%), Margin = 9.350 ms (10.76% of Mean)
+Skewness = 0.09, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 1000, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 19 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 135625.00 ns, 135.6250 us/op
+WorkloadJitting  1: 1 op, 16483417.00 ns, 16.4834 ms/op
+
+OverheadJitting  2: 16 op, 187583.00 ns, 11.7239 us/op
+WorkloadJitting  2: 16 op, 212735167.00 ns, 13.2959 ms/op
+
+WorkloadPilot    1: 16 op, 225759958.00 ns, 14.1100 ms/op
+WorkloadPilot    2: 32 op, 448449458.00 ns, 14.0140 ms/op
+WorkloadPilot    3: 64 op, 948514208.00 ns, 14.8205 ms/op
+
+OverheadWarmup   1: 64 op, 1458.00 ns, 22.7812 ns/op
+OverheadWarmup   2: 64 op, 542.00 ns, 8.4688 ns/op
+OverheadWarmup   3: 64 op, 1167.00 ns, 18.2344 ns/op
+OverheadWarmup   4: 64 op, 625.00 ns, 9.7656 ns/op
+OverheadWarmup   5: 64 op, 209.00 ns, 3.2656 ns/op
+OverheadWarmup   6: 64 op, 542.00 ns, 8.4688 ns/op
+OverheadWarmup   7: 64 op, 291.00 ns, 4.5469 ns/op
+
+OverheadActual   1: 64 op, 542.00 ns, 8.4688 ns/op
+OverheadActual   2: 64 op, 333.00 ns, 5.2031 ns/op
+OverheadActual   3: 64 op, 416.00 ns, 6.5000 ns/op
+OverheadActual   4: 64 op, 416.00 ns, 6.5000 ns/op
+OverheadActual   5: 64 op, 583.00 ns, 9.1094 ns/op
+OverheadActual   6: 64 op, 583.00 ns, 9.1094 ns/op
+OverheadActual   7: 64 op, 250.00 ns, 3.9062 ns/op
+OverheadActual   8: 64 op, 209.00 ns, 3.2656 ns/op
+OverheadActual   9: 64 op, 417.00 ns, 6.5156 ns/op
+OverheadActual  10: 64 op, 541.00 ns, 8.4531 ns/op
+OverheadActual  11: 64 op, 458.00 ns, 7.1562 ns/op
+OverheadActual  12: 64 op, 416.00 ns, 6.5000 ns/op
+OverheadActual  13: 64 op, 500.00 ns, 7.8125 ns/op
+OverheadActual  14: 64 op, 167.00 ns, 2.6094 ns/op
+OverheadActual  15: 64 op, 500.00 ns, 7.8125 ns/op
+OverheadActual  16: 64 op, 167.00 ns, 2.6094 ns/op
+OverheadActual  17: 64 op, 416.00 ns, 6.5000 ns/op
+OverheadActual  18: 64 op, 583.00 ns, 9.1094 ns/op
+OverheadActual  19: 64 op, 1209.00 ns, 18.8906 ns/op
+OverheadActual  20: 64 op, 417.00 ns, 6.5156 ns/op
+
+WorkloadWarmup   1: 64 op, 1053994375.00 ns, 16.4687 ms/op
+WorkloadWarmup   2: 64 op, 1102583625.00 ns, 17.2279 ms/op
+WorkloadWarmup   3: 64 op, 1199559416.00 ns, 18.7431 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 64 op, 1353277125.00 ns, 21.1450 ms/op
+WorkloadActual   2: 64 op, 1452030583.00 ns, 22.6880 ms/op
+WorkloadActual   3: 64 op, 1580076708.00 ns, 24.6887 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 64 op, 1353276708.00 ns, 21.1449 ms/op
+WorkloadResult   2: 64 op, 1452030166.00 ns, 22.6880 ms/op
+WorkloadResult   3: 64 op, 1580076291.00 ns, 24.6887 ms/op
+
+// AfterAll
+// Benchmark Process 36393 has exited with code 0.
+
+Mean = 22.841 ms, StdErr = 1.026 ms (4.49%), N = 3, StdDev = 1.777 ms
+Min = 21.145 ms, Q1 = 21.916 ms, Median = 22.688 ms, Q3 = 23.688 ms, Max = 24.689 ms
+IQR = 1.772 ms, LowerFence = 19.259 ms, UpperFence = 26.346 ms
+ConfidenceInterval = [-9.575 ms; 55.256 ms] (CI 99.9%), Margin = 32.415 ms (141.92% of Mean)
+Skewness = 0.09, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 1000, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 20 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 144458.00 ns, 144.4580 us/op
+WorkloadJitting  1: 1 op, 357133625.00 ns, 357.1336 ms/op
+
+WorkloadWarmup   1: 1 op, 360813084.00 ns, 360.8131 ms/op
+WorkloadWarmup   2: 1 op, 329739125.00 ns, 329.7391 ms/op
+WorkloadWarmup   3: 1 op, 368990459.00 ns, 368.9905 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 374385833.00 ns, 374.3858 ms/op
+WorkloadActual   2: 1 op, 331281708.00 ns, 331.2817 ms/op
+WorkloadActual   3: 1 op, 354069042.00 ns, 354.0690 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 374385833.00 ns, 374.3858 ms/op
+WorkloadResult   2: 1 op, 331281708.00 ns, 331.2817 ms/op
+WorkloadResult   3: 1 op, 354069042.00 ns, 354.0690 ms/op
+
+// AfterAll
+// Benchmark Process 36394 has exited with code 0.
+
+Mean = 353.246 ms, StdErr = 12.450 ms (3.52%), N = 3, StdDev = 21.564 ms
+Min = 331.282 ms, Q1 = 342.675 ms, Median = 354.069 ms, Q3 = 364.227 ms, Max = 374.386 ms
+IQR = 21.552 ms, LowerFence = 310.347 ms, UpperFence = 396.556 ms
+ConfidenceInterval = [-40.160 ms; 746.651 ms] (CI 99.9%), Margin = 393.405 ms (111.37% of Mean)
+Skewness = -0.04, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 1000, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 21 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 139958.00 ns, 139.9580 us/op
+WorkloadJitting  1: 1 op, 45878167.00 ns, 45.8782 ms/op
+
+WorkloadPilot    1: 2 op, 75207292.00 ns, 37.6036 ms/op
+WorkloadPilot    2: 3 op, 115442833.00 ns, 38.4809 ms/op
+WorkloadPilot    3: 4 op, 175506000.00 ns, 43.8765 ms/op
+WorkloadPilot    4: 5 op, 243032375.00 ns, 48.6065 ms/op
+WorkloadPilot    5: 6 op, 251720208.00 ns, 41.9534 ms/op
+WorkloadPilot    6: 7 op, 297196625.00 ns, 42.4567 ms/op
+WorkloadPilot    7: 8 op, 352838542.00 ns, 44.1048 ms/op
+WorkloadPilot    8: 9 op, 393642167.00 ns, 43.7380 ms/op
+WorkloadPilot    9: 10 op, 494135583.00 ns, 49.4136 ms/op
+WorkloadPilot   10: 11 op, 537296167.00 ns, 48.8451 ms/op
+
+WorkloadWarmup   1: 11 op, 547196583.00 ns, 49.7451 ms/op
+WorkloadWarmup   2: 11 op, 564341125.00 ns, 51.3037 ms/op
+WorkloadWarmup   3: 11 op, 567503500.00 ns, 51.5912 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 11 op, 593901292.00 ns, 53.9910 ms/op
+WorkloadActual   2: 11 op, 570107917.00 ns, 51.8280 ms/op
+WorkloadActual   3: 11 op, 577542166.00 ns, 52.5038 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 11 op, 593901292.00 ns, 53.9910 ms/op
+WorkloadResult   2: 11 op, 570107917.00 ns, 51.8280 ms/op
+WorkloadResult   3: 11 op, 577542166.00 ns, 52.5038 ms/op
+
+// AfterAll
+// Benchmark Process 36395 has exited with code 0.
+
+Mean = 52.774 ms, StdErr = 0.639 ms (1.21%), N = 3, StdDev = 1.107 ms
+Min = 51.828 ms, Q1 = 52.166 ms, Median = 52.504 ms, Q3 = 53.247 ms, Max = 53.991 ms
+IQR = 1.082 ms, LowerFence = 50.544 ms, UpperFence = 54.870 ms
+ConfidenceInterval = [32.586 ms; 72.963 ms] (CI 99.9%), Margin = 20.188 ms (38.25% of Mean)
+Skewness = 0.23, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 1000, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 22 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 134250.00 ns, 134.2500 us/op
+WorkloadJitting  1: 1 op, 668610417.00 ns, 668.6104 ms/op
+
+OverheadJitting  2: 1 op, 167.00 ns, 167.0000 ns/op
+WorkloadJitting  2: 1 op, 654085708.00 ns, 654.0857 ms/op
+
+WorkloadWarmup   1: 1 op, 663150750.00 ns, 663.1508 ms/op
+WorkloadWarmup   2: 1 op, 698510209.00 ns, 698.5102 ms/op
+WorkloadWarmup   3: 1 op, 824573208.00 ns, 824.5732 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 824572791.00 ns, 824.5728 ms/op
+WorkloadActual   2: 1 op, 813872000.00 ns, 813.8720 ms/op
+WorkloadActual   3: 1 op, 905136125.00 ns, 905.1361 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 824572791.00 ns, 824.5728 ms/op
+WorkloadResult   2: 1 op, 813872000.00 ns, 813.8720 ms/op
+WorkloadResult   3: 1 op, 905136125.00 ns, 905.1361 ms/op
+
+// AfterAll
+// Benchmark Process 36397 has exited with code 0.
+
+Mean = 847.860 ms, StdErr = 28.804 ms (3.40%), N = 3, StdDev = 49.890 ms
+Min = 813.872 ms, Q1 = 819.222 ms, Median = 824.573 ms, Q3 = 864.854 ms, Max = 905.136 ms
+IQR = 45.632 ms, LowerFence = 750.774 ms, UpperFence = 933.303 ms
+ConfidenceInterval = [-62.320 ms; 1,758.040 ms] (CI 99.9%), Margin = 910.180 ms (107.35% of Mean)
+Skewness = 0.37, Kurtosis = 0.67, MValue = 2
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "6612580d-ea5e-41b5-8990-4cbc048bc970.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 1000, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 23 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/6612580d-ea5e-41b5-8990-4cbc048bc970/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+Runtime is ready
+OverheadJitting  1: 1 op, 144041.00 ns, 144.0410 us/op
+WorkloadJitting  1: 1 op, 73085167.00 ns, 73.0852 ms/op
+
+WorkloadPilot    1: 2 op, 136279417.00 ns, 68.1397 ms/op
+WorkloadPilot    2: 3 op, 240115291.00 ns, 80.0384 ms/op
+WorkloadPilot    3: 4 op, 283309333.00 ns, 70.8273 ms/op
+WorkloadPilot    4: 5 op, 456723417.00 ns, 91.3447 ms/op
+WorkloadPilot    5: 6 op, 462637209.00 ns, 77.1062 ms/op
+WorkloadPilot    6: 7 op, 538168000.00 ns, 76.8811 ms/op
+
+WorkloadWarmup   1: 7 op, 635842250.00 ns, 90.8346 ms/op
+WorkloadWarmup   2: 7 op, 549567417.00 ns, 78.5096 ms/op
+WorkloadWarmup   3: 7 op, 662195917.00 ns, 94.5994 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 7 op, 595619750.00 ns, 85.0885 ms/op
+WorkloadActual   2: 7 op, 660926542.00 ns, 94.4181 ms/op
+WorkloadActual   3: 7 op, 582662000.00 ns, 83.2374 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 7 op, 595619750.00 ns, 85.0885 ms/op
+WorkloadResult   2: 7 op, 660926542.00 ns, 94.4181 ms/op
+WorkloadResult   3: 7 op, 582662000.00 ns, 83.2374 ms/op
+
+// AfterAll
+// Benchmark Process 36400 has exited with code 0.
+
+Mean = 87.581 ms, StdErr = 3.460 ms (3.95%), N = 3, StdDev = 5.993 ms
+Min = 83.237 ms, Q1 = 84.163 ms, Median = 85.089 ms, Q3 = 89.753 ms, Max = 94.418 ms
+IQR = 5.590 ms, LowerFence = 75.777 ms, UpperFence = 98.139 ms
+ConfidenceInterval = [-21.748 ms; 196.910 ms] (CI 99.9%), Margin = 109.329 ms (124.83% of Mean)
+Skewness = 0.34, Kurtosis = 0.67, MValue = 2
+
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Dolittle.SDK.Benchmarks.Event.Store.CommitEvents-report.csv
+  BenchmarkDotNet.Artifacts/results/Dolittle.SDK.Benchmarks.Event.Store.CommitEvents-report-github.md
+  BenchmarkDotNet.Artifacts/results/Dolittle.SDK.Benchmarks.Event.Store.CommitEvents-report.html
+
+// * Detailed results *
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 6.634 ms, StdErr = 0.492 ms (7.41%), N = 3, StdDev = 0.851 ms
+Min = 5.787 ms, Q1 = 6.206 ms, Median = 6.625 ms, Q3 = 7.057 ms, Max = 7.490 ms
+IQR = 0.851 ms, LowerFence = 4.929 ms, UpperFence = 8.335 ms
+ConfidenceInterval = [-8.900 ms; 22.168 ms] (CI 99.9%), Margin = 15.534 ms (234.15% of Mean)
+Skewness = 0.01, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[5.431 ms ; 6.981 ms) | @@
+[6.981 ms ; 8.265 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 6.341 ms, StdErr = 0.282 ms (4.45%), N = 3, StdDev = 0.489 ms
+Min = 5.868 ms, Q1 = 6.090 ms, Median = 6.312 ms, Q3 = 6.578 ms, Max = 6.844 ms
+IQR = 0.488 ms, LowerFence = 5.358 ms, UpperFence = 7.310 ms
+ConfidenceInterval = [-2.575 ms; 15.258 ms] (CI 99.9%), Margin = 8.916 ms (140.61% of Mean)
+Skewness = 0.06, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[5.645 ms ; 6.535 ms) | @@
+[6.535 ms ; 7.289 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 62.033 ms, StdErr = 1.098 ms (1.77%), N = 3, StdDev = 1.902 ms
+Min = 59.839 ms, Q1 = 61.439 ms, Median = 63.040 ms, Q3 = 63.130 ms, Max = 63.220 ms
+IQR = 1.691 ms, LowerFence = 58.903 ms, UpperFence = 65.666 ms
+ConfidenceInterval = [27.331 ms; 96.735 ms] (CI 99.9%), Margin = 34.702 ms (55.94% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[59.799 ms ; 63.261 ms) | @@@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 21.950 ms, StdErr = 0.775 ms (3.53%), N = 3, StdDev = 1.342 ms
+Min = 20.888 ms, Q1 = 21.196 ms, Median = 21.503 ms, Q3 = 22.481 ms, Max = 23.459 ms
+IQR = 1.285 ms, LowerFence = 19.268 ms, UpperFence = 24.409 ms
+ConfidenceInterval = [-2.537 ms; 46.437 ms] (CI 99.9%), Margin = 24.487 ms (111.56% of Mean)
+Skewness = 0.3, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[19.974 ms ; 22.417 ms) | @@
+[22.417 ms ; 24.680 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 329.434 ms, StdErr = 25.473 ms (7.73%), N = 3, StdDev = 44.121 ms
+Min = 301.519 ms, Q1 = 304.002 ms, Median = 306.485 ms, Q3 = 343.392 ms, Max = 380.300 ms
+IQR = 39.391 ms, LowerFence = 244.916 ms, UpperFence = 402.478 ms
+ConfidenceInterval = [-475.492 ms; 1,134.361 ms] (CI 99.9%), Margin = 804.926 ms (244.34% of Mean)
+Skewness = 0.38, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[300.758 ms ; 381.061 ms) | @@@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 48.039 ms, StdErr = 2.013 ms (4.19%), N = 3, StdDev = 3.487 ms
+Min = 44.308 ms, Q1 = 46.452 ms, Median = 48.596 ms, Q3 = 49.905 ms, Max = 51.214 ms
+IQR = 3.453 ms, LowerFence = 41.272 ms, UpperFence = 55.085 ms
+ConfidenceInterval = [-15.570 ms; 111.648 ms] (CI 99.9%), Margin = 63.609 ms (132.41% of Mean)
+Skewness = -0.16, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[41.135 ms ; 46.732 ms) | @
+[46.732 ms ; 53.078 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 608.740 ms, StdErr = 34.561 ms (5.68%), N = 3, StdDev = 59.861 ms
+Min = 567.721 ms, Q1 = 574.395 ms, Median = 581.069 ms, Q3 = 629.250 ms, Max = 677.430 ms
+IQR = 54.855 ms, LowerFence = 492.113 ms, UpperFence = 711.532 ms
+ConfidenceInterval = [-483.340 ms; 1,700.821 ms] (CI 99.9%), Margin = 1,092.081 ms (179.40% of Mean)
+Skewness = 0.36, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[513.246 ms ; 628.871 ms) | @@
+[628.871 ms ; 731.906 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 97.204 ms, StdErr = 14.229 ms (14.64%), N = 3, StdDev = 24.645 ms
+Min = 78.161 ms, Q1 = 83.287 ms, Median = 88.413 ms, Q3 = 106.726 ms, Max = 125.040 ms
+IQR = 23.439 ms, LowerFence = 48.128 ms, UpperFence = 141.885 ms
+ConfidenceInterval = [-352.412 ms; 546.821 ms] (CI 99.9%), Margin = 449.617 ms (462.55% of Mean)
+Skewness = 0.31, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[ 60.859 ms ; 105.715 ms) | @@
+[105.715 ms ; 147.467 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 6.645 ms, StdErr = 0.176 ms (2.65%), N = 3, StdDev = 0.305 ms
+Min = 6.298 ms, Q1 = 6.531 ms, Median = 6.763 ms, Q3 = 6.818 ms, Max = 6.873 ms
+IQR = 0.287 ms, LowerFence = 6.099 ms, UpperFence = 7.249 ms
+ConfidenceInterval = [1.081 ms; 12.209 ms] (CI 99.9%), Margin = 5.564 ms (83.74% of Mean)
+Skewness = -0.33, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[6.021 ms ; 6.540 ms) | @
+[6.540 ms ; 7.151 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 7.031 ms, StdErr = 0.063 ms (0.89%), N = 3, StdDev = 0.108 ms
+Min = 6.913 ms, Q1 = 6.985 ms, Median = 7.057 ms, Q3 = 7.091 ms, Max = 7.125 ms
+IQR = 0.106 ms, LowerFence = 6.826 ms, UpperFence = 7.250 ms
+ConfidenceInterval = [5.055 ms; 9.008 ms] (CI 99.9%), Margin = 1.976 ms (28.11% of Mean)
+Skewness = -0.22, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[6.814 ms ; 6.992 ms) | @
+[6.992 ms ; 7.223 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 63.034 ms, StdErr = 1.617 ms (2.57%), N = 3, StdDev = 2.801 ms
+Min = 59.815 ms, Q1 = 62.089 ms, Median = 64.362 ms, Q3 = 64.643 ms, Max = 64.924 ms
+IQR = 2.554 ms, LowerFence = 58.258 ms, UpperFence = 68.474 ms
+ConfidenceInterval = [11.927 ms; 114.141 ms] (CI 99.9%), Margin = 51.107 ms (81.08% of Mean)
+Skewness = -0.37, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[57.266 ms ; 62.094 ms) | @
+[62.094 ms ; 67.473 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 19.565 ms, StdErr = 1.272 ms (6.50%), N = 3, StdDev = 2.204 ms
+Min = 17.549 ms, Q1 = 18.389 ms, Median = 19.228 ms, Q3 = 20.573 ms, Max = 21.918 ms
+IQR = 2.184 ms, LowerFence = 15.112 ms, UpperFence = 23.850 ms
+ConfidenceInterval = [-20.642 ms; 59.772 ms] (CI 99.9%), Margin = 40.207 ms (205.50% of Mean)
+Skewness = 0.15, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[16.383 ms ; 20.394 ms) | @@
+[20.394 ms ; 23.924 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 315.245 ms, StdErr = 16.910 ms (5.36%), N = 3, StdDev = 29.288 ms
+Min = 282.970 ms, Q1 = 302.803 ms, Median = 322.636 ms, Q3 = 331.383 ms, Max = 340.130 ms
+IQR = 28.580 ms, LowerFence = 259.933 ms, UpperFence = 374.254 ms
+ConfidenceInterval = [-219.080 ms; 849.571 ms] (CI 99.9%), Margin = 534.326 ms (169.50% of Mean)
+Skewness = -0.24, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[256.317 ms ; 304.730 ms) | @
+[304.730 ms ; 366.784 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 51.463 ms, StdErr = 0.959 ms (1.86%), N = 3, StdDev = 1.661 ms
+Min = 50.415 ms, Q1 = 50.506 ms, Median = 50.596 ms, Q3 = 51.987 ms, Max = 53.378 ms
+IQR = 1.481 ms, LowerFence = 48.284 ms, UpperFence = 54.208 ms
+ConfidenceInterval = [21.166 ms; 81.760 ms] (CI 99.9%), Margin = 30.297 ms (58.87% of Mean)
+Skewness = 0.38, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[50.385 ms ; 53.408 ms) | @@@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 615.335 ms, StdErr = 4.985 ms (0.81%), N = 3, StdDev = 8.633 ms
+Min = 607.545 ms, Q1 = 610.694 ms, Median = 613.842 ms, Q3 = 619.230 ms, Max = 624.617 ms
+IQR = 8.536 ms, LowerFence = 597.889 ms, UpperFence = 632.034 ms
+ConfidenceInterval = [457.829 ms; 772.841 ms] (CI 99.9%), Margin = 157.506 ms (25.60% of Mean)
+Skewness = 0.17, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[602.837 ms ; 618.550 ms) | @@
+[618.550 ms ; 632.474 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 77.065 ms, StdErr = 0.672 ms (0.87%), N = 3, StdDev = 1.165 ms
+Min = 75.832 ms, Q1 = 76.524 ms, Median = 77.215 ms, Q3 = 77.681 ms, Max = 78.147 ms
+IQR = 1.157 ms, LowerFence = 74.788 ms, UpperFence = 79.417 ms
+ConfidenceInterval = [55.817 ms; 98.312 ms] (CI 99.9%), Margin = 21.248 ms (27.57% of Mean)
+Skewness = -0.13, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[74.772 ms ; 76.621 ms) | @
+[76.621 ms ; 78.741 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 9.012 ms, StdErr = 0.246 ms (2.73%), N = 3, StdDev = 0.427 ms
+Min = 8.573 ms, Q1 = 8.805 ms, Median = 9.036 ms, Q3 = 9.231 ms, Max = 9.425 ms
+IQR = 0.426 ms, LowerFence = 8.165 ms, UpperFence = 9.870 ms
+ConfidenceInterval = [1.225 ms; 16.798 ms] (CI 99.9%), Margin = 7.786 ms (86.40% of Mean)
+Skewness = -0.06, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[8.185 ms ; 8.842 ms) | @
+[8.842 ms ; 9.619 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 9.272 ms, StdErr = 0.150 ms (1.62%), N = 3, StdDev = 0.261 ms
+Min = 9.018 ms, Q1 = 9.139 ms, Median = 9.260 ms, Q3 = 9.399 ms, Max = 9.539 ms
+IQR = 0.260 ms, LowerFence = 8.748 ms, UpperFence = 9.790 ms
+ConfidenceInterval = [4.518 ms; 14.027 ms] (CI 99.9%), Margin = 4.754 ms (51.27% of Mean)
+Skewness = 0.05, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[8.902 ms ; 9.376 ms) | @@
+[9.376 ms ; 9.776 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 86.930 ms, StdErr = 0.296 ms (0.34%), N = 3, StdDev = 0.513 ms
+Min = 86.443 ms, Q1 = 86.663 ms, Median = 86.882 ms, Q3 = 87.173 ms, Max = 87.465 ms
+IQR = 0.511 ms, LowerFence = 85.896 ms, UpperFence = 87.940 ms
+ConfidenceInterval = [77.580 ms; 96.280 ms] (CI 99.9%), Margin = 9.350 ms (10.76% of Mean)
+Skewness = 0.09, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[85.976 ms ; 87.529 ms) | @@@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 22.841 ms, StdErr = 1.026 ms (4.49%), N = 3, StdDev = 1.777 ms
+Min = 21.145 ms, Q1 = 21.916 ms, Median = 22.688 ms, Q3 = 23.688 ms, Max = 24.689 ms
+IQR = 1.772 ms, LowerFence = 19.259 ms, UpperFence = 26.346 ms
+ConfidenceInterval = [-9.575 ms; 55.256 ms] (CI 99.9%), Margin = 32.415 ms (141.92% of Mean)
+Skewness = 0.09, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[20.300 ms ; 23.533 ms) | @@
+[23.533 ms ; 26.306 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 353.246 ms, StdErr = 12.450 ms (3.52%), N = 3, StdDev = 21.564 ms
+Min = 331.282 ms, Q1 = 342.675 ms, Median = 354.069 ms, Q3 = 364.227 ms, Max = 374.386 ms
+IQR = 21.552 ms, LowerFence = 310.347 ms, UpperFence = 396.556 ms
+ConfidenceInterval = [-40.160 ms; 746.651 ms] (CI 99.9%), Margin = 393.405 ms (111.37% of Mean)
+Skewness = -0.04, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[311.658 ms ; 344.604 ms) | @
+[344.604 ms ; 383.851 ms) | @@
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 52.774 ms, StdErr = 0.639 ms (1.21%), N = 3, StdDev = 1.107 ms
+Min = 51.828 ms, Q1 = 52.166 ms, Median = 52.504 ms, Q3 = 53.247 ms, Max = 53.991 ms
+IQR = 1.082 ms, LowerFence = 50.544 ms, UpperFence = 54.870 ms
+ConfidenceInterval = [32.586 ms; 72.963 ms] (CI 99.9%), Margin = 20.188 ms (38.25% of Mean)
+Skewness = 0.23, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[51.159 ms ; 53.173 ms) | @@
+[53.173 ms ; 54.998 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 847.860 ms, StdErr = 28.804 ms (3.40%), N = 3, StdDev = 49.890 ms
+Min = 813.872 ms, Q1 = 819.222 ms, Median = 824.573 ms, Q3 = 864.854 ms, Max = 905.136 ms
+IQR = 45.632 ms, LowerFence = 750.774 ms, UpperFence = 933.303 ms
+ConfidenceInterval = [-62.320 ms; 1,758.040 ms] (CI 99.9%), Margin = 910.180 ms (107.35% of Mean)
+Skewness = 0.37, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[768.470 ms ; 864.624 ms) | @@
+[864.624 ms ; 950.538 ms) | @
+---------------------------------------------------
+
+CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 87.581 ms, StdErr = 3.460 ms (3.95%), N = 3, StdDev = 5.993 ms
+Min = 83.237 ms, Q1 = 84.163 ms, Median = 85.089 ms, Q3 = 89.753 ms, Max = 94.418 ms
+IQR = 5.590 ms, LowerFence = 75.777 ms, UpperFence = 98.139 ms
+ConfidenceInterval = [-21.748 ms; 196.910 ms] (CI 99.9%), Margin = 109.329 ms (124.83% of Mean)
+Skewness = 0.34, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[77.784 ms ; 89.617 ms) | @@
+[89.617 ms ; 99.872 ms) | @
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.1 (21C52) [Darwin 21.2.0]
+Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+.NET SDK=6.0.101
+  [Host]   : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+  ShortRun : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+
+Job=ShortRun  IterationCount=3  LaunchCount=1  
+WarmupCount=3  
+
+|              Method | PreExistingEvents | EventsToCommit |       Mean |        Error |     StdDev |
+|-------------------- |------------------ |--------------- |-----------:|-------------:|-----------:|
+|  CommitEventsInLoop |                 0 |              1 |   6.634 ms |    15.534 ms |  0.8514 ms |
+| CommitEventsInBatch |                 0 |              1 |   6.341 ms |     8.916 ms |  0.4887 ms |
+|  CommitEventsInLoop |                 0 |             10 |  62.033 ms |    34.702 ms |  1.9021 ms |
+| CommitEventsInBatch |                 0 |             10 |  21.950 ms |    24.487 ms |  1.3422 ms |
+|  CommitEventsInLoop |                 0 |             50 | 329.434 ms |   804.926 ms | 44.1207 ms |
+| CommitEventsInBatch |                 0 |             50 |  48.039 ms |    63.609 ms |  3.4866 ms |
+|  CommitEventsInLoop |                 0 |            100 | 608.740 ms | 1,092.081 ms | 59.8606 ms |
+| CommitEventsInBatch |                 0 |            100 |  97.204 ms |   449.617 ms | 24.6450 ms |
+|  CommitEventsInLoop |               100 |              1 |   6.645 ms |     5.564 ms |  0.3050 ms |
+| CommitEventsInBatch |               100 |              1 |   7.031 ms |     1.976 ms |  0.1083 ms |
+|  CommitEventsInLoop |               100 |             10 |  63.034 ms |    51.107 ms |  2.8013 ms |
+| CommitEventsInBatch |               100 |             10 |  19.565 ms |    40.207 ms |  2.2039 ms |
+|  CommitEventsInLoop |               100 |             50 | 315.245 ms |   534.326 ms | 29.2882 ms |
+| CommitEventsInBatch |               100 |             50 |  51.463 ms |    30.297 ms |  1.6607 ms |
+|  CommitEventsInLoop |               100 |            100 | 615.335 ms |   157.506 ms |  8.6334 ms |
+| CommitEventsInBatch |               100 |            100 |  77.065 ms |    21.248 ms |  1.1647 ms |
+|  CommitEventsInLoop |              1000 |              1 |   9.012 ms |     7.786 ms |  0.4268 ms |
+| CommitEventsInBatch |              1000 |              1 |   9.272 ms |     4.754 ms |  0.2606 ms |
+|  CommitEventsInLoop |              1000 |             10 |  86.930 ms |     9.350 ms |  0.5125 ms |
+| CommitEventsInBatch |              1000 |             10 |  22.841 ms |    32.415 ms |  1.7768 ms |
+|  CommitEventsInLoop |              1000 |             50 | 353.246 ms |   393.405 ms | 21.5639 ms |
+| CommitEventsInBatch |              1000 |             50 |  52.774 ms |    20.188 ms |  1.1066 ms |
+|  CommitEventsInLoop |              1000 |            100 | 847.860 ms |   910.180 ms | 49.8900 ms |
+| CommitEventsInBatch |              1000 |            100 |  87.581 ms |   109.329 ms |  5.9927 ms |
+
+// * Warnings *
+MinIterationTime
+  CommitEvents.CommitEventsInBatch: ShortRun -> The minimum observed iteration time is 44.3077 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  CommitEvents.CommitEventsInBatch: ShortRun -> The minimum observed iteration time is 78.1608 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+
+// * Legends *
+  PreExistingEvents : Value of the 'PreExistingEvents' parameter
+  EventsToCommit    : Value of the 'EventsToCommit' parameter
+  Mean              : Arithmetic mean of all measurements
+  Error             : Half of 99.9% confidence interval
+  StdDev            : Standard deviation of all measurements
+  1 ms              : 1 Millisecond (0.001 sec)
+
+// ***** BenchmarkRunner: End *****
+// ** Remained 0 benchmark(s) to run **
+Run time: 00:04:43 (283.37 sec), executed benchmarks: 24
+
+Global total time: 00:04:53 (293.57 sec), executed benchmarks: 24
+// * Artifacts cleanup *

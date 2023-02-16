@@ -1,0 +1,205 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 3 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet restore  /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/09afab7a-70a9-4df2-a914-4f3099667775
+// command took 3.52s and exited with 0
+// start dotnet build -c Release  --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/09afab7a-70a9-4df2-a914-4f3099667775
+// command took 6.53s and exited with 0
+// ***** Done, took 00:00:10 (10.16 sec)   *****
+// Found 3 benchmarks:
+//   applying_events_with_100_events_to_replay.Applying1EventWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+//   applying_events_with_100_events_to_replay.Applying100EventsWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+//   applying_events_with_100_events_to_replay.Applying1Event100TimesWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+// **************************
+// Benchmark: applying_events_with_100_events_to_replay.Applying1EventWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "09afab7a-70a9-4df2-a914-4f3099667775.dll" --benchmarkName "Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant.applying_events_with_100_events_to_replay.Applying1EventWith100EventsToReplay" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 0 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/09afab7a-70a9-4df2-a914-4f3099667775/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-MNWEAC(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+// BeforeActualRun
+Starting dolittle/runtime:7.8.1-peregrin.14-development container
+Stopping dolittle/runtime:7.8.1-peregrin.14-development container
+WorkloadActual   1: 1 op, 41627709.00 ns, 41.6277 ms/op
+
+// AfterActualRun
+Starting dolittle/runtime:7.8.1-peregrin.14-development container
+Stopping dolittle/runtime:7.8.1-peregrin.14-development container
+WorkloadResult   1: 1 op, 41627709.00 ns, 41.6277 ms/op
+GC:  0 0 0 684968 1
+Threading:  22 1 1
+
+Disposing dolittle/runtime:7.8.1-peregrin.14-development container
+// AfterAll
+// Benchmark Process 37500 has exited with code 0.
+
+Mean = 41.628 ms, StdErr = 0.000 ms (0.00%), N = 1, StdDev = 0.000 ms
+Min = 41.628 ms, Q1 = 41.628 ms, Median = 41.628 ms, Q3 = 41.628 ms, Max = 41.628 ms
+IQR = 0.000 ms, LowerFence = 41.628 ms, UpperFence = 41.628 ms
+ConfidenceInterval = [NaN ms; NaN ms] (CI 99.9%), Margin = NaN ms (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+
+// **************************
+// Benchmark: applying_events_with_100_events_to_replay.Applying100EventsWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "09afab7a-70a9-4df2-a914-4f3099667775.dll" --benchmarkName "Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant.applying_events_with_100_events_to_replay.Applying100EventsWith100EventsToReplay" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 1 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/09afab7a-70a9-4df2-a914-4f3099667775/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-RRAUJD(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+// BeforeActualRun
+Starting dolittle/runtime:7.8.1-peregrin.14-development container
+Stopping dolittle/runtime:7.8.1-peregrin.14-development container
+WorkloadActual   1: 1 op, 84392000.00 ns, 84.3920 ms/op
+
+// AfterActualRun
+Starting dolittle/runtime:7.8.1-peregrin.14-development container
+Stopping dolittle/runtime:7.8.1-peregrin.14-development container
+WorkloadResult   1: 1 op, 84392000.00 ns, 84.3920 ms/op
+GC:  0 0 0 1526024 1
+Threading:  22 0 1
+
+Disposing dolittle/runtime:7.8.1-peregrin.14-development container
+// AfterAll
+// Benchmark Process 37513 has exited with code 0.
+
+Mean = 84.392 ms, StdErr = 0.000 ms (0.00%), N = 1, StdDev = 0.000 ms
+Min = 84.392 ms, Q1 = 84.392 ms, Median = 84.392 ms, Q3 = 84.392 ms, Max = 84.392 ms
+IQR = 0.000 ms, LowerFence = 84.392 ms, UpperFence = 84.392 ms
+ConfidenceInterval = [NaN ms; NaN ms] (CI 99.9%), Margin = NaN ms (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+
+// **************************
+// Benchmark: applying_events_with_100_events_to_replay.Applying1Event100TimesWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "09afab7a-70a9-4df2-a914-4f3099667775.dll" --benchmarkName "Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant.applying_events_with_100_events_to_replay.Applying1Event100TimesWith100EventsToReplay" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 2 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/09afab7a-70a9-4df2-a914-4f3099667775/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-GOAXNZ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+// BeforeActualRun
+Starting dolittle/runtime:7.8.1-peregrin.14-development container
+Stopping dolittle/runtime:7.8.1-peregrin.14-development container
+WorkloadActual   1: 1 op, 1319123292.00 ns, 1.3191 s/op
+
+// AfterActualRun
+Starting dolittle/runtime:7.8.1-peregrin.14-development container
+Stopping dolittle/runtime:7.8.1-peregrin.14-development container
+WorkloadResult   1: 1 op, 1319123292.00 ns, 1.3191 s/op
+GC:  37 12 0 99368928 1
+Threading:  2242 5 1
+
+Disposing dolittle/runtime:7.8.1-peregrin.14-development container
+// AfterAll
+// Benchmark Process 37514 has exited with code 0.
+
+Mean = 1.319 s, StdErr = 0.000 s (0.00%), N = 1, StdDev = 0.000 s
+Min = 1.319 s, Q1 = 1.319 s, Median = 1.319 s, Q3 = 1.319 s, Max = 1.319 s
+IQR = 0.000 s, LowerFence = 1.319 s, UpperFence = 1.319 s
+ConfidenceInterval = [NaN s; NaN s] (CI 99.9%), Margin = NaN s (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant.applying_events_with_100_events_to_replay-report-github.md
+  BenchmarkDotNet.Artifacts/results/Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant.applying_events_with_100_events_to_replay-report-full.json
+
+// * Detailed results *
+applying_events_with_100_events_to_replay.Applying1EventWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 41.628 ms, StdErr = 0.000 ms (0.00%), N = 1, StdDev = 0.000 ms
+Min = 41.628 ms, Q1 = 41.628 ms, Median = 41.628 ms, Q3 = 41.628 ms, Max = 41.628 ms
+IQR = 0.000 ms, LowerFence = 41.628 ms, UpperFence = 41.628 ms
+ConfidenceInterval = [NaN ms; NaN ms] (CI 99.9%), Margin = NaN ms (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+-------------------- Histogram --------------------
+[41.628 ms ; 41.628 ms) | @
+---------------------------------------------------
+
+applying_events_with_100_events_to_replay.Applying100EventsWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 84.392 ms, StdErr = 0.000 ms (0.00%), N = 1, StdDev = 0.000 ms
+Min = 84.392 ms, Q1 = 84.392 ms, Median = 84.392 ms, Q3 = 84.392 ms, Max = 84.392 ms
+IQR = 0.000 ms, LowerFence = 84.392 ms, UpperFence = 84.392 ms
+ConfidenceInterval = [NaN ms; NaN ms] (CI 99.9%), Margin = NaN ms (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+-------------------- Histogram --------------------
+[84.392 ms ; 84.392 ms) | @
+---------------------------------------------------
+
+applying_events_with_100_events_to_replay.Applying1Event100TimesWith100EventsToReplay: Job-IEOUWP(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 1.319 s, StdErr = 0.000 s (0.00%), N = 1, StdDev = 0.000 s
+Min = 1.319 s, Q1 = 1.319 s, Median = 1.319 s, Q3 = 1.319 s, Max = 1.319 s
+IQR = 0.000 s, LowerFence = 1.319 s, UpperFence = 1.319 s
+ConfidenceInterval = [NaN s; NaN s] (CI 99.9%), Margin = NaN s (NaN% of Mean)
+Skewness = NaN, Kurtosis = NaN, MValue = 2
+-------------------- Histogram --------------------
+[1.319 s ; 1.319 s) | @
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.1 (21C52) [Darwin 21.2.0]
+Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+.NET SDK=6.0.101
+  [Host]     : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+  Job-IEOUWP : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+
+PowerPlanMode=00000000-0000-0000-0000-000000000000  InvocationCount=1  IterationCount=1  
+LaunchCount=1  RunStrategy=ColdStart  UnrollFactor=1  
+WarmupCount=0  
+
+|                                      Method |        Mean | Error |      Median |         Min |         Max |      Gen 0 |      Gen 1 | Allocated |
+|-------------------------------------------- |------------:|------:|------------:|------------:|------------:|-----------:|-----------:|----------:|
+|         Applying1EventWith100EventsToReplay |    41.63 ms |    NA |    41.63 ms |    41.63 ms |    41.63 ms |          - |          - |    669 KB |
+|      Applying100EventsWith100EventsToReplay |    84.39 ms |    NA |    84.39 ms |    84.39 ms |    84.39 ms |          - |          - |  1,490 KB |
+| Applying1Event100TimesWith100EventsToReplay | 1,319.12 ms |    NA | 1,319.12 ms | 1,319.12 ms | 1,319.12 ms | 37000.0000 | 12000.0000 | 97,040 KB |
+
+// * Warnings *
+MinIterationTime
+  applying_events_with_100_events_to_replay.Applying1EventWith100EventsToReplay: PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0    -> The minimum observed iteration time is 41.6277 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  applying_events_with_100_events_to_replay.Applying100EventsWith100EventsToReplay: PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=1, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0 -> The minimum observed iteration time is 84.3920 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+
+// * Legends *
+  Mean      : Arithmetic mean of all measurements
+  Error     : Half of 99.9% confidence interval
+  Median    : Value separating the higher half of all measurements (50th percentile)
+  Min       : Minimum
+  Max       : Maximum
+  Gen 0     : GC Generation 0 collects per 1000 operations
+  Gen 1     : GC Generation 1 collects per 1000 operations
+  Allocated : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
+  1 ms      : 1 Millisecond (0.001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+// ** Remained 0 benchmark(s) to run **
+Run time: 00:00:38 (38.98 sec), executed benchmarks: 3
+
+Global total time: 00:00:49 (49.15 sec), executed benchmarks: 3
+// * Artifacts cleanup *

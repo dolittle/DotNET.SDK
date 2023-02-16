@@ -1,0 +1,264 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 3 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet restore  /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa
+// command took 4.02s and exited with 0
+// start dotnet build -c Release  --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa
+// command took 7.23s and exited with 0
+// ***** Done, took 00:00:11 (11.37 sec)   *****
+// Found 3 benchmarks:
+//   committing_100_events_with_warmup.Commit100Loop: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+//   committing_100_events_with_warmup.Commit100: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+//   committing_100_events_with_warmup.Commit1: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+// **************************
+// Benchmark: committing_100_events_with_warmup.Commit100Loop: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa.dll" --benchmarkName "Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup.Commit100Loop" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 0 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-JRJRCJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+Starting dolittle/runtime:7.8.1-development container
+// BeforeActualRun
+WorkloadActual   1: 100 op, 368205666.00 ns, 3.6821 ms/op
+WorkloadActual   2: 100 op, 364676458.00 ns, 3.6468 ms/op
+WorkloadActual   3: 100 op, 332330541.00 ns, 3.3233 ms/op
+WorkloadActual   4: 100 op, 341548500.00 ns, 3.4155 ms/op
+WorkloadActual   5: 100 op, 327239542.00 ns, 3.2724 ms/op
+WorkloadActual   6: 100 op, 334311000.00 ns, 3.3431 ms/op
+WorkloadActual   7: 100 op, 370586000.00 ns, 3.7059 ms/op
+WorkloadActual   8: 100 op, 320280541.00 ns, 3.2028 ms/op
+WorkloadActual   9: 100 op, 329408917.00 ns, 3.2941 ms/op
+WorkloadActual  10: 100 op, 318779000.00 ns, 3.1878 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 100 op, 368205666.00 ns, 3.6821 ms/op
+WorkloadResult   2: 100 op, 364676458.00 ns, 3.6468 ms/op
+WorkloadResult   3: 100 op, 332330541.00 ns, 3.3233 ms/op
+WorkloadResult   4: 100 op, 341548500.00 ns, 3.4155 ms/op
+WorkloadResult   5: 100 op, 327239542.00 ns, 3.2724 ms/op
+WorkloadResult   6: 100 op, 334311000.00 ns, 3.3431 ms/op
+WorkloadResult   7: 100 op, 370586000.00 ns, 3.7059 ms/op
+WorkloadResult   8: 100 op, 320280541.00 ns, 3.2028 ms/op
+WorkloadResult   9: 100 op, 329408917.00 ns, 3.2941 ms/op
+WorkloadResult  10: 100 op, 318779000.00 ns, 3.1878 ms/op
+GC:  0 0 0 1876032 100
+Threading:  1084 0 100
+
+Disposing dolittle/runtime:7.8.1-development container
+Stopping dolittle/runtime:7.8.1-development container
+// AfterAll
+// Benchmark Process 4159 has exited with code 0.
+
+Mean = 3.407 ms, StdErr = 0.063 ms (1.84%), N = 10, StdDev = 0.198 ms
+Min = 3.188 ms, Q1 = 3.278 ms, Median = 3.333 ms, Q3 = 3.589 ms, Max = 3.706 ms
+IQR = 0.311 ms, LowerFence = 2.811 ms, UpperFence = 4.056 ms
+ConfidenceInterval = [3.107 ms; 3.707 ms] (CI 99.9%), Margin = 0.300 ms (8.80% of Mean)
+Skewness = 0.48, Kurtosis = 1.39, MValue = 2.86
+
+// **************************
+// Benchmark: committing_100_events_with_warmup.Commit100: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa.dll" --benchmarkName "Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup.Commit100" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 1 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-JCHUWE(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+Starting dolittle/runtime:7.8.1-development container
+// BeforeActualRun
+WorkloadActual   1: 100 op, 54557083.00 ns, 545.5708 us/op
+WorkloadActual   2: 100 op, 42076375.00 ns, 420.7638 us/op
+WorkloadActual   3: 100 op, 49443708.00 ns, 494.4371 us/op
+WorkloadActual   4: 100 op, 46913417.00 ns, 469.1342 us/op
+WorkloadActual   5: 100 op, 51157625.00 ns, 511.5763 us/op
+WorkloadActual   6: 100 op, 43319041.00 ns, 433.1904 us/op
+WorkloadActual   7: 100 op, 43721000.00 ns, 437.2100 us/op
+WorkloadActual   8: 100 op, 43699334.00 ns, 436.9933 us/op
+WorkloadActual   9: 100 op, 45521875.00 ns, 455.2188 us/op
+WorkloadActual  10: 100 op, 40644500.00 ns, 406.4450 us/op
+
+// AfterActualRun
+WorkloadResult   1: 100 op, 54557083.00 ns, 545.5708 us/op
+WorkloadResult   2: 100 op, 42076375.00 ns, 420.7638 us/op
+WorkloadResult   3: 100 op, 49443708.00 ns, 494.4371 us/op
+WorkloadResult   4: 100 op, 46913417.00 ns, 469.1342 us/op
+WorkloadResult   5: 100 op, 51157625.00 ns, 511.5763 us/op
+WorkloadResult   6: 100 op, 43319041.00 ns, 433.1904 us/op
+WorkloadResult   7: 100 op, 43721000.00 ns, 437.2100 us/op
+WorkloadResult   8: 100 op, 43699334.00 ns, 436.9933 us/op
+WorkloadResult   9: 100 op, 45521875.00 ns, 455.2188 us/op
+WorkloadResult  10: 100 op, 40644500.00 ns, 406.4450 us/op
+GC:  0 0 0 910520 100
+Threading:  11 0 100
+
+Disposing dolittle/runtime:7.8.1-development container
+Stopping dolittle/runtime:7.8.1-development container
+// AfterAll
+// Benchmark Process 4170 has exited with code 0.
+
+Mean = 461.054 μs, StdErr = 13.920 μs (3.02%), N = 10, StdDev = 44.018 μs
+Min = 406.445 μs, Q1 = 434.141 μs, Median = 446.214 μs, Q3 = 488.111 μs, Max = 545.571 μs
+IQR = 53.970 μs, LowerFence = 353.186 μs, UpperFence = 569.067 μs
+ConfidenceInterval = [394.504 μs; 527.604 μs] (CI 99.9%), Margin = 66.550 μs (14.43% of Mean)
+Skewness = 0.58, Kurtosis = 1.91, MValue = 3
+
+// **************************
+// Benchmark: committing_100_events_with_warmup.Commit1: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa.dll" --benchmarkName "Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup.Commit1" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 2 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/5191e6b1-a0f1-4c62-a3b9-66b61d0f16fa/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-BEFTJR(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+Starting dolittle/runtime:7.8.1-development container
+// BeforeActualRun
+WorkloadActual   1: 100 op, 8685917.00 ns, 86.8592 us/op
+WorkloadActual   2: 100 op, 4527791.00 ns, 45.2779 us/op
+WorkloadActual   3: 100 op, 6779458.00 ns, 67.7946 us/op
+WorkloadActual   4: 100 op, 4285875.00 ns, 42.8588 us/op
+WorkloadActual   5: 100 op, 5805625.00 ns, 58.0562 us/op
+WorkloadActual   6: 100 op, 5889209.00 ns, 58.8921 us/op
+WorkloadActual   7: 100 op, 4585709.00 ns, 45.8571 us/op
+WorkloadActual   8: 100 op, 4040334.00 ns, 40.4033 us/op
+WorkloadActual   9: 100 op, 5680709.00 ns, 56.8071 us/op
+WorkloadActual  10: 100 op, 4701208.00 ns, 47.0121 us/op
+
+// AfterActualRun
+WorkloadResult   1: 100 op, 8685917.00 ns, 86.8592 us/op
+WorkloadResult   2: 100 op, 4527791.00 ns, 45.2779 us/op
+WorkloadResult   3: 100 op, 6779458.00 ns, 67.7946 us/op
+WorkloadResult   4: 100 op, 4285875.00 ns, 42.8588 us/op
+WorkloadResult   5: 100 op, 5805625.00 ns, 58.0562 us/op
+WorkloadResult   6: 100 op, 5889209.00 ns, 58.8921 us/op
+WorkloadResult   7: 100 op, 4585709.00 ns, 45.8571 us/op
+WorkloadResult   8: 100 op, 4040334.00 ns, 40.4033 us/op
+WorkloadResult   9: 100 op, 5680709.00 ns, 56.8071 us/op
+WorkloadResult  10: 100 op, 4701208.00 ns, 47.0121 us/op
+GC:  0 0 0 27720 100
+Threading:  11 0 100
+
+Disposing dolittle/runtime:7.8.1-development container
+Stopping dolittle/runtime:7.8.1-development container
+// AfterAll
+// Benchmark Process 4171 has exited with code 0.
+
+Mean = 54.982 μs, StdErr = 4.483 μs (8.15%), N = 10, StdDev = 14.177 μs
+Min = 40.403 μs, Q1 = 45.423 μs, Median = 51.910 μs, Q3 = 58.683 μs, Max = 86.859 μs
+IQR = 13.260 μs, LowerFence = 25.532 μs, UpperFence = 78.574 μs
+ConfidenceInterval = [33.548 μs; 76.415 μs] (CI 99.9%), Margin = 21.433 μs (38.98% of Mean)
+Skewness = 0.97, Kurtosis = 2.84, MValue = 3.6
+
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup-report-github.md
+  BenchmarkDotNet.Artifacts/results/Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup-report-full.json
+
+// * Detailed results *
+committing_100_events_with_warmup.Commit100Loop: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 3.407 ms, StdErr = 0.063 ms (1.84%), N = 10, StdDev = 0.198 ms
+Min = 3.188 ms, Q1 = 3.278 ms, Median = 3.333 ms, Q3 = 3.589 ms, Max = 3.706 ms
+IQR = 0.311 ms, LowerFence = 2.811 ms, UpperFence = 4.056 ms
+ConfidenceInterval = [3.107 ms; 3.707 ms] (CI 99.9%), Margin = 0.300 ms (8.80% of Mean)
+Skewness = 0.48, Kurtosis = 1.39, MValue = 2.86
+-------------------- Histogram --------------------
+[3.181 ms ; 3.422 ms) | @@@@@@@
+[3.422 ms ; 3.555 ms) | 
+[3.555 ms ; 3.827 ms) | @@@
+---------------------------------------------------
+
+committing_100_events_with_warmup.Commit100: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 461.054 μs, StdErr = 13.920 μs (3.02%), N = 10, StdDev = 44.018 μs
+Min = 406.445 μs, Q1 = 434.141 μs, Median = 446.214 μs, Q3 = 488.111 μs, Max = 545.571 μs
+IQR = 53.970 μs, LowerFence = 353.186 μs, UpperFence = 569.067 μs
+ConfidenceInterval = [394.504 μs; 527.604 μs] (CI 99.9%), Margin = 66.550 μs (14.43% of Mean)
+Skewness = 0.58, Kurtosis = 1.91, MValue = 3
+-------------------- Histogram --------------------
+[379.629 μs ; 418.133 μs) | @
+[418.133 μs ; 471.765 μs) | @@@@@@
+[471.765 μs ; 493.188 μs) | 
+[493.188 μs ; 546.820 μs) | @@@
+---------------------------------------------------
+
+committing_100_events_with_warmup.Commit1: Job-QFGZGA(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+Mean = 54.982 μs, StdErr = 4.483 μs (8.15%), N = 10, StdDev = 14.177 μs
+Min = 40.403 μs, Q1 = 45.423 μs, Median = 51.910 μs, Q3 = 58.683 μs, Max = 86.859 μs
+IQR = 13.260 μs, LowerFence = 25.532 μs, UpperFence = 78.574 μs
+ConfidenceInterval = [33.548 μs; 76.415 μs] (CI 99.9%), Margin = 21.433 μs (38.98% of Mean)
+Skewness = 0.97, Kurtosis = 2.84, MValue = 3.6
+-------------------- Histogram --------------------
+[31.767 μs ; 42.239 μs) | @
+[42.239 μs ; 59.512 μs) | @@@@@@@
+[59.512 μs ; 76.431 μs) | @
+[76.431 μs ; 95.496 μs) | @
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.1 (21C52) [Darwin 21.2.0]
+Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+.NET SDK=6.0.101
+  [Host]     : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+  Job-QFGZGA : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+
+PowerPlanMode=00000000-0000-0000-0000-000000000000  InvocationCount=1  IterationCount=10  
+LaunchCount=1  RunStrategy=ColdStart  UnrollFactor=1  
+WarmupCount=0  
+
+|        Method |        Mean |     Error |    StdDev |      Median |         Min |         Max | Allocated |
+|-------------- |------------:|----------:|----------:|------------:|------------:|------------:|----------:|
+| Commit100Loop | 3,407.37 μs | 299.94 μs | 198.39 μs | 3,333.21 μs | 3,187.79 μs | 3,705.86 μs |  18,760 B |
+|     Commit100 |   461.05 μs |  66.55 μs |  44.02 μs |   446.21 μs |   406.44 μs |   545.57 μs |   9,105 B |
+|       Commit1 |    54.98 μs |  21.43 μs |  14.18 μs |    51.91 μs |    40.40 μs |    86.86 μs |     277 B |
+
+// * Warnings *
+MinIterationTime
+  committing_100_events_with_warmup.Commit100: PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0 -> The minimum observed iteration time is 40.6445 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  committing_100_events_with_warmup.Commit1: PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0   -> The minimum observed iteration time is 4.0403 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+
+// * Hints *
+Outliers
+  committing_100_events_with_warmup.Commit1: PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0 -> 1 outlier  was  detected (86.86 μs)
+
+// * Legends *
+  Mean      : Arithmetic mean of all measurements
+  Error     : Half of 99.9% confidence interval
+  StdDev    : Standard deviation of all measurements
+  Median    : Value separating the higher half of all measurements (50th percentile)
+  Min       : Minimum
+  Max       : Maximum
+  Allocated : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
+  1 μs      : 1 Microsecond (0.000001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+// ** Remained 0 benchmark(s) to run **
+Run time: 00:00:30 (30.51 sec), executed benchmarks: 3
+
+Global total time: 00:00:41 (41.88 sec), executed benchmarks: 3
+// * Artifacts cleanup *

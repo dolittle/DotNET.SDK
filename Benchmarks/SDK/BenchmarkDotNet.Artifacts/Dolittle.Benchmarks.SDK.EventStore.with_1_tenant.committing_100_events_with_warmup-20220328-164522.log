@@ -1,0 +1,187 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 3 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet restore  /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7
+// command took 4.01s and exited with 0
+// start dotnet build -c Release  --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7
+// command took 7.11s and exited with 0
+// ***** Done, took 00:00:11 (11.24 sec)   *****
+// Found 3 benchmarks:
+//   committing_100_events_with_warmup.Commit100Loop: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+//   committing_100_events_with_warmup.Commit100: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+//   committing_100_events_with_warmup.Commit1: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+// **************************
+// Benchmark: committing_100_events_with_warmup.Commit100Loop: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.dll" --benchmarkName "Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup.Commit100Loop" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 0 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-UBKUJR(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+Starting dolittle/runtime:8.0.0-development container
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Dolittle.SDK.Handshake.DolittleRuntimeFailedHandshake: Dolittle Runtime failed performing handshake. (3e2d8368-4bca-4e0b-a9bf-8d1cccbcac21)The version of your currently used SDK is too old to be used with this version of the Runtime. Please upgrade your Runtime to a version that supports Contracts 7.0.0.0.
+   at Dolittle.SDK.Handshake.Internal.HandshakeClient.Perform(UInt32 attemptNum, TimeSpan timeSpent, Version headVersion, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/Internal/HandshakeClient.cs:line 60
+   at Dolittle.SDK.Handshake.DolittleRuntimeConnector.TryPerformHandshakeForever(CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/DolittleRuntimeConnector.cs:line 88
+   at Dolittle.SDK.Handshake.DolittleRuntimeConnector.ConnectForever(CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/DolittleRuntimeConnector.cs:line 61
+   at Dolittle.SDK.DolittleClient.Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/DolittleClient.cs:line 241
+   at Dolittle.SDK.ServiceProviderExtensions.GetDolittleClient(IServiceProvider provider, ConfigureDolittleClient configureClient, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/ServiceProviderExtensions.cs:line 40
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GetConnectedClient(SetupDolittleClient setup) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 66
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GetConnectedClient(Boolean withDiscovery) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 64
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 33
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_0.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.notcs:line 175
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.notcs:line 53
+// AfterAll
+// Benchmark Process 4207 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: committing_100_events_with_warmup.Commit100: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.dll" --benchmarkName "Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup.Commit100" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 1 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-KRCRVB(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+Starting dolittle/runtime:8.0.0-development container
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Dolittle.SDK.Handshake.DolittleRuntimeFailedHandshake: Dolittle Runtime failed performing handshake. (3e2d8368-4bca-4e0b-a9bf-8d1cccbcac21)The version of your currently used SDK is too old to be used with this version of the Runtime. Please upgrade your Runtime to a version that supports Contracts 7.0.0.0.
+   at Dolittle.SDK.Handshake.Internal.HandshakeClient.Perform(UInt32 attemptNum, TimeSpan timeSpent, Version headVersion, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/Internal/HandshakeClient.cs:line 60
+   at Dolittle.SDK.Handshake.DolittleRuntimeConnector.TryPerformHandshakeForever(CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/DolittleRuntimeConnector.cs:line 88
+   at Dolittle.SDK.Handshake.DolittleRuntimeConnector.ConnectForever(CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/DolittleRuntimeConnector.cs:line 61
+   at Dolittle.SDK.DolittleClient.Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/DolittleClient.cs:line 241
+   at Dolittle.SDK.ServiceProviderExtensions.GetDolittleClient(IServiceProvider provider, ConfigureDolittleClient configureClient, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/ServiceProviderExtensions.cs:line 40
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GetConnectedClient(SetupDolittleClient setup) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 66
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GetConnectedClient(Boolean withDiscovery) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 64
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 33
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_1.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.notcs:line 763
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.notcs:line 53
+// AfterAll
+// Benchmark Process 4224 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: committing_100_events_with_warmup.Commit1: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.dll" --benchmarkName "Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup.Commit1" --job "PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0" --benchmarkId 2 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: Job-WVNMOJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+Setting up harness
+Starting dolittle/runtime:8.0.0-development container
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Dolittle.SDK.Handshake.DolittleRuntimeFailedHandshake: Dolittle Runtime failed performing handshake. (3e2d8368-4bca-4e0b-a9bf-8d1cccbcac21)The version of your currently used SDK is too old to be used with this version of the Runtime. Please upgrade your Runtime to a version that supports Contracts 7.0.0.0.
+   at Dolittle.SDK.Handshake.Internal.HandshakeClient.Perform(UInt32 attemptNum, TimeSpan timeSpent, Version headVersion, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/Internal/HandshakeClient.cs:line 60
+   at Dolittle.SDK.Handshake.DolittleRuntimeConnector.TryPerformHandshakeForever(CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/DolittleRuntimeConnector.cs:line 88
+   at Dolittle.SDK.Handshake.DolittleRuntimeConnector.ConnectForever(CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/Handshake/DolittleRuntimeConnector.cs:line 61
+   at Dolittle.SDK.DolittleClient.Connect(DolittleClientConfiguration configuration, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/DolittleClient.cs:line 241
+   at Dolittle.SDK.ServiceProviderExtensions.GetDolittleClient(IServiceProvider provider, ConfigureDolittleClient configureClient, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Source/SDK/ServiceProviderExtensions.cs:line 40
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GetConnectedClient(SetupDolittleClient setup) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 66
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GetConnectedClient(Boolean withDiscovery) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 64
+   at Dolittle.Benchmarks.SDK.SingleRuntimeSetup.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/SingleRuntimeSetup.cs:line 33
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_2.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.notcs:line 1351
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/SDK/bin/Release/net6.0/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7/57d1ed60-70ae-4978-b7fa-3bb13ca93fc7.notcs:line 53
+// AfterAll
+// Benchmark Process 4225 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup-report-github.md
+  BenchmarkDotNet.Artifacts/results/Dolittle.Benchmarks.SDK.EventStore.with_1_tenant.committing_100_events_with_warmup-report-full.json
+
+// * Detailed results *
+committing_100_events_with_warmup.Commit100Loop: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+There are not any results runs
+
+committing_100_events_with_warmup.Commit100: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+There are not any results runs
+
+committing_100_events_with_warmup.Commit1: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+Runtime = .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT; GC = Concurrent Workstation
+There are not any results runs
+
+// * Summary *
+
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.1 (21C52) [Darwin 21.2.0]
+Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+.NET SDK=6.0.101
+  [Host]     : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+  Job-VXFEKJ : .NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+
+PowerPlanMode=00000000-0000-0000-0000-000000000000  InvocationCount=1  IterationCount=10  
+LaunchCount=1  RunStrategy=ColdStart  UnrollFactor=1  
+WarmupCount=0  
+
+|        Method | Mean | Error | Median | Min | Max |
+|-------------- |-----:|------:|-------:|----:|----:|
+| Commit100Loop |   NA |    NA |     NA |  NA |  NA |
+|     Commit100 |   NA |    NA |     NA |  NA |  NA |
+|       Commit1 |   NA |    NA |     NA |  NA |  NA |
+
+Benchmarks with issues:
+  committing_100_events_with_warmup.Commit100Loop: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+  committing_100_events_with_warmup.Commit100: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+  committing_100_events_with_warmup.Commit1: Job-VXFEKJ(PowerPlanMode=00000000-0000-0000-0000-000000000000, InvocationCount=1, IterationCount=10, LaunchCount=1, RunStrategy=ColdStart, UnrollFactor=1, WarmupCount=0)
+
+// * Legends *
+  Mean   : Arithmetic mean of all measurements
+  Error  : Half of 99.9% confidence interval
+  Median : Value separating the higher half of all measurements (50th percentile)
+  Min    : Minimum
+  Max    : Maximum
+  1 ns   : 1 Nanosecond (0.000000001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+// ** Remained 0 benchmark(s) to run **
+Run time: 00:00:14 (14.97 sec), executed benchmarks: 3
+
+Global total time: 00:00:26 (26.22 sec), executed benchmarks: 3
+// * Artifacts cleanup *

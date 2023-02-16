@@ -1,0 +1,443 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 24 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet restore  /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611
+// command took 3.44s and exited with 0
+// start dotnet build -c Release  --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611
+// command took 6.6s and exited with 0
+// ***** Done, took 00:00:10 (10.18 sec)   *****
+// Found 24 benchmarks:
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=50]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=100]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=1]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=10]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=50]
+//   CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+//   CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=1000, EventsToCommit=100]
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 0 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+No MongoDB found, starting a new one...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_0.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 193
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36255 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 1 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_1.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 928
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36256 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 2 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_2.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 1663
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36257 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 3 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_3.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 2398
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36258 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 4 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_4.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 3133
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36259 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=50]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 50)" --job "ShortRun" --benchmarkId 5 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_5.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 3868
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36260 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 0, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 6 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_6.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 4603
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36261 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=0, EventsToCommit=100]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 0, EventsToCommit: 100)" --job "ShortRun" --benchmarkId 7 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_7.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 5338
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36262 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 100, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 8 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_8.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 6073
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36263 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInBatch: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=1]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInBatch(PreExistingEvents: 100, EventsToCommit: 1)" --job "ShortRun" --benchmarkId 9 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET 6.0.1 (6.0.121.56705), Arm64 RyuJIT
+// GC=Concurrent Workstation
+// Job: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3)
+
+Found existing MongoDB container, ensuring it is ready...
+MongoDB is ready
+Starting a new Runtime container...
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> Docker.DotNet.DockerImageNotFoundException: Docker API responded with status code=NotFound, response={"message":"No such image: dolittle/runtime:8.0.0"}
+
+   at Docker.DotNet.ContainerOperations.<>c.<.cctor>b__30_1(HttpStatusCode statusCode, String responseBody)
+   at Docker.DotNet.DockerClient.HandleIfErrorResponseAsync(HttpStatusCode statusCode, HttpResponseMessage response, IEnumerable`1 handlers)
+   at Docker.DotNet.DockerClient.MakeRequestAsync(IEnumerable`1 errorHandlers, HttpMethod method, String path, IQueryString queryString, IRequestContent body, IDictionary`2 headers, TimeSpan timeout, CancellationToken token)
+   at Docker.DotNet.ContainerOperations.CreateContainerAsync(CreateContainerParameters parameters, CancellationToken cancellationToken)
+   at Dolittle.SDK.Benchmarks.Harness.DockerClientExtensions.StartNewContainer(IDockerClient client, CreateContainerParameters parameters, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/DockerClientExtensions.cs:line 80
+   at Dolittle.SDK.Benchmarks.Harness.Runtime.StartContainer(String containerNamePrefix, IList`1 environmentVariables, IDockerClient docker, ILogger logger, CancellationToken cancellationToken) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Runtime.cs:line 85
+   at Dolittle.SDK.Benchmarks.Harness.Harness.Start(ILogger logger, SetupDolittleClient setup, ConfigureDolittleClient configure, TenantId[] tenants) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Harness/Harness.cs:line 71
+   at Dolittle.SDK.Benchmarks.JobBase.GlobalSetup() in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/JobBase.cs:line 29
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_9.Run(IHost host, String benchmarkName) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 6808
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/5d4f12af-6674-455a-84b5-1ebba2471611.notcs:line 74
+// AfterAll
+// Benchmark Process 36264 has exited with code 255.
+No more Benchmark runs will be launched as NO measurements were obtained from the previous run!
+
+
+// **************************
+// Benchmark: CommitEvents.CommitEventsInLoop: ShortRun(IterationCount=3, LaunchCount=1, WarmupCount=3) [PreExistingEvents=100, EventsToCommit=10]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet "5d4f12af-6674-455a-84b5-1ebba2471611.dll" --benchmarkName "Dolittle.SDK.Benchmarks.Event.Store.CommitEvents.CommitEventsInLoop(PreExistingEvents: 100, EventsToCommit: 10)" --job "ShortRun" --benchmarkId 10 in /Users/sindrewilting/Dolittle/DotNET.SDK/Benchmarks/Benchmarks/bin/Release/net6.0/5d4f12af-6674-455a-84b5-1ebba2471611/bin/Release/net6.0
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
