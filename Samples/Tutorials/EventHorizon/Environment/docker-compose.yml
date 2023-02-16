@@ -9,27 +9,21 @@ services:
       driver: none
   
   consumer-runtime:
-    image: dolittle/runtime:latest
+    image: dolittle/runtime:8.9.1
     environment:
       - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
-      - "DOLITTLE__RUNTIME__PROCESSING__EVENTHANDLERS__FAST=TRUE"
     volumes:
-      - ./consumer-platform.json:/app/.dolittle/platform.json
-      - ./consumer-resources.json:/app/.dolittle/resources.json
-      - ./consumer-microservices.json:/app/.dolittle/microservices.json
+      - ./consumer-runtime.yml:/app/.dolittle/runtime.yml
     ports:
       - 50054:50052
       - 50055:50053
 
   producer-runtime:
-    image: dolittle/runtime:latest
+    image: dolittle/runtime:8.9.1
     environment:
       - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
-      - "DOLITTLE__RUNTIME__PROCESSING__EVENTHANDLERS__FAST=TRUE"
     volumes:
-      - ./producer-platform.json:/app/.dolittle/platform.json
-      - ./producer-resources.json:/app/.dolittle/resources.json
-      - ./producer-event-horizon-consents.json:/app/.dolittle/event-horizon-consents.json
+      - ./producer-runtime.yml:/app/.dolittle/runtime.yml
     ports:
       - 50052:50052
       - 50053:50053

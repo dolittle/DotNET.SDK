@@ -1,6 +1,11 @@
 # this is to just supress the main editorconfig from applying here
 root = true
 
+
+[*.yml]
+indent_size = 2
+indent_style = space
+
 [*.cs]
 end_of_line = lf
 indent_style = space
