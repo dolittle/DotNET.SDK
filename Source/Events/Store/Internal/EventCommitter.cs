@@ -60,7 +60,7 @@ public class EventCommitter : ICommitEvents
 
         try
         {
-            _logger.CommittingEvents(uncommittedEvents.Count);
+            _logger.CommittingEvents(uncommittedEvents.Count, _executionContext.Tenant);
 
             if (!_toProtobuf.TryConvert(uncommittedEvents, out var protobufEvents, out var error))
             {

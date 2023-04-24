@@ -11,6 +11,7 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
 #pragma warning disable CS0618 // Refers to EventSourceId which is marked obsolete for clients. Should still be used internally
 
@@ -23,6 +24,7 @@ namespace Dolittle.SDK.Aggregates.Internal;
 class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
 {
     readonly EventSourceId _eventSourceId;
+    readonly TenantId _tenant;
     readonly IEventStore _eventStore;
     readonly IEventTypes _eventTypes;
     readonly IServiceProvider _serviceProvider;
@@ -34,13 +36,15 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// Initializes a new instance of the <see cref="AggregateWrapper{TAggregate}"/> class.
     /// </summary>
     /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the aggregate root instance.</param>
+    /// <param name="tenant">The tenant id.</param>
     /// <param name="eventStore">The <see cref="IEventStore" /> used for committing the <see cref="UncommittedAggregateEvents" /> when actions are performed on the <typeparamref name="TAggregate">aggregate</typeparamref>. </param>
     /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
     /// <param name="serviceProvider">The tenant scoped <see cref="IServiceProvider"/>.</param>
     /// <param name="logger">The <see cref="ILogger" />.</param>
-    public AggregateWrapper(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IServiceProvider serviceProvider, ILogger<AggregateWrapper<TAggregate>> logger)
+    public AggregateWrapper(EventSourceId eventSourceId, TenantId tenant, IEventStore eventStore, IEventTypes eventTypes, IServiceProvider serviceProvider, ILogger<AggregateWrapper<TAggregate>> logger)
     {
         _eventSourceId = eventSourceId;
+        _tenant = tenant;
         _eventTypes = eventTypes;
         _eventStore = eventStore;
         _serviceProvider = serviceProvider;
@@ -57,7 +61,7 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
             _instance = await GetHydratedAggregate(cancellationToken);
             var aggregateRootId = _instance.AggregateRootId;
             activity?.Tag(aggregateRootId);
-            _logger.PerformingOn(typeof(TAggregate), aggregateRootId, _instance.EventSourceId);
+            _logger.PerformingOn(typeof(TAggregate), aggregateRootId, _instance.EventSourceId, _tenant);
             await method(_instance);
             if (_instance.AppliedEvents.Any())
             {
@@ -97,7 +101,7 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     Task Rehydrate(TAggregate aggregateRoot, AggregateRootId aggregateRootId, CancellationToken cancellationToken)
     {
         var eventSourceId = aggregateRoot.EventSourceId;
-        _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
+        _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId, _tenant);
         var eventTypesToFetch = GetEventTypes(_eventTypes);
         var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
         return aggregateRoot.RehydrateInternal(committedEventsBatches, AggregateRootMetadata<TAggregate>.MethodsPerEventType, cancellationToken);
@@ -117,7 +121,7 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)
     {
-        _logger.CommittingEvents(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.AppliedEvents.Count(), aggregateRoot.EventSourceId);
+        _logger.CommittingEvents(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.AppliedEvents.Count(), aggregateRoot.EventSourceId, _tenant);
         return _eventStore
             .ForAggregate(aggregateRootId)
             .WithEventSource(aggregateRoot.EventSourceId)

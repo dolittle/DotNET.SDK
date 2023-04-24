@@ -57,7 +57,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         EventSourceId eventSourceId,
         CancellationToken cancellationToken = default)
     {
-        _logger.FetchingAllEventsForAggregate(aggregateRootId, eventSourceId);
+        _logger.FetchingAllEventsForAggregate(aggregateRootId, eventSourceId, _executionContext.Tenant);
         var request = CreateFetchRequestBase(aggregateRootId, eventSourceId);
         request.FetchAllEvents = new FetchAllEventsForAggregateInBatchesRequest();
         return AggregateBatches(eventSourceId, aggregateRootId, DoFetchForAggregate(request, cancellationToken));
@@ -70,7 +70,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         IEnumerable<EventType> eventTypes,
         CancellationToken cancellationToken = default)
     {
-        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId, eventTypes);
+        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId, eventTypes, _executionContext.Tenant);
         var request = CreateFetchRequestBase(aggregateRootId, eventSourceId);
         request.FetchEvents = new FetchEventsForAggregateInBatchesRequest
         {
@@ -82,7 +82,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
     /// <inheritdoc />
     public IAsyncEnumerable<CommittedAggregateEvents> FetchStreamForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, CancellationToken cancellationToken = default)
     {
-        _logger.FetchingAllEventsForAggregate(aggregateRootId, eventSourceId);
+        _logger.FetchingAllEventsForAggregate(aggregateRootId, eventSourceId, _executionContext.Tenant);
         var request = CreateFetchRequestBase(aggregateRootId, eventSourceId);
         request.FetchAllEvents = new FetchAllEventsForAggregateInBatchesRequest();
         return DoFetchForAggregate(request, cancellationToken);
@@ -91,7 +91,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
     /// <inheritdoc />
     public IAsyncEnumerable<CommittedAggregateEvents> FetchStreamForAggregate(AggregateRootId aggregateRootId, EventSourceId eventSourceId, IEnumerable<EventType> eventTypes, CancellationToken cancellationToken = default)
     {
-        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId, eventTypes);
+        _logger.FetchingEventsForAggregate(aggregateRootId, eventSourceId, eventTypes, _executionContext.Tenant);
         var request = CreateFetchRequestBase(aggregateRootId, eventSourceId);
         request.FetchEvents = new FetchEventsForAggregateInBatchesRequest
         {
