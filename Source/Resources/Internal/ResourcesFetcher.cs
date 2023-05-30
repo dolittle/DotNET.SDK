@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ using Dolittle.SDK.Resources.MongoDB.Internal;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Resources.Internal;
@@ -20,16 +22,17 @@ namespace Dolittle.SDK.Resources.Internal;
 public class ResourcesFetcher : IFetchResources
 {
     readonly MongoDBResourceCreator _mongoDB;
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ResourcesFetcher"/> class.
     /// </summary>
     /// <param name="methodCaller">The method caller to make requests to the Runtime with.</param>
     /// <param name="executionContext">The base execution context for the client.</param>
+    /// <param name="configureClientSettings"></param>
     /// <param name="loggerFactory">The logger factory to use to create loggers.</param>
-    public ResourcesFetcher(IPerformMethodCalls methodCaller, ExecutionContext executionContext, ILoggerFactory loggerFactory)
+    public ResourcesFetcher(IPerformMethodCalls methodCaller, ExecutionContext executionContext, Action<MongoClientSettings> configureClientSettings, ILoggerFactory loggerFactory)
     {
-        _mongoDB = new MongoDBResourceCreator(methodCaller, executionContext, loggerFactory);
+        _mongoDB = new MongoDBResourceCreator(methodCaller, executionContext, configureClientSettings, loggerFactory);
     }
 
     /// <inheritdoc />

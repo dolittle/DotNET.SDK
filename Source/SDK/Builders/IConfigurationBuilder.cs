@@ -95,4 +95,11 @@ public interface IConfigurationBuilder
     /// <param name="configureMongoDatabase">The callback for configuring <see cref="MongoDatabaseSettings"/>.</param>
     /// <returns>The builder for continuation.</returns>
     IConfigurationBuilder WithMongoDatabaseSettings(Action<MongoDatabaseSettings> configureMongoDatabase);
+    
+    /// <summary>
+    /// Configures the <see cref="MongoClient"/> used. Please note that setting this will override the default configured tracing of MongoDB.
+    /// </summary>
+    /// <param name="configureMongoClient">The callback for configuring <see cref="MongoClientSettings"/>.</param>
+    /// <returns>The builder for continuation.</returns>
+    IConfigurationBuilder WithMongoClientSettings(Action<MongoClientSettings> configureMongoClient);
 }
