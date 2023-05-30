@@ -250,7 +250,7 @@ public class DolittleClient : IDisposable, IDolittleClient
                 await ConnectToRuntime(methodCaller, configuration, loggerFactory, cancellationToken).ConfigureAwait(false);
             Tenants = tenants;
 
-            await CreateDependencies(methodCaller, configuration.EventSerializerProvider, loggerFactory, executionContext, tenants).ConfigureAwait(false);
+            await CreateDependencies(methodCaller, configuration, loggerFactory, executionContext, tenants).ConfigureAwait(false);
             ConfigureContainer(configuration);
             await RegisterAllUnregistered(methodCaller, configuration.PingInterval, executionContext, loggerFactory).ConfigureAwait(false);
 
@@ -317,13 +317,13 @@ public class DolittleClient : IDisposable, IDolittleClient
 
     async Task CreateDependencies(
         IPerformMethodCalls methodCaller,
-        Func<JsonSerializerSettings> eventSerializerProvider,
+        DolittleClientConfiguration config,
         ILoggerFactory loggerFactory,
         ExecutionContext executionContext,
         IEnumerable<Tenant> tenants)
     {
         _clientCancellationTokenSource = new CancellationTokenSource();
-        var serializer = new EventContentSerializer(_unregisteredEventTypes, eventSerializerProvider);
+        var serializer = new EventContentSerializer(_unregisteredEventTypes, config.EventSerializerProvider);
         _eventsToProtobufConverter = new EventToProtobufConverter(serializer);
         _eventToSDKConverter = new EventToSDKConverter(serializer);
 
@@ -363,6 +363,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         Resources = await new ResourcesFetcher(
             methodCaller,
             executionContext,
+            config.ConfigureMongoClientSettings,
             loggerFactory
         ).FetchResourcesFor(tenants, _clientCancellationTokenSource.Token).ConfigureAwait(false);
     }

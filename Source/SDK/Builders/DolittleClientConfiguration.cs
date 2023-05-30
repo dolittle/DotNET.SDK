@@ -8,6 +8,7 @@ using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
 
@@ -72,11 +73,17 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// Gets the <see cref="CreateTenantServiceProvider"/> factory.
     /// </summary>
     public CreateTenantServiceProvider? TenantServiceProviderFactory { get; private set; }
-    
+
     /// <summary>
     /// Gets the callback for configuring the <see cref="MongoDatabaseSettings"/>.
     /// </summary>
     public Action<MongoDatabaseSettings>? ConfigureMongoDatabaseSettings { get; private set; }
+
+    /// <summary>
+    /// Gets the callback for configuring the <see cref="MongoClientSettings"/>.
+    /// </summary>
+    public Action<MongoClientSettings> ConfigureMongoClientSettings { get; private set; } = settings =>
+        settings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
 
     /// <summary>
     /// Configures the <see cref="DolittleClientConfiguration"/> with the configuration values from <see cref="Configurations.Dolittle"/>.
@@ -215,6 +222,13 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public IConfigurationBuilder WithMongoDatabaseSettings(Action<MongoDatabaseSettings> configureMongoDatabase)
     {
         ConfigureMongoDatabaseSettings = configureMongoDatabase;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IConfigurationBuilder WithMongoClientSettings(Action<MongoClientSettings> configureMongoClient)
+    {
+        ConfigureMongoClientSettings = configureMongoClient;
         return this;
     }
 }
