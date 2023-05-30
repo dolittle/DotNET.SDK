@@ -46,7 +46,6 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
             case "EventHandlerAttribute":
             case "AggregateRootAttribute":
             case "ProjectionAttribute":
-            case "EmbeddingAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
                 return;
 

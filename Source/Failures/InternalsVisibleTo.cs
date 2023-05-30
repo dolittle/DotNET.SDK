@@ -5,6 +5,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly:InternalsVisibleTo("Dolittle.SDK.Events")]
-[assembly:InternalsVisibleTo("Dolittle.SDK.Embeddings")]
 [assembly:InternalsVisibleTo("Dolittle.SDK.EventHorizon")]
 [assembly:InternalsVisibleTo("Dolittle.SDK.Projections")]

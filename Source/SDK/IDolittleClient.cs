@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Builders;
 using Dolittle.SDK.DependencyInversion;
-using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store.Builders;
@@ -52,11 +51,6 @@ public interface IDolittleClient : IDisposable
     /// Gets the <see cref="IProjectionStoreBuilder" />.
     /// </summary>
     IProjectionStoreBuilder Projections { get; }
-
-    /// <summary>
-    /// Gets the <see cref="IEmbeddings" />.
-    /// </summary>
-    IEmbeddings Embeddings { get; }
 
     /// <summary>
     /// Gets the <see cref="IEventHorizons" />.

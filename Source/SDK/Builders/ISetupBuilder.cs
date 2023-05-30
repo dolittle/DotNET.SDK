@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.SDK.Aggregates.Builders;
-using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
@@ -51,13 +50,6 @@ public interface ISetupBuilder
     /// <param name="callback">The builder callback.</param>
     /// <returns>The client builder for continuation.</returns>
     public ISetupBuilder WithProjections(Action<IProjectionsBuilder> callback);
-
-    /// <summary>
-    /// Sets the embeddings through the <see cref="EmbeddingsBuilder" />.
-    /// </summary>
-    /// <param name="callback">The builder callback.</param>
-    /// <returns>The client builder for continuation.</returns>
-    public ISetupBuilder WithEmbeddings(Action<IEmbeddingsBuilder> callback);
 
     /// <summary>
     /// Sets the event horizons through the <see cref="SubscriptionsBuilder" />.

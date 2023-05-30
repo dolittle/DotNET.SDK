@@ -3,7 +3,6 @@
 
 using System.Reflection;
 using Dolittle.SDK.Aggregates;
-using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Handling;
 using Dolittle.SDK.Projections;
@@ -19,7 +18,6 @@ static class AssembliesUnderTest
         typeof(EventTypeAttribute).Assembly,
         typeof(ProjectionAttribute).Assembly,
         typeof(EventHandlerAttribute).Assembly,
-        typeof(EmbeddingAttribute).Assembly,
         typeof(Tenant).Assembly,
         typeof(IDolittleClient).Assembly
     };
