@@ -16,8 +16,6 @@ using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Builders;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.DependencyInversion;
-using Dolittle.SDK.Embeddings;
-using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
@@ -60,7 +58,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly IUnregisteredEventFilters _unregisteredEventFilters;
     readonly IUnregisteredEventHandlers _unregisteredEventHandlers;
     readonly IUnregisteredProjections _unregisteredProjections;
-    readonly IUnregisteredEmbeddings _unregisteredEmbeddings;
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
     readonly SemaphoreSlim _connectLock = new(1, 1);
@@ -69,7 +66,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     IConvertEventsToProtobuf _eventsToProtobufConverter;
     EventHorizons _eventHorizons;
     IProjectionStoreBuilder _projectionStoreBuilder;
-    IEmbeddings _embeddingStoreBuilder;
     ITenantScopedProviders _services;
 
     bool _disposed;
@@ -90,7 +86,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     /// <param name="unregisteredEventFilters">The <see cref="IUnregisteredEventFilters"/>.</param>
     /// <param name="unregisteredEventHandlers">The <see cref="EventHandlerBuilder"/>.</param>
     /// <param name="unregisteredProjections">The <see cref="IUnregisteredProjections"/>.</param>
-    /// <param name="unregisteredEmbeddings">The <see cref="IUnregisteredEmbeddings"/>.</param>
     /// <param name="eventHorizonsBuilder">The <see cref="SubscriptionsBuilder"/>.</param>
     /// <param name="eventHorizonRetryPolicy">The <see cref="EventSubscriptionRetryPolicy"/>.</param>
     public DolittleClient(
@@ -100,7 +95,6 @@ public class DolittleClient : IDisposable, IDolittleClient
         IUnregisteredEventFilters unregisteredEventFilters,
         IUnregisteredEventHandlers unregisteredEventHandlers,
         IUnregisteredProjections unregisteredProjections,
-        IUnregisteredEmbeddings unregisteredEmbeddings,
         SubscriptionsBuilder eventHorizonsBuilder,
         EventSubscriptionRetryPolicy eventHorizonRetryPolicy)
     {
@@ -111,7 +105,6 @@ public class DolittleClient : IDisposable, IDolittleClient
         _unregisteredEventFilters = unregisteredEventFilters;
         _unregisteredEventHandlers = unregisteredEventHandlers;
         _unregisteredProjections = unregisteredProjections;
-        _unregisteredEmbeddings = unregisteredEmbeddings;
         _eventHorizonsBuilder = eventHorizonsBuilder;
         _eventHorizonRetryPolicy = eventHorizonRetryPolicy;
     }
@@ -167,13 +160,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     {
         get => GetOrThrowIfNotConnected(_projectionStoreBuilder);
         private set => _projectionStoreBuilder = value;
-    }
-
-    /// <inheritdoc />
-    public IEmbeddings Embeddings
-    {
-        get => GetOrThrowIfNotConnected(_embeddingStoreBuilder);
-        private set => _embeddingStoreBuilder = value;
     }
 
     /// <inheritdoc />
@@ -353,13 +339,6 @@ public class DolittleClient : IDisposable, IDolittleClient
             _unregisteredProjections.ReadModelTypes,
             _projectionConverter,
             loggerFactory);
-        Embeddings = new Embeddings.Embeddings(
-            methodCaller,
-            _callContextResolver,
-            _unregisteredEmbeddings.ReadModelTypes,
-            _projectionConverter,
-            executionContext,
-            loggerFactory);
         Resources = await new ResourcesFetcher(
             methodCaller,
             executionContext,
@@ -414,13 +393,6 @@ public class DolittleClient : IDisposable, IDolittleClient
             eventProcessors,
             eventProcessingConverter,
             _projectionConverter,
-            loggerFactory,
-            _clientCancellationTokenSource.Token);
-        _unregisteredEmbeddings.Register(
-            eventProcessors,
-            _eventsToProtobufConverter,
-            _projectionConverter,
-            _unregisteredEventTypes,
             loggerFactory,
             _clientCancellationTokenSource.Token);
     }
@@ -479,6 +451,5 @@ public class DolittleClient : IDisposable, IDolittleClient
             .AddScoped(_ => EventStore.ForTenant(tenant))
             .AddScoped(_ => Aggregates.ForTenant(tenant))
             .AddScoped(_ => Projections.ForTenant(tenant))
-            .AddScoped(_ => Embeddings.ForTenant(tenant))
             .AddScoped(_ => Resources.ForTenant(tenant));
 }

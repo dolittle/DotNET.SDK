@@ -13,7 +13,6 @@ using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
-using Dolittle.SDK.Embeddings;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Filters;
 using Dolittle.SDK.Events.Handling;
@@ -100,7 +99,6 @@ public class HandshakeClient : IPerformHandshake
         protobuf.EventHandlers.AddRange(GetBuildResultsFor<EventHandlerModelId>(buildResults, _ => 0));
         protobuf.Filters.AddRange(GetBuildResultsFor<FilterModelId>(buildResults, _ => 0));
         protobuf.Projections.AddRange(GetBuildResultsFor<ProjectionModelId>(buildResults, _ => 0));
-        protobuf.Embeddings.AddRange(GetBuildResultsFor<EmbeddingModelId>(buildResults, _ => 0));
         protobuf.Other.AddRange(buildResults.AllNonIdentifiable.Select(_ => _.ToProtobuf()));
         return protobuf;
     }
