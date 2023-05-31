@@ -24,7 +24,7 @@ public class MongoDBResource : IMongoDBResource
     {
         _mongoUrl = MongoUrl.Create(runtimeMongoDBResponse.ConnectionString);
         var clientSettings = MongoClientSettings.FromUrl(_mongoUrl);
-        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
+        clientSettings.ClusterConfigurator = cb => cb.AddTelemetry();
         _mongoClient = new MongoClient(clientSettings.Freeze());
     }
 
