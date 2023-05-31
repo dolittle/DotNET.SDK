@@ -21,7 +21,7 @@ static class MongoClientSettingsExtensions
     {
         HashSet<string> commandsToFilter = new(
             new[] { "ping", "isMaster", "buildInfo", "saslStart", "saslContinue" },
-            StringComparer.InvariantCultureIgnoreCase);
+            StringComparer.OrdinalIgnoreCase);
         builder.Subscribe(
             new DiagnosticsActivityEventSubscriber(
                 new InstrumentationOptions
