@@ -4,7 +4,6 @@
 using System;
 using Dolittle.Runtime.Resources.Contracts;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 
 namespace Dolittle.SDK.Resources.MongoDB.Internal;
 
@@ -19,14 +18,18 @@ public class MongoDBResource : IMongoDBResource
     /// <summary>
     /// Initializes a new instance of the <see cref="MongoDBResource"/> class.
     /// </summary>
-    /// <param name="runtimeMongoDBResponse">The MongoDB resource response from the Runtime.</param>
-    public MongoDBResource(GetMongoDBResponse runtimeMongoDBResponse)
+    /// <param name="runtimeMongoDbResponse">The MongoDB resource response from the Runtime.</param>
+    /// <param name="clientSettingsCallback"></param>
+    public MongoDBResource(GetMongoDBResponse runtimeMongoDbResponse,
+        Action<MongoClientSettings>? clientSettingsCallback)
     {
-        _mongoUrl = MongoUrl.Create(runtimeMongoDBResponse.ConnectionString);
+        _mongoUrl = MongoUrl.Create(runtimeMongoDbResponse.ConnectionString);
         var clientSettings = MongoClientSettings.FromUrl(_mongoUrl);
-        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
+        ConfigureSettings(clientSettingsCallback, clientSettings);
+
         _mongoClient = new MongoClient(clientSettings.Freeze());
     }
+
 
     /// <inheritdoc />
     public IMongoDatabase GetDatabase(Action<MongoDatabaseSettings>? databaseSettingsCallback = default)
@@ -35,5 +38,23 @@ public class MongoDBResource : IMongoDBResource
         var databaseSettings = new MongoDatabaseSettings();
         databaseSettingsCallback?.Invoke(databaseSettings);
         return _mongoClient.GetDatabase(_mongoUrl.DatabaseName, databaseSettings);
+    }
+
+    /// <summary>
+    /// Configures <see cref="MongoClientSettings"/> class.
+    /// </summary>
+    /// <param name="clientSettings">Configured settings</param>
+    /// <param name="providedConfiguration">Provided configuration callback</param>
+    static void ConfigureSettings(Action<MongoClientSettings>? providedConfiguration,
+        MongoClientSettings clientSettings)
+    {
+        if (providedConfiguration is null)
+        {
+            clientSettings.ClusterConfigurator = builder => builder.AddTelemetry();
+        }
+        else
+        {
+            providedConfiguration.Invoke(clientSettings);
+        }
     }
 }

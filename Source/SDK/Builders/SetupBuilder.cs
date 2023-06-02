@@ -9,7 +9,6 @@ using BaselineTypeDiscovery;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
-using Dolittle.SDK.Embeddings.Builder;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
@@ -35,7 +34,6 @@ public class SetupBuilder : ISetupBuilder
     readonly EventFiltersBuilder _eventFiltersBuilder;
     readonly EventHandlersBuilder _eventHandlersBuilder;
     readonly ProjectionsBuilder _projectionsBuilder;
-    readonly EmbeddingsBuilder _embeddingsBuilder;
     readonly SubscriptionsBuilder _eventHorizonsBuilder = new();
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy = EventHorizonRetryPolicy;
 
@@ -50,7 +48,6 @@ public class SetupBuilder : ISetupBuilder
         _aggregateRootsBuilder = new AggregateRootsBuilder(_modelBuilder, _buildResults);
         _eventFiltersBuilder = new EventFiltersBuilder(_modelBuilder);
         _eventHandlersBuilder = new EventHandlersBuilder(_modelBuilder, _buildResults);
-        _embeddingsBuilder = new EmbeddingsBuilder(_modelBuilder, _buildResults);
 
         
         _projectionsBuilder = new ProjectionsBuilder(
@@ -99,13 +96,6 @@ public class SetupBuilder : ISetupBuilder
     }
 
     /// <inheritdoc />
-    public ISetupBuilder WithEmbeddings(Action<IEmbeddingsBuilder> callback)
-    {
-        callback(_embeddingsBuilder);
-        return this;
-    }
-
-    /// <inheritdoc />
     public ISetupBuilder WithEventHorizons(Action<SubscriptionsBuilder> callback)
     {
         callback(_eventHorizonsBuilder);
@@ -139,7 +129,6 @@ public class SetupBuilder : ISetupBuilder
             EventFiltersBuilder.Build(model, _buildResults),
             EventHandlersBuilder.Build(model, unregisteredEventTypes, _buildResults),
             ProjectionsBuilder.Build(model, unregisteredEventTypes, _buildResults),
-            EmbeddingsBuilder.Build(model, unregisteredEventTypes, _buildResults),
             _eventHorizonsBuilder,
             _eventHorizonRetryPolicy);
     }
@@ -187,7 +176,6 @@ public class SetupBuilder : ISetupBuilder
         RegisterAllAggregateRoots();
         RegisterAllEventHandlers();
         RegisterAllProjections();
-        RegisterAllEmbeddings();
     }
 
     void RegisterAllEventTypes() => ForAllAllScannedAssemblies(assembly => _eventTypesBuilder.RegisterAllFrom(assembly));
@@ -197,6 +185,4 @@ public class SetupBuilder : ISetupBuilder
     void RegisterAllEventHandlers() => ForAllAllScannedAssemblies(assembly => _eventHandlersBuilder.RegisterAllFrom(assembly));
 
     void RegisterAllProjections() => ForAllAllScannedAssemblies(assembly => _projectionsBuilder.RegisterAllFrom(assembly));
-
-    void RegisterAllEmbeddings() => ForAllAllScannedAssemblies(assembly => _embeddingsBuilder.RegisterAllFrom(assembly));
 }
