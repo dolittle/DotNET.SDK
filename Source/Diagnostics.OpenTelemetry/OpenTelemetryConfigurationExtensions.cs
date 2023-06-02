@@ -43,7 +43,7 @@ public static class OpenTelemetryConfigurationExtensions
         Uri.TryCreate(settings.Endpoint, UriKind.Absolute, out var otlpEndpoint);
 
 #if NETCOREAPP3_0_OR_GREATER
-        
+
         if (otlpEndpoint is not null && !otlpEndpoint.Scheme.Equals("https"))
         {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
@@ -64,7 +64,8 @@ public static class OpenTelemetryConfigurationExtensions
         return builder;
     }
 
-    static void AddOpenTelemetryLogging(this IHostBuilder builder, ResourceBuilder resourceBuilder, Uri? otlpEndpoint, Action<OpenTelemetryLoggerOptions>? configure)
+    static void AddOpenTelemetryLogging(this IHostBuilder builder, ResourceBuilder resourceBuilder, Uri? otlpEndpoint,
+        Action<OpenTelemetryLoggerOptions>? configure)
     {
         builder.ConfigureLogging(loggingBuilder =>
         {
@@ -85,16 +86,17 @@ public static class OpenTelemetryConfigurationExtensions
     static void AddOpenTelemetryTracing(this IHostBuilder builder, ResourceBuilder resourceBuilder, Uri? otlpEndpoint, Action<TracerProviderBuilder>? configure)
     {
         builder.ConfigureServices(services =>
-            services.AddOpenTelemetryTracing(builder =>
-            {
-                builder.SetResourceBuilder(resourceBuilder)
-                    .AddDolittleInstrumentation()
-                    .AddAspNetCoreInstrumentation()
-                    .AddMongoDBInstrumentation()
-                    .AddProtoActorInstrumentation()
-                    .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
-                configure?.Invoke(builder);
-            }));
+            services.AddOpenTelemetry()
+                .WithTracing(_ =>
+                {
+                    _.SetResourceBuilder(resourceBuilder)
+                        .AddDolittleInstrumentation()
+                        .AddAspNetCoreInstrumentation()
+                        .AddMongoDBInstrumentation()
+                        .AddProtoActorInstrumentation()
+                        .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
+                    configure?.Invoke(_);
+                }));
     }
 
     static Action<OtlpExporterOptions> ConfigureOtlpExporter(Uri? otlpEndpoint)
