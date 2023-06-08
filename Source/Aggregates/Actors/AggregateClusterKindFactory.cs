@@ -30,6 +30,6 @@ static class AggregateClusterKindFactory<TAggregate> where TAggregate : Aggregat
         var idleUnloadTimeout = serviceProvider.GetRequiredService<AggregateUnloadTimeout>()();
 
         return new ClusterKind(aggregateRootType.Id.Value.ToString(),
-            Props.FromProducer(() => new AggregateActor<TAggregate>(providerForTenant, logger, idleUnloadTimeout)));
+            Props.FromProducer(() => new AggregateActor<TAggregate>(providerForTenant, logger, idleUnloadTimeout)).WithClusterRequestDeduplication());
     }
 }
