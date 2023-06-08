@@ -1,3 +1,14 @@
+# [21.0.1] - 2023-6-8 [PR: #220](https://github.com/dolittle/DotNET.SDK/pull/220)
+## Summary
+Removed retries against aggregate actors. Added new test classes for Aggregates.
+
+### Added
+- Additional helpers / assertions for testing aggregate roots
+
+### Fixed
+- Removed potential retries on Aggregate.Perform, which could occur when response times are greater than the set retry timeout.
+
+
 # [21.0.0] - 2023-6-2 [PR: #219](https://github.com/dolittle/DotNET.SDK/pull/219)
 ## Summary
 
