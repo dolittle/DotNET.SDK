@@ -45,6 +45,20 @@ public class AggregateRootAssertion
     public EventSequenceAssertion<T> ShouldHaveEvent<T>()
         where T : class
         => ShouldHaveEvent<T>(false);
+    
+    /// <summary>
+    /// Asserts that there was produced exactly one event, and of the specified type. Returns the Event value assertion for the event.
+    /// </summary>
+    /// <typeparam name="T"><see cref="Type" /> of the event that you wish to assert against.</typeparam>
+    /// <returns>An <see cref="EventSequenceAssertion{T}" /> scoped to your event type.</returns>
+    public EventValueAssertion<T> ShouldHaveSingleEvent<T>()
+        where T : class
+    {
+        // Ensure that there is only one event
+        ShouldHaveNumberOfEvents(1);
+        // And that it is the correct type. Return the value assertion for the event
+        return ShouldHaveEvent<T>(false).Single();
+    }
 
     /// <summary>
     /// Starts the Fluent Interface by establishing an Event sequence to assert against.

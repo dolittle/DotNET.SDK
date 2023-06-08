@@ -44,6 +44,22 @@ public class EventSequenceAssertion<T>
     /// Asserts that an event of the specified type is present anywhere in the sequence, allowing further assertions against the first instance.
     /// </summary>
     /// <returns>An EventValueAssertion{T} to allow assertions against the event instance.</returns>
+#pragma warning disable CA1720
+    public EventValueAssertion<T> Single()
+#pragma warning restore CA1720
+    {
+        var numConformingEvents = _conformingEvents.Count;
+        if (numConformingEvents != 1)
+        {
+            _throwError($"there are {numConformingEvents} conforming events, not 1");
+        }
+        return new EventValueAssertion<T>(_conformingEvents.First());
+    }
+
+    /// <summary>
+    /// Asserts that an event of the specified type is present anywhere in the sequence, allowing further assertions against the first instance.
+    /// </summary>
+    /// <returns>An EventValueAssertion{T} to allow assertions against the event instance.</returns>
     public EventValueAssertion<T> First()
         => new(_conformingEvents.First());
 
