@@ -10,6 +10,7 @@ using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
@@ -48,11 +49,13 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
             {
                 EventHandlerId = _eventHandler.Identifier.ToProtobuf(),
                 ScopeId = _eventHandler.ScopeId.ToProtobuf(),
-                Partitioned = _eventHandler.Partitioned
+                Partitioned = _eventHandler.Partitioned,
+                Concurrency = _eventHandler.Concurrency,
+                StartFrom = GetStartFrom(_eventHandler),
             };
             if (_eventHandler.HasAlias)
             {
-                registrationRequest.Alias = _eventHandler.Alias.Value;
+                registrationRequest.Alias = _eventHandler.Alias!.Value;
             }
 
             registrationRequest.EventTypes.AddRange(_eventHandler.HandledEvents.Select(_ => _.ToProtobuf()).ToArray());
@@ -60,8 +63,25 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
         }
     }
 
+    static StartFrom GetStartFrom(IEventHandler eventHandler)
+    {
+        if (eventHandler.StartFrom is not null)
+        {
+            return new StartFrom
+            {
+                Timestamp = Timestamp.FromDateTimeOffset(eventHandler.StartFrom.Value),
+            };
+        }
+
+        return new StartFrom
+        {
+            Position = eventHandler.ResetTo == ProcessFrom.Last ? StartFrom.Types.Position.Latest : StartFrom.Types.Position.Start
+        };
+    }
+
     /// <inheritdoc/>
-    protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation)
+    protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider,
+        CancellationToken cancellation)
     {
         var streamEvent = _converter.ToSDK(request.Event);
         var committedEvent = streamEvent.Event;

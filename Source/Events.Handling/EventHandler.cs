@@ -31,6 +31,10 @@ public class EventHandler : IEventHandler
         Identifier = identifier.Id;
         ScopeId = identifier.Scope;
         Partitioned = identifier.Partitioned;
+        Concurrency = identifier.Concurrency;
+        ResetTo = identifier.ResetTo;
+        StartFrom = identifier.StartFrom;
+        StopAt = identifier.StopAt;
         _eventHandlerMethods = eventHandlerMethods;
         if (!string.IsNullOrEmpty(identifier.Alias))
         {
@@ -38,6 +42,10 @@ public class EventHandler : IEventHandler
         }
     }
 
+    public int Concurrency { get; }
+    public ProcessFrom ResetTo { get; }
+    public DateTimeOffset? StartFrom { get; }
+    public DateTimeOffset? StopAt { get; }
 
     /// <inheritdoc/>
     public EventHandlerId Identifier { get; }
@@ -55,7 +63,7 @@ public class EventHandler : IEventHandler
     public EventHandlerAlias? Alias { get; }
 
     /// <inheritdoc />
-    public bool HasAlias => Alias is not null; 
+    public bool HasAlias => Alias is not null;
 
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
