@@ -1,3 +1,22 @@
+# [21.0.0] - 2023-6-2 [PR: #219](https://github.com/dolittle/DotNET.SDK/pull/219)
+## Summary
+
+Release Highlights: MongoDB Client Config Override, Enhanced MongoDB Tracing, Library Upgrades, and Embeddings API Removal
+
+### Added
+
+- [Allow users to override MongoDB client config](https://github.com/dolittle/DotNET.SDK/pull/216)
+
+### Changed
+
+- [Default enabled filtering for MongoDB traces.](https://github.com/dolittle/DotNET.SDK/pull/218)
+- Upgraded libraries for Proto.Actor, MongoDB & OpenTelemetry
+
+### Removed
+
+- [Embeddings API has been removed.](https://github.com/dolittle/DotNET.SDK/pull/217)
+
+
 # [20.2.0] - 2023-1-23 [PR: #195](https://github.com/dolittle/DotNET.SDK/pull/195)
 ## Summary
 
