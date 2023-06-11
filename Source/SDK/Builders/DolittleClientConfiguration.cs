@@ -37,7 +37,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <summary>
     /// Gets the ping-interval <see cref="TimeSpan"/>.
     /// </summary>
-    public TimeSpan PingInterval { get; private set; } = TimeSpan.FromSeconds(5);
+    public TimeSpan PingInterval { get; private set; } = TimeSpan.MaxValue;
 
     /// <summary>
     /// How long should the aggregates be kept in memory when not in use.
