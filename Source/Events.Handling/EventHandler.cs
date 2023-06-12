@@ -71,7 +71,7 @@ public class EventHandler : IEventHandler
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
-        var start = Stopwatch.GetTimestamp();
+        var time = Stopwatch.StartNew();
         using var activity = context.CommittedExecutionContext.StartChildActivity($"{(HasAlias ? Alias.Value + "." : "")}Handle {@event.GetType().Name}")
             ?.Tag(eventType);
 
@@ -87,12 +87,12 @@ public class EventHandler : IEventHandler
             {
                 throw new EventHandlerMethodFailed(Identifier, eventType, @event, exception);
             }
-            Metrics.EventProcessed(TimeSpan.FromTicks(Stopwatch.GetTimestamp() - start));
+            Metrics.EventProcessed(time.Elapsed);
         }
         catch (Exception e)
         {
             activity?.RecordError(e);
-            Metrics.EventFailedToProcess(TimeSpan.FromTicks(Stopwatch.GetTimestamp() - start));
+            Metrics.EventFailedToProcess(time.Elapsed);
             throw;
         }
 

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Protobuf;
 
 namespace Dolittle.SDK.Events.Store.Converters;

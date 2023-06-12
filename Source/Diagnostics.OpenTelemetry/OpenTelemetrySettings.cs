@@ -32,9 +32,9 @@ public record OpenTelemetrySettings
     /// Enable tracing via OTLP
     /// </summary>
     public bool Tracing { get; set; } = true;
-    
+
     /// <summary>
-    /// Enable metrics via OTLP
+    /// Enable metrics via OTLP - default is true
     /// </summary>
     public bool Metrics { get; set; } = true;
 
@@ -47,6 +47,9 @@ public record OpenTelemetrySettings
     /// Logging configuration callback.
     /// </summary>
     public Action<OpenTelemetryLoggerOptions>? ConfigureLogging { get; set; } = null;
-    
+
+    /// <summary>
+    /// Metrics configuration callback.
+    /// </summary>
     public Action<MeterProviderBuilder>? ConfigureMetrics { get; set; } = null;
 }
