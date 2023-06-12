@@ -113,7 +113,6 @@ public static class OpenTelemetryConfigurationExtensions
                 {
                     _.SetResourceBuilder(resourceBuilder)
                         .AddAspNetCoreInstrumentation()
-                        .AddProcessInstrumentation()
                         .AddRuntimeInstrumentation()
                         .AddMeter(Metrics.MeterName)
                         .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
