@@ -15,6 +15,7 @@ public static class Metrics
     /// The name of the meter.
     /// </summary>
     public const string MeterName = "dolittle-sdk";
+
     static readonly Meter _meterProvider = new(MeterName);
 
     static readonly Histogram<double> _eventsProcessTime = _meterProvider.CreateHistogram<double>(
@@ -26,7 +27,7 @@ public static class Metrics
         "dolittle.events-committed",
         "events",
         "Number of events committed");
-    
+
     static readonly Counter<long> _bytesCommitted = _meterProvider.CreateCounter<long>(
         "dolittle.events-committed-bytes",
         "byte",
@@ -36,13 +37,13 @@ public static class Metrics
         "dolittle.events-failed-processing",
         "seconds",
         "Durations of event that failed processing");
-    
-    static readonly Counter<long> _eventsRead = _meterProvider.CreateCounter<long>(
+
+    static readonly Counter<long> _eventsRehydrated = _meterProvider.CreateCounter<long>(
         "dolittle.events-read",
         "events",
         "Total number of events replayed");
-    
-    static readonly Counter<long> _bytesReplayed = _meterProvider.CreateCounter<long>(
+
+    static readonly Counter<long> _eventBytesRehydrated = _meterProvider.CreateCounter<long>(
         "dolittle.events-read-bytes",
         "byte",
         "Total number bytes replayed. Combine with number of events for average size of events");
@@ -52,7 +53,7 @@ public static class Metrics
     /// </summary>
     /// <param name="duration"></param>
     public static void EventProcessed(TimeSpan duration) => _eventsProcessTime.Record(duration.TotalSeconds);
-    
+
     /// <summary>
     /// Register event processed unsuccessfully.
     /// </summary>
@@ -68,14 +69,13 @@ public static class Metrics
         _eventsCommitted.Add(events);
         _bytesCommitted.Add(totalBytes);
     }
-    
+
     /// <summary>
     /// Register events used to rehydrate aggregates.
     /// </summary>
     public static void EventsRehydrated(int events, long totalBytes)
     {
-        _eventsRead.Add(events);
-        _bytesReplayed.Add(totalBytes);
+        _eventsRehydrated.Add(events);
+        _eventBytesRehydrated.Add(totalBytes);
     }
-
 }
