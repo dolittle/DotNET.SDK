@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Proto.OpenTelemetry;
@@ -60,6 +61,11 @@ public static class OpenTelemetryConfigurationExtensions
         {
             builder.AddOpenTelemetryTracing(resourceBuilder, otlpEndpoint, settings.ConfigureTracing);
         }
+        
+        if (settings.Metrics)
+        {
+            builder.AddOpenTelemetryMetrics(resourceBuilder, otlpEndpoint, settings.ConfigureMetrics);
+        }
 
         return builder;
     }
@@ -94,6 +100,22 @@ public static class OpenTelemetryConfigurationExtensions
                         .AddAspNetCoreInstrumentation()
                         .AddMongoDBInstrumentation()
                         .AddProtoActorInstrumentation()
+                        .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
+                    configure?.Invoke(_);
+                }));
+    }
+    
+    static void AddOpenTelemetryMetrics(this IHostBuilder builder, ResourceBuilder resourceBuilder, Uri? otlpEndpoint, Action<MeterProviderBuilder>? configure)
+    {
+        builder.ConfigureServices(services =>
+            services.AddOpenTelemetry()
+                .WithMetrics(_ =>
+                {
+                    _.SetResourceBuilder(resourceBuilder)
+                        .AddAspNetCoreInstrumentation()
+                        .AddProcessInstrumentation()
+                        .AddRuntimeInstrumentation()
+                        .AddMeter(Metrics.MeterName)
                         .AddOtlpExporter(ConfigureOtlpExporter(otlpEndpoint));
                     configure?.Invoke(_);
                 }));

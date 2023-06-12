@@ -176,6 +176,8 @@ public abstract class AggregateRoot
     internal async Task RehydrateInternal(IAsyncEnumerable<CommittedAggregateEvents> batches, IReadOnlyDictionary<Type, MethodInfo> onMethods,
         CancellationToken cancellationToken)
     {
+        var events = 0;
+        var bytes = 0;
         var hasBatches = false;
         var expectedVersion = AggregateRootVersion.Initial;
         await foreach (var batch in batches.WithCancellation(cancellationToken))
@@ -191,6 +193,7 @@ public abstract class AggregateRoot
 
             foreach (var @event in batch)
             {
+                events++;
                 Version = @event.AggregateRootVersion + 1;
                 var eventContent = @event.Content;
                 if (onMethods.TryGetValue(eventContent.GetType(), out var handleMethod))

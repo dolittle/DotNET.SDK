@@ -3,6 +3,7 @@
 
 using System;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
@@ -31,6 +32,11 @@ public record OpenTelemetrySettings
     /// Enable tracing via OTLP
     /// </summary>
     public bool Tracing { get; set; } = true;
+    
+    /// <summary>
+    /// Enable metrics via OTLP
+    /// </summary>
+    public bool Metrics { get; set; } = true;
 
     /// <summary>
     /// Tracing configuration callback
@@ -41,4 +47,6 @@ public record OpenTelemetrySettings
     /// Logging configuration callback.
     /// </summary>
     public Action<OpenTelemetryLoggerOptions>? ConfigureLogging { get; set; } = null;
+    
+    public Action<MeterProviderBuilder>? ConfigureMetrics { get; set; } = null;
 }

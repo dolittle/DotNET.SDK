@@ -7,6 +7,9 @@ using Diagnostics;
 
 namespace Dolittle.SDK.Execution;
 
+/// <summary>
+/// Simplify working with <see cref="Activity"/>.
+/// </summary>
 public static class ActivityExtensions
 {
     /// <summary>
