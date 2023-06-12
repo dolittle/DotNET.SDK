@@ -13,7 +13,7 @@
         <ProtobufVersion>3.23.2</ProtobufVersion>
         <GrpcVersion>2.53.0</GrpcVersion>
         <MongoDBDriverVersion>2.19.2</MongoDBDriverVersion>
-        <OpenTelemetryVersion>1.4.0</OpenTelemetryVersion>
+        <OpenTelemetryVersion>1.5.0</OpenTelemetryVersion>
         <MongoDBOpenTelemetryVersion>1.0.0</MongoDBOpenTelemetryVersion>
         <NewtonsoftVersion>13.0.2</NewtonsoftVersion>
         <SystemImmutableVersion>7.0.0</SystemImmutableVersion>

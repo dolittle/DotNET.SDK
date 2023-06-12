@@ -19,6 +19,7 @@ namespace Dolittle.SDK.Execution;
 /// <param name="CorrelationId"><see cref="CorrelationId"/> for this <see cref="ExecutionContext"/>.</param>
 /// <param name="Claims"><see cref="Claims"/> to populate with.</param>
 /// <param name="Culture"><see cref="CultureInfo"/> for the <see cref="ExecutionContext"/>.</param>
+/// <param name="SpanId"><see cref="ActivitySpanId"/> for the <see cref="ActivitySpanId"/>.</param>
 public record ExecutionContext(
     MicroserviceId Microservice,
     TenantId Tenant,

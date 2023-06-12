@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
     </ItemGroup>
     
     <ItemGroup>
