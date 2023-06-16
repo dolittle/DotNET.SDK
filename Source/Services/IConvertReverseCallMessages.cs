@@ -50,14 +50,14 @@ public interface IConvertReverseCallMessages<TClientMessage, TServerMessage, TCo
     /// </summary>
     /// <param name="response">The <typeparamref name="TConnectResponse"/> to get the failure from.</param>
     /// <returns>The <see cref="Failure" /> from the <typeparamref name="TConnectResponse"/> or null if there was no failure.</returns>
-    Failure GetFailureFromConnectResponse(TConnectResponse response);
+    Failure? GetFailureFromConnectResponse(TConnectResponse response);
 
     /// <summary>
     /// Gets the <see cref="Ping"/> from a <typeparamref name="TServerMessage"/>.
     /// </summary>
     /// <param name="message">The <typeparamref name="TServerMessage"/> to get the ping from.</param>
     /// <returns>The <see cref="Ping"/> in the message.</returns>
-    Ping GetPingFrom(TServerMessage message);
+    Ping? GetPingFrom(TServerMessage message);
 
     /// <summary>
     /// Creates <typeparamref name="TClientMessage"/> from a <see cref="Pong"/>.
