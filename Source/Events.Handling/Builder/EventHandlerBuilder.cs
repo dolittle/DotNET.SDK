@@ -19,6 +19,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     readonly EventHandlerMethodsBuilder _methodsBuilder;
 
     bool _partitioned = true;
+    int _concurrency = 1;
     ScopeId _scopeId = ScopeId.Default;
     EventHandlerAlias? _alias;
 
@@ -34,12 +35,12 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         _methodsBuilder = new EventHandlerMethodsBuilder(_eventHandlerId);
         Bind();
     }
-    
+
     /// <summary>
     /// Gets the <see cref="EventHandlerModelId"/>.
     /// </summary>
-    public EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, _alias);
-    
+    public EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, alias: _alias?.Value, concurrency: _concurrency);
+
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
     {
@@ -58,6 +59,16 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         return _methodsBuilder;
     }
 
+    /// <inheritdoc />
+    public IEventHandlerBuilder WithConcurrency(int concurrency)
+    {
+        Unbind();
+        _concurrency = concurrency > 0 ? concurrency : 1;
+        Bind();
+        return this;
+    }
+
+    
     /// <inheritdoc />
     public IEventHandlerBuilder InScope(ScopeId scopeId)
     {
@@ -96,7 +107,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         eventHandler = new EventHandler(identifier, eventTypesToMethods);
         return true;
     }
-    
+
     /// <inheritdoc />
     public bool Equals(EventHandlerBuilder other)
         => ReferenceEquals(this, other);
@@ -113,6 +124,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     {
         _modelBuilder.BindIdentifierToProcessorBuilder(ModelId, this);
     }
+
     void Unbind()
     {
         _modelBuilder.UnbindIdentifierToProcessorBuilder(ModelId, this);
