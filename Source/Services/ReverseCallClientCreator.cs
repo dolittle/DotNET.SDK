@@ -44,7 +44,7 @@ public class ReverseCallClientCreator : ICreateReverseCallClients
     }
 
     /// <inheritdoc/>
-    public IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
+    public IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse, TClientMessage> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
         IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol)
         where TClientMessage : class, IMessage
         where TServerMessage : class, IMessage

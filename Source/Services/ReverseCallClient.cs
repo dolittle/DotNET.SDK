@@ -27,7 +27,7 @@ namespace Dolittle.SDK.Services;
 /// <typeparam name="TRequest">Type of the requests sent from the server to the client using.</typeparam>
 /// <typeparam name="TResponse">Type of the responses received from the client using.</typeparam>
 public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>
-    : IDisposable, IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse>
+    : IDisposable, IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse, TClientMessage>
     where TClientMessage : IMessage
     where TServerMessage : IMessage
     where TConnectArguments : class
@@ -96,6 +96,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         _protocol.SetConnectArgumentsContextIn(callContext, connectArguments);
         var connectMessage = _protocol.CreateMessageFrom(connectArguments);
 
+        // ReSharper disable once MethodSupportsCancellation
         await _clientToServer.WriteAsync(connectMessage).ConfigureAwait(false);
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -147,6 +148,13 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         }
     }
 
+    public Task WriteMessage(TClientMessage message, CancellationToken token)
+    {
+        // ReSharper disable once MethodSupportsCancellation
+        return _clientToServer!.WriteAsync(message);
+    }
+
+
     /// <inheritdoc/>
     public async Task Handle(IReverseCallHandler<TRequest, TResponse> handler, CancellationToken cancellationToken)
     {
@@ -174,7 +182,15 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                 }
                 else if (request != null)
                 {
-                    _ = Task.Run(() => OnReceivedRequest(handler, request, cancellationToken));
+                    _ = Task.Run(() => OnReceivedRequest(handler, request, cancellationToken), CancellationToken.None);
+                }
+                else if (_protocol.IsDisconnectAck(message))
+                {
+                    // The server has acknowledged our disconnect request, and completed in-flight requests.
+                    // We can now safely complete the stream.
+                    _logger.ReceivedDisconnectAck();
+                    await _clientToServer!.CompleteAsync().ConfigureAwait(false);
+                    return;
                 }
                 else
                 {
@@ -196,6 +212,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
             {
                 throw new PingTimedOut(_pingInterval);
             }
+
             _logger.CancelledByServerDuringHandling();
         }
     }
@@ -217,7 +234,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         {
             return;
         }
-        
+
         if (disposing)
         {
             _writeResponseSemaphore.Dispose();
@@ -248,6 +265,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
             var message = _protocol.CreateMessageFrom(new Pong());
 
             _logger.WritingPong();
+            // ReSharper disable once MethodSupportsCancellation
             await _clientToServer.WriteAsync(message).ConfigureAwait(false);
         }
         finally
@@ -272,7 +290,8 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                     .ForTenant(requestContext.ExecutionContext.TenantId.To<TenantId>())
                     .ForCorrelation(requestContext.ExecutionContext.CorrelationId.To<CorrelationId>());
 
-                response = await handler.Handle(request, executionContext, _tenantScopedProviders.ForTenant(executionContext.Tenant), cancellationToken).ConfigureAwait(false);
+                response = await handler.Handle(request, executionContext, _tenantScopedProviders.ForTenant(executionContext.Tenant), cancellationToken)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -21,7 +21,7 @@ public interface ICreateReverseCallClients
     /// <typeparam name="TRequest">Type of the requests sent from the server to the client.</typeparam>
     /// <typeparam name="TResponse">Type of the responses received from the client.</typeparam>
     /// <returns>A new reverse call client.</returns>
-    IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
+    IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse, TClientMessage> Create<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse>(
         IAmAReverseCallProtocol<TClientMessage, TServerMessage, TConnectArguments, TConnectResponse, TRequest, TResponse> protocol)
         where TClientMessage : class, IMessage
         where TServerMessage : class, IMessage
