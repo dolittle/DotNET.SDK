@@ -1,3 +1,15 @@
+# [22.0.0] - 2023-6-22 [PR: #224](https://github.com/dolittle/DotNET.SDK/pull/224)
+## Summary
+Major SDK release supporting runtime V9.0.0. In addition to V9 having major performance improvements, this allows the user to also enable concurrent processing with partitioned event handlers.
+
+### Added
+- Support for concurrent event handlers
+- [Metrics via OpenTelemetry](https://github.com/dolittle/DotNET.SDK/pull/221)
+
+### Changed
+- Improved eventhandler disconnect procedure
+
+
 # [21.0.1] - 2023-6-8 [PR: #220](https://github.com/dolittle/DotNET.SDK/pull/220)
 ## Summary
 Removed retries against aggregate actors. Added new test classes for Aggregates.
