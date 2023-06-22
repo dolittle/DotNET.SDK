@@ -16,9 +16,9 @@ public class RuntimeBuilder
         _runtimeWithMongoFactory = runtimeWithMongoFactory;
     }
 
-    public IRuntimeWithMongo Build(string runtimeTag = "9.0.0-hadhafang.10", string mongoDbTag = "latest")
+    public IRuntimeWithMongo Build(string runtimeTag = "latest", string mongoDbTag = "latest")
         => _runtimeWithMongoFactory.Create(_dockerClient, runtimeTag, mongoDbTag);
 
-    public IRuntimeWithMongo BuildDevelopment(string tag = "9.0.0-hadhafang.10")
+    public IRuntimeWithMongo BuildDevelopment(string tag = "latest")
         => _runtimeWithMongoFactory.CreateDevelopment(_dockerClient, tag);
 }
