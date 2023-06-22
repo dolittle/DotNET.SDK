@@ -3,6 +3,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Dolittle.Protobuf.Contracts;
+using Google.Protobuf;
 
 namespace Dolittle.SDK.Services;
 
@@ -13,11 +15,12 @@ namespace Dolittle.SDK.Services;
 /// <typeparam name="TConnectResponse">Type of the response that is received after the initial Connect call.</typeparam>
 /// <typeparam name="TRequest">Type of the requests sent from the server to the client.</typeparam>
 /// <typeparam name="TResponse">Type of the responses received from the client using.</typeparam>
-public interface IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse>
+public interface IReverseCallClient<TConnectArguments, TConnectResponse, TRequest, TResponse, TClientMessage>
     where TConnectArguments : class
     where TConnectResponse : class
     where TRequest : class
     where TResponse : class
+    where TClientMessage: IMessage
 {
     /// <summary>
     /// Gets the connect response.
@@ -31,6 +34,14 @@ public interface IReverseCallClient<TConnectArguments, TConnectResponse, TReques
     /// <param name="token">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task" /> that, when resolved, returns whether a connection response was received.</returns>
     Task<bool> Connect(TConnectArguments connectArguments, CancellationToken token);
+
+    /// <summary>
+    /// Write a message to the server.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    Task WriteMessage(TClientMessage message, CancellationToken token);
 
     /// <summary>
     /// Handle a call.

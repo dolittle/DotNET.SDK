@@ -2,10 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Diagnostics;
 using Dolittle.Runtime.Events.Contracts;
+using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Services;
@@ -74,8 +77,11 @@ public class EventCommitter : ICommitEvents
             };
             request.Events.AddRange(protobufEvents);
 
-            var response = await _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
+            var task = _caller.Call(_commitForAggregateMethod, request, cancellationToken).ConfigureAwait(false);
+            var totalBytes = protobufEvents.Sum(it => Encoding.UTF8.GetBytes(it.Content).Length);
+            var response = await task;
             response.Failure.ThrowIfFailureIsSet();
+            Metrics.EventsCommitted(uncommittedEvents.Count, totalBytes);
 
             if (_toSDK.TryConvert(response.Events, out var committedEvents, out error))
             {

@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Diagnostics;
+using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Dolittle.SDK.Execution;
 
@@ -31,6 +33,10 @@ public class EventHandler : IEventHandler
         Identifier = identifier.Id;
         ScopeId = identifier.Scope;
         Partitioned = identifier.Partitioned;
+        Concurrency = identifier.Concurrency;
+        ResetTo = identifier.ResetTo;
+        StartFrom = identifier.StartFrom;
+        StopAt = identifier.StopAt;
         _eventHandlerMethods = eventHandlerMethods;
         if (!string.IsNullOrEmpty(identifier.Alias))
         {
@@ -38,6 +44,10 @@ public class EventHandler : IEventHandler
         }
     }
 
+    public int Concurrency { get; }
+    public ProcessFrom ResetTo { get; }
+    public DateTimeOffset? StartFrom { get; }
+    public DateTimeOffset? StopAt { get; }
 
     /// <inheritdoc/>
     public EventHandlerId Identifier { get; }
@@ -55,11 +65,13 @@ public class EventHandler : IEventHandler
     public EventHandlerAlias? Alias { get; }
 
     /// <inheritdoc />
-    public bool HasAlias => Alias is not null; 
+    [MemberNotNullWhen(true, nameof(Alias))]
+    public bool HasAlias => Alias is not null;
 
     /// <inheritdoc/>
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
+        var time = Stopwatch.StartNew();
         using var activity = context.CommittedExecutionContext.StartChildActivity($"{(HasAlias ? Alias.Value + "." : "")}Handle {@event.GetType().Name}")
             ?.Tag(eventType);
 
@@ -75,10 +87,12 @@ public class EventHandler : IEventHandler
             {
                 throw new EventHandlerMethodFailed(Identifier, eventType, @event, exception);
             }
+            Metrics.EventProcessed(time.Elapsed);
         }
         catch (Exception e)
         {
             activity?.RecordError(e);
+            Metrics.EventFailedToProcess(time.Elapsed);
             throw;
         }
 

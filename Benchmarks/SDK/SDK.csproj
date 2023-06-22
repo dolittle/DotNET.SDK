@@ -5,10 +5,12 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>Dolittle.Benchmarks.SDK</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
     </ItemGroup>
     
     <ItemGroup>

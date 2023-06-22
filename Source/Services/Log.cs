@@ -34,6 +34,9 @@ static partial class Log
     
     [LoggerMessage(0, LogLevel.Warning, "Received message from Reverse Call Dispatcher while handling, but it was not a request or a ping" )]
     internal static partial void ReceivedNonPingOrRequestDuringHandling(this ILogger logger);
+    
+    [LoggerMessage(0, LogLevel.Information, "Received  Disconnect Ack")]
+    internal static partial void ReceivedDisconnectAck(this ILogger logger);
 
     [LoggerMessage(0, LogLevel.Debug, "Reverse Call Client was cancelled by client while handling requests")]
     internal static partial void CancelledByClientDuringHandling(this ILogger logger);

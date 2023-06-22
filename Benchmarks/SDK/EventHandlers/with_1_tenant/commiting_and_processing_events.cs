@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Tenancy;
 
@@ -10,11 +11,14 @@ namespace Dolittle.Benchmarks.SDK.EventHandlers.with_1_tenant;
 
 public class commiting_and_processing_events : SingleRuntimeSetup
 {
-    IEventStore _eventStore;
-    TaskCompletionSource<bool> _finishedProcessing;
-    AnEvent anEvent = new();
-    LastEvent lastEvent = new();
+    IEventStore? _eventStore;
+    TaskCompletionSource<bool>? _finishedProcessing;
+    readonly AnEvent _anEvent = new();
+    readonly LastEvent _lastEvent = new();
 
+    int _i = 0;
+    EventSourceId[]? _eventSources;
+    
     public override void IterationSetup()
     {
         base.IterationSetup();
@@ -22,50 +26,45 @@ public class commiting_and_processing_events : SingleRuntimeSetup
             .WithEventTypes(_ => _.Register<AnEvent>().Register<LastEvent>())
             .WithEventHandlers(_ => _
                 .Create("63c974e5-1381-4757-a5de-04ef9d729d16")
+                .WithConcurrency(Concurrency)
                 .Partitioned()
-                .Handle<AnEvent>((evt, ctx) =>
-                {
-                })
-                .Handle<LastEvent>((evt, ctx) =>
-                {
-                    _finishedProcessing.SetResult(true);
-                })));
+                .Handle<AnEvent>((evt, ctx) => { })
+                .Handle<LastEvent>((evt, ctx) => { _finishedProcessing.SetResult(true); })));
         _eventStore = client.EventStore.ForTenant(TenantId.Development);
         _finishedProcessing = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _eventStore.CommitEvent(anEvent, "source").Wait();
+        _eventStore.CommitEvent(_anEvent, "source").Wait();
+        _eventSources = new EventSourceId[EventSourceIds];
+        for (var i = 0; i < EventSourceIds; i++)
+        {
+            _eventSources[i] = $"source_{i}";
+        }
     }
 
-    [Benchmark]
-    public async Task CommitAndProcess1Event()
+    EventSourceId NextEventSource()
     {
-        _ = _eventStore.CommitEvent(lastEvent, "source");
-        await _finishedProcessing.Task.ConfigureAwait(false);
+        var next = _i % EventSourceIds;
+        _i++;
+        return _eventSources![next];
     }
 
+    [Params(1, 100)] public int Concurrency { get; set; }
+
+    public int EventSourceIds => Concurrency; // this allows the concurrent processing to be maximally performant, since each event source are always processed sequentially
+
+    [Params(1, 100, 1000)] public int Events { get; set; }
+    
     [Benchmark]
-    public async Task CommitAndProcess100Event()
+    public async Task CommitAndProcessEvents()
     {
-        _ = _eventStore.Commit(_ =>
+        _ = _eventStore!.Commit(_ =>
         {
-            for (var i = 0; i < 99; i++)
+            for (var i = 1; i < Events; i++)
             {
-                _.CreateEvent(anEvent).FromEventSource("source");
+                _.CreateEvent(_anEvent).FromEventSource(NextEventSource());
             }
-            _.CreateEvent(lastEvent).FromEventSource("source");
+
+            _.CreateEvent(_lastEvent).FromEventSource(NextEventSource());
         });
-        await _finishedProcessing.Task.ConfigureAwait(false);
-    }
-    [Benchmark]
-    public async Task CommitAndProcess1000Event()
-    {
-        _ = _eventStore.Commit(_ =>
-        {
-            for (var i = 0; i < 999; i++)
-            {
-                _.CreateEvent(anEvent).FromEventSource("source");
-            }
-            _.CreateEvent(lastEvent).FromEventSource("source");
-        });
-        await _finishedProcessing.Task.ConfigureAwait(false);
+        await _finishedProcessing!.Task.ConfigureAwait(false);
     }
 }

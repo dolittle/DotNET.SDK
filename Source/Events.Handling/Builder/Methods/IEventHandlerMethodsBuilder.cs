@@ -78,4 +78,5 @@ public interface IEventHandlerMethodsBuilder
     /// <param name="method">The <see cref="VoidEventHandlerSignature" />.</param>
     /// <returns>The <see cref="IEventHandlerMethodsBuilder" /> for continuation.</returns>
     public IEventHandlerMethodsBuilder Handle(EventTypeId eventTypeId, Generation eventTypeGeneration, VoidEventHandlerSignature method);
+
 }

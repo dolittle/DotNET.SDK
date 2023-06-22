@@ -23,6 +23,12 @@ public interface IEventHandlerBuilder
     IEventHandlerMethodsBuilder Unpartitioned();
 
     /// <summary>
+    /// Set the concurrency level for the event handler. Minimum is 1
+    /// </summary>
+    /// <returns>The builder for continuation.</returns>
+    IEventHandlerBuilder WithConcurrency(int concurrency);
+    
+    /// <summary>
     /// Defines the event handler to operate on a specific <see cref="ScopeId" />.
     /// </summary>
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>

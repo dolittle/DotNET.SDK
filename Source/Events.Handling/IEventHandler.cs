@@ -44,6 +44,11 @@ public interface IEventHandler
     /// </summary>
     bool HasAlias { get; }
 
+    int Concurrency { get; }
+    ProcessFrom ResetTo { get; }
+    DateTimeOffset? StartFrom { get; }
+    DateTimeOffset? StopAt { get; }
+
     /// <summary>
     /// Handle an event.
     /// </summary>
