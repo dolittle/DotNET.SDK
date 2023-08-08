@@ -10,8 +10,9 @@ public class AggregateRootWithDefaultConstructor : AggregateRoot
 
     public void EventCausingNoStateChange()
     {
-        Apply(new EventCausingNoStateChange());
+        Apply(new EventCausingNoStateChange(EventSourceId.Value));
     }
+    
     public void Fail()
     {
         throw TheFailure;

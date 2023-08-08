@@ -25,6 +25,8 @@ class spec_for<TAggregate>
         aggregate_of = get_aggregate_of();
         aggregate_of_mock = aggregate_of as AggregateOfMock<TAggregate>;
     }
+    
+    
 
     protected static IAggregateOf<TAggregate> get_aggregate_of()
     {

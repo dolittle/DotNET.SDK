@@ -34,7 +34,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
         configureServices?.Invoke(services);
         return Create(services.BuildServiceProvider());
     }
-    
+
     /// <summary>
     /// Creates an instance of <see cref="AggregateOfMock{TAggregate}"/> that uses the given <see cref="IServiceProvider"/> to create the aggregate intance.
     /// </summary>
@@ -47,7 +47,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
             getAggregate.ThrowIfFailed();
             return getAggregate;
         });
-    
+
     /// <summary>
     /// Initializes an instance of the <see cref="AggregateOfMock{T}"/> class.
     /// </summary>
@@ -70,7 +70,22 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
             eventSourceId,
             _aggregateLocks[eventSourceId],
             aggregate,
-            () => _createAggregateRoot(eventSourceId),
+            () =>
+            {
+                var aggregateRoot = _createAggregateRoot(eventSourceId);
+                try
+                {
+                    // If the ID is not passed in the constructor, set it here
+                    // It will throw if set, that can be ignored
+                    aggregateRoot.EventSourceId = eventSourceId;
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                return aggregateRoot;
+            },
             oldAggregate => _aggregates[eventSourceId] = oldAggregate,
             numEventsBeforeLastOperation => _numEventsBeforeLastOperation[eventSourceId] = numEventsBeforeLastOperation);
     }
@@ -81,7 +96,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     /// <param name="eventSourceId">The event source id.</param>
     /// <returns>The <see cref="AggregateRootOperationsMock{TAggregate}"/>.</returns>
     public AggregateRootOperationsMock<TAggregate> GetMock(EventSourceId eventSourceId)
-        => (AggregateRootOperationsMock<TAggregate>) Get(eventSourceId);
+        => (AggregateRootOperationsMock<TAggregate>)Get(eventSourceId);
 
     /// <summary>
     /// Tries to get the <typeparamref name="TAggregate"/> with the given <see cref="EventSourceId"/>.
@@ -122,9 +137,9 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
         {
             return _aggregates[eventSource];
         }
+
         var freshAggregate = _createAggregateRoot(eventSource);
         _aggregateLocks.TryAdd(eventSource, new object());
         return _aggregates.GetOrAdd(eventSource, freshAggregate);
     }
 }
-

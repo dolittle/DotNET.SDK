@@ -18,7 +18,7 @@ public class StatefulAggregateRoot : AggregateRoot
     
     public void EventCausingNoStateChange()
     {
-        Apply(new EventCausingNoStateChange());
+        Apply(new EventCausingNoStateChange(EventSourceId.Value));
     }
     public void EventCausingStateChange(int theNewState)
     {
