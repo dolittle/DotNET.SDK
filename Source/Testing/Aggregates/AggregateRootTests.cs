@@ -4,6 +4,7 @@
 using System;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
@@ -15,10 +16,30 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
 
     protected IAggregateRootOperations<T> Aggregate { get; }
 
+    protected AggregateRootTests(EventSourceId eventSourceId, Action<IServiceCollection>? configureServices = default)
+    {
+        _eventSourceId = eventSourceId;
+        _aggregateOf = AggregateOfMock<T>.Create(configureServices);
+        Aggregate = _aggregateOf.Get(eventSourceId);
+    }
+
     protected AggregateRootTests(Func<EventSourceId, T> getAggregate, EventSourceId eventSourceId)
     {
         _eventSourceId = eventSourceId;
-        _aggregateOf = new AggregateOfMock<T>(getAggregate);
+        _aggregateOf = new AggregateOfMock<T>(id =>
+        {
+            var aggregate = getAggregate(id);
+            try
+            {
+                aggregate.EventSourceId = id;
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return aggregate;
+        });
         Aggregate = _aggregateOf.Get(eventSourceId);
     }
 
