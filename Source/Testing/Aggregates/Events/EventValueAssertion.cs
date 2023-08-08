@@ -12,7 +12,10 @@ namespace Dolittle.SDK.Testing.Aggregates.Events;
 public class EventValueAssertion<T>
     where T : class
 {
-    readonly T _event;
+    /// <summary>
+    /// Gets the event that is being asserted against.
+    /// </summary>
+    public T Event { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventValueAssertion{T}"/> class with the event to assert against.
@@ -20,7 +23,7 @@ public class EventValueAssertion<T>
     /// <param name="evt">The event you wish to assert against.</param>
     public EventValueAssertion(T evt)
     {
-        _event = evt;
+        Event = evt;
     }
 
     /// <summary>
@@ -31,7 +34,7 @@ public class EventValueAssertion<T>
     {
         foreach (var assert in assertions)
         {
-            assert(_event);
+            assert(Event);
         }
     }
 }
