@@ -1,3 +1,12 @@
+# [22.0.2] - 2023-8-8 [PR: #226](https://github.com/dolittle/DotNET.SDK/pull/226)
+## Summary
+
+Simplify usage of `AggregateRootTests<T>`, no longer requiring the user to provide the callback to create the aggregate instance.
+
+### Added
+- Allow AggregateRootTests to be used without providing callback to instantiate aggregate instance
+
+
 # [22.0.1] - 2023-8-8 [PR: #225](https://github.com/dolittle/DotNET.SDK/pull/225)
 ## Summary
 Minor Dolittle.SDK.Testing improvements
