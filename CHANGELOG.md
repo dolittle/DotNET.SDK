@@ -1,3 +1,14 @@
+# [22.0.3] - 2023-8-15 [PR: #227](https://github.com/dolittle/DotNET.SDK/pull/227)
+## Summary
+Reduces some overhead by reducing duplicate tracing of event handling. Fixed an issue where both the client and actor would wrap the exception in AggregateRootOperationFailed
+
+### Changed
+- Removed duplicate event traces (avoid tracing HandleEventRequest).
+
+### Fixed
+- Avoids wrapping AggregateRootOperationFailed in an AggregateRootOperationFailed.
+
+
 # [22.0.2] - 2023-8-8 [PR: #226](https://github.com/dolittle/DotNET.SDK/pull/226)
 ## Summary
 
