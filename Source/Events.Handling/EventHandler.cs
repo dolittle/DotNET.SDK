@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Diagnostics;
+using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Dolittle.SDK.Execution;
@@ -20,6 +21,7 @@ namespace Dolittle.SDK.Events.Handling;
 public class EventHandler : IEventHandler
 {
     readonly IDictionary<EventType, IEventHandlerMethod> _eventHandlerMethods;
+    readonly string _activityName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandler"/> class.
@@ -42,6 +44,8 @@ public class EventHandler : IEventHandler
         {
             Alias = identifier.Alias;
         }
+
+        _activityName = $"{(HasAlias ? Alias.Value + "." : "")}Handle ";
     }
 
     public int Concurrency { get; }
@@ -72,8 +76,8 @@ public class EventHandler : IEventHandler
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
         var time = Stopwatch.StartNew();
-        using var activity = context.CommittedExecutionContext.StartChildActivity($"{(HasAlias ? Alias.Value + "." : "")}Handle {@event.GetType().Name}")
-            ?.Tag(eventType);
+        using var activity = @event is not HandleEventRequest ? context.CommittedExecutionContext.StartChildActivity($"{_activityName}{@event.GetType().Name}")
+            ?.Tag(eventType) : null;
 
         try
         {
