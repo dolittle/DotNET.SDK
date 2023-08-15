@@ -65,6 +65,11 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
                 throw result.Exception;
             }
         }
+        catch (AggregateRootOperationFailed e) when(e.InnerException is not null)
+        {
+            activity?.RecordError(e.InnerException);
+            throw;
+        }
         catch (Exception e)
         {
             activity?.RecordError(e);
