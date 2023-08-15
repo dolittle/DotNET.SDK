@@ -68,7 +68,11 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         catch (AggregateRootOperationFailed e) when(e.InnerException is not null)
         {
             activity?.RecordError(e.InnerException);
-            throw;
+            // ReSharper disable once PossibleIntendedRethrow
+#pragma warning disable CA2200
+            // Here we would like the stacktrace to be updated with this stack instead of the actor stack
+            throw e;
+#pragma warning restore CA2200
         }
         catch (Exception e)
         {
