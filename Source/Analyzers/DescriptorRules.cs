@@ -81,5 +81,14 @@ static class DescriptorRules
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
                 description: "Change the On-method to take a single event as a parameter");
+
+        internal static readonly DiagnosticDescriptor MutationsCannotProduceEvents = new(
+            DiagnosticIds.AggregateMutationsCannotProduceEvents,
+            "Apply method should not be called within On method",
+            "Apply method should not be called within On method in aggregates as they are NOT allowed to produce new events",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true
+        );
     }
 }

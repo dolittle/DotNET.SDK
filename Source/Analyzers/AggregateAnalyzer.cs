@@ -27,6 +27,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Aggregate.MissingMutation,
             DescriptorRules.Aggregate.MutationShouldBePrivate,
             DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters,
+            DescriptorRules.Aggregate.MutationsCannotProduceEvents,
             DescriptorRules.Events.MissingAttribute
         );
 
@@ -52,6 +53,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
         var handledEvents = CheckOnMethods(context, aggregateSymbol);
         CheckApplyInvocations(context, aggregateSyntax, handledEvents);
+        CheckApplyInvocationsInOnMethods(context, aggregateSyntax, aggregateSymbol);
     }
 
 
@@ -138,6 +140,41 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToMinimalTypeNameProps(),
                     type.ToString()));
+            }
+        }
+    }
+    
+    static void CheckApplyInvocationsInOnMethods(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax aggregateClassSyntax, INamedTypeSymbol aggregateType)
+    {
+        var semanticModel = context.SemanticModel;
+
+        var onMethods = aggregateType
+            .GetMembers()
+            .Where(member => member.Name.Equals("On"))
+            .OfType<IMethodSymbol>()
+            .Where(method => !method.DeclaredAccessibility.HasFlag(Accessibility.Public))
+            .ToArray();
+
+        foreach (var onMethod in onMethods)
+        {
+            if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax)
+            {
+                continue;
+            }
+
+            var applyInvocations = syntax
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Where(invocation => invocation.Expression is IdentifierNameSyntax { Identifier.Text: "Apply" })
+                .ToArray();
+
+            foreach (var applyInvocation in applyInvocations)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DescriptorRules.Aggregate.MutationsCannotProduceEvents,
+                    applyInvocation.GetLocation(),
+                    new[] { onMethod.ToDisplayString() }
+                ));
             }
         }
     }
