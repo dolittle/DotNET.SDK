@@ -167,12 +167,28 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 .OfType<InvocationExpressionSyntax>()
                 .Where(invocation => invocation.Expression is IdentifierNameSyntax { Identifier.Text: "Apply" })
                 .ToArray();
-
+            
             foreach (var applyInvocation in applyInvocations)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DescriptorRules.Aggregate.MutationsCannotProduceEvents,
                     applyInvocation.GetLocation(),
+                    new[] { onMethod.ToDisplayString() }
+                ));
+            }
+            
+            var memberApplyInvocations = syntax
+                .DescendantNodes()
+                .OfType<MemberAccessExpressionSyntax>()
+                .Where(memberAccess => memberAccess.Name is IdentifierNameSyntax { Identifier.Text: "Apply" })
+                .Where(memberAccess => memberAccess.Name is IdentifierNameSyntax { Identifier.Text: "Apply" } && memberAccess.Expression is ThisExpressionSyntax or BaseExpressionSyntax)
+                .ToArray();
+            
+            foreach (var invocation in memberApplyInvocations)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DescriptorRules.Aggregate.MutationsCannotProduceEvents,
+                    invocation.GetLocation(),
                     new[] { onMethod.ToDisplayString() }
                 ));
             }
