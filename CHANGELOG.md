@@ -1,3 +1,13 @@
+# [22.0.4] - 2023-8-28 [PR: #228](https://github.com/dolittle/DotNET.SDK/pull/228)
+## Summary
+
+Added analyzer to guard against bugs where new events are produced in an `On` method. These should only update the internal state of the aggregate, not produce new events.
+
+### Added
+
+- Check against `Apply` used in aggregate `On` methods
+
+
 # [22.0.3] - 2023-8-15 [PR: #227](https://github.com/dolittle/DotNET.SDK/pull/227)
 ## Summary
 Reduces some overhead by reducing duplicate tracing of event handling. Fixed an issue where both the client and actor would wrap the exception in AggregateRootOperationFailed
