@@ -36,7 +36,12 @@ public static class DiagnosticIds
     public const string AggregateMutationHasIncorrectNumberOfParametersRuleId = "AGG0003";
 
     /// <summary>
-    /// Aggregate on-method has an incorrect number of parameters
+    /// Aggregate On-method has an incorrect number of parameters
     /// </summary>
     public const string AggregateMutationShouldBePrivateRuleId = "AGG0004";
+    
+    /// <summary>
+    /// Apply can not be used in an On-method. 
+    /// </summary>
+    public const string AggregateMutationsCannotProduceEvents = "AGG0005";
 }

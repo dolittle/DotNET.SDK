@@ -359,4 +359,179 @@ class SomeAggregate: AggregateRoot
 
         await VerifyAnalyzerAsync(test, expected);
     }
+
+    [Fact]
+    public async Task ShouldFindApplyInOnMethod()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3c"")]
+record InvalidThingHappening(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        Apply(new InvalidThingHappening(""This should not be here""));
+    }
+
+    void On(InvalidThingHappening @event)
+    {
+        Name = @event.Name;
+    }
+}";
+
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.MutationsCannotProduceEvents)
+                .WithSpan(25, 9, 25, 68)
+                .WithArguments("Apply(new InvalidThingHappening(\"This should not be here\"))")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+    
+    [Fact]
+    public async Task ShouldFindApplyInOnMethodWithThis()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3c"")]
+record InvalidThingHappening(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        this.Apply(new InvalidThingHappening(""This should not be here""));
+    }
+
+    void On(InvalidThingHappening @event)
+    {
+        Name = @event.Name;
+    }
+}";
+
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.MutationsCannotProduceEvents)
+                .WithSpan(25, 9, 25, 19)
+                .WithArguments("Apply(new InvalidThingHappening(\"This should not be here\"))")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+    
+    [Fact]
+    public async Task ShouldFindApplyInOnMethodWithBase()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3c"")]
+record InvalidThingHappening(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        base.Apply(new InvalidThingHappening(""This should not be here""));
+    }
+
+    void On(InvalidThingHappening @event)
+    {
+        Name = @event.Name;
+    }
+}";
+
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.MutationsCannotProduceEvents)
+                .WithSpan(25, 9, 25, 19)
+                .WithArguments("Apply(new InvalidThingHappening(\"This should not be here\"))")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ShouldNotFindApplyWhenTargetIsNotAggregate()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name){
+    public void Apply(){
+        System.Console.WriteLine(""Not relevant"");
+    }
+}
+
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        @event.Apply();
+    }
+}";
+
+        await VerifyAnalyzerFindsNothingAsync(test);
+    }
+    
 }
