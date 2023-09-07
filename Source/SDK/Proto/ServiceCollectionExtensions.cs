@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Builders;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,21 @@ static class ServiceCollectionExtensions
                 var timeout = dolittleClientConfiguration.AggregateIdleTimeout;
 
                 return () => timeout;
+            })
+            .AddSingleton<DefaultAggregatePerformTimeout>(sp =>
+            {
+                var dolittleClientConfiguration = sp.GetRequiredService<DolittleClientConfiguration>();
+                var timeout = dolittleClientConfiguration.DefaultAggregatePerformTimeout;
+                if (timeout is not null)
+                {
+                    var seconds = (int)Math.Ceiling(timeout.Value.TotalSeconds);
+                    if (seconds > 0)
+                    {
+                        return () => CancellationTokens.FromSeconds(seconds);
+                    }
+                }
+
+                return () => default;
             });
     }
 

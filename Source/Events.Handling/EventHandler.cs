@@ -76,8 +76,7 @@ public class EventHandler : IEventHandler
     public async Task Handle(object @event, EventType eventType, EventContext context, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
         var time = Stopwatch.StartNew();
-        using var activity = @event is not HandleEventRequest ? context.CommittedExecutionContext.StartChildActivity($"{_activityName}{@event.GetType().Name}")
-            ?.Tag(eventType) : null;
+        using var activity = context.CommittedExecutionContext.StartChildActivity($"{_activityName}{@event.GetType().Name}");
 
         try
         {

@@ -42,7 +42,13 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// <summary>
     /// How long should the aggregates be kept in memory when not in use.
     /// </summary>
-    public TimeSpan AggregateIdleTimeout { get; private set; } = TimeSpan.FromSeconds(20);
+    public TimeSpan AggregateIdleTimeout { get; private set; } = TimeSpan.FromSeconds(30);
+    
+    /// <summary>
+    /// The default timeout for performing an aggregate operation (potentially including hydration & commits).
+    /// If no CancellationToken is provided, this timeout will be used.
+    /// </summary>
+    public TimeSpan? DefaultAggregatePerformTimeout { get; private set; }
 
     /// <summary>
     /// Gets the event serializer provider.
@@ -193,6 +199,13 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public IConfigurationBuilder WithAggregateIdleTimout(TimeSpan timeout)
     {
         AggregateIdleTimeout = timeout;
+        return this;
+    }
+    
+    /// <inheritdoc />
+    public IConfigurationBuilder WithDefaultAggregatePerformTimeout(TimeSpan timeout)
+    {
+        DefaultAggregatePerformTimeout = timeout;
         return this;
     }
 
