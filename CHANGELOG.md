@@ -1,3 +1,15 @@
+# [22.0.5] - 2023-9-7 [PR: #229](https://github.com/dolittle/DotNET.SDK/pull/229)
+## Summary
+
+This solves for timing issues with VERY large aggregates. Normally this will not be necessary, but if aggregates are very long and take a long time to rehydrate, this will let them still work correctly. In addition, added `DefaultAggregatePerformTimeout `which can be set globally to time out perform requests if they are extremely slow. 
+
+### Added
+- `DefaultAggregatePerformTimeout`
+
+### Removed
+- Duplicate tracing of event handlers
+
+
 # [22.0.4] - 2023-8-28 [PR: #228](https://github.com/dolittle/DotNET.SDK/pull/228)
 ## Summary
 
