@@ -69,6 +69,15 @@ public interface IConfigurationBuilder
     public IConfigurationBuilder WithAggregateIdleTimout(TimeSpan timeout);
 
     /// <summary>
+    /// Sets the default timeout for performing an aggregate operation (potentially including hydration & commits).
+    /// If no CancellationToken is provided, this timeout will be used.
+    /// Not set by default
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public IConfigurationBuilder WithDefaultAggregatePerformTimeout(TimeSpan timeout);
+    
+    /// <summary>
     /// Configures the root <see cref="IServiceProvider"/> for the <see cref="IDolittleClient"/>.
     /// </summary>
     /// <param name="serviceProvider">The <see cref="IDolittleClient"/>.</param>

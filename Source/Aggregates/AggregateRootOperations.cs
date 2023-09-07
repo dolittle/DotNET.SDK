@@ -15,6 +15,12 @@ using Proto.Cluster;
 namespace Dolittle.SDK.Aggregates;
 
 /// <summary>
+/// If no CancellationToken is used, this delegate will be called to use the default timeout.
+/// </summary>
+public delegate CancellationToken DefaultAggregatePerformTimeout();
+
+
+/// <summary>
 /// Represents an implementation of <see cref="IAggregateRootOperations{T}"/>.
 /// </summary>
 /// <typeparam name="TAggregate"><see cref="AggregateRoot"/> type.</typeparam>
@@ -23,6 +29,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
 {
     readonly EventSourceId _eventSourceId;
     readonly IRootContext _context;
+    readonly DefaultAggregatePerformTimeout _defaultTimeout;
     readonly ClusterIdentity _clusterIdentity;
 
     /// <summary>
@@ -31,9 +38,11 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// <param name="eventSourceId">The <see cref="EventSourceId"/> of the aggregate root instance.</param>
     /// <param name="tenantId">The <see cref="TenantId"/> of the current tenant.</param>
     /// <param name="context">The <see cref="IRootContext" />Root context used to communicate with actors</param>
-    public AggregateRootOperations(EventSourceId eventSourceId, TenantId tenantId, IRootContext context)
+    /// <param name="defaultTimeout">The &lt;see cref="DefaultAggregatePerformTimeout" /&gt; Used if no cancellation token is passed.</param>
+    public AggregateRootOperations(EventSourceId eventSourceId, TenantId tenantId, IRootContext context, DefaultAggregatePerformTimeout defaultTimeout)
     {
         _context = context;
+        _defaultTimeout = defaultTimeout;
         _eventSourceId = eventSourceId;
         _clusterIdentity = ClusterIdentityMapper.GetClusterIdentity<TAggregate>(tenantId, eventSourceId);
     }
@@ -51,6 +60,10 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// <inheritdoc/>
     public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {
+        if(cancellationToken == default)
+        {
+            cancellationToken = _defaultTimeout();
+        }
         using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.Perform")
             ?.Tag(_eventSourceId);
 
