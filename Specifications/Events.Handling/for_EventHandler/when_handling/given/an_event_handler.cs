@@ -17,6 +17,8 @@ public class an_event_handler
     protected static Mock<IEventHandlerMethod> event_handler_method;
     protected static IDictionary<EventType, IEventHandlerMethod> event_handler_methods;
     protected static EventHandler event_handler;
+    protected static int concurrency = 1;
+    protected static ProcessFrom reset_to = ProcessFrom.Earliest;
 
     Establish context = () =>
     {
@@ -29,6 +31,6 @@ public class an_event_handler
         {
             { handled_event_type, event_handler_method.Object }
         };
-        event_handler = new EventHandler(new EventHandlerModelId(identifier, partitioned, scope_id, "some alias"), event_handler_methods);
+        event_handler = new EventHandler(new EventHandlerModelId(identifier, partitioned, scope_id, "some alias", concurrency, reset_to, null, null), event_handler_methods);
     };
 }

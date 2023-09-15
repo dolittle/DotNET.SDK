@@ -18,6 +18,8 @@ public class when_creating
     static IEnumerable<EventType> event_types;
     static IDictionary<EventType, IEventHandlerMethod> event_handler_methods;
     static EventHandler event_handler;
+    static int concurrency = 1;
+    static ProcessFrom reset_to = ProcessFrom.Earliest;
 
     Establish context = () =>
     {
@@ -36,7 +38,7 @@ public class when_creating
                 _ => new EventHandlerMethod((@event, eventContext) => Task.CompletedTask) as IEventHandlerMethod));
     };
 
-    Because of = () => event_handler = new EventHandler(new EventHandlerModelId(identifier, partitioned, scope_id, alias), event_handler_methods);
+    Because of = () => event_handler = new EventHandler(new EventHandlerModelId(identifier, partitioned, scope_id, alias, concurrency, reset_to), event_handler_methods);
 
     It should_not_be_null = () => event_handler.ShouldNotBeNull();
     It should_have_the_correct_partitioned_value = () => event_handler.Partitioned.ShouldEqual(partitioned);

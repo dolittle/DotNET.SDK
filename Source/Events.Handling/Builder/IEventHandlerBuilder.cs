@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 
 namespace Dolittle.SDK.Events.Handling.Builder;
@@ -41,4 +42,27 @@ public interface IEventHandlerBuilder
     /// <param name="alias">The <see cref="EventHandlerAlias" />.</param>
     /// <returns>The builder for continuation.</returns>
     IEventHandlerBuilder WithAlias(EventHandlerAlias alias);
+    
+    /// <summary>
+    /// Set where in the stream the event handler starts if it has no state
+    /// </summary>
+    /// <param name="processFrom"></param>
+    /// <returns></returns>
+    IEventHandlerBuilder StartFrom(ProcessFrom processFrom);
+    
+    /// <summary>
+    /// Set when in the stream the event handler starts if it has no state.
+    /// Overrides <see cref="StartFrom(ProcessFrom)"/> if set
+    /// </summary>
+    /// <param name="processFrom">Timestamp to start processing from</param>
+    /// <returns></returns>
+    IEventHandlerBuilder StartFrom(DateTimeOffset processFrom);
+    
+    /// <summary>
+    /// Optional
+    /// If the event handler should not process newer events than the given timestamp, this can be set.
+    /// </summary>
+    /// <param name="stopAt"></param>
+    /// <returns></returns>
+    IEventHandlerBuilder StopAt(DateTimeOffset stopAt);
 }

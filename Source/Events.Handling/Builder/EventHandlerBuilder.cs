@@ -21,6 +21,9 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     bool _partitioned = true;
     int _concurrency = 1;
     ScopeId _scopeId = ScopeId.Default;
+    ProcessFrom _resetTo;
+    DateTimeOffset? _startFrom;
+    DateTimeOffset? _stopAt;
     EventHandlerAlias? _alias;
 
     /// <summary>
@@ -39,7 +42,7 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
     /// <summary>
     /// Gets the <see cref="EventHandlerModelId"/>.
     /// </summary>
-    public EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, alias: _alias?.Value, concurrency: _concurrency);
+    public EventHandlerModelId ModelId => new(_eventHandlerId, _partitioned, _scopeId, alias: _alias?.Value, concurrency: _concurrency,_resetTo, _startFrom, _stopAt);
 
     /// <inheritdoc />
     public IEventHandlerMethodsBuilder Partitioned()
@@ -86,6 +89,34 @@ public class EventHandlerBuilder : IEventHandlerBuilder, ICanTryBuildEventHandle
         Bind();
         return this;
     }
+
+    /// <inheritdoc />
+    public IEventHandlerBuilder StartFrom(ProcessFrom processFrom)
+    {
+        Unbind();
+        _resetTo = processFrom;
+        Bind();
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IEventHandlerBuilder StartFrom(DateTimeOffset processFrom)
+    {
+        Unbind();
+        _startFrom = processFrom;
+        Bind();
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IEventHandlerBuilder StopAt(DateTimeOffset stopAt)
+    {
+        Unbind();
+        _stopAt = stopAt;
+        Bind();
+        return this;
+    }
+
 
     /// <inheritdoc />
     public bool TryBuild(EventHandlerModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IEventHandler eventHandler)
