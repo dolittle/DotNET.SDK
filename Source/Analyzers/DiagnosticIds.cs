@@ -44,4 +44,10 @@ public static class DiagnosticIds
     /// Apply can not be used in an On-method. 
     /// </summary>
     public const string AggregateMutationsCannotProduceEvents = "AGG0005";
+    
+    /// <summary>
+    /// Public methods can not mutate the state of an aggregate.
+    /// All mutations need to be done in On-methods.
+    /// </summary>
+    public const string PublicMethodsCannotMutateAggregateState = "AGG0006";
 }

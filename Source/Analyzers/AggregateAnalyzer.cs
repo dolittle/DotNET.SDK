@@ -28,7 +28,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Aggregate.MutationShouldBePrivate,
             DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters,
             DescriptorRules.Aggregate.MutationsCannotProduceEvents,
-            DescriptorRules.Events.MissingAttribute
+            DescriptorRules.Events.MissingAttribute,
+            DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState
         );
 
     /// <inheritdoc />
@@ -53,7 +54,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
         var handledEvents = CheckOnMethods(context, aggregateSymbol);
         CheckApplyInvocations(context, aggregateSyntax, handledEvents);
-        CheckApplyInvocationsInOnMethods(context, aggregateSyntax, aggregateSymbol);
+        CheckApplyInvocationsInOnMethods(context, aggregateSymbol);
+        CheckMutationsInPublicMethods(context, aggregateSymbol);
     }
 
 
@@ -144,10 +146,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         }
     }
     
-    static void CheckApplyInvocationsInOnMethods(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax aggregateClassSyntax, INamedTypeSymbol aggregateType)
+    static void CheckApplyInvocationsInOnMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
     {
-        var semanticModel = context.SemanticModel;
-
         var onMethods = aggregateType
             .GetMembers()
             .Where(member => member.Name.Equals("On"))
@@ -194,4 +194,62 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             }
         }
     }
-}
+    
+        static void CheckMutationsInPublicMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
+        {
+        var publicMethods = aggregateType
+            .GetMembers()
+            .Where(member => !member.Name.Equals("On"))
+            .OfType<IMethodSymbol>()
+            .Where(method => method.DeclaredAccessibility.HasFlag(Accessibility.Public))
+            .ToArray();
+        if (publicMethods.Length == 0)
+        {
+            return;
+        }
+        var walker = new MutationWalker(context, aggregateType);
+
+        foreach (var onMethod in publicMethods)
+        {
+            if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax)
+            {
+                continue;
+            }
+            walker.Visit(syntax);
+        }
+    }
+
+        class MutationWalker : CSharpSyntaxWalker
+        {
+           readonly SyntaxNodeAnalysisContext _context;
+           readonly INamedTypeSymbol _aggregateType;
+
+            public MutationWalker(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
+            {
+                _context = context;
+                _aggregateType = aggregateType;
+            }
+
+            public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+            {
+                var leftExpression = node.Left;
+
+                if (leftExpression is IdentifierNameSyntax || leftExpression is MemberAccessExpressionSyntax)
+                {
+                    var symbolInfo = _context.SemanticModel.GetSymbolInfo(leftExpression);
+                    if (symbolInfo.Symbol is IFieldSymbol || symbolInfo.Symbol is IPropertySymbol)
+                    {
+                        var containingType = symbolInfo.Symbol.ContainingType;
+                        if (containingType != null && SymbolEqualityComparer.Default.Equals(_aggregateType, containingType))
+                        {
+                            var diagnostic = Diagnostic.Create(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState, leftExpression.GetLocation());
+                            _context.ReportDiagnostic(diagnostic);
+                        }
+                    }
+                }
+
+                base.VisitAssignmentExpression(node);
+            }
+
+            // You can also add other types of mutations like increments, decrements, method calls etc.
+        }}

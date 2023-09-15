@@ -90,5 +90,14 @@ static class DescriptorRules
             DiagnosticSeverity.Error,
             isEnabledByDefault: true
         );
+        
+        internal static readonly DiagnosticDescriptor PublicMethodsCannotMutateAggregateState = new(
+            DiagnosticIds.PublicMethodsCannotMutateAggregateState,
+            "Aggregates should only be mutated with events",
+            "Public methods can not mutate the state of an aggregate. All mutations needs to be done via events.",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true
+        );
     }
 }
