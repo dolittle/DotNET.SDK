@@ -1,3 +1,18 @@
+# [22.1.0] - 2023-9-18 [PR: #232](https://github.com/dolittle/DotNET.SDK/pull/232)
+## Summary
+
+Adds support for new features from runtime V9.1. This includes the ability to configure event handlers to start from the latest events instead of the beginning (startFrom), as well as being able to limit the handler to events produced within a specific timeframe. (startFromTimestamp, stopAtTimestamp)
+
+In addition this release comes with new analyzers for event handlers, making sure that incorrect use of the handlers should be a compile time issue instead of a runtime one. 
+
+### Added
+
+- EventHandlerAttribute: startFrom (Earliest / Latest)
+- EventHandlerAttribute: startFromTimestamp - Overrides startFrom if set, ensures the handlers starts on the first event after the given timestamp. It can be in the future.
+- EventHandlerAttribute: stopAtTimestamp - If set, the event handler will stop processing when it reaches events newer than this timestamp.
+- Additional Roslyn analyzers, to ensure correct use of EventHandlers / aggregates
+
+
 # [22.0.5] - 2023-9-7 [PR: #229](https://github.com/dolittle/DotNET.SDK/pull/229)
 ## Summary
 
