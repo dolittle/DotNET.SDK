@@ -134,4 +134,23 @@ class SomeEvent
 
         await VerifyAnalyzerFindsNothingAsync(test);
     }
+    
+    [Fact]
+    public async Task ShouldDetectEventHandlerWhenQualified()
+    {
+        var test = @"
+[Dolittle.SDK.Events.Handling.EventHandler("""")]
+class SomeEvent
+{
+    public string Name {get; set;}
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.InvalidIdentity)
+                .WithSpan(2, 2, 2, 47)
+                .WithArguments("Dolittle.SDK.Events.Handling.EventHandler", "eventHandlerId", "\"\""),
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
 }

@@ -22,6 +22,10 @@ record NameUpdated(string Name);
 [AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
 class SomeAggregate: AggregateRoot
 {
+    public SomeAggregate(){
+        Name = ""John Doe"";
+    }
+
     public string Name {get; set;}
 
     public void UpdateName(string name)
@@ -38,7 +42,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindNonPrivateMutation()
+    public async Task ShouldFindNonPrivateOnMethod()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -75,7 +79,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMutationWithIncorrectParameters()
+    public async Task ShouldFindOnMethodWithIncorrectParameters()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -112,7 +116,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMutationWithNoParameters()
+    public async Task ShouldFindOnMethodWithNoParameters()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -225,7 +229,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMissingMutationFromConstructor()
+    public async Task ShouldFindMissingOnMethodFromConstructor()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -256,7 +260,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMissingMutationWhenNested()
+    public async Task ShouldFindMissingOnMethodWhenNested()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -290,7 +294,7 @@ class SomeAggregate: AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMissingMutation()
+    public async Task ShouldFindMissingOnMethod()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -328,7 +332,7 @@ public class SomeAggregate : AggregateRoot
     }
 
     [Fact]
-    public async Task ShouldFindMissingMutationFromVariable()
+    public async Task ShouldFindMissingOnMethodFromVariable()
     {
         var test = @"
 using Dolittle.SDK.Aggregates;
@@ -532,6 +536,160 @@ class SomeAggregate: AggregateRoot
 }";
 
         await VerifyAnalyzerFindsNothingAsync(test);
+    }
+    
+    [Fact]
+    public async Task ShouldFindInvalidMutationOnProperty()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+        Name = name;
+    }
+
+    private void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+    }
+}";
+        
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
+                .WithSpan(17, 9, 17, 13)
+                .WithArguments("Name = name;")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    
+    [Fact]
+    public async Task ShouldFindInvalidMutationOnThisProperty()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+        this.Name = name;
+    }
+
+    private void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+    }
+}";
+        
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
+                .WithSpan(17, 9, 17, 18)
+                .WithArguments("this.Name = name;")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+    
+    [Fact]
+    public async Task ShouldFindInvalidMutationOnField()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    string? _name;
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+        _name = name;
+    }
+
+    private void On(NameUpdated @event)
+    {
+        _name = @event.Name;
+    }
+}";
+        
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
+                .WithSpan(17, 9, 17, 14)
+                .WithArguments("_name = name;")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    
+    [Fact]
+    public async Task ShouldFindInvalidMutationOnThisField()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    string? _name;
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+        this._name = name;
+    }
+
+    private void On(NameUpdated @event)
+    {
+        this._name = @event.Name;
+    }
+}";
+        
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
+                .WithSpan(17, 9, 17, 19)
+                .WithArguments("this._name = name;")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
     }
     
 }

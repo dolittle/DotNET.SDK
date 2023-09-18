@@ -18,6 +18,9 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
 {
     protected Task VerifyCodeFixAsync(string source, string expectedResult, DiagnosticResult diagnosticResult)
     {
+        source = ToLfLineEndings(source);
+        expectedResult = ToLfLineEndings(expectedResult);
+        
         var test = new CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>
         {
             TestCode = source,
@@ -37,5 +40,10 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
         }
         
         return test.RunAsync(CancellationToken.None);
+    }
+
+    string ToLfLineEndings(string source)
+    {
+        return source.Replace("\r\n", "\n");
     }
 }

@@ -27,8 +27,8 @@ public class EventHandlerModelId : Identifier<EventHandlerId, ScopeId>
         bool partitioned,
         ScopeId scope,
         string? alias,
-        int concurrency = 1,
-        ProcessFrom resetTo = ProcessFrom.First,
+        int concurrency,
+        ProcessFrom resetTo,
         DateTimeOffset? startFrom = null,
         DateTimeOffset? stopAt = null)
         : base("EventHandler", id, alias, scope)

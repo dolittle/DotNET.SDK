@@ -58,6 +58,10 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
                 registrationRequest.Alias = _eventHandler.Alias!.Value;
             }
 
+            if (_eventHandler.StopAt.HasValue)
+            {
+                registrationRequest.StopAt = Timestamp.FromDateTimeOffset(_eventHandler.StopAt.Value);
+            }
             registrationRequest.EventTypes.AddRange(_eventHandler.HandledEvents.Select(_ => _.ToProtobuf()).ToArray());
             return registrationRequest;
         }
@@ -75,7 +79,7 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
 
         return new StartFrom
         {
-            Position = eventHandler.ResetTo == ProcessFrom.Last ? StartFrom.Types.Position.Latest : StartFrom.Types.Position.Start
+            Position = eventHandler.ResetTo == ProcessFrom.Latest ? StartFrom.Types.Position.Latest : StartFrom.Types.Position.Start
         };
     }
 

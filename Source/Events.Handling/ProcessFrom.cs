@@ -11,9 +11,9 @@ public enum ProcessFrom
     /// <summary>
     ///   Start from the beginning of the stream, process all events.
     /// </summary>
-    First,
+    Earliest,
     /// <summary>
     /// Start after the latest event in the stream, only process new events.
     /// </summary>
-    Last
+    Latest
 }
