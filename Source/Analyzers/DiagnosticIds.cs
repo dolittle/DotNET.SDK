@@ -21,6 +21,20 @@ public static class DiagnosticIds
     public const string IdentityIsNotUniqueRuleId = "SDK0003";
 
     /// <summary>
+    /// Invalid timestamp.
+    /// </summary>
+    public const string InvalidTimestampParameter = "SDK0004";
+    
+    /// <summary>
+    /// Invalid timestamp.
+    /// </summary>
+    public const string InvalidStartStopTime = "SDK0005";
+
+    public const string InvalidAccessibility = "SDK0006";
+    
+    public const string EventHandlerMissingEventContext = "SDK0007";
+    
+    /// <summary>
     /// Aggregate missing the required Attribute.
     /// </summary>
     public const string AggregateMissingAttributeRuleId = "AGG0001";
@@ -50,4 +64,6 @@ public static class DiagnosticIds
     /// All mutations need to be done in On-methods.
     /// </summary>
     public const string PublicMethodsCannotMutateAggregateState = "AGG0006";
+    
+
 }

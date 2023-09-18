@@ -7,6 +7,26 @@ namespace Dolittle.SDK.Analyzers;
 
 static class DescriptorRules
 {
+    internal static readonly DiagnosticDescriptor InvalidTimestamp =
+        new(
+            DiagnosticIds.InvalidTimestampParameter,
+            title: "Invalid DateTimeOffset format",
+            messageFormat: "Value '{0}' should be a valid DateTimeOffset",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The value should be a valid DateTimeOffset.");
+    
+    internal static readonly DiagnosticDescriptor InvalidStartStopTimestamp =
+        new(
+            DiagnosticIds.InvalidStartStopTime,
+            title: "Start is not before stop",
+            messageFormat: "'{0}' should be before '{1}'",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Start timestamp should be before stop timestamp.");
+    
     internal static readonly DiagnosticDescriptor InvalidIdentity =
         new(
             DiagnosticIds.AttributeInvalidIdentityRuleId,
@@ -26,7 +46,17 @@ static class DescriptorRules
             DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Assign a unique identity in the attribute");
-    
+
+    internal static readonly DiagnosticDescriptor InvalidAccessibility = 
+        new(
+            DiagnosticIds.InvalidAccessibility,
+            title: "Invalid accessibility level",
+            messageFormat: "{0} needs to be '{1}'",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Change the accessibility level to '{1}'.");
+
     internal static class Events
     {
         internal static readonly DiagnosticDescriptor MissingAttribute =
@@ -38,6 +68,16 @@ static class DescriptorRules
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
                 description: "Mark the event with an EventTypeAttribute and assign an identifier to it");
+        
+        internal static readonly DiagnosticDescriptor MissingEventContext =
+            new(
+                DiagnosticIds.EventHandlerMissingEventContext,
+                title: "Handle method does not take EventContext as the second parameter",
+                messageFormat: "{0} is missing EventContext argument",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "Add the EventContext as the second parameter to the Handle method");
     }
 
     internal static class Aggregate

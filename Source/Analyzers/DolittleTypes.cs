@@ -12,5 +12,7 @@ static class DolittleTypes
     
     public const string ICommitEventsInterface = "Dolittle.SDK.Events.Store.ICommitEvents";
     
+    public const string EventContext = "Dolittle.SDK.Events.EventContext";
+    
     
 }
