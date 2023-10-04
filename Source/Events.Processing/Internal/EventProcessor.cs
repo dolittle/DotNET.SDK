@@ -58,10 +58,11 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
     /// <inheritdoc/>
     public async Task<TResponse> Handle(TRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
-        using var activity = executionContext.StartChildActivity("Handle " + request.GetType().Name)
+        using var activity = request is HandleEventRequest ? null : executionContext
+            .StartChildActivity("Handle " + request.GetType().Name)
             ?.SetTag("kind",Kind.Value);
         
-        RetryProcessingState retryProcessingState = null;
+        RetryProcessingState? retryProcessingState = null;
         try
         {
             retryProcessingState = GetRetryProcessingStateFromRequest(request);
