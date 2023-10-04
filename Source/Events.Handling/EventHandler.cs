@@ -76,6 +76,9 @@ public class EventHandler : IEventHandler
     {
         var time = Stopwatch.StartNew();
         using var activity = context.CommittedExecutionContext.StartChildActivity($"{_activityName}{@event.GetType().Name}");
+        activity?
+            .Tag(context.EventSourceId)
+            .Tag(eventType);
 
         try
         {
