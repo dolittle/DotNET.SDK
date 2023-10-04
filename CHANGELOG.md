@@ -1,3 +1,14 @@
+# [22.1.1] - 2023-10-4 [PR: #233](https://github.com/dolittle/DotNET.SDK/pull/233)
+## Summary
+Minor tracing improvements.
+
+### Added
+ * Added event metadata to eventhandler traces
+
+### Removed
+*  HandleEventRequests traces (already traced at a lower level)
+
+
 # [22.1.0] - 2023-9-18 [PR: #232](https://github.com/dolittle/DotNET.SDK/pull/232)
 ## Summary
 
