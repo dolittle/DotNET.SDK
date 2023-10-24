@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Testing.Aggregates;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 

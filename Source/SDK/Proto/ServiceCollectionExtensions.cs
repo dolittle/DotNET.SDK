@@ -74,7 +74,11 @@ static class ServiceCollectionExtensions
                 ClusterKinds = getClusterKinds(p).ToImmutableList()
             };
 
-            var system = new ActorSystem()
+            var system = new ActorSystem(new ActorSystemConfig
+                {
+                    ConfigureProps = props => props with { StartDeadline = TimeSpan.Zero },
+                    ConfigureSystemProps = (_, props) => props with { StartDeadline = TimeSpan.Zero },
+                })
                 .WithRemote(r)
                 .WithCluster(c)
                 .WithServiceProvider(p);

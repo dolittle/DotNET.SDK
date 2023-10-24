@@ -1,10 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using Dolittle.SDK.DependencyInversion;
 using Machine.Specifications;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DependencyInversion.for_TypeExtensions.when_getting_service_descriptors_from_tenant_scoped_type;
 

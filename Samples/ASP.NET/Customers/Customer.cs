@@ -1,7 +1,6 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
 using Microsoft.Extensions.Logging;
@@ -23,6 +22,6 @@ public class Customer : AggregateRoot
     public void EatDish(string dish)
     {
         Apply(new DishEaten(dish, Name));
-        _logger.LogInformation("Customer {Name} is eating {Dish}.", Name, dish);
+        _logger.LogInformation("Customer {Name} is eating {Dish}", Name, dish);
     }
 }
