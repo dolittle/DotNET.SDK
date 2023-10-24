@@ -20,10 +20,17 @@ public class KitchenController : ControllerBase
     [HttpPost("prepare")]
     public async Task<IActionResult> Prepare([FromBody] PrepareDish cmd)
     {
-        await _kitchen
-            .Get(cmd.Kitchen)
-            .Perform(_ => _.PrepareDish(cmd.Chef, cmd.Dish))
-            .ConfigureAwait(false);
-        return Ok();
+        try
+        {
+            await _kitchen
+                .Get(cmd.Kitchen)
+                .Perform(_ => _.PrepareDish(cmd.Chef, cmd.Dish))
+                .ConfigureAwait(false);
+            return Ok();
+        }
+        catch (AggregateRootOperationFailed e) when(e.InnerException is OutOfIngredients)
+        {
+            return StatusCode(400, e.InnerException.Message);
+        }
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using Dolittle.SDK.Aggregates;
-using Kitchen;
 using Machine.Specifications;
 
 namespace Specs.Kitchen.for_Kitchen.when_preparing_dish.in_one_operation;
