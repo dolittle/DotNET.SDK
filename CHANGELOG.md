@@ -1,3 +1,9 @@
+# [22.1.2] - 2023-10-24 [PR: #234](https://github.com/dolittle/DotNET.SDK/pull/234)
+## Summary
+
+Maintenance release, upgrading SDK dependencies.
+
+
 # [22.1.1] - 2023-10-4 [PR: #233](https://github.com/dolittle/DotNET.SDK/pull/233)
 ## Summary
 Minor tracing improvements.
