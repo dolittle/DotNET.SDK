@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Dolittle.SDK.Concepts;
 
 namespace Dolittle.SDK.Concepts;
 

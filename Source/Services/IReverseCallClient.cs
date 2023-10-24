@@ -3,7 +3,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Dolittle.Protobuf.Contracts;
 using Google.Protobuf;
 
 namespace Dolittle.SDK.Services;
