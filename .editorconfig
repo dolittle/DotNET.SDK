@@ -50,7 +50,7 @@ dotnet_naming_symbols.const_fields.required_modifiers                           
 dotnet_naming_style.const_fields.capitalization                                 = pascal_case
 dotnet_naming_style.const_fields.required_prefix                                =
 
-# public static fields are pascal case
+# public fields are pascal case
 dotnet_naming_rule.static_readonly_fields.symbols                               = static_readonly_fields
 dotnet_naming_rule.static_readonly_fields.style                                 = static_readonly_fields
 dotnet_naming_rule.static_readonly_fields.severity                              = suggestion
@@ -108,7 +108,7 @@ dotnet_diagnostic.CA1805.severity = none
 dotnet_diagnostic.IDE0083.severity = none
 # CA1309: Use ordinal StringComparison
 dotnet_diagnostic.CA1309.severity = none
-# CA1000: Do not declare static members on generic types
+# CA1000: Do not declare members on generic types
 dotnet_diagnostic.CA1000.severity = none
 # RCS1018: Add accessibility modifiers
 dotnet_diagnostic.RCS1018.severity = none
