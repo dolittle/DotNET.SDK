@@ -48,7 +48,7 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-    async Task<Document> GenerateStub(CodeFixContext context, Document document, string eventType, CancellationToken ct)
+    static async Task<Document> GenerateStub(CodeFixContext context, Document document, string eventType, CancellationToken ct)
     {
         if (await context.Document.GetSyntaxRootAsync(ct) is not CompilationUnitSyntax root) return document;
 
