@@ -4,11 +4,12 @@ using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
+using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using Version = Dolittle.SDK.Microservices.Version;
 
 namespace Specs;
 
-static class given
+class given
 {
     internal static EventContext an_event_context_for<TEvent>(EventSourceId eventSource, EventLogSequenceNumber sequenceNumber = null)
     {

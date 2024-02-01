@@ -5,25 +5,24 @@ using Customers;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Testing.Aggregates;
 using Kitchen;
-using Machine.Specifications;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Specs.for_DishServer.given;
 
-class the_handler
+public class the_handler
 {
-    protected static readonly EventSourceId customer_name = DishServer.CustomerName; 
-    protected static DishServer handler;
-    protected static AggregateOfMock<Customer> customers;
-    protected static EventSourceId kitchen_name;
-    protected static DishPrepared @event;
+    protected readonly EventSourceId customer_name = DishServer.CustomerName;
+    protected DishServer handler;
+    protected AggregateOfMock<Customer> customers;
+    protected EventSourceId kitchen_name;
+    protected DishPrepared @event;
     
-    Establish context = () =>
+    protected the_handler()
     {
         customers = AggregateOfMock<Customer>.Create(_ => _.AddLogging());
         handler = new DishServer(customers, NullLogger<DishServer>.Instance);
         kitchen_name = "Dolittle Tacos";
         @event = new DishPrepared("some dish", "some chef");
-    };
+    }
 }

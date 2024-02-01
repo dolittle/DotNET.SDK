@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <Import Project="../../specs.props" />
+    <Import Project="../../tests.props" />
 
     <PropertyGroup>
         <AssemblyName>Dolittle.SDK.ASP.NET.Specs</AssemblyName>

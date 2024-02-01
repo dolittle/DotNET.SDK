@@ -1,17 +1,18 @@
 // Copyright (c) Dolittle. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// Licensed under the M[Fact] public void license. See LICENSE file in the project root for full license information.
 
 using Customers;
+using FluentAssertions;
 using Kitchen;
-using Machine.Specifications;
+using Xunit;
 
 namespace Specs.for_DishServer;
 
-class when_two_dishes_have_been_prepared : given.the_handler
+public class when_two_dishes_have_been_prepared : given.the_handler
 {
-    static DishPrepared first_dish, second_dish;
-    
-    Establish context = () =>
+    DishPrepared first_dish, second_dish;
+
+    public when_two_dishes_have_been_prepared()
     {
         first_dish = @event with
         {
@@ -25,26 +26,34 @@ class when_two_dishes_have_been_prepared : given.the_handler
         };
 
         handler.Handle(first_dish, Specs.given.an_event_context_for<DishPrepared>(kitchen_name)).GetAwaiter().GetResult();
-    };
-    
-    Because of = async () => await handler.Handle(second_dish, Specs.given.an_event_context_for<DishPrepared>(kitchen_name));
 
-    It should_get_the_correct_customer = () => customers.TryGetAggregate(customer_name, out _).ShouldBeTrue(); 
-    
-    It the_customer_should_have_only_eaten_second_dish_after_last_operation = () => customers.AfterLastOperationOn(customer_name).ShouldHaveEvent<DishEaten>()
-        .CountOf(1)
-        .First().Where(_ => _.Dish.ShouldEqual(second_dish.Dish));
+        handler.Handle(second_dish, Specs.given.an_event_context_for<DishPrepared>(kitchen_name)).GetAwaiter().GetResult();
+    }
 
-    It the_customer_should_have_only_eaten_one_dish_after_last_operation = () => customers.AfterLastOperationOn(customer_name).ShouldHaveNumberOfEvents(1);
 
-    It the_customer_should_have_eaten_first_dish_first = () => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
+    [Fact]
+    public void should_get_the_correct_customer() => customers.TryGetAggregate(customer_name, out _).Should().BeTrue();
+
+    [Fact]
+    public void the_customer_should_have_only_eaten_second_dish_after_last_operation() => customers
+        .AfterLastOperationOn(customer_name)
+        .ShouldHaveSingleEvent<DishEaten>()
+        .Where(_ => _.Dish.Should().Be(second_dish.Dish));
+
+    [Fact]
+    public void the_customer_should_have_only_eaten_one_dish_after_last_operation() =>
+        customers.AfterLastOperationOn(customer_name).ShouldHaveNumberOfEvents(1);
+
+    [Fact]
+    public void the_customer_should_have_eaten_first_dish_first() => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
         .AtBeginning()
-        .Where(_ => _.Dish.ShouldEqual(first_dish.Dish));
-    
-    It the_customer_should_have_eaten_second_dish_last = () => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
-        .AtEnd()
-        .Where(_ => _.Dish.ShouldEqual(second_dish.Dish));
+        .Where(_ => _.Dish.Should().Be(first_dish.Dish));
 
-    It the_customer_should_have_only_eaten_two_dishes = () => customers.AssertThat(customer_name).ShouldHaveNumberOfEvents(2);
-    
+    [Fact]
+    public void the_customer_should_have_eaten_second_dish_last() => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
+        .AtEnd()
+        .Where(_ => _.Dish.Should().Be(second_dish.Dish));
+
+    [Fact]
+    public void the_customer_should_have_only_eaten_two_dishes() => customers.AssertThat(customer_name).ShouldHaveNumberOfEvents(2);
 }
