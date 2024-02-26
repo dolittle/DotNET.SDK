@@ -15,7 +15,7 @@ static class AggregateClusterKindFactory
     public static ClusterKind CreateKind(IServiceProvider serviceProvider, Type aggregateRootType)
     {
         var createKind = typeof(AggregateClusterKindFactory<>).MakeGenericType(aggregateRootType).GetMethod(nameof(CreateKind));
-        return (ClusterKind)createKind!.Invoke(null, new object[] { serviceProvider })!;
+        return (ClusterKind)createKind!.Invoke(null, [serviceProvider])!;
     }
 }
 

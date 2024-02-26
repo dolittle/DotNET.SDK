@@ -84,7 +84,7 @@ public static class GuidExtensions
     {
         if (TryToGuid(source, out var value, out error))
         {
-            id = typeof(T).GetConstructor(new []{ typeof(Guid) })?.Invoke(new object[]{ value }) as T;
+            id = typeof(T).GetConstructor([typeof(Guid)])?.Invoke([value]) as T;
             return true;
         }
 

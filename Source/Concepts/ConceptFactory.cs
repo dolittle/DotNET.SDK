@@ -21,5 +21,5 @@ public static class ConceptFactory
         => type
             .GetConstructors()
             .Single(c => c.GetParameters().Length > 0)
-            .Invoke(new[] {value});
+            .Invoke([value]);
 }

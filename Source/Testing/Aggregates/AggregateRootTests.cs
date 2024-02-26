@@ -55,4 +55,13 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
         AssertThat = _aggregateOf.AfterLastOperationOn(_eventSourceId);
         return AssertThat;
     }
+
+    protected void OperationShouldBeIdempotent(Action<T> action)
+    {
+        WhenPerforming(action);
+        
+        WhenPerforming(action);
+        // Second call should not produce events, as the state should not have changed
+        AssertThat.ShouldHaveNoEvents();
+    }
 }

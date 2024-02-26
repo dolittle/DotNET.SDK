@@ -88,22 +88,20 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                 typeof(IProjectionOf<>).MakeGenericType(readModelType),
                 serviceProvider => GetOfMethodForReadModel(readModelType).Invoke(
                     serviceProvider.GetRequiredService<IProjectionStore>(),
-                    new object[]
-                    {
+                    [
                         projection.Identifier,
                         projection.ScopeId
-                    }));
+                    ]));
             if (projection.Copies.MongoDB.ShouldCopy)
             {
                 serviceCollection.AddScoped(
                     typeof(IMongoCollection<>).MakeGenericType(readModelType),
                     serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
                         serviceProvider.GetRequiredService<IMongoDatabase>(),
-                        new object[]
-                        {
+                        [
                             projection.Copies.MongoDB.CollectionName.Value,
                             null
-                        }));
+                        ]));
             }
         }
     }
@@ -111,21 +109,19 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     static MethodInfo GetOfMethodForReadModel(Type readModelType)
         => typeof(IProjectionStore).GetMethod(
             nameof(IProjectionStore.Of),
-            new[]
-            {
+            [
                 typeof(ProjectionId),
                 typeof(ScopeId)
-            })
+            ])
             ?.MakeGenericMethod(readModelType);
     
     static MethodInfo GetCollectionMethodForReadModel(Type readModelType)
         => typeof(IMongoDatabase).GetMethod(
             nameof(IMongoDatabase.GetCollection),
-            new[]
-            {
+            [
                 typeof(string),
                 typeof(MongoCollectionSettings)
-            })
+            ])
             ?.MakeGenericMethod(readModelType);
 
 }

@@ -69,11 +69,11 @@ class SomeAggregate: AggregateRoot
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MutationShouldBePrivate)
                 .WithSpan(19, 5, 22, 6)
                 .WithArguments("SomeAggregate.On(NameUpdated)")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -106,11 +106,11 @@ class SomeAggregate: AggregateRoot
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters)
                 .WithSpan(19, 5, 22, 6)
                 .WithArguments("SomeAggregate.On(NameUpdated, string)")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -142,14 +142,14 @@ class SomeAggregate: AggregateRoot
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MissingMutation)
                 .WithSpan(16, 9, 16, 37)
                 .WithArguments("NameUpdated"),
             Diagnostic(DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters)
                 .WithSpan(19, 5, 21, 6)
                 .WithArguments("SomeAggregate.On()")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -180,11 +180,11 @@ class SomeAggregate: AggregateRoot
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MissingAttribute)
                 .WithSpan(9, 7, 9, 20)
                 .WithArguments("SomeAggregate")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -216,14 +216,14 @@ class SomeAggregate: AggregateRoot
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Events.MissingAttribute)
                 .WithSpan(16, 9, 16, 37)
                 .WithArguments("Test.NameUpdated"),
             Diagnostic(DescriptorRules.Events.MissingAttribute)
                 .WithSpan(19, 21, 19, 39)
                 .WithArguments("Test.NameUpdated")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -250,11 +250,11 @@ class SomeAggregate: AggregateRoot
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MissingMutation)
                 .WithSpan(16, 9, 16, 37)
                 .WithArguments("NameUpdated")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -284,11 +284,11 @@ class SomeAggregate: AggregateRoot
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MissingMutation)
                 .WithSpan(18, 13, 18, 41)
                 .WithArguments("NameUpdated")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -322,11 +322,11 @@ public class SomeAggregate : AggregateRoot
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MissingMutation)
                 .WithSpan(22, 13, 22, 41)
                 .WithArguments("NameUpdated")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -355,11 +355,11 @@ class SomeAggregate: AggregateRoot
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MissingMutation)
                 .WithSpan(18, 9, 18, 22)
                 .WithArguments("NameUpdated")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -401,11 +401,11 @@ class SomeAggregate: AggregateRoot
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MutationsCannotProduceEvents)
                 .WithSpan(25, 9, 25, 68)
                 .WithArguments("Apply(new InvalidThingHappening(\"This should not be here\"))")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -447,11 +447,11 @@ class SomeAggregate: AggregateRoot
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MutationsCannotProduceEvents)
                 .WithSpan(25, 9, 25, 19)
                 .WithArguments("Apply(new InvalidThingHappening(\"This should not be here\"))")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -493,11 +493,11 @@ class SomeAggregate: AggregateRoot
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.MutationsCannotProduceEvents)
                 .WithSpan(25, 9, 25, 19)
                 .WithArguments("Apply(new InvalidThingHappening(\"This should not be here\"))")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -567,11 +567,11 @@ class SomeAggregate: AggregateRoot
 }";
         
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
                 .WithSpan(17, 9, 17, 13)
                 .WithArguments("Name = name;")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -606,11 +606,11 @@ class SomeAggregate: AggregateRoot
 }";
         
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
                 .WithSpan(17, 9, 17, 18)
                 .WithArguments("this.Name = name;")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -644,11 +644,11 @@ class SomeAggregate: AggregateRoot
 }";
         
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
                 .WithSpan(17, 9, 17, 14)
                 .WithArguments("_name = name;")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -683,11 +683,11 @@ class SomeAggregate: AggregateRoot
 }";
         
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState)
                 .WithSpan(17, 9, 17, 19)
                 .WithArguments("this._name = name;")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }

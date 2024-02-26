@@ -7,7 +7,7 @@
         <MachineSpecificationsRunnerVersion>2.9.0</MachineSpecificationsRunnerVersion>
         <MachineSpecificationsVersion>1.0.0</MachineSpecificationsVersion>
         <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
-        <MicrosoftDotNetTestVersion>17.8.0</MicrosoftDotNetTestVersion>
+        <MicrosoftDotNetTestVersion>17.9.0</MicrosoftDotNetTestVersion>
         <ProtoActorVersion>1.6.0</ProtoActorVersion>
         <RxVersion>4.4.1</RxVersion>
         <ProtobufVersion>3.25.3</ProtobufVersion>

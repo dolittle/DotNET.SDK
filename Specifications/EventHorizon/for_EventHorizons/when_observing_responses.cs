@@ -25,14 +25,14 @@ public class when_observing_responses : given.an_event_horizons_and_a_subscripti
             .Setup(_ => _.Call(Moq.It.IsAny<SubscriptionsSubscribeMethod>(), Moq.It.IsAny<SubscriptionRequest>(), Moq.It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(new SubscriptionResponse { ConsentId = Guid.NewGuid().ToProtobuf(), Failure = null }));
 
-        returned_responses = new[]
-        {
+        returned_responses =
+        [
             event_horizons.Subscribe(subscription).GetAwaiter().GetResult(),
             event_horizons.Subscribe(subscription).GetAwaiter().GetResult(),
-            event_horizons.Subscribe(subscription).GetAwaiter().GetResult(),
-        };
+            event_horizons.Subscribe(subscription).GetAwaiter().GetResult()
+        ];
 
-        observed_responses = new List<SubscribeResponse>();
+        observed_responses = [];
         event_horizons.Responses.Subscribe(_ => observed_responses.Add(_));
     };
 

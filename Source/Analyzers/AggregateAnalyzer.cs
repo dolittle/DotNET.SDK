@@ -173,7 +173,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(
                     DescriptorRules.Aggregate.MutationsCannotProduceEvents,
                     applyInvocation.GetLocation(),
-                    new[] { onMethod.ToDisplayString() }
+                    [onMethod.ToDisplayString()]
                 ));
             }
             
@@ -189,7 +189,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(
                     DescriptorRules.Aggregate.MutationsCannotProduceEvents,
                     invocation.GetLocation(),
-                    new[] { onMethod.ToDisplayString() }
+                    [onMethod.ToDisplayString()]
                 ));
             }
         }

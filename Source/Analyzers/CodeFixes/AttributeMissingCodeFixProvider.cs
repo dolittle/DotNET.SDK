@@ -48,7 +48,6 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-
     static async Task<Solution> GenerateIdentityAttribute(CodeFixContext context, Document document, string targetClass, string attributeClass,
         CancellationToken cancellationToken)
     {

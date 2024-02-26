@@ -11,7 +11,7 @@ namespace Customers;
 [CopyProjectionToMongoDB("dishes_eaten")]
 public class DishesEaten
 {
-    public string[] Dishes { get; set; } = {};
+    public string[] Dishes { get; set; } = [];
     
     [KeyFromEventSource]
     public void On(DishEaten evt, ProjectionContext ctx)

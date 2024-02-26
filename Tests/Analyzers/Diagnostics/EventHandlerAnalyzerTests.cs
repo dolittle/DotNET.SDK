@@ -62,11 +62,11 @@ class SomeEventHandler
     
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidTimestamp)
                 .WithSpan(5, 86, 5, 125)
-                .WithArguments("startFromTimestamp"),
-        };
+                .WithArguments("startFromTimestamp")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -84,11 +84,11 @@ class SomeEventHandler
     
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidTimestamp)
                 .WithSpan(5, 86, 5, 122)
-                .WithArguments("stopAtTimestamp"),
-        };
+                .WithArguments("stopAtTimestamp")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -123,11 +123,11 @@ class SomeEventHandler
     
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidStartStopTimestamp)
                 .WithSpan(5, 2, 5, 131)
-                .WithArguments("startFromTimestamp","stopAtTimestamp"),
-        };
+                .WithArguments("startFromTimestamp","stopAtTimestamp")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -149,11 +149,11 @@ class SomeEventHandler
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Events.MissingAttribute)
                 .WithSpan(10, 34, 10, 37)
-                .WithArguments("SomeEvent"),
-        };
+                .WithArguments("SomeEvent")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -176,11 +176,11 @@ class SomeEventHandler
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidAccessibility)
                 .WithSpan(11, 10, 11, 16)
-                .WithArguments("Handle", "Public"),
-        };
+                .WithArguments("Handle", "Public")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -203,11 +203,11 @@ class SomeEventHandler
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidAccessibility)
                 .WithSpan(11, 18, 11, 24)
-                .WithArguments("Handle", "Public"),
-        };
+                .WithArguments("Handle", "Public")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -230,11 +230,11 @@ class SomeEventHandler
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidAccessibility)
                 .WithSpan(11, 19, 11, 25)
-                .WithArguments("Handle", "Public"),
-        };
+                .WithArguments("Handle", "Public")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -257,11 +257,11 @@ class SomeEventHandler
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Events.MissingEventContext)
                 .WithSpan(11, 17, 11, 23)
-                .WithArguments("Handle"),
-        };
+                .WithArguments("Handle")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }

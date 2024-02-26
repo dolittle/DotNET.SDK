@@ -45,7 +45,7 @@ static class DescriptorRules
             DiagnosticCategories.Sdk,
             DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Assign a unique identity in the attribute");
+            description: "Assign a unique identity in the attribute.");
 
     internal static readonly DiagnosticDescriptor InvalidAccessibility = 
         new(

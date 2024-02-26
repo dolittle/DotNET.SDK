@@ -9,18 +9,16 @@ namespace Dolittle.SDK.Microservices;
 /// <summary>
 /// Represents an implementation of <see cref="IVersionConverter"/>.
 /// </summary>
-public class VersionConverter : IVersionConverter
+public partial class VersionConverter : IVersionConverter
 {
-    static readonly Regex _versionRegex = new("(\\d+).(\\d+).(\\d+)-*([\\w]+)*[+-.]*(\\d+)*", RegexOptions.Compiled);
+    static readonly Regex _versionRegex = VersionRegex();
 
     /// <inheritdoc/>
     public Version FromString(string versionAsString)
     {
         var result = _versionRegex.Match(versionAsString);
         if (!result.Success)
-        {
             throw new InvalidVersionString(versionAsString);
-        }
         var major = int.Parse(result.Groups[1].Value, CultureInfo.InvariantCulture);
         var minor = int.Parse(result.Groups[2].Value, CultureInfo.InvariantCulture);
         var patch = int.Parse(result.Groups[3].Value, CultureInfo.InvariantCulture);
@@ -39,4 +37,7 @@ public class VersionConverter : IVersionConverter
         var postfix = version.IsPreRelease ? $"-{version.PreReleaseString}.{version.Build}" : string.Empty;
         return $"{version.Major}.{version.Minor}.{version.Patch}{postfix}";
     }
+
+    [GeneratedRegex("(\\d+).(\\d+).(\\d+)-*([\\w]+)*[+-.]*(\\d+)*", RegexOptions.Compiled)]
+    private static partial Regex VersionRegex();
 }
