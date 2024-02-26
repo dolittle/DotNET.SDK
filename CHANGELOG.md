@@ -1,3 +1,16 @@
+# [22.1.3] - 2024-2-26 [PR: #235](https://github.com/dolittle/DotNET.SDK/pull/235)
+## Summary
+Maintenance release - Updated library dependencies
+
+### Changed
+
+- Updated OTEL to 1.7
+- Updated Proto.Actor to 1.6
+- Updated Microsoft extensions to 8.0
+- Updated Mongo drivers to 2.24
+- Updated Grpc & Protobuf to latest
+
+
 # [22.1.2] - 2023-10-24 [PR: #234](https://github.com/dolittle/DotNET.SDK/pull/234)
 ## Summary
 
