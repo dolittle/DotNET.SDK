@@ -2,7 +2,6 @@
 using System.Globalization;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Security;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 using Version = Dolittle.SDK.Microservices.Version;
