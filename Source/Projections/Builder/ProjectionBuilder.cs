@@ -1,11 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Builder.Copies;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -17,8 +16,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
 {
     readonly ProjectionId _projectionId;
     readonly IModelBuilder _modelBuilder;
-    readonly IProjectionCopyToMongoDBBuilderFactory _copyToMongoDbBuilderFactory;
-    ICanTryBuildProjection _methodsBuilder;
+    ICanTryBuildProjection? _methodsBuilder;
 
     ScopeId _scopeId = ScopeId.Default;
 
@@ -28,11 +26,10 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     /// <param name="projectionId">The <see cref="ProjectionId" />.</param>
     /// <param name="modelBuilder">The <see cref="IModelBuilder" />.</param>
     /// <param name="copyToMongoDBBuilderFactory">The <see cref="IProjectionCopyToMongoDBBuilderFactory"/>.</param>
-    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder, IProjectionCopyToMongoDBBuilderFactory copyToMongoDBBuilderFactory)
+    public ProjectionBuilder(ProjectionId projectionId, IModelBuilder modelBuilder)
     {
         _projectionId = projectionId;
         _modelBuilder = modelBuilder;
-        _copyToMongoDbBuilderFactory = copyToMongoDBBuilderFactory;
     }
 
     /// <inheritdoc />
@@ -58,14 +55,13 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
             _projectionId,
             _scopeId,
             _modelBuilder,
-            this,
-            new ProjectionCopyDefinitionBuilder<TReadModel>(_copyToMongoDbBuilderFactory.CreateFor<TReadModel>()));
+            this);
         _methodsBuilder = builder;
         return builder;
     }
 
     /// <inheritdoc/>
-    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, [NotNullWhen(true)] out IProjection? projection)
     {
         projection = default;
         if (_methodsBuilder != null)

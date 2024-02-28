@@ -10,7 +10,6 @@ using Diagnostics;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Execution;
 using Dolittle.SDK.Projections.Builder;
-using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections;
 
@@ -32,15 +31,13 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
     public Projection(
         ProjectionModelId identifier,
-        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
-        ProjectionCopies copies)
+        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods)
     {
         _onMethods = onMethods;
         Identifier = identifier.Id;
         ScopeId = identifier.Scope;
         Events = onMethods.Select(_ => new EventSelector(_.Key, _.Value.KeySelector)).ToList();
         ProjectionType = typeof(TReadModel);
-        Copies = copies;
 
         if (!string.IsNullOrEmpty(identifier.Alias))
         {
@@ -65,9 +62,6 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public IEnumerable<EventSelector> Events { get; }
 
     /// <inheritdoc />
-    public ProjectionCopies Copies { get; }
-
-    /// <inheritdoc />
     public ProjectionAlias? Alias { get; }
 
     /// <inheritdoc />
@@ -77,8 +71,7 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context,
         CancellationToken cancellation)
     {
-        using var activity = context.EventContext.CommittedExecutionContext.StartChildActivity("Projection on " + @event.GetType().Name)
-            ?.Tag(eventType);
+        using var activity = context.EventContext.CommittedExecutionContext.StartChildActivity("Projection on " + @event.GetType().Name)?.Tag(eventType);
 
         try
         {

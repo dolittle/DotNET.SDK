@@ -21,16 +21,10 @@ delegate Task<IServiceProvider> GetServiceProviderForTenant(TenantId tenantId);
 
 delegate TimeSpan AggregateUnloadTimeout();
 
-class Perform<TAggregate> where TAggregate : AggregateRoot
+class Perform<TAggregate>(Func<TAggregate, Task> callback, CancellationToken cancellationToken) where TAggregate : AggregateRoot
 {
-    public Perform(Func<TAggregate, Task> callback, CancellationToken cancellationToken)
-    {
-        Callback = callback;
-        CancellationToken = cancellationToken;
-    }
-
-    public Func<TAggregate, Task> Callback { get; }
-    public CancellationToken CancellationToken { get; }
+    public Func<TAggregate, Task> Callback { get; } = callback;
+    public CancellationToken CancellationToken { get; } = cancellationToken;
 }
 
 class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
@@ -41,7 +35,6 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
 
     EventSourceId? _eventSourceId;
 
-    // ReSharper disable once StaticMemberInGenericType
     readonly TimeSpan _idleUnloadTimeout;
 
     internal AggregateActor(GetServiceProviderForTenant getServiceProvider, ILogger<AggregateActor<TAggregate>> logger, TimeSpan idleUnloadTimeout)

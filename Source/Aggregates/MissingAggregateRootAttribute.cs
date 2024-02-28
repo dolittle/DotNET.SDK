@@ -8,14 +8,10 @@ namespace Dolittle.SDK.Aggregates;
 /// <summary>
 /// Exception that gets thrown when a <see cref="AggregateRoot" /> is missing <see cref="AggregateRootAttribute" />.
 /// </summary>
-public class MissingAggregateRootAttribute : Exception
+/// <remarks>
+/// Initializes a new instance of the <see cref="MissingAggregateRootAttribute"/> class.
+/// </remarks>
+/// <param name="aggregateRootType">The <see cref="Type" /> of the <see cref="AggregateRoot" />.</param>
+public class MissingAggregateRootAttribute(Type aggregateRootType) : Exception($"Aggregate Root {aggregateRootType} is missing [AggregateRoot] attribute")
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MissingAggregateRootAttribute"/> class.
-    /// </summary>
-    /// <param name="aggregateRootType">The <see cref="Type" /> of the <see cref="AggregateRoot" />.</param>
-    public MissingAggregateRootAttribute(Type aggregateRootType)
-        : base($"Aggregate Root {aggregateRootType} is missing [AggregateRoot] attribute")
-    {
-    }
 }

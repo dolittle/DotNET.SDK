@@ -93,18 +93,18 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                         projection.Identifier,
                         projection.ScopeId
                     }));
-            if (projection.Copies.MongoDB.ShouldCopy)
-            {
-                serviceCollection.AddScoped(
-                    typeof(IMongoCollection<>).MakeGenericType(readModelType),
-                    serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
-                        serviceProvider.GetRequiredService<IMongoDatabase>(),
-                        new object[]
-                        {
-                            projection.Copies.MongoDB.CollectionName.Value,
-                            null
-                        }));
-            }
+            // if (projection.Copies.MongoDB.ShouldCopy)
+            // {
+            //     serviceCollection.AddScoped(
+            //         typeof(IMongoCollection<>).MakeGenericType(readModelType),
+            //         serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
+            //             serviceProvider.GetRequiredService<IMongoDatabase>(),
+            //             new object[]
+            //             {
+            //                 projection.Copies.MongoDB.CollectionName.Value,
+            //                 null
+            //             }));
+            // }
         }
     }
 

@@ -9,7 +9,6 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB.for_MongoDbCollectionNameValid
 
 public class a_validator
 {
-    protected static MongoDbCollectionNameValidator validator;
     protected static ClientBuildResults build_results;
     protected static ProjectionModelId identifier;
     
@@ -17,7 +16,6 @@ public class a_validator
     Establish context = () =>
     {
         build_results = new ClientBuildResults();
-        validator = new MongoDbCollectionNameValidator();
         identifier = new ProjectionModelId("69891694-022c-4df4-8384-55a0804ca7b4", ScopeId.Default, "aliasy");
     };
 }

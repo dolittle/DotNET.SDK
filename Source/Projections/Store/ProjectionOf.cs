@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
@@ -14,7 +15,7 @@ namespace Dolittle.SDK.Projections.Store;
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
 public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ProjectionBase, new()
 {
     readonly IProjectionStore _projectionStore;
 
@@ -23,8 +24,7 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     /// </summary>
     /// <param name="projectionStore">The <see cref="IProjectionStore"/>.</param>
     /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
-    public ProjectionOf(IProjectionStore projectionStore, ProjectionModelId identifier)
-        : this(projectionStore, identifier.Id, identifier.Scope)
+    public ProjectionOf(IProjectionStore projectionStore, ProjectionModelId identifier) : this(projectionStore, identifier.Id, identifier.Scope)
     {
     }
 
@@ -48,8 +48,13 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     public ScopeId Scope { get; }
 
     /// <inheritdoc />
-    public Task<TReadModel> Get(Key key, CancellationToken cancellation = default)
+    public Task<TReadModel?> Get(Key key, CancellationToken cancellation = default)
         => _projectionStore.Get<TReadModel>(key, Identifier, Scope, cancellation);
+
+    public IQueryable<TReadModel> AsQueryable()
+    {
+        throw new NotImplementedException();
+    }
 
     /// <inheritdoc />
     public Task<CurrentState<TReadModel>> GetState(Key key, CancellationToken cancellation = default)

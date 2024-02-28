@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -21,7 +20,6 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     where TProjection : class, new()
 {
     readonly ProjectionModelId _identifier;
-    readonly Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> _copyToMongoDbBuilder;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
 
@@ -30,10 +28,9 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// </summary>
     /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="copyToMongoDbBuilder">The <see cref="Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder{TProjection}"/>.</param>
-    public ConventionProjectionBuilder(ProjectionModelId identifier,  Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
+    public ConventionProjectionBuilder(ProjectionModelId identifier)
     {
         _identifier = identifier;
-        _copyToMongoDbBuilder = copyToMongoDbBuilder;
     }
 
     /// <inheritdoc />
@@ -77,13 +74,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             return false;
         }
 
-        if (!_copyToMongoDbBuilder.TryBuildFromReadModel(identifier, buildResults, out var copyToMongoDB))
-        {
-            buildResults.AddFailure(identifier, $"Failed to build projection copies definition using conventions from projection type {_projectionType}");
-            return false;
-        }
+        // if (!_copyToMongoDbBuilder.TryBuildFromReadModel(identifier, buildResults, out var copyToMongoDB))
+        // {
+        //     buildResults.AddFailure(identifier, $"Failed to build projection copies definition using conventions from projection type {_projectionType}");
+        //     return false;
+        // }
         
-        projection = new Projection<TProjection>(_identifier, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
+        projection = new Projection<TProjection>(_identifier, eventTypesToMethods);
         return true;
     }
     

@@ -27,11 +27,6 @@ public interface IProjection
     /// Gets the scope the projection is in.
     /// </summary>
     ScopeId ScopeId { get; }
-
-    /// <summary>
-    /// Gets the <see cref="ProjectionCopies"/>.
-    /// </summary>
-    ProjectionCopies Copies { get; }
     
     /// <summary>
     /// Gets the alias of the projection.

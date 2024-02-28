@@ -55,22 +55,22 @@ public class ProjectionStore : IProjectionStore
 
     /// <inheritdoc />
     public IProjectionOf<TProjection> Of<TProjection>()
-        where TProjection : class, new()
+        where TProjection : ProjectionBase, new()
         => new ProjectionOf<TProjection>(this, _projectionAssociations.GetFor<TProjection>());
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
-        where TReadModel : class, new()
+        where TReadModel : ProjectionBase, new()
         => new ProjectionOf<TReadModel>(this, projectionId, ScopeId.Default);
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
-        where TReadModel : class, new()
+        where TReadModel : ProjectionBase, new()
         => new ProjectionOf<TReadModel>(this, projectionId, scopeId);
 
     /// <inheritdoc/>
     public Task<TProjection> Get<TProjection>(Key key, CancellationToken cancellation = default)
-        where TProjection : class, new()
+        where TProjection : ProjectionBase, new()
     {
         var identifier = _projectionAssociations.GetFor<TProjection>();
         return Get<TProjection>(key, identifier.Id, identifier.Scope, cancellation);
@@ -78,7 +78,7 @@ public class ProjectionStore : IProjectionStore
 
     /// <inheritdoc/>
     public Task<TReadModel> Get<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
-        where TReadModel : class, new()
+        where TReadModel : ProjectionBase, new()
         => Get<TReadModel>(key, projectionId, ScopeId.Default, cancellation);
 
     /// <inheritdoc/>

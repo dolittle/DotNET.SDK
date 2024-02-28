@@ -19,4 +19,14 @@ public class MissingOnMethodForEventType : Exception
         : base($"Missing on-method for '{eventType}'")
     {
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MissingOnMethodForEventType"/> class.
+    /// </summary>
+    /// <param name="eventType">The <see cref="EventType" />.</param>
+    /// <param name="projectionType">The projection type</param>
+    public MissingOnMethodForEventType(Type eventType, Type projectionType)
+        : base($"Missing on-method for '{eventType.FullName}' in projection '{projectionType.FullName}'")
+    {
+    }
 }

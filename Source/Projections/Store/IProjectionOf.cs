@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
@@ -13,8 +14,7 @@ namespace Dolittle.SDK.Projections.Store;
 /// Defines a system that knows about a projection.
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
-public interface IProjectionOf<TReadModel>
-    where TReadModel : class, new()
+public interface IProjectionOf<TReadModel> where TReadModel : class, new()
 {
     /// <summary>
     /// Gets the <see cref="ProjectionId"/> identifier.
@@ -32,7 +32,9 @@ public interface IProjectionOf<TReadModel>
     /// <param name="key">The <see cref="Key" /> of the projection.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task" /> that, when resolved, returns the <typeparamref name="TReadModel"/> read model.</returns>
-    Task<TReadModel> Get(Key key, CancellationToken cancellation = default);
+    Task<TReadModel?> Get(Key key, CancellationToken cancellation = default);
+    
+    IQueryable<TReadModel> AsQueryable();
 
     /// <summary>
     /// Gets the projection state by key.

@@ -57,7 +57,7 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
                 ProjectionId = _projection.Identifier.ToProtobuf(),
                 ScopeId = _projection.ScopeId.ToProtobuf(),
                 InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None),
-                Copies = _projection.Copies.ToProtobuf()
+                // Copies = _projection.Copies.ToProtobuf()
             };
             if (_projection.HasAlias)
             {
@@ -93,7 +93,7 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
 
         return result.Type switch
         {
-            ProjectionResultType.Replace => new ProjectionResponse { Replace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None) } },
+            ProjectionResultType.Replace => new ProjectionResponse { Replace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.ReadModel, Formatting.None) } },
             ProjectionResultType.Delete => new ProjectionResponse { Delete = new ProjectionDeleteResponse() },
             _ => throw new UnknownProjectionResultType(result.Type)
         };

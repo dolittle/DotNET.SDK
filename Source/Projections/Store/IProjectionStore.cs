@@ -20,7 +20,7 @@ public interface IProjectionStore
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TProjection}"/> for the <typeparamref name="TProjection"/> projection read model class.</returns>
     IProjectionOf<TProjection> Of<TProjection>()
-        where TProjection : class, new();
+        where TProjection : ProjectionBase, new();
 
     /// <summary>
     /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.
@@ -29,7 +29,7 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
     IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
-        where TReadModel : class, new();
+        where TReadModel : ProjectionBase, new();
 
     /// <summary>
     /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.
@@ -39,7 +39,7 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
     IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
-        where TReadModel : class, new();
+        where TReadModel : ProjectionBase, new();
     
     /// <summary>
     /// Gets a projection read model by key for a projection associated with a type.
@@ -49,7 +49,7 @@ public interface IProjectionStore
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TProjection"/> read model.</returns>
     Task<TProjection> Get<TProjection>(Key key, CancellationToken cancellation = default)
-        where TProjection : class, new();
+        where TProjection : ProjectionBase, new();
 
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection identifier.
@@ -60,7 +60,7 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TReadModel"/> read model.</returns>
     Task<TReadModel> Get<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
-        where TReadModel : class, new();
+        where TReadModel : ProjectionBase, new();
 
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection identifier.
@@ -80,7 +80,7 @@ public interface IProjectionStore
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TReadModel"/> read model.</returns>
-    Task<TReadModel> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
+    Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         where TReadModel : class, new();
 
     /// <summary>
