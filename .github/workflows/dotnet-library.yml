@@ -25,6 +25,7 @@ jobs:
           dotnet-version: |
             6.0.x
             7.0.x
+            8.0.x
       - name: Setup dotCover
         run: dotnet tool install JetBrains.dotCover.GlobalTool -g
       - name: Setup report generator
