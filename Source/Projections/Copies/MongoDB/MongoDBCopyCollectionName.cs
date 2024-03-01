@@ -3,7 +3,6 @@
 
 using System;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.Concepts;
 

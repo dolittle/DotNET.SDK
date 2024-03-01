@@ -3,4 +3,6 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("ProjectionsTests")]
+[assembly:InternalsVisibleTo("Dolittle.SDK.ProjectionTests")]
+[assembly:InternalsVisibleTo("Dolittle.SDK")]
+

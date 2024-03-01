@@ -115,6 +115,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     public Task Connected => _connectedCompletionSource.Task;
 
     internal IAggregateRootTypes AggregateRootTypes => _unregisteredAggregateRoots;
+    internal IUnregisteredProjections ProjectionTypes => _unregisteredProjections;
 
     /// <inheritdoc />
     public IEventTypes EventTypes { get; }

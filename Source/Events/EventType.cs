@@ -15,7 +15,7 @@ public class EventType : Artifact<EventTypeId>
     /// </summary>
     /// <param name="id">The <see cref="EventTypeId">unique identifier</see> of the <see cref="EventType"/>.</param>
     public EventType(EventTypeId id)
-        : this(id, Generation.First, null)
+        : this(id, Generation.First)
     {
     }
 
@@ -56,7 +56,7 @@ public class EventType : Artifact<EventTypeId>
     /// <summary>
     /// Gets the alias for the Event Type.
     /// </summary>
-    public EventTypeAlias? Alias { get; }
+    public new EventTypeAlias? Alias { get; }
 
     /// <summary>
     /// Gets a value indicating whether the Event Type has an alias or not.

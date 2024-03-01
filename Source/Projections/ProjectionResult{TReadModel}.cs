@@ -20,6 +20,11 @@ public class ProjectionResult<TReadModel> where TReadModel : class, new()
     public static ProjectionResult<TReadModel> Keep { get; } = new() { Type = ProjectionResultType.Keep };
 
     /// <summary>
+    /// Gets a <see cref="ProjectionResult{TReadModel}" /> that signifies that the read model should be kept as is, IE no-op.
+    /// </summary>
+    public static ProjectionResult<TReadModel> Replace(TReadModel readModel) => readModel;
+    
+    /// <summary>
     /// Gets the updated read model.
     /// </summary>
     public TReadModel? ReadModel { get; private init; }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -34,7 +35,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildProjection other)
+    public bool Equals(ICanTryBuildProjection? other)
     {
         if (ReferenceEquals(this, other))
         {
@@ -51,7 +52,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         => HashCode.Combine(_identifier, _projectionType);
     
     /// <inheritdoc/>
-    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, [NotNullWhen(true)] out IProjection? projection)
     {
         projection = default;
         buildResults.AddInformation(identifier, $"Building from type {_projectionType}");
@@ -73,12 +74,6 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         {
             return false;
         }
-
-        // if (!_copyToMongoDbBuilder.TryBuildFromReadModel(identifier, buildResults, out var copyToMongoDB))
-        // {
-        //     buildResults.AddFailure(identifier, $"Failed to build projection copies definition using conventions from projection type {_projectionType}");
-        //     return false;
-        // }
         
         projection = new Projection<TProjection>(_identifier, eventTypesToMethods);
         return true;
@@ -111,7 +106,6 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         }
         buildResults.AddFailure(identifier, $"There are no projection methods to register in projection {_projectionType}", $"A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
         return false;
-
     }
 
     bool TryAddDecoratedOnMethods(
@@ -184,8 +178,9 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
 
             if (!TryGetEventParameterType(method, out var eventParameterType))
             {
-                shouldAddHandler = false;
+                allMethodsAdded = false;
                 buildResults.AddFailure(identifier, $"{method} has no parameters.", $"A projection method should take in as parameters an event and an {nameof(ProjectionContext)}");
+                continue;
             }
 
             if (eventParameterType == typeof(object))
@@ -254,14 +249,6 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
 
     static Type GetSignature(MethodInfo method)
     {
-        if (MethodReturnsTask(method))
-        {
-            return typeof(TaskProjectionMethodSignature<>);
-        }
-        if (MethodReturnsTaskResultType(method))
-        {
-            return typeof(TaskResultProjectionMethodSignature<>);
-        }
         if (MethodReturnsVoid(method))
         {
             return typeof(SyncProjectionMethodSignature<>);
@@ -275,14 +262,6 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
 
     static Type GetTypedSignature(MethodInfo method)
     {
-        if (MethodReturnsTask(method))
-        {
-            return typeof(TaskProjectionMethodSignature<,>);
-        }
-        if (MethodReturnsTaskResultType(method))
-        {
-            return typeof(TaskResultProjectionMethodSignature<,>);
-        }
         if (MethodReturnsVoid(method))
         {
             return typeof(SyncProjectionMethodSignature<,>);
@@ -317,9 +296,9 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         return false;
     }
 
-    bool TryGetKeySelector(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults, out KeySelector keySelector)
+    bool TryGetKeySelector(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults, [NotNullWhen(true)] out KeySelector? keySelector)
     {
-        keySelector = null;
+        keySelector = default;
         var attributes = method
             .GetCustomAttributes()
             .OfType<IKeySelectorAttribute>().ToArray();
@@ -340,7 +319,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         return true;
     }
 
-    static bool TryGetEventParameterType(MethodInfo method, out Type type)
+    static bool TryGetEventParameterType(MethodInfo method, [NotNullWhen(true)] out Type? type)
     {
         type = default;
         if (method.GetParameters().Length == 0)

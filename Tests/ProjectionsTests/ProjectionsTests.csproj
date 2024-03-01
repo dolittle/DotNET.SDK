@@ -2,6 +2,11 @@
 
     <Import Project="../../tests.props" />
 
+    <PropertyGroup>
+        <RootNamespace>Dolittle.SDK.ProjectionTests</RootNamespace>
+        <AssemblyName>Dolittle.SDK.ProjectionTests</AssemblyName>
+    </PropertyGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\..\Source\Projections\Projections.csproj" />
     </ItemGroup>

@@ -2,8 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading.Tasks;
-using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -17,30 +15,17 @@ public class TypedProjectionMethod<TReadModel, TEvent> : IProjectionMethod<TRead
     where TReadModel : class, new()
     where TEvent : class
 {
-    readonly TaskProjectionSignature<TReadModel, TEvent> _method;
+    readonly SyncProjectionSignature<TReadModel, TEvent> _method;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypedProjectionMethod{TReadModel, TEvent}"/> class.
     /// </summary>
     /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel, TEvent}" />.</param>
     /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
-    public TypedProjectionMethod(TaskProjectionSignature<TReadModel, TEvent> method, KeySelector keySelector)
+    public TypedProjectionMethod(SyncProjectionSignature<TReadModel, TEvent> method, KeySelector keySelector)
     {
         _method = method;
         KeySelector = keySelector;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TypedProjectionMethod{TReadModel, TEvent}"/> class.
-    /// </summary>
-    /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel, TEvent}" />.</param>
-    /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
-    public TypedProjectionMethod(SyncProjectionSignature<TReadModel, TEvent> method, KeySelector keySelector)
-        : this(
-            (TReadModel readModel, TEvent @event, ProjectionContext context)
-                => Task.FromResult(method(readModel, @event, context)),
-            keySelector)
-    {
     }
 
     /// <inheritdoc/>
@@ -51,13 +36,14 @@ public class TypedProjectionMethod<TReadModel, TEvent> : IProjectionMethod<TRead
         => eventTypes.GetFor(typeof(TEvent));
 
     /// <inheritdoc/>
-    public Task<Try<ProjectionResult<TReadModel>>> TryOn(TReadModel readModel, object @event, ProjectionContext context)
+    public ProjectionResult<TReadModel> TryOn(TReadModel readModel, object @event, ProjectionContext context)
     {
-        if (@event is TEvent typedEvent)
+        if (@event is not TEvent typedEvent)
         {
-            return _method(readModel, typedEvent, context).TryTask();
+        throw new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
         }
 
-        return Task.FromResult<Try<ProjectionResult<TReadModel>>>(new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType()));
+        return _method(readModel, typedEvent, context);
+
     }
 }

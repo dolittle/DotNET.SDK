@@ -11,7 +11,11 @@ using Dolittle.SDK.Projections.Core;
 
 namespace Dolittle.SDK.Projections.Internal;
 
-public class ProjectionType<TProjection> where TProjection : ProjectionBase, new()
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TProjection"></typeparam>
+public static class ProjectionType<TProjection> where TProjection : ProjectionBase, new()
 {
     public delegate ProjectionResult<TProjection> ApplyMethod(TProjection projection, object @event, ProjectionContext context);
 
@@ -66,7 +70,8 @@ public class ProjectionType<TProjection> where TProjection : ProjectionBase, new
     static IReadOnlyDictionary<Type, ApplyMethod> CreateMethodsPerEventType()
     {
         var projectionType = typeof(TProjection);
-        var dictionary = new Dictionary<Type, ApplyMethod>();
+        var applyMethods = new Dictionary<Type, ApplyMethod>();
+        var keySelectors = new Dictionary<Type, KeySelector>();
         foreach (var method in projectionType
             .GetTypeInfo()
             .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -76,9 +81,9 @@ public class ProjectionType<TProjection> where TProjection : ProjectionBase, new
             )
         )
         {
-            if(dictionary.TryAdd(method.GetParameters()[0].ParameterType, CreateApplyMethod(method)))
+            if (applyMethods.TryAdd(method.GetParameters()[0].ParameterType, CreateApplyMethod(method)))
             {
-                dictionary[method.GetParameters()[0].ParameterType] = CreateApplyMethod(method);
+                applyMethods[method.GetParameters()[0].ParameterType] = CreateApplyMethod(method);
             }
             else
             {
@@ -86,7 +91,7 @@ public class ProjectionType<TProjection> where TProjection : ProjectionBase, new
             }
         }
 
-        return dictionary;
+        return applyMethods;
     }
 
     static bool ParametersAreValid(ParameterInfo[] parameters)
@@ -202,7 +207,7 @@ public class ProjectionType<TProjection> where TProjection : ProjectionBase, new
 
 class DuplicateHandlerForEventType : Exception
 {
-    public DuplicateHandlerForEventType(Type parameterType, Type type): base(
+    public DuplicateHandlerForEventType(Type parameterType, Type type) : base(
         $"Duplicate handler for event type '{parameterType.FullName}' in projection '{type.FullName}'")
     {
     }

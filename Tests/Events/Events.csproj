@@ -2,6 +2,11 @@
 
     <Import Project="../../tests.props" />
 
+    <PropertyGroup>
+        <RootNamespace>Dolittle.SDK.Events</RootNamespace>
+        <AssemblyName>Dolittle.SDK.Events.Tests</AssemblyName>
+    </PropertyGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\..\Source\Events\Events.csproj" />
     </ItemGroup>

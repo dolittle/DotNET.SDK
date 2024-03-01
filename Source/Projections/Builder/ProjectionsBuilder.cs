@@ -7,7 +7,6 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
 using Dolittle.SDK.Projections.Store;
 
 namespace Dolittle.SDK.Projections.Builder;

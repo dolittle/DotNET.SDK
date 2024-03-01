@@ -68,7 +68,7 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public bool HasAlias => Alias is not null;
 
     /// <inheritdoc/>
-    public async Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context,
+    public Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context,
         CancellationToken cancellation)
     {
         using var activity = context.EventContext.CommittedExecutionContext.StartChildActivity("Projection on " + @event.GetType().Name)?.Tag(eventType);
@@ -80,18 +80,13 @@ public class Projection<TReadModel> : IProjection<TReadModel>
                 throw new MissingOnMethodForEventType(eventType);
             }
 
-            var tryOn = await method.TryOn(readModel, @event, context).ConfigureAwait(false);
-            if (tryOn.Exception != default)
-            {
-                throw new ProjectionOnMethodFailed(Identifier, eventType, @event, tryOn.Exception);
-            }
-
-            return tryOn.Result;
+            return Task.FromResult(method.TryOn(readModel, @event, context));
         }
         catch (Exception e)
         {
             activity?.RecordError(e);
-            throw;
+            throw new ProjectionOnMethodFailed(Identifier, eventType, @event, e);
+            
         }
     }
 }

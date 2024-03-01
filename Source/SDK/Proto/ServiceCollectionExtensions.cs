@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

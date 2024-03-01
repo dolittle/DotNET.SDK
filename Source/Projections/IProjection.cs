@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies;
 
 namespace Dolittle.SDK.Projections;
 

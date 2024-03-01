@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading.Tasks;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
 
@@ -17,34 +16,19 @@ public class TypedClassProjectionMethod<TProjection, TEvent> : IProjectionMethod
     where TProjection : class, new()
     where TEvent : class
 {
-    readonly TaskResultProjectionMethodSignature<TProjection, TEvent> _method;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TypedClassProjectionMethod{TProjection, TEvent}"/> class.
-    /// </summary>
-    /// <param name="method">The <see cref="TaskProjectionMethodSignature{TProjection, TEvent}"/> method to invoke.</param>
-    /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
-    public TypedClassProjectionMethod(TaskProjectionMethodSignature<TProjection, TEvent> method, KeySelector keySelector)
-        : this(
-            async (TProjection instanceAndReadModel, TEvent @event, ProjectionContext context) =>
-            {
-                await method(instanceAndReadModel, @event, context).ConfigureAwait(false);
-                return ProjectionResultType.Replace;
-            },
-            keySelector)
-    {
-    }
+    readonly SyncResultProjectionMethodSignature<TProjection, TEvent> _method;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypedClassProjectionMethod{TProjection, TEvent}"/> class.
     /// </summary>
     /// <param name="method">The <see cref="TaskResultProjectionMethodSignature{TProjection, TEvent}"/> method to invoke.</param>
     /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
-    public TypedClassProjectionMethod(TaskResultProjectionMethodSignature<TProjection, TEvent> method, KeySelector keySelector)
+    public TypedClassProjectionMethod(SyncResultProjectionMethodSignature<TProjection, TEvent> method, KeySelector keySelector)
     {
         _method = method;
         KeySelector = keySelector;
     }
+    
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypedClassProjectionMethod{TProjection, TEvent}"/> class.
@@ -64,42 +48,28 @@ public class TypedClassProjectionMethod<TProjection, TEvent> : IProjectionMethod
     {
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TypedClassProjectionMethod{TProjection, TEvent}"/> class.
-    /// </summary>
-    /// <param name="method">The <see cref="SyncResultProjectionMethodSignature{TProjection, TEvent}" /> method to invoke.</param>
-    /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
-    public TypedClassProjectionMethod(
-        SyncResultProjectionMethodSignature<TProjection, TEvent> method,
-        KeySelector keySelector)
-        : this(
-            (TProjection instanceAndReadModel, TEvent @event, ProjectionContext context)
-                => Task.FromResult(method(instanceAndReadModel, @event, context)),
-            keySelector)
-    {
-    }
-
     /// <inheritdoc/>
     public KeySelector KeySelector { get; }
 
     /// <inheritdoc/>
-    public EventType GetEventType(IEventTypes eventTypes)
-        => eventTypes.GetFor(typeof(TEvent));
+    public EventType GetEventType(IEventTypes eventTypes) => eventTypes.GetFor(typeof(TEvent));
 
     /// <inheritdoc/>
-    public async Task<Try<ProjectionResult<TProjection>>> TryOn(TProjection readModel, object @event, ProjectionContext context)
+    public ProjectionResult<TProjection> TryOn(TProjection readModel, object @event, ProjectionContext context)
     {
-        if (@event is TEvent typedEvent)
+        if (@event is not TEvent typedEvent)
         {
-            var resultType = await _method(readModel, typedEvent, context).TryTask().ConfigureAwait(false);
-            return resultType switch
-            {
-                { Success: true, Result: ProjectionResultType.Delete } => ProjectionResult<TProjection>.Delete,
-                { Success: true, Result: ProjectionResultType.Replace } => new Try<ProjectionResult<TProjection>>(readModel),
-                _ => resultType.Exception
-            };
+            throw new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
         }
 
-        return new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
+        var resultType = _method(readModel, typedEvent, context);
+
+        return resultType switch
+        {
+            ProjectionResultType.Delete => ProjectionResult<TProjection>.Delete,
+            ProjectionResultType.Replace => new Try<ProjectionResult<TProjection>>(readModel),
+            ProjectionResultType.Keep => ProjectionResult<TProjection>.Keep,
+            _ => ProjectionResult<TProjection>.Keep
+        };
     }
 }

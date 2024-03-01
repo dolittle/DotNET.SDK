@@ -17,7 +17,6 @@ using Proto.Cluster;
 
 namespace Dolittle.SDK.Aggregates.Actors;
 
-delegate Task<IServiceProvider> GetServiceProviderForTenant(TenantId tenantId);
 
 delegate TimeSpan AggregateUnloadTimeout();
 
