@@ -23,13 +23,13 @@ delegate TimeSpan AggregateUnloadTimeout();
 
 class Perform<TAggregate> where TAggregate : AggregateRoot
 {
-    public Perform(Func<TAggregate, Task> callback, CancellationToken cancellationToken)
+    public Perform(Func<TAggregate, Task<object>> callback, CancellationToken cancellationToken)
     {
         Callback = callback;
         CancellationToken = cancellationToken;
     }
 
-    public Func<TAggregate, Task> Callback { get; }
+    public Func<TAggregate, Task<object>> Callback { get; }
     public CancellationToken CancellationToken { get; }
 }
 
@@ -44,7 +44,9 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
     // ReSharper disable once StaticMemberInGenericType
     readonly TimeSpan _idleUnloadTimeout;
 
-    internal AggregateActor(GetServiceProviderForTenant getServiceProvider, ILogger<AggregateActor<TAggregate>> logger, TimeSpan idleUnloadTimeout)
+    internal AggregateActor(GetServiceProviderForTenant getServiceProvider,
+        ILogger<AggregateActor<TAggregate>> logger,
+        TimeSpan idleUnloadTimeout)
     {
         _getServiceProvider = getServiceProvider;
         _logger = logger;
@@ -83,7 +85,8 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
 
             _eventSourceId = eventSourceId;
             var serviceProvider = await _getServiceProvider(tenantId);
-            _aggregateWrapper = ActivatorUtilities.CreateInstance<AggregateWrapper<TAggregate>>(serviceProvider, _eventSourceId);
+            _aggregateWrapper =
+                ActivatorUtilities.CreateInstance<AggregateWrapper<TAggregate>>(serviceProvider, _eventSourceId);
             if (_idleUnloadTimeout > TimeSpan.Zero)
             {
                 context.SetReceiveTimeout(_idleUnloadTimeout);
@@ -106,13 +109,13 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
     {
         try
         {
-            await _aggregateWrapper!.Perform(perform.Callback, perform.CancellationToken);
-            context.Respond(new Try<bool>(true));
+            var result = await _aggregateWrapper!.Perform(perform.Callback, perform.CancellationToken);
+            context.Respond(new Try<object>(result));
         }
         catch (Exception e)
         {
             Activity.Current?.RecordError(e);
-            context.Respond(new Try<bool>(e));
+            context.Respond(new Try<object>(e));
         }
         finally
         {

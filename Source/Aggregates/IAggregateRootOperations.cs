@@ -29,5 +29,5 @@ public interface IAggregateRootOperations<TAggregate>
     /// <param name="method"><see cref="Action{T}">Method</see> to perform.</param>
     /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
     /// <returns>The <see cref="Task" /> representing the asynchronous operation.</returns>
-    Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default);
+    Task<object> Perform(Func<TAggregate, Task<object>> method, CancellationToken cancellationToken = default);
 }

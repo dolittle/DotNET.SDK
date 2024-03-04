@@ -19,7 +19,6 @@ namespace Dolittle.SDK.Aggregates;
 /// </summary>
 public delegate CancellationToken DefaultAggregatePerformTimeout();
 
-
 /// <summary>
 /// Represents an implementation of <see cref="IAggregateRootOperations{T}"/>.
 /// </summary>
@@ -39,7 +38,8 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     /// <param name="tenantId">The <see cref="TenantId"/> of the current tenant.</param>
     /// <param name="context">The <see cref="IRootContext" />Root context used to communicate with actors</param>
     /// <param name="defaultTimeout">The &lt;see cref="DefaultAggregatePerformTimeout" /&gt; Used if no cancellation token is passed.</param>
-    public AggregateRootOperations(EventSourceId eventSourceId, TenantId tenantId, IRootContext context, DefaultAggregatePerformTimeout defaultTimeout)
+    public AggregateRootOperations(EventSourceId eventSourceId, TenantId tenantId, IRootContext context,
+        DefaultAggregatePerformTimeout defaultTimeout)
     {
         _context = context;
         _defaultTimeout = defaultTimeout;
@@ -48,37 +48,40 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     }
 
     /// <inheritdoc/>
-    public Task Perform(Action<TAggregate> method, CancellationToken cancellationToken = default)
-        => Perform(
-            aggregate =>
-            {
-                method(aggregate);
-                return Task.CompletedTask;
-            },
-            cancellationToken);
+    public async Task Perform(Action<TAggregate> method, CancellationToken cancellationToken = default) =>
+        await Perform(aggregate =>
+        {
+            method(aggregate);
+            return Task.FromResult(new object());
+        }, cancellationToken);
 
     /// <inheritdoc/>
-    public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
+    public async Task<object> Perform(Func<TAggregate, Task<object>> method,
+        CancellationToken cancellationToken = default)
     {
-        if(cancellationToken == default)
+        if (cancellationToken == default)
         {
             cancellationToken = _defaultTimeout();
         }
+
         using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.Perform")
             ?.Tag(_eventSourceId);
 
         try
         {
             var result = await _context.System.Cluster()
-                .RequestAsync<Try<bool>>(_clusterIdentity, new Perform<TAggregate>(method, cancellationToken), _context,
+                .RequestAsync<Try<object>>(_clusterIdentity, new Perform<TAggregate>(method, cancellationToken),
+                    _context,
                     cancellationToken);
 
             if (!result.Success)
             {
                 throw result.Exception;
             }
+
+            return result.Result;
         }
-        catch (AggregateRootOperationFailed e) when(e.InnerException is not null)
+        catch (AggregateRootOperationFailed e) when (e.InnerException is not null)
         {
             activity?.RecordError(e.InnerException);
             // ReSharper disable once PossibleIntendedRethrow

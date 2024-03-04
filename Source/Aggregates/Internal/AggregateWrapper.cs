@@ -12,6 +12,7 @@ using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;
 using Dolittle.SDK.Events.Store.Builders;
 using Microsoft.Extensions.Logging;
+
 #pragma warning disable CS0618 // Refers to EventSourceId which is marked obsolete for clients. Should still be used internally
 
 namespace Dolittle.SDK.Aggregates.Internal;
@@ -38,7 +39,8 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// <param name="eventTypes">The <see cref="IEventTypes"/>.</param>
     /// <param name="serviceProvider">The tenant scoped <see cref="IServiceProvider"/>.</param>
     /// <param name="logger">The <see cref="ILogger" />.</param>
-    public AggregateWrapper(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes, IServiceProvider serviceProvider, ILogger<AggregateWrapper<TAggregate>> logger)
+    public AggregateWrapper(EventSourceId eventSourceId, IEventStore eventStore, IEventTypes eventTypes,
+        IServiceProvider serviceProvider, ILogger<AggregateWrapper<TAggregate>> logger)
     {
         _eventSourceId = eventSourceId;
         _eventTypes = eventTypes;
@@ -47,7 +49,8 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
         _logger = logger;
     }
 
-    public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
+    public async Task<TResult> Perform<TResult>(Func<TAggregate, Task<TResult>> method,
+        CancellationToken cancellationToken = default)
     {
         using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.Perform")
             ?.Tag(_eventSourceId);
@@ -58,12 +61,14 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
             var aggregateRootId = _instance.AggregateRootId;
             activity?.Tag(aggregateRootId);
             _logger.PerformingOn(typeof(TAggregate), aggregateRootId, _instance.EventSourceId);
-            await method(_instance);
+            var result = await method(_instance);
             if (_instance.AppliedEvents.Any())
             {
                 await CommitAppliedEvents(_instance, aggregateRootId).ConfigureAwait(false);
                 _instance.ClearAppliedEvents();
             }
+
+            return result;
         }
         catch (Exception e)
         {
@@ -99,8 +104,10 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
         var eventSourceId = aggregateRoot.EventSourceId;
         _logger.RehydratingAggregateRoot(typeof(TAggregate), aggregateRootId, eventSourceId);
         var eventTypesToFetch = GetEventTypes(_eventTypes);
-        var committedEventsBatches = _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
-        return aggregateRoot.RehydrateInternal(committedEventsBatches, AggregateRootMetadata<TAggregate>.MethodsPerEventType, cancellationToken);
+        var committedEventsBatches =
+            _eventStore.FetchStreamForAggregate(aggregateRootId, eventSourceId, eventTypesToFetch, cancellationToken);
+        return aggregateRoot.RehydrateInternal(committedEventsBatches,
+            AggregateRootMetadata<TAggregate>.MethodsPerEventType, cancellationToken);
     }
 
     static bool IsStateLess => AggregateRootMetadata<TAggregate>.IsStateLess;
@@ -113,11 +120,12 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     static IEnumerable<EventType> GetEventTypes(IEventTypes eventTypes)
         => IsStateLess
             ? Enumerable.Empty<EventType>()
-            :  AggregateRootMetadata<TAggregate>.MethodsPerEventType.Keys.Select(eventTypes.GetFor);
+            : AggregateRootMetadata<TAggregate>.MethodsPerEventType.Keys.Select(eventTypes.GetFor);
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)
     {
-        _logger.CommittingEvents(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.AppliedEvents.Count(), aggregateRoot.EventSourceId);
+        _logger.CommittingEvents(aggregateRoot.GetType(), aggregateRootId, aggregateRoot.AppliedEvents.Count(),
+            aggregateRoot.EventSourceId);
         return _eventStore
             .ForAggregate(aggregateRootId)
             .WithEventSource(aggregateRoot.EventSourceId)
