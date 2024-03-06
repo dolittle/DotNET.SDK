@@ -11,7 +11,7 @@ namespace Kitchen;
 [AggregateRoot("01ad9a9f-711f-47a8-8549-43320f782a1e")]
 public class Kitchen : AggregateRoot
 {
-    int _ingredients = 100;
+    int _ingredients = 2;
 
     public Kitchen(EventSourceId eventSource)
         : base(eventSource)

@@ -40,10 +40,9 @@ public class TypedProjectionMethod<TReadModel, TEvent> : IProjectionMethod<TRead
     {
         if (@event is not TEvent typedEvent)
         {
-        throw new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
+            throw new TypedProjectionMethodInvokedOnEventOfWrongType(typeof(TEvent), @event.GetType());
         }
 
         return _method(readModel, typedEvent, context);
-
     }
 }

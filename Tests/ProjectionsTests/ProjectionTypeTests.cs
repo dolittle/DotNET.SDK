@@ -12,13 +12,6 @@ public class ProjectionTypeTests
     static readonly ProjectionContext _projectionContext = new(true, ProjectionKey, TestEventContexts.ForType<SomeEvent>());
 
     [Fact]
-    public void CanCreateProjections()
-    {
-        var testProjection = ProjectionType<TestProjection>.Create(ProjectionKey);
-        testProjection.Id.Should().Be(ProjectionKey);
-    }
-
-    [Fact]
     public void CanGetProjectionOnMethods()
     {
         var methodInfo = ProjectionType<TestProjection>.MethodsPerEventType;
@@ -35,7 +28,10 @@ public class ProjectionTypeTests
     [Fact]
     public void CanMutateProjections()
     {
-        var testProjection = ProjectionType<TestProjection>.Create(ProjectionKey);
+        var testProjection = new TestProjection
+        {
+            Id = ProjectionKey,
+        };
         var someEvent = new SomeEvent
         {
             Thing = "foo"
@@ -54,11 +50,14 @@ public class ProjectionTypeTests
                 Content = "foo"
             });
     }
-    
+
     [Fact]
     public void CanMutateProjectionsWithEventContextSignature()
     {
-        var testProjection = ProjectionType<TestProjection>.Create(ProjectionKey);
+                var testProjection = new TestProjection
+        {
+            Id = ProjectionKey,
+        };
         var someEvent = new SomeOtherEvent()
         {
             SomeNumber = 42
@@ -81,7 +80,12 @@ public class ProjectionTypeTests
     [Fact]
     public void CanDeleteProjections()
     {
-        var result = ProjectionType<TestProjection>.Create(ProjectionKey).Apply(new SomeEvent { Thing = "foo" }, _projectionContext);
+        var testProjection = new TestProjection
+        {
+            Id = ProjectionKey,
+        };
+        
+        var result = testProjection.Apply(new SomeEvent { Thing = "foo" }, _projectionContext);
 
         var before = result.ReadModel!;
 

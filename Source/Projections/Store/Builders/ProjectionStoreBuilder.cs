@@ -50,8 +50,6 @@ public class ProjectionStoreBuilder : IProjectionStoreBuilder
         
         return new ProjectionStore(
             provider,
-            executionContext,
-            _projectionAssociations,
-            _loggerFactory.CreateLogger<ProjectionStore>());
+            _projectionAssociations);
     }
 }

@@ -12,7 +12,10 @@ public class InvalidProjectionTests
     [Fact]
     public void ShouldThrowOnInvalidProjections()
     {
-        Action create = () => ProjectionType<InvalidProjection>.Create("SomeKey");
+        var create = () =>
+        {
+            var id = ProjectionType<InvalidProjection>.ProjectionModelId;
+        };
 
         create.Invoking(it => it()).Should()
             .Throw<TypeInitializationException>()

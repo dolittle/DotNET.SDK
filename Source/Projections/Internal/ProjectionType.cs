@@ -30,19 +30,6 @@ public static class ProjectionType<TProjection> where TProjection : ProjectionBa
     }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="TProjection" />.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public static TProjection Create(Key key)
-    {
-        return new TProjection
-        {
-            Id = key.Value
-        };
-    }
-
-    /// <summary>
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
