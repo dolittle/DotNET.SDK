@@ -5,7 +5,7 @@
 using Dolittle.SDK.Projections;
 
 [Projection("98f9db66-b6ca-4e5f-9fc3-638626c9ecfa")]
-public class DishCounter
+public class DishCounter: ProjectionBase
 {
     public int NumberOfTimesPrepared = 0;
     public string Name = "";

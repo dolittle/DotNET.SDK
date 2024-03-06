@@ -20,7 +20,7 @@ public interface IProjectionCopyToMongoDBBuilder<TReadModel>
     /// </summary>
     /// <param name="name">The <see cref="ProjectionCopyToMongoDB"/>.</param>
     /// <returns>The builder for continuation</returns>
-    IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(MongoDBCopyCollectionName name);
+    IProjectionCopyToMongoDBBuilder<TReadModel> ToCollection(MongoDBProjectionCollectionName name);
 
     /// <summary>
     /// Sets the conversion from a field to a <see cref="BsonType"/>.

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using Dolittle.SDK.Projections;
 
+[Projection("e518986f-7e72-45f8-b4ac-2e34b26082ac")]
 public class Chef: ProjectionBase
 {
     public string Name = "";

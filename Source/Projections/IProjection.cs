@@ -2,7 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections;
@@ -26,7 +27,7 @@ public interface IProjection
     /// Gets the scope the projection is in.
     /// </summary>
     ScopeId ScopeId { get; }
-    
+
     /// <summary>
     /// Gets the alias of the projection.
     /// </summary>
@@ -35,10 +36,11 @@ public interface IProjection
     /// <summary>
     /// Gets a value indicating whether the projection has an alias or not.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Alias))]
     bool HasAlias { get; }
 
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this event handler.
     /// </summary>
-    IEnumerable<EventSelector> Events { get; }
+    IImmutableDictionary<EventType, KeySelector> Events { get; }
 }

@@ -48,10 +48,9 @@ public static class ServiceCollectionExtensions
         var aggregateKinds = aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
             .Select(kind => kind.WithProps(props => props.WithTracing()));
 
-        var projectionTypes = client.ProjectionTypes.ReadModelTypes.Values;
+        var projectionTypes = client.ProjectionTypes.Values;
 
-        var projectionKinds = projectionTypes.Select(projectionType => ProjectionClusterKindFactory.CreateKind(serviceProvider, projectionType))
-            .Select(kind => kind.WithProps(props => props.WithTracing()));
+        var projectionKinds = projectionTypes.Select(projectionType => ProjectionClusterKindFactory.CreateKind(serviceProvider, projectionType));
 
         return aggregateKinds.Concat(projectionKinds);
     }

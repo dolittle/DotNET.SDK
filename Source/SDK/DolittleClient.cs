@@ -28,7 +28,6 @@ using Dolittle.SDK.Handshake;
 using Dolittle.SDK.Handshake.Internal;
 using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
-using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Resources;
 using Dolittle.SDK.Resources.Internal;
 using Dolittle.SDK.Services;
@@ -48,7 +47,6 @@ namespace Dolittle.SDK;
 public class DolittleClient : IDisposable, IDolittleClient
 {
     readonly ICoordinateProcessing _processingCoordinator = new ProcessingCoordinator();
-    readonly IConvertProjectionsToSDK _projectionConverter = new ProjectionsToSDKConverter();
     readonly IResolveCallContext _callContextResolver = new CallContextResolver();
 
     readonly IClientBuildResults _buildResults;
@@ -312,6 +310,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         var serializer = new EventContentSerializer(_unregisteredEventTypes, config.EventSerializerProvider);
         _eventsToProtobufConverter = new EventToProtobufConverter(serializer);
         _eventToSDKConverter = new EventToSDKConverter(serializer);
+        IServiceProvider TenantServiceProvider(TenantId tenant) => Services.ForTenant(tenant);
 
         EventStore = new EventStoreBuilder(
             methodCaller,
@@ -325,7 +324,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             loggerFactory);
         // Important to not send in the method group because it will crash because it calls get on the Services-property before it is ready.
 #pragma warning disable IDE0200
-        Aggregates = new AggregatesBuilder(tenant => Services.ForTenant(tenant));
+        Aggregates = new AggregatesBuilder(TenantServiceProvider);
 #pragma warning restore IDE0200
         EventHorizons = new EventHorizons(
             methodCaller,
@@ -333,11 +332,9 @@ public class DolittleClient : IDisposable, IDolittleClient
             _eventHorizonRetryPolicy,
             loggerFactory.CreateLogger<EventHorizons>());
         Projections = new ProjectionStoreBuilder(
-            methodCaller,
+            TenantServiceProvider,
             executionContext,
-            _callContextResolver,
             _unregisteredProjections.ReadModelTypes,
-            _projectionConverter,
             loggerFactory);
         Resources = await new ResourcesFetcher(
             methodCaller,
@@ -392,7 +389,6 @@ public class DolittleClient : IDisposable, IDolittleClient
         _unregisteredProjections.Register(
             eventProcessors,
             eventProcessingConverter,
-            _projectionConverter,
             loggerFactory,
             _clientCancellationTokenSource.Token);
     }

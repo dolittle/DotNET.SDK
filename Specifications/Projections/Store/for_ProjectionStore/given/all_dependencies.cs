@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Dolittle.Runtime.Projections.Contracts;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Protobuf;
 using Dolittle.SDK.Security;
 using Dolittle.SDK.Services;
@@ -47,11 +46,10 @@ public class all_dependencies
             CultureInfo.InvariantCulture, null);
         read_model_types = new ProjectionReadModelTypes();
         projection_store = new ProjectionStore(
-            method_caller.Object,
-            new ProjectionStoreRequestCreator(new CallContextResolver()),
+            Mock.Of<IServiceProvider>(),
             an_execution_context,
             read_model_types,
-            new ProjectionsToSDKConverter(), Mock.Of<ILogger>());
+            Mock.Of<ILogger>());
     };
 
     protected static void with_projection_types(params Type[] projection_types)

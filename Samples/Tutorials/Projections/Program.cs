@@ -3,6 +3,7 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/projections/csharp/
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK;
 using Dolittle.SDK.Tenancy;
@@ -33,9 +34,10 @@ await eventStore.CommitEvent(new DishPrepared("Chili Canon Wrap", "Mrs. Tex Mex"
 
 await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 
-var dishes = await client.Projections
+var dishes = client.Projections
     .ForTenant(TenantId.Development)
-    .GetAll<DishCounter>().ConfigureAwait(false);
+    .AsQueryable<DishCounter>()
+    .ToList();
 
 foreach (var dish in dishes)
 {

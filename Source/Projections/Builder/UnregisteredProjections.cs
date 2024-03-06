@@ -8,15 +8,18 @@ using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Common;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Handling.Internal;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
+using Dolittle.SDK.Projections.Actors;
+using Dolittle.SDK.Projections.Copies.MongoDB;
 using Dolittle.SDK.Projections.Internal;
 using Dolittle.SDK.Projections.Store;
-using Dolittle.SDK.Projections.Store.Converters;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Proto.Cluster;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -36,7 +39,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         ReadModelTypes = readModelTypes;
         AddTenantScopedServices = AddToContainer;
     }
-    
+
     /// <inheritdoc />
     public ConfigureTenantServices AddTenantScopedServices { get; }
 
@@ -44,7 +47,6 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     public void Register(
         IEventProcessors eventProcessors,
         IEventProcessingConverter processingConverter,
-        IConvertProjectionsToSDK projectionsConverter,
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken)
     {
@@ -54,9 +56,8 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                 CreateProjectionsProcessor(
                     projection,
                     processingConverter,
-                    projectionsConverter,
                     loggerFactory),
-                new ProjectionsProtocol(),
+                EventHandlerProtocol.Instance,
                 cancellationToken);
         }
     }
@@ -64,19 +65,19 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     /// <inheritdoc />
     public IProjectionReadModelTypes ReadModelTypes { get; }
 
-    static EventProcessor<ProjectionId, ProjectionRegistrationRequest, ProjectionRequest, ProjectionResponse> CreateProjectionsProcessor(
+    static EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse> CreateProjectionsProcessor(
         IProjection projection,
         IEventProcessingConverter processingConverter,
-        IConvertProjectionsToSDK projectionConverter,
         ILoggerFactory loggerFactory)
     {
-        var processorType = typeof(ProjectionsProcessor<>).MakeGenericType(projection.ProjectionType); 
-        return Activator.CreateInstance(
+        var processorType = typeof(ProjectionsProcessor<>).MakeGenericType(projection.ProjectionType);
+        // var clientType = typeof(IProjectionClient<>).MakeGenericType(projection.ProjectionType);
+        var instance = Activator.CreateInstance(
             processorType,
             projection,
             processingConverter,
-            projectionConverter,
-            loggerFactory.CreateLogger(processorType)) as EventProcessor<ProjectionId, ProjectionRegistrationRequest, ProjectionRequest, ProjectionResponse>;
+            loggerFactory.CreateLogger(processorType)) ?? throw new InvalidOperationException($"Could not create an instance of {processorType}");
+        return (EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>)instance;
     }
 
     void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection)
@@ -84,48 +85,51 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         foreach (var projection in Values)
         {
             var readModelType = projection.ProjectionType;
+
+            var collectionName = MongoDBProjectionCollectionName.From(projection.Identifier, projection.Alias?.Value).Value;
+            serviceCollection.AddScoped(
+                typeof(IMongoCollection<>).MakeGenericType(readModelType),
+                serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
+                    serviceProvider.GetRequiredService<IMongoDatabase>(), [collectionName, null]));
+
+            var projectionClientInterface = typeof(IProjectionClient<>).MakeGenericType(readModelType);
+            var projectionClientType = typeof(ProjectionClient<>).MakeGenericType(readModelType);
+            serviceCollection.AddSingleton(
+                projectionClientInterface,
+                serviceProvider =>
+                    Activator.CreateInstance(projectionClientType, [
+                        projection,
+                        serviceProvider.GetRequiredService<Cluster>()
+                    ])!);
+
             serviceCollection.AddScoped(
                 typeof(IProjectionOf<>).MakeGenericType(readModelType),
                 serviceProvider => GetOfMethodForReadModel(readModelType).Invoke(
                     serviceProvider.GetRequiredService<IProjectionStore>(),
-                    new object[]
-                    {
+                    [
                         projection.Identifier,
                         projection.ScopeId
-                    }));
-            // if (projection.Copies.MongoDB.ShouldCopy)
-            // {
-            //     serviceCollection.AddScoped(
-            //         typeof(IMongoCollection<>).MakeGenericType(readModelType),
-            //         serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
-            //             serviceProvider.GetRequiredService<IMongoDatabase>(),
-            //             new object[]
-            //             {
-            //                 projection.Copies.MongoDB.CollectionName.Value,
-            //                 null
-            //             }));
-            // }
+                    ])!);
         }
     }
 
     static MethodInfo GetOfMethodForReadModel(Type readModelType)
         => typeof(IProjectionStore).GetMethod(
-            nameof(IProjectionStore.Of),
-            new[]
-            {
-                typeof(ProjectionId),
-                typeof(ScopeId)
-            })
-            ?.MakeGenericMethod(readModelType);
-    
-    static MethodInfo GetCollectionMethodForReadModel(Type readModelType)
-        => typeof(IMongoDatabase).GetMethod(
-            nameof(IMongoDatabase.GetCollection),
-            new[]
-            {
-                typeof(string),
-                typeof(MongoCollectionSettings)
-            })
+                nameof(IProjectionStore.Of),
+                new[]
+                {
+                    typeof(ProjectionId),
+                    typeof(ScopeId)
+                })
             ?.MakeGenericMethod(readModelType);
 
+    static MethodInfo GetCollectionMethodForReadModel(Type readModelType)
+        => typeof(IMongoDatabase).GetMethod(
+                nameof(IMongoDatabase.GetCollection),
+                new[]
+                {
+                    typeof(string),
+                    typeof(MongoCollectionSettings)
+                })
+            ?.MakeGenericMethod(readModelType);
 }

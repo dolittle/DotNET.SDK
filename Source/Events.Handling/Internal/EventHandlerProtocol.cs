@@ -18,6 +18,12 @@ namespace Dolittle.SDK.Events.Handling.Internal;
 public class EventHandlerProtocol : IAmAReverseCallProtocol<EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage,
     EventHandlerRegistrationRequest, EventHandlerRegistrationResponse, HandleEventRequest, EventHandlerResponse>
 {
+    EventHandlerProtocol()
+    {
+    }
+
+    public static EventHandlerProtocol Instance { get; } = new();
+
     /// <inheritdoc/>
     public AsyncDuplexStreamingCall<EventHandlerClientToRuntimeMessage, EventHandlerRuntimeToClientMessage> Call(ChannelBase channel, CallOptions callOptions)
         => new EventHandlersClient(channel).Connect(callOptions);

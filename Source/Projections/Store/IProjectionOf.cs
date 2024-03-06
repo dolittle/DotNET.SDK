@@ -36,18 +36,18 @@ public interface IProjectionOf<TReadModel> where TReadModel : class, new()
     
     IQueryable<TReadModel> AsQueryable();
 
-    /// <summary>
-    /// Gets the projection state by key.
-    /// </summary>
-    /// <param name="key">The <see cref="Key" /> of the projection.</param>
-    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TReadModel}"/> of <typeparamref name="TReadModel"/>.</returns>
-    Task<CurrentState<TReadModel>> GetState(Key key, CancellationToken cancellation = default);
-
-    /// <summary>
-    /// Gets all projection read models.
-    /// </summary>
-    /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
-    /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="IEnumerable{T}" /> of <typeparamref name="TReadModel" />.</returns>
-    Task<IEnumerable<TReadModel>> GetAll(CancellationToken cancellation = default);
+    // /// <summary>
+    // /// Gets the projection state by key.
+    // /// </summary>
+    // /// <param name="key">The <see cref="Key" /> of the projection.</param>
+    // /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    // /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="CurrentState{TReadModel}"/> of <typeparamref name="TReadModel"/>.</returns>
+    // Task<CurrentState<TReadModel>> GetState(Key key, CancellationToken cancellation = default);
+    //
+    // /// <summary>
+    // /// Gets all projection read models.
+    // /// </summary>
+    // /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
+    // /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="IEnumerable{T}" /> of <typeparamref name="TReadModel" />.</returns>
+    // Task<IEnumerable<TReadModel>> GetAll(CancellationToken cancellation = default);
 }

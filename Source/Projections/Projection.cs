@@ -3,12 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Diagnostics;
+using System.Collections.Immutable;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
 using Dolittle.SDK.Projections.Builder;
 
 namespace Dolittle.SDK.Projections;
@@ -28,7 +24,6 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     /// <param name="identifier">The <see cref="ProjectionId" />.</param>
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
-    /// <param name="copies">The <see cref="ProjectionCopies"/>.</param>
     public Projection(
         ProjectionModelId identifier,
         IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods)
@@ -36,7 +31,7 @@ public class Projection<TReadModel> : IProjection<TReadModel>
         _onMethods = onMethods;
         Identifier = identifier.Id;
         ScopeId = identifier.Scope;
-        Events = onMethods.Select(_ => new EventSelector(_.Key, _.Value.KeySelector)).ToList();
+        Events = onMethods.ToImmutableDictionary(_ => _.Key, _ => _.Value.KeySelector);
         ProjectionType = typeof(TReadModel);
 
         if (!string.IsNullOrEmpty(identifier.Alias))
@@ -59,7 +54,7 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public TReadModel InitialState { get; } = new();
 
     /// <inheritdoc/>
-    public IEnumerable<EventSelector> Events { get; }
+    public IImmutableDictionary<EventType, KeySelector> Events { get; }
 
     /// <inheritdoc />
     public ProjectionAlias? Alias { get; }
@@ -68,25 +63,13 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     public bool HasAlias => Alias is not null;
 
     /// <inheritdoc/>
-    public Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context,
-        CancellationToken cancellation)
+    public ProjectionResult<TReadModel> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context)
     {
-        using var activity = context.EventContext.CommittedExecutionContext.StartChildActivity("Projection on " + @event.GetType().Name)?.Tag(eventType);
-
-        try
+        if (!_onMethods.TryGetValue(eventType, out var method))
         {
-            if (!_onMethods.TryGetValue(eventType, out var method))
-            {
-                throw new MissingOnMethodForEventType(eventType);
-            }
+            throw new MissingOnMethodForEventType(eventType);
+        }
 
-            return Task.FromResult(method.TryOn(readModel, @event, context));
-        }
-        catch (Exception e)
-        {
-            activity?.RecordError(e);
-            throw new ProjectionOnMethodFailed(Identifier, eventType, @event, e);
-            
-        }
+        return method.TryOn(readModel, @event, context);
     }
 }

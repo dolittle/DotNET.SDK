@@ -21,6 +21,7 @@
         <ProjectReference Include="../Events.Processing/Events.Processing.csproj" />
         <ProjectReference Include="../Protobuf/Protobuf.csproj" />
         <ProjectReference Include="../Resources/Resources.csproj" />
+        <ProjectReference Include="..\Events.Handling\Events.Handling.csproj" />
     </ItemGroup>
     
 </Project>

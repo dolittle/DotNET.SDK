@@ -58,7 +58,7 @@ public class UnregisteredEventHandlers : UniqueBindings<EventHandlerModelId, IEv
                     eventHandler,
                     processingConverter,
                     loggerFactory.CreateLogger<EventHandlerProcessor>()),
-                new EventHandlerProtocol(),
+                EventHandlerProtocol.Instance,
                 cancellationToken);
         }
     }

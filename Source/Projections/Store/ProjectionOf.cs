@@ -2,11 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
+using MongoDB.Driver;
 
 namespace Dolittle.SDK.Projections.Store;
 
@@ -17,50 +18,47 @@ namespace Dolittle.SDK.Projections.Store;
 public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     where TReadModel : ProjectionBase, new()
 {
-    readonly IProjectionStore _projectionStore;
+    readonly IMongoCollection<TReadModel> _collection;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionOf{TReadModel}"/> class.
     /// </summary>
     /// <param name="projectionStore">The <see cref="IProjectionStore"/>.</param>
     /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
-    public ProjectionOf(IProjectionStore projectionStore, ProjectionModelId identifier) : this(projectionStore, identifier.Id, identifier.Scope)
+    public ProjectionOf(IMongoCollection<TReadModel> collection, ProjectionModelId identifier) : this(collection, identifier.Id, identifier.Scope)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionOf{TReadModel}"/> class.
     /// </summary>
-    /// <param name="projectionStore">The <see cref="IProjectionStore"/>.</param>
+    /// <param name="collection"></param>
     /// <param name="identifier">The <see cref="ProjectionId"/>.</param>
     /// <param name="scope">The <see cref="ScopeId"/>.</param>
-    public ProjectionOf(IProjectionStore projectionStore, ProjectionId identifier, ScopeId scope)
+    public ProjectionOf(IMongoCollection<TReadModel> collection, ProjectionId identifier, ScopeId scope)
     {
-        _projectionStore = projectionStore;
+        _collection = collection;
         Identifier = identifier;
         Scope = scope;
     }
 
     /// <inheritdoc />
     public ProjectionId Identifier { get; }
-    
+
     /// <inheritdoc />
     public ScopeId Scope { get; }
 
     /// <inheritdoc />
-    public Task<TReadModel?> Get(Key key, CancellationToken cancellation = default)
-        => _projectionStore.Get<TReadModel>(key, Identifier, Scope, cancellation);
+    public async Task<TReadModel?> Get(Key key, CancellationToken cancellation = default)
+    {
+        var id = key.Value;
+        var result = await _collection.Find(it => it.Id.Equals(id)).FirstOrDefaultAsync(cancellationToken: cancellation);
+        return result;
+        //return _projectionStore.Get<TReadModel>(key, Identifier, Scope, cancellation);
+    }
 
     public IQueryable<TReadModel> AsQueryable()
     {
-        throw new NotImplementedException();
+        return _collection.AsQueryable();
     }
-
-    /// <inheritdoc />
-    public Task<CurrentState<TReadModel>> GetState(Key key, CancellationToken cancellation = default)
-        => _projectionStore.GetState<TReadModel>(key, Identifier, Scope,cancellation);
-
-    /// <inheritdoc />
-    public Task<IEnumerable<TReadModel>> GetAll(CancellationToken cancellation = default)
-        => _projectionStore.GetAll<TReadModel>(Identifier, Scope,cancellation);
 }

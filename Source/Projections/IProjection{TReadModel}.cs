@@ -28,5 +28,5 @@ public interface IProjection<TReadModel> : IProjection
     /// <param name="context">The context of the projection.</param>
     /// <param name="cancellation">The <see cref="CancellationToken" /> used to cancel the processing of the request.</param>
     /// <returns>A <see cref="Task"/> that, when resolved, returns a <see cref="ProjectionResult{TReadModel}"/>.</returns>
-    Task<ProjectionResult<TReadModel>> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context, CancellationToken cancellation);
+    ProjectionResult<TReadModel> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context);
 }
