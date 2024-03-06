@@ -45,6 +45,27 @@ static class AnalysisExtensions
 
         return false;
     }
+    
+    /// <summary>
+    /// Checks if base class of the type is Dolittle.SDK.Projections.ProjectionBase
+    /// </summary>
+    /// <param name="typeSymbol">The checked class</param>
+    /// <returns></returns>
+    public static bool IsProjection(this INamedTypeSymbol typeSymbol)
+    {
+        var baseType = typeSymbol.BaseType;
+        while (baseType != null)
+        {
+            if (baseType.ToString() == DolittleTypes.ProjectionBaseClass)
+            {
+                return true;
+            }
+
+            baseType = baseType.BaseType;
+        }
+
+        return false;
+    }
 
     public static bool HasEventTypeAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.EventTypeAttribute);
     public static bool HasAggregateRootAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.AggregateRootAttribute);

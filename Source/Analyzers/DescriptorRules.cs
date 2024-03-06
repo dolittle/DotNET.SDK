@@ -140,4 +140,60 @@ static class DescriptorRules
             isEnabledByDefault: true
         );
     }
+
+    internal static class Projection
+    {
+        internal static readonly DiagnosticDescriptor MissingAttribute =
+            new(
+                DiagnosticIds.ProjectionMissingAttributeRuleId,
+                title: "Class does not have the correct identifying ProjectionAttribute",
+                messageFormat: "'{0}' is missing ProjectionAttribute",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "Mark the class with an attribute to assign an identifier to it");
+
+        // ProjectionMissingBaseClassRuleId
+        
+        internal static readonly DiagnosticDescriptor MissingBaseClass =
+            new(
+                DiagnosticIds.ProjectionMissingBaseClassRuleId,
+                title: "Projection does not inherit from ProjectionBase",
+                messageFormat: "'{0}' does not inherit from ProjectionBase",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "Inherit from ProjectionBase.");
+        
+        internal static readonly DiagnosticDescriptor InvalidOnMethodParameters =
+            new(
+                DiagnosticIds.ProjectionInvalidOnMethodParametersRuleId,
+                title: "Invalid On-method",
+                messageFormat: "'{0}' is invalid",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "Change the On-method to match the required signature. The method should take an event as first parameter and a ProjectionContext as the second parameter.");
+        
+        internal static readonly DiagnosticDescriptor InvalidOnMethodReturnType =
+            new(
+                DiagnosticIds.ProjectionInvalidOnMethodReturnTypeRuleId,
+                title: "Invalid On-method return type",
+                messageFormat: "'{0}' returns an invalid type",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "Change the On-method to return void, ProjectionResultType or ProjectionResult<TReadModel>.");
+        
+        internal static readonly DiagnosticDescriptor EventTypeAlreadyHandled =
+            new(
+                DiagnosticIds.ProjectionDuplicateEventHandler,
+                title: "Event type already handled",
+                messageFormat: "'{0}' is already handled",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "The event type is already handled by another On-method.");
+    }
+
 }
