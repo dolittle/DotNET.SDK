@@ -115,9 +115,35 @@ class SomeHandler
             .WithArguments("EventHandler", "eventHandlerId", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
-    
+
     [Fact]
     public async Task FixesProjections()
+    {
+        var test = @"
+using Dolittle.SDK.Projections;
+
+[Projection("""")]
+class SomeProjection
+{
+}";
+
+        var expected = @"
+using Dolittle.SDK.Projections;
+
+[Projection(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeProjection
+{
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+
+        var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
+            .WithSpan(4, 2, 4, 16)
+            .WithArguments("Projection", "projectionId", "\"\"");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
+
+    [Fact]
+    public async Task FixesProjectionsWithNamedParameters()
     {
         var test = @"
 using Dolittle.SDK.Projections;
@@ -141,7 +167,7 @@ class SomeProjection
             .WithArguments("Projection", "projectionId", @"""invalid-id""");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
-    
+
     [Fact]
     public async Task FixesAggregates()
     {

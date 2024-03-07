@@ -153,7 +153,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 allMethodsAdded = false;
                 continue;
             }
-            if (eventTypesToMethods.TryAdd(eventType, CreateUntypedOnMethod(method, eventType, keySelector)))
+            if (eventTypesToMethods!.TryAdd(eventType, CreateUntypedOnMethod(method, eventType, keySelector)))
             {
                 continue;
             }
@@ -172,7 +172,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         IClientBuildResults buildResults)
     {
         var allMethodsAdded = true;
-        foreach (var method in methods.Where(_ => !IsDecoratedOnMethod(_) && _.Name == MethodName))
+        foreach (var method in methods.Where(method => !IsDecoratedOnMethod(method) && method.Name == MethodName))
         {
             var shouldAddHandler = TryGetKeySelector(identifier, method, buildResults, out var keySelector);
 
