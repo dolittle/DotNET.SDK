@@ -1,3 +1,55 @@
+# [23.0.0] - 2024-3-8 [PR: #237](https://github.com/dolittle/DotNET.SDK/pull/237)
+## Summary
+
+### Projections
+
+This version rewrites projections from being a runtime feature to being done completely on the SDK side. It keeps the interface pretty much the same as the old projections, but relaxes some rules around method signatures.  Context is now an optional second parameter, and allows both `ProjectionContext `or `EventContext`. KeyFrom is now optional and will default to the `EventSourceId`. All projections also needs to extend 
+
+The existing IProjectionOf and IProjectionStore interfaces have been reduced to expose `Get` and the ability to use `IQueryable`, and will now allow all filtering to be done in the DB.
+
+Example Projection
+
+```csharp
+[Projection("055319f1-6af8-48a0-b190-323e21ba6cde")]
+public class SomeProjection : ReadModel
+{
+    public int UpdateCount { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public int SomeNumber { get; set; }
+
+    public void On(SomeEvent evt, ProjectionContext ctx)
+    {
+        UpdateCount++;
+        Content = evt.Content;
+    }
+
+    public void On(SomeOtherEvent evt, ProjectionContext ctx)
+    {
+        UpdateCount++;
+        SomeNumber = evt.SomeNumber;
+    }
+
+    public ProjectionResultType On(DeleteEvent _) => ProjectionResultType.Delete;
+}
+```
+
+
+
+### Aggregates
+Added `Perform<TResponse>` which allows the caller to get return values from operations on aggregates.
+
+
+### Added
+
+- SDK Projections - Full rewrite
+- `ProjectionTests<TProjection>` - Added blackbox testing of projections.
+- `AggregateRoot.Perform<TResponse>` - Ability to get responses from aggregates
+
+### Removed
+
+- Runtime integrated projections
+
+
 # [22.1.3] - 2024-2-26 [PR: #235](https://github.com/dolittle/DotNET.SDK/pull/235)
 ## Summary
 Maintenance release - Updated library dependencies
