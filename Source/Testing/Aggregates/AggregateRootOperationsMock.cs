@@ -64,6 +64,30 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
             return Task.CompletedTask;
         }, cancellationToken);
 
+    public Task<TResponse> Perform<TResponse>(Func<TAggregate, TResponse> method, CancellationToken cancellationToken = default)
+    {
+        lock (_concurrencyLock)
+        {
+            var previousAppliedEvents = new ReadOnlyCollection<AppliedEvent>(_aggregateRoot.AppliedEvents.ToList());
+            try
+            {
+                var previousAppliedEventCount = previousAppliedEvents.Count;
+                _persistNumEventsBeforeLastOperation(previousAppliedEventCount);
+                var response = method(_aggregateRoot);
+                OnNewEvents(previousAppliedEventCount);
+
+                return Task.FromResult(response);
+            }
+            catch (Exception ex)
+            {
+                var oldAggregate = _createAggregate();
+                ApplyEvents(oldAggregate, previousAppliedEvents);
+                _persistOldAggregate(oldAggregate);
+                throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, ex);
+            }
+        }
+    }
+
     /// <summary>
     /// Performs operation on aggregate synchronously.
     /// </summary>

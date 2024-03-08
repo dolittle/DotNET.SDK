@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.ExceptionServices;
 
 namespace Dolittle.SDK.Async;
@@ -32,6 +33,8 @@ public class Try<TResult>
     /// <summary>
     /// Gets a value indicating whether the operation succeeded.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Result))]
+    [MemberNotNullWhen(false, nameof(Exception))]
     public bool Success { get; }
 
     /// <summary>
@@ -78,8 +81,8 @@ public class Try<TResult>
     /// <param name="exception">The <see cref="System.Exception" /> to convert.</param>
     /// <return><see cref="Try{TResult}" />.</return>
     public static implicit operator Try<TResult>(Exception exception) => new(exception);
-    
-    
+
+
     /// <summary>
     /// Throws the <see cref="Exception"/> with its original stack trace information if this <see cref="Try"/> failed.
     /// </summary>

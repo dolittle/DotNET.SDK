@@ -56,7 +56,47 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
                 return Task.CompletedTask;
             },
             cancellationToken);
+    
 
+    /// <inheritdoc/>
+    public async Task<TResponse> Perform<TResponse>(Func<TAggregate, TResponse> method, CancellationToken cancellationToken = default)
+    {
+        if(cancellationToken == default)
+        {
+            cancellationToken = _defaultTimeout();
+        }
+        using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.PerformWithResponse")
+            ?.Tag(_eventSourceId);
+
+        try
+        {
+            var result = await _context.System.Cluster()
+                .RequestAsync<Try<object?>>(_clusterIdentity, new PerformAndRespond<TAggregate>(agg => method(agg), cancellationToken), _context,
+                    cancellationToken);
+
+            if (!result.Success)
+            {
+                throw result.Exception;
+            }
+
+            return (TResponse)result.Result;
+        }
+        catch (AggregateRootOperationFailed e) when(e.InnerException is not null)
+        {
+            activity?.RecordError(e.InnerException);
+            // ReSharper disable once PossibleIntendedRethrow
+#pragma warning disable CA2200
+            // Here we would like the stacktrace to be updated with this stack instead of the actor stack
+            throw e;
+#pragma warning restore CA2200
+        }
+        catch (Exception e)
+        {
+            activity?.RecordError(e);
+            throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, e);
+        }
+    }
+    
     /// <inheritdoc/>
     public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {

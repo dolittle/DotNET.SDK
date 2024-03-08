@@ -26,6 +26,12 @@ class Perform<TAggregate>(Func<TAggregate, Task> callback, CancellationToken can
     public CancellationToken CancellationToken { get; } = cancellationToken;
 }
 
+class PerformAndRespond<TAggregate>(Func<TAggregate, object?> callback, CancellationToken cancellationToken) where TAggregate : AggregateRoot
+{
+    public Func<TAggregate, object?> Callback { get; } = callback;
+    public CancellationToken CancellationToken { get; } = cancellationToken;
+}
+
 class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
 {
     readonly GetServiceProviderForTenant _getServiceProvider;
@@ -51,6 +57,7 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
             Stopping => OnStopping(context),
             ReceiveTimeout => OnReceiveTimeout(context),
             Perform<TAggregate> msg => OnPerform(msg, context),
+            PerformAndRespond<TAggregate> msg => OnPerformAndRespond(msg, context),
             _ => Task.CompletedTask
         };
     }
@@ -105,6 +112,28 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
         {
             Activity.Current?.RecordError(e);
             context.Respond(new Try<bool>(e));
+        }
+        finally
+        {
+            if (_idleUnloadTimeout == TimeSpan.Zero) // 0 means instantly unload
+            {
+                // ReSharper disable once MethodHasAsyncOverload - awaiting this will deadlock
+                context.Poison(context.Self);
+            }
+        }
+    }
+    
+    async Task OnPerformAndRespond(PerformAndRespond<TAggregate> performAndRespond, IContext context)
+    {
+        try
+        {
+            var response = await _aggregateWrapper!.Perform(performAndRespond.Callback, performAndRespond.CancellationToken);
+            context.Respond(new Try<object?>(response));
+        }
+        catch (Exception e)
+        {
+            Activity.Current?.RecordError(e);
+            context.Respond(new Try<object?>(e));
         }
         finally
         {
