@@ -42,4 +42,20 @@ public class InvalidProjectionTests
                           Missing [Projection] attribute on MissingAttributeProjection
                           """);
     }
+    
+    [Fact]
+    public void ShouldThrowOnPrivateHandlers()
+    {
+        var get = () =>
+        {
+            var projection = ProjectionFixture<PrivateHandlers>.Projection;
+        };
+
+        get.Invoking(it => it()).Should()
+            .Throw<TypeInitializationException>()
+            .WithInnerException(typeof(ArgumentException))
+            .WithMessage($"""
+                          Void On(Dolittle.SDK.Projections.Types.SomeEvent, Dolittle.SDK.Projections.ProjectionContext) has the signature of an projection method, but is not public.. Projection methods needs to be public
+                          """);
+    }
 }
