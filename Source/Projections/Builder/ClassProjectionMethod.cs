@@ -11,9 +11,9 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
 public class ClassProjectionMethod<TProjection> : IProjectionMethod<TProjection>
-    where TProjection : class, new()
+    where TProjection : ReadModel, new()
 {
-    readonly SyncProjectionSignature<TProjection> _method;
+    readonly ProjectionSignature<TProjection> _method;
     readonly EventType _eventType;
 
     /// <summary>
@@ -22,7 +22,7 @@ public class ClassProjectionMethod<TProjection> : IProjectionMethod<TProjection>
     /// <param name="method">The <see cref="TaskResultProjectionMethodSignature{TProjection}"/> method to invoke.</param>
     /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
     /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
-    public ClassProjectionMethod(SyncProjectionSignature<TProjection> method, EventType eventType, KeySelector keySelector)
+    public ClassProjectionMethod(ProjectionSignature<TProjection> method, EventType eventType, KeySelector keySelector)
     {
         _method = method;
         KeySelector = keySelector;
@@ -35,7 +35,7 @@ public class ClassProjectionMethod<TProjection> : IProjectionMethod<TProjection>
     /// <param name="method">The <see cref="TaskResultProjectionMethodSignature{TProjection}"/> method to invoke.</param>
     /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
     /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
-    public ClassProjectionMethod(SyncResultProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
+    public ClassProjectionMethod(ProjectionResultTypeSignature<TProjection> method, EventType eventType, KeySelector keySelector)
         : this(
             (instanceAndReadModel, @event, context) =>
             {
@@ -56,10 +56,10 @@ public class ClassProjectionMethod<TProjection> : IProjectionMethod<TProjection>
     /// <summary>
     /// Initializes a new instance of the <see cref="ClassProjectionMethod{TEventHandler}"/> class.
     /// </summary>
-    /// <param name="method">The <see cref="SyncProjectionMethodSignature{TEvent, TProjection}" /> method to invoke.</param>
+    /// <param name="method">The <see cref="ProjectionMethodSignature{TReadModel,TEvent}" /> method to invoke.</param>
     /// <param name="eventType">The <see cref="EventType" /> of the event.</param>
     /// <param name="keySelector">The <see cref="Projections.KeySelector"/> for selecting the key.</param>
-    public ClassProjectionMethod(SyncProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
+    public ClassProjectionMethod(ProjectionMethodSignature<TProjection> method, EventType eventType, KeySelector keySelector)
         : this(
             (instanceAndReadModel, @event, context) =>
             {

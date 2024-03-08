@@ -7,7 +7,7 @@ using Dolittle.SDK.Projections;
 using Dolittle.SDK.Projections.Copies.MongoDB;
 
 [Projection("98f9db66-b6ca-4e5f-9fc3-638626c9ecfa")]
-public class DishCounter: ProjectionBase
+public class DishCounter: ReadModel
 {
     public int NumberOfTimesPrepared = 0;
     public string Name = "";

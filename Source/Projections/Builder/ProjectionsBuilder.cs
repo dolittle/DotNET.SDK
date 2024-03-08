@@ -42,9 +42,7 @@ public class ProjectionsBuilder : IProjectionsBuilder
     }
 
     /// <inheritdoc />
-    public IProjectionsBuilder Register<TProjection>()
-        where TProjection : class, new()
-        => Register(typeof(TProjection));
+    public IProjectionsBuilder Register<TProjection>() where TProjection : ReadModel, new() => Register(typeof(TProjection));
 
 
     /// <inheritdoc />
@@ -76,16 +74,9 @@ public class ProjectionsBuilder : IProjectionsBuilder
             CreateConventionProjectionBuilderFor(type, identifier));
 
     ICanTryBuildProjection CreateConventionProjectionBuilderFor(Type readModelType, ProjectionModelId identifier)
-        => Activator.CreateInstance(
-                typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType),
-                identifier)
+        => Activator.CreateInstance(typeof(ConventionProjectionBuilder<>).MakeGenericType(readModelType), identifier)
             as ICanTryBuildProjection;
     
-    
-    // static MethodInfo CreateForMethodForReadModel(Type readModelType)
-    //     => typeof(IProjectionCopyToMongoDBBuilderFactory).GetMethod(nameof(IProjectionCopyToMongoDBBuilderFactory.CreateFor), Array.Empty<Type>())?.MakeGenericMethod(readModelType);
-    
-
     /// <summary>
     /// Build projections.
     /// </summary>

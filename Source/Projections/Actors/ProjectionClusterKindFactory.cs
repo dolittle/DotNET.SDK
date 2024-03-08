@@ -19,7 +19,7 @@ static class ProjectionClusterKindFactory
     }
 }
 
-static class ProjectionClusterKindFactory<TProjection> where TProjection : ProjectionBase, new()
+static class ProjectionClusterKindFactory<TProjection> where TProjection : ReadModel, new()
 {
     // ReSharper disable once UnusedMember.Global - Called by reflection
     public static ClusterKind CreateKind(IServiceProvider serviceProvider, IProjection<TProjection> projection)

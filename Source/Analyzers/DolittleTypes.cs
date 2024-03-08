@@ -14,7 +14,7 @@ static class DolittleTypes
 
     public const string EventContext = "Dolittle.SDK.Events.EventContext";
     
-    public const string ProjectionBaseClass = "Dolittle.SDK.Projections.ProjectionBase";
+    public const string ReadModelClass = "Dolittle.SDK.Projections.ReadModel";
     public const string ProjectionAttribute = "Dolittle.SDK.Projections.ProjectionAttribute";
     public const string ProjectionResultType = "Dolittle.SDK.Projections.ProjectionResultType";
     public const string ProjectionContextType = "Dolittle.SDK.Projections.ProjectionContext";

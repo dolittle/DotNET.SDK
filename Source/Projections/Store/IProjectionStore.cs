@@ -21,7 +21,7 @@ public interface IProjectionStore
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TProjection}"/> for the <typeparamref name="TProjection"/> projection read model class.</returns>
     IProjectionOf<TProjection> Of<TProjection>()
-        where TProjection : ProjectionBase, new();
+        where TProjection : ReadModel, new();
 
     /// <summary>
     /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.
@@ -30,7 +30,7 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
     IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
-        where TReadModel : ProjectionBase, new();
+        where TReadModel : ReadModel, new();
 
     /// <summary>
     /// Gets the <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.
@@ -39,7 +39,7 @@ public interface IProjectionStore
     /// <param name="scopeId">The <see cref="ScopeId"/>.</param>
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
-    IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId) where TReadModel : ProjectionBase, new();
+    IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId) where TReadModel : ReadModel, new();
     
     /// <summary>
     /// Gets a projection read model by key for a projection associated with a type.
@@ -48,7 +48,7 @@ public interface IProjectionStore
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TProjection"/> read model.</returns>
-    Task<TProjection?> Get<TProjection>(Key key, CancellationToken cancellation = default) where TProjection : ProjectionBase, new();
+    Task<TProjection?> Get<TProjection>(Key key, CancellationToken cancellation = default) where TProjection : ReadModel, new();
     
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection identifier.
@@ -59,7 +59,7 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TReadModel"/> read model.</returns>
     Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
-        where TReadModel : ProjectionBase, new();
+        where TReadModel : ReadModel, new();
     
     /// <summary>
     /// Gets a projection read model by key for a projection specified by projection and scope identifier.
@@ -71,13 +71,13 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <typeparamref name="TReadModel"/> read model.</returns>
     Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
-        where TReadModel : ProjectionBase, new();
+        where TReadModel : ReadModel, new();
 
     /// <summary>
     /// Gets all projection read models for a projection associated with a type.
     /// </summary>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>A <see cref="Task{TResult}" /> that, when resolved, returns the <see cref="IEnumerable{T}" /> of <typeparamref name="TProjection" />.</returns>
-    IQueryable<TProjection> AsQueryable<TProjection>() where TProjection : ProjectionBase, new();
+    IQueryable<TProjection> AsQueryable<TProjection>() where TProjection : ReadModel, new();
 
 }

@@ -16,5 +16,5 @@ public interface IProjectionReadModelTypes : IUniqueBindings<ProjectionModelId, 
     /// </summary>
     /// <typeparam name="TProjection">The <see cref="Type" /> of the projection.</typeparam>
     /// <returns>The <see cref="ProjectionModelId" />.</returns>
-    ProjectionModelId GetFor<TProjection>() where TProjection : class, new();
+    ProjectionModelId GetFor<TProjection>() where TProjection : ReadModel, new();
 }

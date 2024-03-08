@@ -10,7 +10,7 @@ namespace ProjectionsTests;
 /// Projection with multiple on-methods for the same event type.
 /// </summary>
 [Projection("055319f1-6af8-48a0-b190-323e21ba6cde")]
-public class InvalidProjection : ProjectionBase
+public class InvalidProjection : ReadModel
 {
     public string Content { get; set; } = string.Empty;
 

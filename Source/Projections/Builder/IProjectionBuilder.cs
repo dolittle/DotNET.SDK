@@ -25,5 +25,5 @@ public interface IProjectionBuilder
     /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
     /// <exception cref="ReadModelAlreadyDefinedForProjection">Is thrown when called multiple times.</exception>
     IProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
-        where TReadModel : class, new();
+        where TReadModel : ReadModel, new();
 }

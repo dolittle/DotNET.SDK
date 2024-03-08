@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TReadModel">The type of the projection read model.</typeparam>
 public interface IProjectionBuilderForReadModel<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     /// <summary>
     /// Defines the projection to operate in a specific <see cref="ScopeId" />.
@@ -26,9 +26,9 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// </summary>
     /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
-    /// <param name="method">The <see cref="SyncProjectionSignature{T}" />.</param>
+    /// <param name="method">The <see cref="ProjectionSignature{TReadModel}" />.</param>
     /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
-    IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
+    IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, ProjectionSignature<TReadModel, TEvent> method)
         where TEvent : class;
 
     /// <summary>
@@ -36,18 +36,18 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// </summary>
     /// <param name="eventType">The <see cref="EventType" /> of the event to handle.</param>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
-    /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
+    /// <param name="method">The <see cref="ProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
     /// </summary>
     /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
-    /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
+    /// <param name="method">The <see cref="ProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Add a method for updating a projection on an event.
@@ -55,9 +55,9 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     /// <param name="eventTypeId">The <see cref="EventTypeId" /> of the event to handle.</param>
     /// <param name="eventTypeGeneration">The <see cref="Generation" /> of the <see cref="EventType" /> of the event to handle.</param>
     /// <param name="selectorCallback">The <see cref="KeySelectorSignature{T}"/> used to build the <see cref="KeySelector"/> for the event.</param>
-    /// <param name="method">The <see cref="SyncProjectionSignature{TReadModel}" />.</param>
+    /// <param name="method">The <see cref="ProjectionSignature{TReadModel}" />.</param>
     /// <returns>The builder for continuation.</returns>
-    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method);
+    IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method);
 
     /// <summary>
     /// Defines the projection to have a specific <see cref="ProjectionAlias" />.

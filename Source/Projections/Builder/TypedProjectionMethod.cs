@@ -12,21 +12,33 @@ namespace Dolittle.SDK.Projections.Builder;
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
 /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
 public class TypedProjectionMethod<TReadModel, TEvent> : IProjectionMethod<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
     where TEvent : class
 {
-    readonly SyncProjectionSignature<TReadModel, TEvent> _method;
+    readonly ProjectionSignature<TReadModel, TEvent> _method;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypedProjectionMethod{TReadModel, TEvent}"/> class.
     /// </summary>
     /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel, TEvent}" />.</param>
     /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
-    public TypedProjectionMethod(SyncProjectionSignature<TReadModel, TEvent> method, KeySelector keySelector)
+    public TypedProjectionMethod(ProjectionSignature<TReadModel, TEvent> method, KeySelector keySelector)
     {
         _method = method;
         KeySelector = keySelector;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TypedProjectionMethod{TReadModel, TEvent}"/> class.
+    /// </summary>
+    /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel, TEvent}" />.</param>
+    /// <param name="keySelector">The <see cref="Projections.KeySelector" />.</param>
+    public TypedProjectionMethod(ProjectionEventContextSignature<TReadModel, TEvent> method, KeySelector keySelector) : this(
+        (instance, @event, context) => method(instance, @event, context.EventContext), keySelector)
+    {
+    }
+    
+    
 
     /// <inheritdoc/>
     public KeySelector KeySelector { get; }

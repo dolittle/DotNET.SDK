@@ -7,7 +7,7 @@ using Dolittle.SDK.Projections;
 namespace Customers;
 
 [Projection("185107c2-f897-40c8-bb06-643b3642f230")]
-public class DishesEaten: ProjectionBase
+public class DishesEaten: ReadModel
 {
     public string[] Dishes { get; set; } = {};
     

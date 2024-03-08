@@ -14,9 +14,5 @@
     <ItemGroup>
         <PackageReference Include="moq" Version="4.18.3" PrivateAssets="all" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Projections\" />
-    </ItemGroup>
 
 </Project>

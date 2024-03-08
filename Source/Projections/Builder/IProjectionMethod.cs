@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
 public interface IProjectionMethod<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     /// <summary>
     /// Gets the <see cref="KeySelector" />.

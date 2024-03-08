@@ -158,12 +158,12 @@ static class DescriptorRules
         internal static readonly DiagnosticDescriptor MissingBaseClass =
             new(
                 DiagnosticIds.ProjectionMissingBaseClassRuleId,
-                title: "Projection does not inherit from ProjectionBase",
-                messageFormat: "'{0}' does not inherit from ProjectionBase",
+                title: "Projection does not inherit from ReadModel",
+                messageFormat: "'{0}' does not inherit from ReadModel",
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Inherit from ProjectionBase.");
+                description: "Inherit from ReadModel.");
         
         internal static readonly DiagnosticDescriptor InvalidOnMethodParameters =
             new(

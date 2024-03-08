@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Store;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Testing.Aggregates;
@@ -22,39 +23,45 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     readonly ConcurrentDictionary<EventSourceId, object> _aggregateLocks = new();
     readonly ConcurrentDictionary<EventSourceId, TAggregate> _aggregates = new();
     readonly ConcurrentDictionary<EventSourceId, int> _numEventsBeforeLastOperation = new();
+    readonly Action<UncommittedAggregateEvents>? _appendEvents;
 
     /// <summary>
     /// Creates an instance of <see cref="AggregateOfMock{TAggregate}"/>.
     /// </summary>
     /// <param name="configureServices">The optional callback for configuring the <see cref="IServiceCollection"/> used to create the instances of <typeparamref name="TAggregate"/>.</param>
+    /// <param name="appendEvents">Callback on applied events</param>
     /// <returns>The <see cref="AggregateOfMock{TAggregate}"/>.</returns>
-    public static AggregateOfMock<TAggregate> Create(Action<IServiceCollection>? configureServices = default)
+    public static AggregateOfMock<TAggregate> Create(Action<IServiceCollection>? configureServices = default,
+        Action<UncommittedAggregateEvents>? appendEvents = default)
     {
         var services = new ServiceCollection();
         configureServices?.Invoke(services);
-        return Create(services.BuildServiceProvider());
+        return Create(services.BuildServiceProvider(), appendEvents);
     }
 
     /// <summary>
     /// Creates an instance of <see cref="AggregateOfMock{TAggregate}"/> that uses the given <see cref="IServiceProvider"/> to create the aggregate intance.
     /// </summary>
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to create the instances of the <typeparamref name="TAggregate"/>.</param>
+    /// <param name="appendEvents"></param>
     /// <returns>The <see cref="AggregateOfMock{TAggregate}"/>.</returns>
-    public static AggregateOfMock<TAggregate> Create(IServiceProvider serviceProvider)
+    public static AggregateOfMock<TAggregate> Create(IServiceProvider serviceProvider, Action<UncommittedAggregateEvents>? appendEvents)
         => new(eventSource =>
         {
             var getAggregate = AggregateRootMetadata<TAggregate>.Construct(serviceProvider, eventSource);
             getAggregate.ThrowIfFailed();
             return getAggregate;
-        });
+        }, appendEvents);
 
     /// <summary>
     /// Initializes an instance of the <see cref="AggregateOfMock{T}"/> class.
     /// </summary>
     /// <param name="createAggregateRoot"></param>
-    public AggregateOfMock(Func<EventSourceId, TAggregate> createAggregateRoot)
+    /// <param name="appendEvents">Callback on new stored events</param>
+    public AggregateOfMock(Func<EventSourceId, TAggregate> createAggregateRoot, Action<UncommittedAggregateEvents>? appendEvents =  null)
     {
         _createAggregateRoot = createAggregateRoot;
+        _appendEvents = appendEvents;
     }
 
     /// <summary>
@@ -87,7 +94,8 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
                 return aggregateRoot;
             },
             oldAggregate => _aggregates[eventSourceId] = oldAggregate,
-            numEventsBeforeLastOperation => _numEventsBeforeLastOperation[eventSourceId] = numEventsBeforeLastOperation);
+            numEventsBeforeLastOperation => _numEventsBeforeLastOperation[eventSourceId] = numEventsBeforeLastOperation,
+            _appendEvents);
     }
 
     /// <summary>

@@ -13,7 +13,7 @@ public class ProjectionReadModelTypes : UniqueBindings<ProjectionModelId, Type>,
 {
     /// <inheritdoc/>
     public ProjectionModelId GetFor<TProjection>()
-        where TProjection : class, new()
+        where TProjection : ReadModel, new()
         => base.GetFor(typeof(TProjection));
 
 }

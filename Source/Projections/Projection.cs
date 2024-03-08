@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Projections;
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
 public class Projection<TReadModel> : IProjection<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     readonly IDictionary<EventType, IProjectionMethod<TReadModel>> _onMethods;
 

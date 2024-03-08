@@ -20,7 +20,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -44,7 +44,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -68,7 +68,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -92,7 +92,7 @@ class SomeProjection: ProjectionBase
 // record NameUpdated(string Name);
 //
 // [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-// class SomeProjection: ProjectionBase
+// class SomeProjection: ReadModel
 // {
 //     public string Name {get; set;}
 //
@@ -129,7 +129,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -162,7 +162,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -199,7 +199,7 @@ using Dolittle.SDK.Events;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -229,7 +229,7 @@ using Dolittle.SDK.Events;
 [EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
 record NameUpdated(string Name);
 
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
@@ -260,7 +260,7 @@ namespace Test;
 record NameUpdated(string Name);
 
 [Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
-class SomeProjection: ProjectionBase
+class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 

@@ -11,9 +11,9 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
 public class ProjectionMethod<TReadModel> : IProjectionMethod<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
-    readonly SyncProjectionSignature<TReadModel> _method;
+    readonly ProjectionSignature<TReadModel> _method;
     readonly EventType _eventType;
 
     /// <summary>
@@ -22,7 +22,7 @@ public class ProjectionMethod<TReadModel> : IProjectionMethod<TReadModel>
     /// <param name="method">The <see cref="TaskProjectionSignature{TReadModel}" />.</param>
     /// <param name="keySelector">The <see cref="KeySelector" />.</param>
     /// <param name="eventType">The <see cref="EventType" />.</param>
-    public ProjectionMethod(SyncProjectionSignature<TReadModel> method, KeySelector keySelector, EventType eventType)
+    public ProjectionMethod(ProjectionSignature<TReadModel> method, KeySelector keySelector, EventType eventType)
     {
         _method = method;
         _eventType = eventType;

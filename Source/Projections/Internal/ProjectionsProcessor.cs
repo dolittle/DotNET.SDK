@@ -25,7 +25,7 @@ namespace Dolittle.SDK.Projections.Internal;
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
 public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>
-    where TReadModel : ProjectionBase, new()
+    where TReadModel : ReadModel, new()
 {
     readonly IProjection<TReadModel> _projection;
     readonly IEventProcessingConverter _eventConverter;

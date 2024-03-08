@@ -44,7 +44,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
 
     /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
-        where TReadModel : class, new()
+        where TReadModel : ReadModel, new()
     {
         if (_methodsBuilder != default)
         {

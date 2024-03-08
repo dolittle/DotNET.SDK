@@ -1,7 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace Dolittle.SDK.Projections;
 
@@ -9,7 +9,7 @@ namespace Dolittle.SDK.Projections;
 /// Represents the result of a projection's On-method.
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
-public class ProjectionResult<TReadModel> where TReadModel : class, new()
+public class ProjectionResult<TReadModel> where TReadModel : ReadModel, new()
 {
     /// <summary>
     /// Gets a <see cref="ProjectionResult{TReadModel}" /> that signifies that the read model should be deleted.
@@ -25,7 +25,7 @@ public class ProjectionResult<TReadModel> where TReadModel : class, new()
     /// Gets a <see cref="ProjectionResult{TReadModel}" /> that signifies that the read model should be kept as is, IE no-op.
     /// </summary>
     public static ProjectionResult<TReadModel> Replace(TReadModel readModel) => readModel;
-    
+
     /// <summary>
     /// Gets the updated read model.
     /// </summary>
@@ -48,5 +48,25 @@ public class ProjectionResult<TReadModel> where TReadModel : class, new()
         }
 
         return new ProjectionResult<TReadModel> { ReadModel = readModel, Type = ProjectionResultType.Replace };
+    }
+
+    /// <summary>
+    /// Convert the TReadModel and ProjectionResultType to a ProjectionResult.
+    /// </summary>
+    /// <param name="readModel">The read model instance.</param>
+    /// <param name="resultType">The result from the projection method</param>
+    /// <returns></returns>
+    public static ProjectionResult<TReadModel> ToResult(TReadModel readModel, ProjectionResultType resultType)
+    {
+        switch (resultType)
+        {
+            case ProjectionResultType.Replace:
+                return readModel;
+            case ProjectionResultType.Delete:
+                return Delete;
+            case ProjectionResultType.Keep:
+            default:
+                return Keep;
+        }
     }
 }

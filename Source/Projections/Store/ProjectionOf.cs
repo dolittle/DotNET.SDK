@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Projections.Store;
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
 public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
-    where TReadModel : ProjectionBase, new()
+    where TReadModel : ReadModel, new()
 {
     readonly IMongoCollection<TReadModel> _collection;
 

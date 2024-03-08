@@ -47,7 +47,7 @@ static class AnalysisExtensions
     }
     
     /// <summary>
-    /// Checks if base class of the type is Dolittle.SDK.Projections.ProjectionBase
+    /// Checks if base class of the type is Dolittle.SDK.Projections.ReadModel
     /// </summary>
     /// <param name="typeSymbol">The checked class</param>
     /// <returns></returns>
@@ -56,7 +56,7 @@ static class AnalysisExtensions
         var baseType = typeSymbol.BaseType;
         while (baseType != null)
         {
-            if (baseType.ToString() == DolittleTypes.ProjectionBaseClass)
+            if (baseType.ToString() == DolittleTypes.ReadModelClass)
             {
                 return true;
             }

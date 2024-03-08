@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Store;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
@@ -25,6 +26,7 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     readonly Func<TAggregate> _createAggregate;
     readonly Action<TAggregate> _persistOldAggregate;
     readonly Action<int> _persistNumEventsBeforeLastOperation;
+    readonly Action<UncommittedAggregateEvents>? _appendEvents;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootOperationsMock{TAggregate}"/> class.
@@ -35,13 +37,15 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <param name="createAggregate">The callback for creating a new clean aggregate.</param>
     /// <param name="persistOldAggregate"></param>
     /// <param name="persistNumEventsBeforeLastOperation"></param>
+    /// <param name="appendEvents">Optional callback on applied events</param>
     public AggregateRootOperationsMock(
         EventSourceId eventSourceId,
         object concurrencyLock,
         TAggregate aggregateRoot,
         Func<TAggregate> createAggregate,
         Action<TAggregate> persistOldAggregate,
-        Action<int> persistNumEventsBeforeLastOperation)
+        Action<int> persistNumEventsBeforeLastOperation,
+        Action<UncommittedAggregateEvents>? appendEvents)
     {
         _eventSourceId = eventSourceId;
         _concurrencyLock = concurrencyLock;
@@ -49,6 +53,7 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
         _createAggregate = createAggregate;
         _persistOldAggregate = persistOldAggregate;
         _persistNumEventsBeforeLastOperation = persistNumEventsBeforeLastOperation;
+        _appendEvents = appendEvents;
     }
 
     /// <inheritdoc />
@@ -70,7 +75,7 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
             method(_);
             return Task.CompletedTask;
         }, cancellationToken).GetAwaiter().GetResult();
-    
+
     /// <summary>
     /// Performs operation on aggregate synchronously.
     /// </summary>
@@ -78,7 +83,7 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <param name="cancellationToken">The cancellation token.</param>
     public void PerformSync(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
         => Perform(method, cancellationToken).GetAwaiter().GetResult();
-    
+
     /// <inheritdoc />
     public Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {
@@ -87,8 +92,11 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
             var previousAppliedEvents = new ReadOnlyCollection<AppliedEvent>(_aggregateRoot.AppliedEvents.ToList());
             try
             {
-                _persistNumEventsBeforeLastOperation(previousAppliedEvents.Count);
+                var previousAppliedEventCount = previousAppliedEvents.Count;
+                _persistNumEventsBeforeLastOperation(previousAppliedEventCount);
                 method(_aggregateRoot).GetAwaiter().GetResult();
+                OnNewEvents(previousAppliedEventCount);
+
                 return Task.CompletedTask;
             }
             catch (Exception ex)
@@ -99,6 +107,30 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
                 throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, ex);
             }
         }
+    }
+
+    void OnNewEvents(int previousAppliedEventCount)
+    {
+        if (_appendEvents is not null)
+        {
+            var newEvents = _aggregateRoot.AppliedEvents.Skip(previousAppliedEventCount).ToList();
+            if (newEvents.Count > 0)
+            {
+                _appendEvents(ToUncommittedEvents(newEvents));
+            }
+        }
+    }
+
+    UncommittedAggregateEvents ToUncommittedEvents(List<AppliedEvent> newEvents)
+    {
+        var uncommittedEvents = new UncommittedAggregateEvents(_eventSourceId, _aggregateRoot.AggregateRootId, _aggregateRoot.Version);
+        foreach (var newEvent in newEvents)
+        {
+            var eventType = EventTypeMetadata.GetEventType(newEvent.Event);
+            uncommittedEvents.Add(new UncommittedAggregateEvent(eventType!, newEvent.Event, newEvent.Public));
+        }
+
+        return uncommittedEvents;
     }
 
     static void ApplyEvents(TAggregate aggregate, IEnumerable<AppliedEvent> events)

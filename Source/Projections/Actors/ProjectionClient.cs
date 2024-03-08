@@ -23,7 +23,7 @@ public interface IProjectionClient<TProjection>
     Task<ProjectionResultType> On(object @event, EventType eventType, EventContext context, CancellationToken cancellationToken);
 }
 
-public class ProjectionClient<TProjection>(IProjection<TProjection> projection, Cluster cluster) : IProjectionClient<TProjection> where TProjection : ProjectionBase, new()
+public class ProjectionClient<TProjection>(IProjection<TProjection> projection, Cluster cluster) : IProjectionClient<TProjection> where TProjection : ReadModel, new()
 {
     readonly string _kind = ProjectionActor<TProjection>.GetKind(projection);
 

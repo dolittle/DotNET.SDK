@@ -5,6 +5,17 @@ using System.Reflection;
 
 namespace Dolittle.SDK.Events;
 
+public static class EventTypeMetadata
+{
+    public static EventType? GetEventType(object @event)
+    {
+        return typeof(EventTypeMetadata<>)
+            .MakeGenericType(@event.GetType())
+            .GetProperty(nameof(EventTypeMetadata<object>.EventType))
+            ?.GetValue(null) as EventType;
+    }
+}
+
 public static class EventTypeMetadata<TEventType> where TEventType : class
 {
     // ReSharper disable once StaticMemberInGenericType

@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
 public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForReadModel<TReadModel>, ICanTryBuildProjection
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
     readonly ProjectionId _projectionId;
@@ -62,7 +62,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
+    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, ProjectionSignature<TReadModel, TEvent> method)
         where TEvent : class
     {
         _methods.Add(new TypedProjectionMethod<TReadModel, TEvent>(method, selectorCallback(new KeySelectorBuilder<TEvent>())));
@@ -70,19 +70,19 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method)
     {
         _methods.Add(new ProjectionMethod<TReadModel>(method, selectorCallback(new KeySelectorBuilder()), eventType));
         return this;
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId), selectorCallback, method);
 
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
     /// <inheritdoc />

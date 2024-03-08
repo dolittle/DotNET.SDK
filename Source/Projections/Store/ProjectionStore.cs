@@ -34,38 +34,38 @@ public class ProjectionStore : IProjectionStore
 
     /// <inheritdoc />
     public IProjectionOf<TProjection> Of<TProjection>()
-        where TProjection : ProjectionBase, new()
+        where TProjection : ReadModel, new()
         => new ProjectionOf<TProjection>(_providers.GetRequiredService<IMongoCollection<TProjection>>(), _projectionAssociations.GetFor<TProjection>());
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
-        where TReadModel : ProjectionBase, new()
+        where TReadModel : ReadModel, new()
         => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, ScopeId.Default);
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
-        where TReadModel : ProjectionBase, new()
+        where TReadModel : ReadModel, new()
         => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, scopeId);
 
     /// <inheritdoc/>
     public Task<TProjection?> Get<TProjection>(Key key, CancellationToken cancellation = default)
-        where TProjection : ProjectionBase, new()
+        where TProjection : ReadModel, new()
     {
         return Of<TProjection>().Get(key, cancellation);
     }
 
     /// <inheritdoc/>
-    public IQueryable<TProjection> AsQueryable<TProjection>() where TProjection : ProjectionBase, new()
+    public IQueryable<TProjection> AsQueryable<TProjection>() where TProjection : ReadModel, new()
         => Of<TProjection>().AsQueryable();
 
     /// <inheritdoc/>
     public Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
-        where TReadModel : ProjectionBase, new()
+        where TReadModel : ReadModel, new()
         => Of<TReadModel>(projectionId).Get(key, cancellation);
     
     /// <inheritdoc/>
     public Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
-        where TReadModel : ProjectionBase, new()
+        where TReadModel : ReadModel, new()
     {
         return Of<TReadModel>(projectionId, scopeId).Get(key, cancellation);
     }

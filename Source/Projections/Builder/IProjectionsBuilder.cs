@@ -24,7 +24,7 @@ public interface IProjectionsBuilder
     /// <typeparam name="TProjection">The <see cref="Type" /> that is the projection class.</typeparam>
     /// <returns>The builder for continuation.</returns>
     IProjectionsBuilder Register<TProjection>()
-        where TProjection : class, new();
+        where TProjection : ReadModel, new();
 
     /// <summary>
     /// Registers a <see cref="Type" /> as a projection class.

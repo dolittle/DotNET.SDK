@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections;
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
 public interface IProjection<TReadModel> : IProjection
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     /// <summary>
     /// Gets the initial <typeparamref name="TReadModel"/> read model state.

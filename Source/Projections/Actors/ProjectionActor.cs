@@ -20,7 +20,7 @@ public class ProjectionActor<TProjection>(
     GetServiceProviderForTenant getServiceProvider,
     IProjection<TProjection> projectionType,
     ILogger<ProjectionActor<TProjection>> logger,
-    TimeSpan idleUnloadTimeout) : IActor where TProjection : ProjectionBase, new()
+    TimeSpan idleUnloadTimeout) : IActor where TProjection : ReadModel, new()
 {
     /// <summary>
     /// The cluster kind for the projection actor.
@@ -84,7 +84,7 @@ public class ProjectionActor<TProjection>(
             {
                 case ProjectionResultType.Replace:
                     _projection = result.ReadModel;
-                    _projection!.LastUpdated = projectionContext.EventContext.Occurred;
+                    _projection!.SetLastUpdated(projectionContext.EventContext.Occurred);
                     await _collection!.ReplaceOneAsync(p => p.Id == _projection!.Id, _projection, new ReplaceOptions { IsUpsert = true });
                     break;
                 case ProjectionResultType.Delete:

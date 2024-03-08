@@ -1,99 +1,56 @@
-using Dolittle.SDK.Projections;
-using Dolittle.SDK.Projections.Internal;
+using Dolittle.SDK.Testing.Projections;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Xunit;
 
 namespace ProjectionsTests;
 
-public class ProjectionTypeTests
+public class ProjectionTypeTests : ProjectionTests<TestProjection>
 {
     const string ProjectionKey = "foo";
-    static readonly ProjectionContext _projectionContext = new(true, ProjectionKey, TestEventContexts.ForType<SomeEvent>());
-
-    [Fact]
-    public void CanGetProjectionOnMethods()
-    {
-        var methodInfo = ProjectionType<TestProjection>.MethodsPerEventType;
-
-        methodInfo.Should().NotBeNull();
-        methodInfo.Keys.Should().BeEquivalentTo(new[]
-        {
-            typeof(SomeEvent),
-            typeof(SomeOtherEvent),
-            typeof(DeleteEvent)
-        });
-    }
-
     [Fact]
     public void CanMutateProjections()
     {
-        var testProjection = new TestProjection
-        {
-            Id = ProjectionKey,
-        };
-        var someEvent = new SomeEvent
+        var when = DateTimeOffset.Now;
+
+        WithEvent(ProjectionKey, new SomeEvent
         {
             Thing = "foo"
-        };
+        });
+        WithEvent(ProjectionKey, new SomeOtherEvent
+        {
+            SomeNumber = 10
+        }, when);
 
-        var result = ProjectionType<TestProjection>.Apply(testProjection, someEvent, _projectionContext);
-
-        using var _ = new AssertionScope();
-
-        result.Type.Should().Be(ProjectionResultType.Replace);
-        result.ReadModel.Should()
-            .BeEquivalentTo(new TestProjection
-            {
-                Id = ProjectionKey,
-                UpdateCount = 1,
-                Content = "foo"
-            });
+        ReadModel(ProjectionKey).Should().BeEquivalentTo(new TestProjection
+        {
+            Id = ProjectionKey,
+            Content = "foo",
+            LastUpdated = when,
+            UpdateCount = 2,
+            TheNumber = 10
+        });
     }
 
     [Fact]
     public void CanMutateProjectionsWithEventContextSignature()
     {
-                var testProjection = new TestProjection
-        {
-            Id = ProjectionKey,
-        };
-        var someEvent = new SomeOtherEvent()
+        WithEvent(ProjectionKey, new SomeOtherEvent()
         {
             SomeNumber = 42
-        };
+        });
 
-        var result = testProjection.Apply(someEvent, _projectionContext);
-
-        using var _ = new AssertionScope();
-
-        result.Type.Should().Be(ProjectionResultType.Replace);
-        result.ReadModel.Should()
-            .BeEquivalentTo(new TestProjection
-            {
-                Id = ProjectionKey,
-                UpdateCount = 1,
-                TheNumber = 42
-            });
+        ReadModel(ProjectionKey)!.TheNumber.Should().Be(42);
     }
-
+    
     [Fact]
     public void CanDeleteProjections()
     {
-        var testProjection = new TestProjection
+        WithEvent(ProjectionKey, new SomeEvent
         {
-            Id = ProjectionKey,
-        };
+            Thing = "foo"
+        });
+        WithEvent(ProjectionKey, new DeleteEvent { Reason = "Just because" });
         
-        var result = testProjection.Apply(new SomeEvent { Thing = "foo" }, _projectionContext);
-
-        var before = result.ReadModel!;
-
-        var deleteResult = before.Apply(new DeleteEvent { Reason = "Just because" }, _projectionContext);
-
-        using var _ = new AssertionScope();
-
-        deleteResult.Type.Should().Be(ProjectionResultType.Delete);
-        deleteResult.ReadModel.Should().BeNull();
+        ReadModel(ProjectionKey).Should().BeNull();
     }
 }

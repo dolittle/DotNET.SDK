@@ -14,7 +14,7 @@ namespace Dolittle.SDK.Projections.Store;
 /// Defines a system that knows about a projection.
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
-public interface IProjectionOf<TReadModel> where TReadModel : class, new()
+public interface IProjectionOf<TReadModel> where TReadModel : ReadModel, new()
 {
     /// <summary>
     /// Gets the <see cref="ProjectionId"/> identifier.
