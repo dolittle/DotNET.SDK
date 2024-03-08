@@ -3,7 +3,7 @@
 
 using Dolittle.SDK.Events;
 
-namespace ProjectionsTests;
+namespace Dolittle.SDK.Projections.Types;
 
 [EventType("055319f1-6af8-48a0-b190-323e21ba6cde")]
 public class DeleteEvent

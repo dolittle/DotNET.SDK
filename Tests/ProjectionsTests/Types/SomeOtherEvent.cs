@@ -3,7 +3,7 @@
 
 using Dolittle.SDK.Events;
 
-namespace ProjectionsTests;
+namespace Dolittle.SDK.Projections.Types;
 
 [EventType("b118f2ff-68a5-46bc-949b-ec849b48ce02")]
 public class SomeOtherEvent

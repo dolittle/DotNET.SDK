@@ -3,14 +3,10 @@
 
 using System.Globalization;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Execution;
-using Dolittle.SDK.Microservices;
 using Dolittle.SDK.Security;
-using Dolittle.SDK.Tenancy;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
-using Version = System.Version;
 
-namespace ProjectionsTests;
+namespace Dolittle.SDK.Projections;
 
 public static class TestEventContexts
 {

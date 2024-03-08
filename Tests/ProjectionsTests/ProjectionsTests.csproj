@@ -3,8 +3,8 @@
     <Import Project="../../tests.props" />
 
     <PropertyGroup>
-        <RootNamespace>Dolittle.SDK.ProjectionTests</RootNamespace>
-        <AssemblyName>Dolittle.SDK.ProjectionTests</AssemblyName>
+        <RootNamespace>Dolittle.SDK.Projections</RootNamespace>
+        <AssemblyName>Dolittle.SDK.Projections.Tests</AssemblyName>
     </PropertyGroup>
     
     <ItemGroup>

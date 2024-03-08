@@ -279,14 +279,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         if (!ProjectionSignatureFactory<TProjection>.ParametersAreValid(method, out parametersType))
         {
             okay = false;
-            buildResults.AddFailure(identifier, $"{method} needs to have two parameters where the second parameter is {typeof(ProjectionContext)}");
-        }
-
-        if (!MethodHasNoExtraParameters(method))
-        {
-            okay = false;
-            buildResults.AddFailure(identifier,
-                $"{method} needs to only have two parameters where the first is the event to handle and the second is {typeof(ProjectionContext)}");
+            buildResults.AddFailure(identifier, $"{method} needs to have one or two parameters where the first parameter is the event and the second parameter is {typeof(ProjectionContext)} or {typeof(EventContext)}");
         }
 
         if (ProjectionSignatureFactory<TProjection>.ResponseTypeIsValid(method, out responseType))

@@ -22,7 +22,7 @@ public abstract class ProjectionTests<TProjection>
     readonly IProjection<TProjection> _projection = ProjectionFixture<TProjection>.Projection;
     protected IAggregates Aggregates { get; }
 
-    protected void ForAggregate<TAggregate>(EventSourceId id, Action<TAggregate> callback) where TAggregate : AggregateRoot
+    protected void WhenAggregateMutated<TAggregate>(EventSourceId id, Action<TAggregate> callback) where TAggregate : AggregateRoot
     {
         Aggregates.Get<TAggregate>(id).Perform(callback, CancellationToken.None).GetAwaiter().GetResult();
     }
@@ -45,9 +45,25 @@ public abstract class ProjectionTests<TProjection>
         }
     }
 
-    protected TProjection? ReadModel(Key key)
+    protected void WithEvent(CommittedEvent committedEvent)
     {
-        return _projections.GetValueOrDefault(key);
+        lock (this)
+        {
+            On(committedEvent);
+        }
+    }
+
+    protected TProjection ReadModel(Key key)
+    {
+        return _projections.GetValueOrDefault(key) ?? throw new ReadModelDidNotExist(key);
+    }
+
+    protected void ReadModelShouldBeDeleted(Key key)
+    {
+        if (_projections.TryGetValue(key, out var projection))
+        {
+            throw new ReadModelExistedWhenItShouldNot(key, projection);
+        }
     }
 
     protected ProjectionTests(Action<IServiceCollection>? configureServices = default)
@@ -128,5 +144,21 @@ public abstract class ProjectionTests<TProjection>
             evt.Occurred,
             evt.ExecutionContext,
             ExecutionContexts.Test);
+    }
+}
+
+public class ReadModelExistedWhenItShouldNot : Exception
+{
+    public ReadModelExistedWhenItShouldNot(Key key, object projection)
+        : base($"Read model for {key} existed when it should not. Projection: {projection}")
+    {
+    }
+}
+
+public class ReadModelDidNotExist : Exception
+{
+    public ReadModelDidNotExist(Key key)
+        : base($"Read model for {key} did not exist")
+    {
     }
 }

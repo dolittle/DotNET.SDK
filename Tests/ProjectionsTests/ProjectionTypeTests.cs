@@ -1,8 +1,9 @@
+using Dolittle.SDK.Projections.Types;
 using Dolittle.SDK.Testing.Projections;
 using FluentAssertions;
 using Xunit;
 
-namespace ProjectionsTests;
+namespace Dolittle.SDK.Projections;
 
 public class ProjectionTypeTests : ProjectionTests<TestProjection>
 {
@@ -50,7 +51,7 @@ public class ProjectionTypeTests : ProjectionTests<TestProjection>
             Thing = "foo"
         });
         WithEvent(ProjectionKey, new DeleteEvent { Reason = "Just because" });
-        
-        ReadModel(ProjectionKey).Should().BeNull();
+
+        ReadModelShouldBeDeleted(ProjectionKey);
     }
 }

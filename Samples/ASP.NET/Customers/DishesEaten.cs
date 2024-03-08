@@ -11,7 +11,6 @@ public class DishesEaten: ReadModel
 {
     public string[] Dishes { get; set; } = {};
     
-    [KeyFromEventSource]
     public void On(DishEaten evt, ProjectionContext ctx)
     {
         Dishes = Dishes.Append(evt.Dish).ToArray();

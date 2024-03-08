@@ -2,12 +2,12 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Dolittle.SDK.Projections.Core;
-using Dolittle.SDK.ProjectionTests.InvalidProjections;
+using Dolittle.SDK.Projections.InvalidProjections;
 using Dolittle.SDK.Testing.Projections;
 using FluentAssertions;
 using Xunit;
 
-namespace Dolittle.SDK.ProjectionTests;
+namespace Dolittle.SDK.Projections;
 
 public class InvalidProjectionTests
 {
@@ -23,7 +23,7 @@ public class InvalidProjectionTests
             .Throw<TypeInitializationException>()
             .WithInnerException(typeof(ArgumentException))
             .WithMessage("""
-                         Multiple handlers for ProjectionsTests.SomeEvent
+                         Multiple handlers for Dolittle.SDK.Projections.Types.SomeEvent
                          """);
     }
 
