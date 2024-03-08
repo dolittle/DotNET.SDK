@@ -3,8 +3,9 @@
 // Sample code for the tutorial at https://dolittle.io/tutorials/getting-started/projections/
 
 using System.Collections.Generic;
+using Dolittle.SDK.Projections;
 
-public class Chef
+public class Chef: ReadModel
 {
     public string Name = "";
     public List<string> Dishes = new();

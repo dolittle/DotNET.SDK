@@ -31,16 +31,14 @@ public interface IArtifacts<TArtifact, TId> : IUniqueBindings<TArtifact, Type>
     /// </summary>
     /// <typeparam name="T"><see cref="Type"/> of the artifact.</typeparam>
     /// <returns><see cref="bool"/>.</returns>
-    bool HasFor<T>()
-        where T : class;
+    bool HasFor<T>() where T : class;
 
     /// <summary>
     /// Get an <see cref="Artifact{TId}"/> bound to the given <see cref="Type"/>.
     /// </summary>
     /// <typeparam name="T"><see cref="Type"/> of the artifact.</typeparam>
     /// <returns><see cref="Artifact{TId}"/>.</returns>
-    TArtifact GetFor<T>()
-        where T : class;
+    TArtifact GetFor<T>() where T : class;
 
     /// <summary>
     /// Check if there is an <typeparamref name="TArtifact"/> associated with a <see cref="Type" />.

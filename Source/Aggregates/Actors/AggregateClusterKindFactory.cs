@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.SDK.Aggregates.Internal;
+using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Proto;
@@ -30,6 +31,7 @@ static class AggregateClusterKindFactory<TAggregate> where TAggregate : Aggregat
         var idleUnloadTimeout = serviceProvider.GetRequiredService<AggregateUnloadTimeout>()();
 
         return new ClusterKind(aggregateRootType.Id.Value.ToString(),
-            Props.FromProducer(() => new AggregateActor<TAggregate>(providerForTenant, logger, idleUnloadTimeout)).WithClusterRequestDeduplication(TimeSpan.FromMinutes(5)));
+            Props.FromProducer(() => new AggregateActor<TAggregate>(providerForTenant, logger, idleUnloadTimeout))
+                .WithClusterRequestDeduplication(TimeSpan.FromMinutes(5)));
     }
 }

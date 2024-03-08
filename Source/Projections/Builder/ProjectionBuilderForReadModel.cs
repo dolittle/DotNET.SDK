@@ -3,14 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Builder.Copies;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
-
 namespace Dolittle.SDK.Projections.Builder;
 
 /// <summary>
@@ -18,7 +16,7 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TReadModel">The <see cref="Type" /> of the read model.</typeparam>
 public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForReadModel<TReadModel>, ICanTryBuildProjection
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
     readonly ProjectionId _projectionId;
@@ -26,7 +24,6 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
     readonly ProjectionBuilder _parentBuilder;
-    readonly IProjectionCopyDefinitionBuilder<TReadModel> _projectionCopyDefinitionBuilder;
 
     ProjectionModelId ModelId => new(_projectionId, _scopeId, _alias);
 
@@ -42,20 +39,18 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         ProjectionId projectionId,
         ScopeId scopeId,
         IModelBuilder modelBuilder,
-        ProjectionBuilder parentBuilder,
-        IProjectionCopyDefinitionBuilder<TReadModel> copyDefinitionBuilder)
+        ProjectionBuilder parentBuilder)
     {
         _projectionId = projectionId;
         _alias = typeof(TReadModel).Name;
         _scopeId = scopeId;
         _modelBuilder = modelBuilder;
         _parentBuilder = parentBuilder;
-        _projectionCopyDefinitionBuilder = copyDefinitionBuilder;
         BindModel();
     }
     
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildProjection other) => ReferenceEquals(this, other);
+    public bool Equals(ICanTryBuildProjection? other) => ReferenceEquals(this, other);
 
     /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> InScope(ScopeId scopeId)
@@ -67,7 +62,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, TaskProjectionSignature<TReadModel, TEvent> method)
+    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, ProjectionSignature<TReadModel, TEvent> method)
         where TEvent : class
     {
         _methods.Add(new TypedProjectionMethod<TReadModel, TEvent>(method, selectorCallback(new KeySelectorBuilder<TEvent>())));
@@ -75,42 +70,19 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, SyncProjectionSignature<TReadModel, TEvent> method)
-        where TEvent : class
+    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method)
     {
-        _methods.Add(new TypedProjectionMethod<TReadModel, TEvent>(method, selectorCallback(new KeySelectorBuilder<TEvent>())));
+        _methods.Add(new ProjectionMethod<TReadModel>(method, selectorCallback(new KeySelectorBuilder()), eventType));
         return this;
     }
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
-    {
-        _methods.Add(new ProjectionMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventType eventType, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
-    {
-        _methods.Add(new ProjectionMethod<TReadModel>(method, eventType, selectorCallback(new KeySelectorBuilder())));
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
-        => On(new EventType(eventTypeId), selectorCallback, method);
-
-    /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId), selectorCallback, method);
 
 
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, TaskProjectionSignature<TReadModel> method)
-        => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
-
-    /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, SyncProjectionSignature<TReadModel> method)
+    public IProjectionBuilderForReadModel<TReadModel> On(EventTypeId eventTypeId, Generation eventTypeGeneration, KeySelectorSignature selectorCallback, ProjectionSignature<TReadModel> method)
         => On(new EventType(eventTypeId, eventTypeGeneration), selectorCallback, method);
 
     /// <inheritdoc />
@@ -121,16 +93,9 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         BindModel();
         return this;
     }
-
+    
     /// <inheritdoc />
-    public IProjectionBuilderForReadModel<TReadModel> CopyToMongoDB(Action<IProjectionCopyToMongoDBBuilder<TReadModel>>? callback = default)
-    {
-        _projectionCopyDefinitionBuilder.CopyToMongoDB(callback);
-        return this;
-    }
-
-    /// <inheritdoc />
-    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, [NotNullWhen(true)] out IProjection? projection)
     {
         projection = default;
         var eventTypesToMethods = new Dictionary<EventType, IProjectionMethod<TReadModel>>();
@@ -140,15 +105,9 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
             return false;
         }
 
-        if (!_projectionCopyDefinitionBuilder.TryBuild(identifier, buildResults, out var projectionCopies))
-        {
-            buildResults.AddFailure(identifier, $"Failed to build projection copies definition");
-            return false;
-        }
-
         if (eventTypesToMethods.Any())
         {
-            projection = new Projection<TReadModel>(identifier, eventTypesToMethods, projectionCopies);
+            projection = new Projection<TReadModel>(identifier, eventTypesToMethods);
             return true;
         }
         buildResults.AddFailure(identifier, "No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");

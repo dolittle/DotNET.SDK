@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Builders;
+using Dolittle.SDK.Projections.Actors;
 using Dolittle.SDK.Proto;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -43,8 +44,15 @@ public static class ServiceCollectionExtensions
             .AggregateRootTypes
             .Types;
 
-        return aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
+
+        var aggregateKinds = aggregateTypes.Select(aggregateType => AggregateClusterKindFactory.CreateKind(serviceProvider, aggregateType))
             .Select(kind => kind.WithProps(props => props.WithTracing()));
+
+        var projectionTypes = client.ProjectionTypes.Values;
+
+        var projectionKinds = projectionTypes.Select(projectionType => ProjectionClusterKindFactory.CreateKind(serviceProvider, projectionType));
+
+        return aggregateKinds.Concat(projectionKinds);
     }
 
     static IServiceCollection AddDolittleOptions(this IServiceCollection services)

@@ -13,16 +13,12 @@ namespace Dolittle.SDK.Events.Builders;
 /// <summary>
 /// Represents an implementation of <see cref="IUnregisteredEventTypes"/>.
 /// </summary>
-public class UnregisteredEventTypes : EventTypes, IUnregisteredEventTypes
+/// <remarks>
+/// Initializes an instance of the <see cref="UnregisteredEventTypes"/> class.
+/// </remarks>
+/// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for <see cref="EventType"/> to <see cref="Type"/>.</param>
+public class UnregisteredEventTypes(IUniqueBindings<EventType, Type> bindings) : EventTypes(bindings), IUnregisteredEventTypes
 {
-    /// <summary>
-    /// Initializes an instance of the <see cref="UnregisteredEventTypes"/> class.
-    /// </summary>
-    /// <param name="bindings">The <see cref="IUniqueBindings{TIdentifier,TValue}"/> for <see cref="EventType"/> to <see cref="Type"/>.</param>
-    public UnregisteredEventTypes(IUniqueBindings<EventType, Type> bindings) : base(bindings)
-    {
-    }
-
     /// <inheritdoc />
     public async Task<IEventTypes> Register(EventTypesClient eventTypesClientClient, CancellationToken cancellationToken)
     {

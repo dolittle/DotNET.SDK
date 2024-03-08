@@ -6,13 +6,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Processing.Contracts;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Events.Processing.Internal;
 using Dolittle.SDK.Events.Store;
-using Dolittle.SDK.Projections.Store.Converters;
+using Dolittle.SDK.Execution;
+using Dolittle.SDK.Projections.Actors;
 using Dolittle.SDK.Protobuf;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using OpenTelemetry.Trace;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Projections.Internal;
@@ -21,12 +24,13 @@ namespace Dolittle.SDK.Projections.Internal;
 /// Represents a <see cref="EventProcessor{TIdentifier, TRegisterArguments, TRequest, TResponse}" /> that can handle projections.
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
-public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, ProjectionRegistrationRequest, ProjectionRequest, ProjectionResponse>
-    where TReadModel : class, new()
+public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>
+    where TReadModel : ReadModel, new()
 {
     readonly IProjection<TReadModel> _projection;
     readonly IEventProcessingConverter _eventConverter;
-    readonly IConvertProjectionsToSDK _projectionConverter;
+    readonly ILogger _logger;
+    readonly string _activityName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionsProcessor{TReadModel}"/> class.
@@ -38,73 +42,66 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
     public ProjectionsProcessor(
         IProjection<TReadModel> projection,
         IEventProcessingConverter eventConverter,
-        IConvertProjectionsToSDK projectionConverter,
         ILogger logger)
         : base("Projection", projection.Identifier, logger)
     {
         _projection = projection;
         _eventConverter = eventConverter;
-        _projectionConverter = projectionConverter;
+        _logger = logger;
+        _activityName = "Projection " + projection.Alias?.Value ?? typeof(TReadModel).Name;
     }
 
     /// <inheritdoc/>
-    public override ProjectionRegistrationRequest RegistrationRequest
+    public override EventHandlerRegistrationRequest RegistrationRequest
     {
         get
         {
-            var registrationRequest = new ProjectionRegistrationRequest
+            var registrationRequest = new EventHandlerRegistrationRequest
             {
-                ProjectionId = _projection.Identifier.ToProtobuf(),
+                EventHandlerId = _projection.Identifier.ToProtobuf(),
                 ScopeId = _projection.ScopeId.ToProtobuf(),
-                InitialState = JsonConvert.SerializeObject(_projection.InitialState, Formatting.None),
-                Copies = _projection.Copies.ToProtobuf()
+                Concurrency = 5
             };
             if (_projection.HasAlias)
             {
                 registrationRequest.Alias = _projection.Alias.Value;
             }
-            
-            registrationRequest.Events.AddRange(_projection.Events.Select(CreateProjectionEventSelector).ToArray());
+
+            registrationRequest.EventTypes.AddRange(_projection.Events.Keys.Select(eventType => eventType.ToProtobuf()));
 
             return registrationRequest;
         }
     }
 
     /// <inheritdoc/>
-    protected override async Task<ProjectionResponse> Process(ProjectionRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation)
+    protected override async Task<EventHandlerResponse> Process(HandleEventRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider,
+        CancellationToken cancellation)
     {
-        if (!_projectionConverter.TryConvert<TReadModel>(request.CurrentState, out var currentState, out var error))
-        {
-            throw error;
-        }
-
         var committedEvent = _eventConverter.ToSDK(request.Event).Event;
         var eventContext = committedEvent.GetEventContext(executionContext);
-        var projectionContext = new ProjectionContext(currentState.WasCreatedFromInitialState, currentState.Key, eventContext);
-
-        var result = await _projection
-            .On(
-                currentState.State,
-                committedEvent.Content,
-                committedEvent.EventType,
-                projectionContext,
-                cancellation)
-            .ConfigureAwait(false);
-
-        return result.Type switch
+        using var activity = eventContext.CommittedExecutionContext.StartChildActivity(_activityName + committedEvent.Content.GetType().Name)
+            ?.Tag(committedEvent.EventType);
+        try
         {
-            ProjectionResultType.Replace => new ProjectionResponse { Replace = new ProjectionReplaceResponse { State = JsonConvert.SerializeObject(result.UpdatedReadModel, Formatting.None) } },
-            ProjectionResultType.Delete => new ProjectionResponse { Delete = new ProjectionDeleteResponse() },
-            _ => throw new UnknownProjectionResultType(result.Type)
-        };
+            var client = serviceProvider.GetRequiredService<IProjectionClient<TReadModel>>();
+            var result = await client.On(committedEvent.Content, committedEvent.EventType, eventContext, cancellation);
+            activity?.SetTag("result", result.ToString());
+            return new EventHandlerResponse();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error processing projection event {Event} for ", committedEvent);
+            activity?.RecordException(e);
+            throw;
+        }
     }
 
     /// <inheritdoc/>
-    protected override RetryProcessingState GetRetryProcessingStateFromRequest(ProjectionRequest request)
+    protected override RetryProcessingState GetRetryProcessingStateFromRequest(HandleEventRequest request)
         => request.RetryProcessingState;
 
     /// <inheritdoc/>
-    protected override ProjectionResponse CreateResponseFromFailure(ProcessorFailure failure)
+    protected override EventHandlerResponse CreateResponseFromFailure(ProcessorFailure failure)
         => new() { Failure = failure };
 
     static ProjectionEventSelector CreateProjectionEventSelector(EventSelector eventSelector)
@@ -121,9 +118,12 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Pro
         {
             KeySelectorType.EventSourceId => WithEventType(eventSelector, _ => _.EventSourceKeySelector = new EventSourceIdKeySelector()),
             KeySelectorType.PartitionId => WithEventType(eventSelector, _ => _.PartitionKeySelector = new PartitionIdKeySelector()),
-            KeySelectorType.Property => WithEventType(eventSelector, _ => _.EventPropertyKeySelector = new EventPropertyKeySelector { PropertyName = eventSelector.KeySelector.Expression ?? string.Empty }),
-            KeySelectorType.Static => WithEventType(eventSelector, _ => _.StaticKeySelector = new StaticKeySelector{StaticKey = eventSelector.KeySelector.StaticKey ?? string.Empty}),
-            KeySelectorType.EventOccurred => WithEventType(eventSelector, _ => _.EventOccurredKeySelector = new EventOccurredKeySelector { Format = eventSelector.KeySelector.OccurredFormat ?? string.Empty}),
+            KeySelectorType.Property => WithEventType(eventSelector,
+                _ => _.EventPropertyKeySelector = new EventPropertyKeySelector { PropertyName = eventSelector.KeySelector.Expression ?? string.Empty }),
+            KeySelectorType.Static => WithEventType(eventSelector,
+                _ => _.StaticKeySelector = new StaticKeySelector { StaticKey = eventSelector.KeySelector.StaticKey ?? string.Empty }),
+            KeySelectorType.EventOccurred => WithEventType(eventSelector,
+                _ => _.EventOccurredKeySelector = new EventOccurredKeySelector { Format = eventSelector.KeySelector.OccurredFormat ?? string.Empty }),
             _ => throw new UnknownKeySelectorType(eventSelector.KeySelector.Type)
         };
     }

@@ -3,17 +3,14 @@
 
 using System.Linq;
 using Dolittle.SDK.Projections;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 
 namespace Customers;
 
-[Projection("185107c2-f897-40c8-bb06-643b3642f229")]
-[CopyProjectionToMongoDB("dishes_eaten")]
-public class DishesEaten
+[Projection("185107c2-f897-40c8-bb06-643b3642f230")]
+public class DishesEaten: ReadModel
 {
     public string[] Dishes { get; set; } = {};
     
-    [KeyFromEventSource]
     public void On(DishEaten evt, ProjectionContext ctx)
     {
         Dishes = Dishes.Append(evt.Dish).ToArray();

@@ -17,20 +17,19 @@ using Proto.Cluster;
 
 namespace Dolittle.SDK.Aggregates.Actors;
 
-delegate Task<IServiceProvider> GetServiceProviderForTenant(TenantId tenantId);
 
 delegate TimeSpan AggregateUnloadTimeout();
 
-class Perform<TAggregate> where TAggregate : AggregateRoot
+class Perform<TAggregate>(Func<TAggregate, Task> callback, CancellationToken cancellationToken) where TAggregate : AggregateRoot
 {
-    public Perform(Func<TAggregate, Task> callback, CancellationToken cancellationToken)
-    {
-        Callback = callback;
-        CancellationToken = cancellationToken;
-    }
+    public Func<TAggregate, Task> Callback { get; } = callback;
+    public CancellationToken CancellationToken { get; } = cancellationToken;
+}
 
-    public Func<TAggregate, Task> Callback { get; }
-    public CancellationToken CancellationToken { get; }
+class PerformAndRespond<TAggregate>(Func<TAggregate, object?> callback, CancellationToken cancellationToken) where TAggregate : AggregateRoot
+{
+    public Func<TAggregate, object?> Callback { get; } = callback;
+    public CancellationToken CancellationToken { get; } = cancellationToken;
 }
 
 class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
@@ -41,7 +40,6 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
 
     EventSourceId? _eventSourceId;
 
-    // ReSharper disable once StaticMemberInGenericType
     readonly TimeSpan _idleUnloadTimeout;
 
     internal AggregateActor(GetServiceProviderForTenant getServiceProvider, ILogger<AggregateActor<TAggregate>> logger, TimeSpan idleUnloadTimeout)
@@ -59,6 +57,7 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
             Stopping => OnStopping(context),
             ReceiveTimeout => OnReceiveTimeout(context),
             Perform<TAggregate> msg => OnPerform(msg, context),
+            PerformAndRespond<TAggregate> msg => OnPerformAndRespond(msg, context),
             _ => Task.CompletedTask
         };
     }
@@ -113,6 +112,28 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
         {
             Activity.Current?.RecordError(e);
             context.Respond(new Try<bool>(e));
+        }
+        finally
+        {
+            if (_idleUnloadTimeout == TimeSpan.Zero) // 0 means instantly unload
+            {
+                // ReSharper disable once MethodHasAsyncOverload - awaiting this will deadlock
+                context.Poison(context.Self);
+            }
+        }
+    }
+    
+    async Task OnPerformAndRespond(PerformAndRespond<TAggregate> performAndRespond, IContext context)
+    {
+        try
+        {
+            var response = await _aggregateWrapper!.Perform(performAndRespond.Callback, performAndRespond.CancellationToken);
+            context.Respond(new Try<object?>(response));
+        }
+        catch (Exception e)
+        {
+            Activity.Current?.RecordError(e);
+            context.Respond(new Try<object?>(e));
         }
         finally
         {

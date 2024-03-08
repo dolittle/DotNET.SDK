@@ -20,17 +20,18 @@ public class Kitchen : AggregateRoot
         _logger = logger;
     }
 
-    public void PrepareDish(string dish, string chef)
+    public int PrepareDish(string dish, string chef)
     {
         if (_ingredients <= 0)
         {
             throw new Exception("We have run out of ingredients, sorry!");
         }
+
         Apply(new DishPrepared(dish, chef));
         _logger.LogInformation("Kitchen {EventSourceId} prepared a {Dish}, there are {Ingredients} ingredients left", _eventSource, dish, _ingredients);
+        return _ingredients;
     }
 
     void On(DishPrepared @event)
         => _ingredients--;
 }
-

@@ -8,7 +8,7 @@ namespace Dolittle.SDK.Projections.Copies.MongoDB.for_MongoDbCollectionNameValid
 public class contains_the_null_character : given.a_validator
 {
     static bool result;
-    Because of = () => result = validator.Validate(identifier, build_results, "\0");
+    Because of = () => result = MongoDbCollectionNameValidator.Validate(identifier, build_results, "\0");
 
     It should_fail = () => result.ShouldBeFalse();
     It should_result_in_failing_build_results = () => build_results.Failed.ShouldBeTrue();

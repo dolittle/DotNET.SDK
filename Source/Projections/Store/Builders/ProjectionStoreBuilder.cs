@@ -3,8 +3,6 @@
 
 using System;
 using Dolittle.SDK.Execution;
-using Dolittle.SDK.Projections.Store.Converters;
-using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.Logging;
 
@@ -15,51 +13,43 @@ namespace Dolittle.SDK.Projections.Store.Builders;
 /// </summary>
 public class ProjectionStoreBuilder : IProjectionStoreBuilder
 {
-    readonly IPerformMethodCalls _caller;
+    readonly Func<TenantId, IServiceProvider> _getServiceProvider;
     readonly ExecutionContext _executionContext;
-    readonly IResolveCallContext _callContextResolver;
     readonly IProjectionReadModelTypes _projectionAssociations;
-    readonly IConvertProjectionsToSDK _projectionsToSDKConverter;
     readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionStoreBuilder"/> class.
     /// </summary>
-    /// <param name="caller">The caller for unary calls.</param>
+    /// <param name="getServiceProvider"></param>
     /// <param name="executionContext">The base <see cref="ExecutionContext"/> to use.</param>
-    /// <param name="callContextResolver">The <see cref="IResolveCallContext" />.</param>
     /// <param name="projectionAssociations">The <see cref="IProjectionReadModelTypes" />.</param>
     /// <param name="projectionsToSDKConverter">The <see cref="IConvertProjectionsToSDK" />.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
     public ProjectionStoreBuilder(
-        IPerformMethodCalls caller,
+        Func<TenantId, IServiceProvider> getServiceProvider,
         ExecutionContext executionContext,
-        IResolveCallContext callContextResolver,
         IProjectionReadModelTypes projectionAssociations,
-        IConvertProjectionsToSDK projectionsToSDKConverter,
         ILoggerFactory loggerFactory)
     {
-        _caller = caller;
+        _getServiceProvider = getServiceProvider;
         _executionContext = executionContext;
-        _callContextResolver = callContextResolver;
         _projectionAssociations = projectionAssociations;
-        _projectionsToSDKConverter = projectionsToSDKConverter;
         _loggerFactory = loggerFactory;
     }
 
     /// <inheritdoc />
     public IProjectionStore ForTenant(TenantId tenantId)
     {
+        var provider = _getServiceProvider(tenantId);
+        
         var executionContext = _executionContext
             .ForTenant(tenantId)
             .ForCorrelation(Guid.NewGuid());
 
+        
         return new ProjectionStore(
-            _caller,
-            new ProjectionStoreRequestCreator(_callContextResolver),
-            executionContext,
-            _projectionAssociations,
-            _projectionsToSDKConverter,
-            _loggerFactory.CreateLogger<ProjectionStore>());
+            provider,
+            _projectionAssociations);
     }
 }

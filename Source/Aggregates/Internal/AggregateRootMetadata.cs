@@ -16,8 +16,7 @@ namespace Dolittle.SDK.Aggregates.Internal;
 /// Provides static metadata about a specific aggregate root class 
 /// </summary>
 /// <typeparam name="TAggregateRoot"></typeparam>
-static class AggregateRootMetadata<TAggregateRoot>
-    where TAggregateRoot : AggregateRoot
+static class AggregateRootMetadata<TAggregateRoot> where TAggregateRoot : AggregateRoot
 {
     // ReSharper disable StaticMemberInGenericType
     public static Func<IServiceProvider, EventSourceId, Try<TAggregateRoot>> Construct { get; }

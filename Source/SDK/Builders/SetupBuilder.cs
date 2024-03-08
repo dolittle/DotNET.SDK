@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BaselineTypeDiscovery;
@@ -12,12 +13,10 @@ using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
+using Dolittle.SDK.Events.Handling;
 using Dolittle.SDK.Events.Handling.Builder;
+using Dolittle.SDK.Projections;
 using Dolittle.SDK.Projections.Builder;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB;
-using Dolittle.SDK.Projections.Builder.Copies.MongoDB.Internal;
-using Dolittle.SDK.Projections.Copies;
-using Dolittle.SDK.Projections.Copies.MongoDB;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Builders;
@@ -49,15 +48,10 @@ public class SetupBuilder : ISetupBuilder
         _eventFiltersBuilder = new EventFiltersBuilder(_modelBuilder);
         _eventHandlersBuilder = new EventHandlersBuilder(_modelBuilder, _buildResults);
 
-        
+
         _projectionsBuilder = new ProjectionsBuilder(
             _modelBuilder,
-            _buildResults,
-            new ProjectionCopyToMongoDbBuilderFactory(
-                new MongoDbCollectionNameValidator(),
-                new ConversionsFromBsonClassMapBuilder(new ConversionsFromBsonClassMapAdder()),
-                new ConversionsFromConvertToMongoDBAttributesBuilder(),
-                new PropertyPathResolver()));
+            _buildResults);
     }
 
     /// <inheritdoc />
@@ -119,9 +113,10 @@ public class SetupBuilder : ISetupBuilder
         {
             DiscoverAndRegisterAll();
         }
-        
+
         var model = _modelBuilder.Build(_buildResults);
         var unregisteredEventTypes = EventTypesBuilder.Build(model, _buildResults);
+
         return new DolittleClient(
             _buildResults,
             unregisteredEventTypes,

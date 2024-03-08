@@ -16,5 +16,10 @@ public enum ProjectionResultType
     /// <summary>
     /// Deletes the read model.
     /// </summary>
-    Delete = 1
+    Delete = 1,
+
+    /// <summary>
+    /// No change to the read model.
+    /// </summary>
+    Keep = 2
 }

@@ -1,0 +1,15 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../tests.props" />
+
+    <PropertyGroup>
+        <RootNamespace>Dolittle.SDK.Projections</RootNamespace>
+        <AssemblyName>Dolittle.SDK.Projections.Tests</AssemblyName>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\Source\Projections\Projections.csproj" />
+      <ProjectReference Include="..\..\Source\Testing\Testing.csproj" />
+    </ItemGroup>
+
+</Project>

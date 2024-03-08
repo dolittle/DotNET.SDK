@@ -47,6 +47,34 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
         _logger = logger;
     }
 
+    public async Task<TResponse> Perform<TResponse>(Func<TAggregate, TResponse> method, CancellationToken cancellationToken = default)
+    {
+        using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.Perform")
+            ?.Tag(_eventSourceId);
+
+        try
+        {
+            _instance = await GetHydratedAggregate(cancellationToken);
+            var aggregateRootId = _instance.AggregateRootId;
+            activity?.Tag(aggregateRootId);
+            _logger.PerformingOn(typeof(TAggregate), aggregateRootId, _instance.EventSourceId);
+            var result = method(_instance);
+            if (_instance.AppliedEvents.Any())
+            {
+                await CommitAppliedEvents(_instance, aggregateRootId).ConfigureAwait(false);
+                _instance.ClearAppliedEvents();
+            }
+
+            return result;
+        }
+        catch (Exception e)
+        {
+            _instance = null; // Reset the instance so that it will be rehydrated next time
+            activity?.RecordError(e);
+            throw new AggregateRootOperationFailed(typeof(TAggregate), _eventSourceId, e);
+        }
+    }
+    
     public async Task Perform(Func<TAggregate, Task> method, CancellationToken cancellationToken = default)
     {
         using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.Perform")

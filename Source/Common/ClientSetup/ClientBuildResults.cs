@@ -32,6 +32,7 @@ public class ClientBuildResults : IClientBuildResults
         {
             Failed = true;
         }
+
         _results.Add(result);
     }
 
@@ -56,7 +57,7 @@ public class ClientBuildResults : IClientBuildResults
         => Add(ClientBuildResult.Error(error));
 
     /// <inheritdoc />
-    public void AddError(IIdentifier id,  Exception error)
+    public void AddError(IIdentifier id, Exception error)
         => Add(new IdentifiableClientBuildResult(id, ClientBuildResult.Error(error)));
 
     /// <inheritdoc />
@@ -69,7 +70,7 @@ public class ClientBuildResults : IClientBuildResults
         {
             result.Log(logger);
         }
-        
+
         foreach (var group in _identifiableResults.GroupBy(_ => _.Identifier))
         {
             foreach (var result in group)
@@ -78,13 +79,19 @@ public class ClientBuildResults : IClientBuildResults
             }
         }
     }
-    
+
+    public string ErrorString => !Failed
+        ? ""
+        : string.Join("\n", _results.Where(_ => _.IsFailed).Select(_ => _.Message)) +
+          string.Join("\n", _identifiableResults.Where(_ => _.Result.IsFailed).Select(_ => _.Result.Message));
+
     void Add(IdentifiableClientBuildResult result)
     {
         if (result.Result.IsFailed)
         {
             Failed = true;
         }
+
         _identifiableResults.Add(result);
     }
 }

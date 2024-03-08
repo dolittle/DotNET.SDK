@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
 
@@ -19,5 +20,5 @@ public interface ICanTryBuildProjection : IEquatable<ICanTryBuildProjection>
     /// <param name="eventTypes">The <see cref="IEventTypes" />.</param>
     /// <param name="buildResults">The <see cref="IClientBuildResults"/>.</param>
     /// <param name="projection">The built <see cref="IProjection"/>.</param>
-    bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection);
+    bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, [NotNullWhen(true)] out IProjection? projection);
 }

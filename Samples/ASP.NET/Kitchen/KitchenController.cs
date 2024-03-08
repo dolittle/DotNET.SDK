@@ -22,11 +22,11 @@ public class KitchenController : ControllerBase
     {
         try
         {
-            await _kitchen
+            var remaining = await _kitchen
                 .Get(cmd.Kitchen)
                 .Perform(_ => _.PrepareDish(cmd.Chef, cmd.Dish))
                 .ConfigureAwait(false);
-            return Ok();
+            return Ok(remaining);
         }
         catch (AggregateRootOperationFailed e) when(e.InnerException is OutOfIngredients)
         {

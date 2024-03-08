@@ -27,7 +27,7 @@ public static class MongoDatabaseExtensions
         where TSchema : class
     {
         DolittleMongoConventions.EnsureConventionsAreRegistered();
-        return database.GetCollection<TSchema>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+        return database.GetCollection<TSchema>(MongoDBProjectionCollectionName.GetFrom<TSchema>(), settings);
     }
     
     /// <summary>
@@ -42,6 +42,6 @@ public static class MongoDatabaseExtensions
         where TSchema : class
     {
         DolittleMongoConventions.EnsureConventionsAreRegistered();
-        return database.GetCollection<BsonDocument>(MongoDBCopyCollectionName.GetFrom<TSchema>(), settings);
+        return database.GetCollection<BsonDocument>(MongoDBProjectionCollectionName.GetFrom<TSchema>(), settings);
     }
 }

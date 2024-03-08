@@ -14,7 +14,7 @@ public static class DiagnosticIds
     /// Attribute missing the required ID.
     /// </summary>
     public const string EventMissingAttributeRuleId = "SDK0002";
-    
+
     /// <summary>
     /// Identity is shared between multiple targets.
     /// </summary>
@@ -24,16 +24,16 @@ public static class DiagnosticIds
     /// Invalid timestamp.
     /// </summary>
     public const string InvalidTimestampParameter = "SDK0004";
-    
+
     /// <summary>
     /// Invalid timestamp.
     /// </summary>
     public const string InvalidStartStopTime = "SDK0005";
 
     public const string InvalidAccessibility = "SDK0006";
-    
+
     public const string EventHandlerMissingEventContext = "SDK0007";
-    
+
     /// <summary>
     /// Aggregate missing the required Attribute.
     /// </summary>
@@ -53,17 +53,23 @@ public static class DiagnosticIds
     /// Aggregate On-method has an incorrect number of parameters
     /// </summary>
     public const string AggregateMutationShouldBePrivateRuleId = "AGG0004";
-    
+
     /// <summary>
     /// Apply can not be used in an On-method. 
     /// </summary>
     public const string AggregateMutationsCannotProduceEvents = "AGG0005";
-    
+
     /// <summary>
     /// Public methods can not mutate the state of an aggregate.
     /// All mutations need to be done in On-methods.
     /// </summary>
     public const string PublicMethodsCannotMutateAggregateState = "AGG0006";
-    
 
+
+    public const string ProjectionMissingAttributeRuleId = "PROJ0001";
+    public const string ProjectionMissingBaseClassRuleId = "PROJ0002";
+    public const string ProjectionInvalidOnMethodParametersRuleId = "PROJ0003";
+    public const string ProjectionInvalidOnMethodReturnTypeRuleId = "PROJ0004";
+    public const string ProjectionInvalidOnMethodVisibilityRuleId = "PROJ0005";
+    public const string ProjectionDuplicateEventHandler = "PROJ0006";
 }

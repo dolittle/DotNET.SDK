@@ -6,7 +6,6 @@ using Dolittle.SDK.Common;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Events.Processing;
 using Dolittle.SDK.Projections.Store;
-using Dolittle.SDK.Projections.Store.Converters;
 using Microsoft.Extensions.Logging;
 
 namespace Dolittle.SDK.Projections.Builder;
@@ -27,13 +26,11 @@ public interface IUnregisteredProjections : IUniqueBindings<ProjectionModelId, I
     /// </summary>
     /// <param name="eventProcessors">The <see cref="IEventProcessors" />.</param>
     /// <param name="processingConverter">The <see cref="IEventProcessingConverter" />.</param>
-    /// <param name="projectionsConverter">The <see cref="IConvertProjectionsToSDK"/>.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory" />.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken" />.</param>
     void Register(
         IEventProcessors eventProcessors,
         IEventProcessingConverter processingConverter,
-        IConvertProjectionsToSDK projectionsConverter,
         ILoggerFactory loggerFactory,
         CancellationToken cancellationToken);
     

@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TReadModel">The type of the read model.</typeparam>
 public interface IProjectionMethod<TReadModel>
-    where TReadModel : class, new()
+    where TReadModel : ReadModel, new()
 {
     /// <summary>
     /// Gets the <see cref="KeySelector" />.
@@ -26,7 +26,7 @@ public interface IProjectionMethod<TReadModel>
     /// <param name="event">The event.</param>
     /// <param name="context">The context of the projection.</param>
     /// <returns>A <see cref="Task" /> that, when resolved, returns a <see cref="Try{TResult}" /> with <see cref="ProjectionResult{TReadModel}" />.</returns>
-    Task<Try<ProjectionResult<TReadModel>>> TryOn(TReadModel readModel, object @event, ProjectionContext context);
+    ProjectionResult<TReadModel> TryOn(TReadModel readModel, object @event, ProjectionContext context);
 
     /// <summary>
     /// Gets the <see cref="EventType" />.

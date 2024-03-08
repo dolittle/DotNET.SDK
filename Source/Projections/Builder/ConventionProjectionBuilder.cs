@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
-using Dolittle.SDK.Projections.Copies;
+using Dolittle.SDK.Projections.Internal;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -18,10 +18,9 @@ namespace Dolittle.SDK.Projections.Builder;
 /// </summary>
 /// <typeparam name="TProjection">The <see cref="Type" /> of the read model.</typeparam>
 public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
-    where TProjection : class, new()
+    where TProjection : ReadModel, new()
 {
     readonly ProjectionModelId _identifier;
-    readonly Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> _copyToMongoDbBuilder;
     const string MethodName = "On";
     readonly Type _projectionType = typeof(TProjection);
 
@@ -30,14 +29,13 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     /// </summary>
     /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     /// <param name="copyToMongoDbBuilder">The <see cref="Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder{TProjection}"/>.</param>
-    public ConventionProjectionBuilder(ProjectionModelId identifier,  Copies.MongoDB.Internal.IProjectionCopyToMongoDBBuilder<TProjection> copyToMongoDbBuilder)
+    public ConventionProjectionBuilder(ProjectionModelId identifier)
     {
         _identifier = identifier;
-        _copyToMongoDbBuilder = copyToMongoDbBuilder;
     }
 
     /// <inheritdoc />
-    public bool Equals(ICanTryBuildProjection other)
+    public bool Equals(ICanTryBuildProjection? other)
     {
         if (ReferenceEquals(this, other))
         {
@@ -45,29 +43,32 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         }
 
         return other is ConventionProjectionBuilder<TProjection> otherBuilder
-            && _projectionType == otherBuilder._projectionType;
+               && _projectionType == otherBuilder._projectionType;
     }
-    
-    
+
+
     /// <inheritdoc />
     public override int GetHashCode()
         => HashCode.Combine(_identifier, _projectionType);
-    
+
     /// <inheritdoc/>
-    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, out IProjection projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults,
+        [NotNullWhen(true)] out IProjection? projection)
     {
         projection = default;
         buildResults.AddInformation(identifier, $"Building from type {_projectionType}");
-        
+
         if (!HasParameterlessConstructor())
         {
-            buildResults.AddFailure(identifier, $"The projection class {_projectionType} has no default/parameterless constructor", "It must only have one, parameterless, constructor");
+            buildResults.AddFailure(identifier, $"The projection class {_projectionType} has no default/parameterless constructor",
+                "It must only have one, parameterless, constructor");
             return false;
         }
-        
+
         if (HasMoreThanOneConstructor())
         {
-            buildResults.AddFailure(identifier, $"The projection class {_projectionType} has more than one constructor", "It must only have one, parameterless, constructor");
+            buildResults.AddFailure(identifier, $"The projection class {_projectionType} has more than one constructor",
+                "It must only have one, parameterless, constructor");
             return false;
         }
 
@@ -77,22 +78,16 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             return false;
         }
 
-        if (!_copyToMongoDbBuilder.TryBuildFromReadModel(identifier, buildResults, out var copyToMongoDB))
-        {
-            buildResults.AddFailure(identifier, $"Failed to build projection copies definition using conventions from projection type {_projectionType}");
-            return false;
-        }
-        
-        projection = new Projection<TProjection>(_identifier, eventTypesToMethods, new ProjectionCopies(copyToMongoDB));
+        projection = new Projection<TProjection>(_identifier, eventTypesToMethods);
         return true;
     }
-    
-    
+
+
     bool HasParameterlessConstructor()
         => _projectionType.GetConstructors().Any(t => t.GetParameters().Length == 0);
 
     bool HasMoreThanOneConstructor() => _projectionType.GetConstructors().Length > 1;
-    
+
     bool TryBuildOnMethods(
         ProjectionModelId identifier,
         IEventTypes eventTypes,
@@ -101,7 +96,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     {
         var allMethods = _projectionType.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic);
         var hasWrongMethods = !TryAddDecoratedOnMethods(identifier, allMethods, eventTypesToMethods, buildResults)
-            || !TryAddConventionOnMethods(identifier, allMethods, eventTypes, eventTypesToMethods, buildResults);
+                              || !TryAddConventionOnMethods(identifier, allMethods, eventTypes, eventTypesToMethods, buildResults);
 
         if (hasWrongMethods)
         {
@@ -112,9 +107,10 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         {
             return true;
         }
-        buildResults.AddFailure(identifier, $"There are no projection methods to register in projection {_projectionType}", $"A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
-        return false;
 
+        buildResults.AddFailure(identifier, $"There are no projection methods to register in projection {_projectionType}",
+            $"A projection method either needs to be decorated with [{nameof(OnAttribute)}] or have the name {MethodName}");
+        return false;
     }
 
     bool TryAddDecoratedOnMethods(
@@ -137,10 +133,11 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             if (!TryGetEventParameterType(method, out var eventParameterType))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure(identifier, $"{method} has no parameters, but is decorated with [{nameof(OnAttribute)}]", "A projection method should take in as parameters an event and a {nameof(ProjectionContext)}");
+                buildResults.AddFailure(identifier, $"{method} has no parameters, but is decorated with [{nameof(OnAttribute)}]",
+                    "A projection method should take in as parameters an event and a {nameof(ProjectionContext)}");
             }
 
-            if (!ParametersAreOkay(identifier, method, buildResults))
+            if (!ParametersAreOkay(identifier, method, buildResults, out var parametersType, out var responseType))
             {
                 shouldAddHandler = false;
             }
@@ -162,10 +159,12 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 allMethodsAdded = false;
                 continue;
             }
-            if (eventTypesToMethods.TryAdd(eventType, CreateUntypedOnMethod(method, eventType, keySelector)))
+
+            if (eventTypesToMethods!.TryAdd(eventType, CreateUntypedOnMethod(method, eventType, keySelector)))
             {
                 continue;
             }
+
             allMethodsAdded = false;
             buildResults.AddFailure(identifier, $"Multiple handlers for {eventType}");
         }
@@ -181,20 +180,23 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         IClientBuildResults buildResults)
     {
         var allMethodsAdded = true;
-        foreach (var method in methods.Where(_ => !IsDecoratedOnMethod(_) && _.Name == MethodName))
+        foreach (var method in methods.Where(method => !IsDecoratedOnMethod(method) && method.Name == MethodName))
         {
             var shouldAddHandler = TryGetKeySelector(identifier, method, buildResults, out var keySelector);
 
             if (!TryGetEventParameterType(method, out var eventParameterType))
             {
-                shouldAddHandler = false;
-                buildResults.AddFailure(identifier, $"{method} has no parameters.", $"A projection method should take in as parameters an event and an {nameof(ProjectionContext)}");
+                allMethodsAdded = false;
+                buildResults.AddFailure(identifier, $"{method} has no parameters.",
+                    $"A projection method should take in as parameters an event and an {nameof(ProjectionContext)}");
+                continue;
             }
 
             if (eventParameterType == typeof(object))
             {
                 shouldAddHandler = false;
-                buildResults.AddFailure(identifier, $"{method} cannot handle an untyped event when not decorated with [{nameof(OnAttribute)}]", $"Decorate method with [{nameof(OnAttribute)}]");
+                buildResults.AddFailure(identifier, $"{method} cannot handle an untyped event when not decorated with [{nameof(OnAttribute)}]",
+                    $"Decorate method with [{nameof(OnAttribute)}]");
             }
 
             if (!eventTypes.HasFor(eventParameterType))
@@ -203,7 +205,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                 buildResults.AddFailure(identifier, $"{method} handles event of type {eventParameterType}, but it is not associated to any event type");
             }
 
-            if (!ParametersAreOkay(identifier, method, buildResults))
+            if (!ParametersAreOkay(identifier, method, buildResults, out var parametersType, out var responseType))
             {
                 shouldAddHandler = false;
             }
@@ -225,6 +227,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             {
                 continue;
             }
+
             allMethodsAdded = false;
             buildResults.AddFailure(identifier, $"Multiple handlers for {eventParameterType}");
         }
@@ -232,97 +235,66 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         return allMethodsAdded;
     }
 
-    IProjectionMethod<TProjection> CreateUntypedOnMethod(MethodInfo method, EventType eventType, KeySelector keySelector)
+    ClassProjectionMethod<TProjection> CreateUntypedOnMethod(MethodInfo method, EventType eventType, KeySelector keySelector)
     {
-        var projectionSignatureType = GetSignature(method);
-        var projectionSignature = method.CreateDelegate(projectionSignatureType.MakeGenericType(_projectionType), null);
-        return Activator.CreateInstance(
-            typeof(ClassProjectionMethod<>).MakeGenericType(_projectionType),
-            projectionSignature,
-            eventType,
-            keySelector) as IProjectionMethod<TProjection>;
+        return new ClassProjectionMethod<TProjection>(ProjectionSignatureFactory<TProjection>.MapUnTyped(method), eventType, keySelector);
     }
+
 
     IProjectionMethod<TProjection> CreateTypedOnMethod(Type eventParameterType, MethodInfo method, KeySelector keySelector)
     {
-        var projectionSignatureGenericTypeDefinition = GetTypedSignature(method);
-        var projectionSignatureType = projectionSignatureGenericTypeDefinition.MakeGenericType(_projectionType, eventParameterType);
-        var projectionSignature = method.CreateDelegate(projectionSignatureType, null);
-
+        var projectionSignature = typeof(ProjectionSignatureFactory<TProjection>)
+            .GetMethod("TryMap")?
+            .MakeGenericMethod(eventParameterType)
+            .Invoke(null, new object[] {method});
+        
         return Activator.CreateInstance(
-            typeof(TypedClassProjectionMethod<,>).MakeGenericType(_projectionType, eventParameterType),
+            typeof(TypedProjectionMethod<,>).MakeGenericType(_projectionType, eventParameterType),
             projectionSignature,
             keySelector) as IProjectionMethod<TProjection>;
     }
 
+
     static Type GetSignature(MethodInfo method)
     {
-        if (MethodReturnsTask(method))
-        {
-            return typeof(TaskProjectionMethodSignature<>);
-        }
-        if (MethodReturnsTaskResultType(method))
-        {
-            return typeof(TaskResultProjectionMethodSignature<>);
-        }
         if (MethodReturnsVoid(method))
         {
-            return typeof(SyncProjectionMethodSignature<>);
+            return typeof(ProjectionMethodSignature<>);
         }
+
         if (MethodReturnsResultType(method))
         {
-            return typeof(SyncResultProjectionMethodSignature<>);
+            return typeof(ProjectionResultTypeSignature<>);
         }
+
         throw new InvalidProjectionMethodReturnType(method.ReturnType);
     }
 
-    static Type GetTypedSignature(MethodInfo method)
-    {
-        if (MethodReturnsTask(method))
-        {
-            return typeof(TaskProjectionMethodSignature<,>);
-        }
-        if (MethodReturnsTaskResultType(method))
-        {
-            return typeof(TaskResultProjectionMethodSignature<,>);
-        }
-        if (MethodReturnsVoid(method))
-        {
-            return typeof(SyncProjectionMethodSignature<,>);
-        }
-        if (MethodReturnsResultType(method))
-        {
-            return typeof(SyncResultProjectionMethodSignature<,>);
-        }
-        throw new InvalidProjectionMethodReturnType(method.ReturnType);
-    }
-
-    bool ParametersAreOkay(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults)
+    bool ParametersAreOkay(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults,
+        [NotNullWhen(true)] out ProjectionParametersType? parametersType,
+        [NotNullWhen(true)] out ProjectionMethodResponseType? responseType
+    )
     {
         var okay = true;
-        if (!SecondMethodParameterIsProjectionContext(method))
+        if (!ProjectionSignatureFactory<TProjection>.ParametersAreValid(method, out parametersType))
         {
             okay = false;
-            buildResults.AddFailure(identifier, $"{method} needs to have two parameters where the second parameter is {typeof(ProjectionContext)}");
+            buildResults.AddFailure(identifier, $"{method} needs to have one or two parameters where the first parameter is the event and the second parameter is {typeof(ProjectionContext)} or {typeof(EventContext)}");
         }
 
-        if (!MethodHasNoExtraParameters(method))
-        {
-            okay = false;
-            buildResults.AddFailure(identifier, $"{method} needs to only have two parameters where the first is the event to handle and the second is {typeof(ProjectionContext)}");
-        }
-
-        if (!MethodReturnsAsyncVoid(method) && (MethodReturnsVoid(method) || MethodReturnsResultType(method) || MethodReturnsTask(method) || MethodReturnsTaskResultType(method)))
+        if (ProjectionSignatureFactory<TProjection>.ResponseTypeIsValid(method, out responseType))
         {
             return okay;
         }
-        buildResults.AddFailure(identifier, $"{method} needs to return either {typeof(void)}, {typeof(ProjectionResultType)}, {typeof(Task)}, {typeof(Task<ProjectionResultType>)}");
+
+        buildResults.AddFailure(identifier,
+            $"{method} needs to return either {typeof(void)}, {typeof(ProjectionResultType)}, {typeof(ProjectionResult<TProjection>)}, {typeof(TProjection)}");
         return false;
     }
 
-    bool TryGetKeySelector(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults, out KeySelector keySelector)
+    bool TryGetKeySelector(ProjectionModelId identifier, MethodInfo method, IClientBuildResults buildResults, [NotNullWhen(true)] out KeySelector? keySelector)
     {
-        keySelector = null;
+        keySelector = default;
         var attributes = method
             .GetCustomAttributes()
             .OfType<IKeySelectorAttribute>().ToArray();
@@ -332,10 +304,14 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             return false;
         }
 
-        if (!attributes.Any())
+        if (attributes.Length == 0)
         {
-            buildResults.AddFailure(identifier, $"{method} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}], [{nameof(KeyFromEventSourceAttribute)}], [{nameof(StaticKeyAttribute)}] or [{nameof(KeyFromEventOccurredAttribute)}]");
-            return false;
+            // default to EventSourceId
+            keySelector = KeySelector.EventSource();
+            return true;
+
+            // buildResults.AddFailure(identifier, $"{method} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}], [{nameof(KeyFromEventSourceAttribute)}], [{nameof(StaticKeyAttribute)}] or [{nameof(KeyFromEventOccurredAttribute)}]");
+            // return false;
         }
 
         keySelector = attributes.Single().KeySelector;
@@ -343,7 +319,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         return true;
     }
 
-    static bool TryGetEventParameterType(MethodInfo method, out Type type)
+    static bool TryGetEventParameterType(MethodInfo method, [NotNullWhen(true)] out Type? type)
     {
         type = default;
         if (method.GetParameters().Length == 0)
@@ -364,22 +340,21 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
     static bool MethodHasNoExtraParameters(MethodInfo method)
         => method.GetParameters().Length == 2;
 
-    static bool MethodReturnsTask(MethodInfo method)
-        => method.ReturnType == typeof(Task);
-
-    static bool MethodReturnsTaskResultType(MethodInfo method)
-        => method.ReturnType == typeof(Task<ProjectionResultType>);
-
     static bool MethodReturnsVoid(MethodInfo method)
         => method.ReturnType == typeof(void);
 
     static bool MethodReturnsResultType(MethodInfo method)
         => method.ReturnType == typeof(ProjectionResultType);
 
+    bool MethodReturnsResult(MethodInfo method)
+        => method.ReturnType.IsGenericType
+           && method.ReturnType.GetGenericTypeDefinition() == typeof(ProjectionResult<>)
+           && method.ReturnType.GetGenericArguments()[0] == _projectionType;
+
     static bool MethodReturnsAsyncVoid(MethodInfo method)
     {
         var asyncAttribute = typeof(AsyncStateMachineAttribute);
-        var isAsyncMethod = (AsyncStateMachineAttribute)method.GetCustomAttribute(asyncAttribute) != null;
+        var isAsyncMethod = method.GetCustomAttribute(asyncAttribute) != null;
         return isAsyncMethod && MethodReturnsVoid(method);
     }
 }

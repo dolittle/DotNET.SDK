@@ -22,6 +22,14 @@ public interface IAggregateRootOperations<TAggregate>
     /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
     /// <returns>The <see cref="Task" /> representing the asynchronous operation.</returns>
     Task Perform(Action<TAggregate> method, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Perform an operation on an <see cref="AggregateRoot"/> and return a value.
+    /// </summary>
+    /// <param name="method"><see cref="Action{T}">Method</see> to perform.</param>
+    /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
+    /// <returns>The <see cref="Task{TResponse}" /> representing the asynchronous operation.</returns>
+    Task<TResponse> Perform<TResponse>(Func<TAggregate, TResponse> method, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Perform an asynchronous operation on an <see cref="AggregateRoot"/>.

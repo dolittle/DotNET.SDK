@@ -24,10 +24,6 @@ app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseRouting();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 app.Run();

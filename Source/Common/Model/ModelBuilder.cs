@@ -50,6 +50,8 @@ public class ModelBuilder : IModelBuilder
         }
     }
 
+
+
     /// <summary>
     /// Builds a valid Dolittle application model from the bindings.
     /// </summary>
