@@ -3,23 +3,18 @@
 
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections;
+using ProjectionsTests;
 
-namespace ProjectionsTests;
+namespace Dolittle.SDK.ProjectionTests.InvalidProjections;
 
 /// <summary>
-/// Projection with multiple on-methods for the same event type.
+/// Projection without the [Projection] attribute.
 /// </summary>
-[Projection("055319f1-6af8-48a0-b190-323e21ba6cde")]
-public class InvalidProjection : ReadModel
+public class MissingAttributeProjection : ReadModel
 {
     public string Content { get; set; } = string.Empty;
 
-    void On(SomeEvent evt, ProjectionContext ctx)
-    {
-        Content = evt.Thing;
-    }
-
-    void On(SomeEvent evt, EventContext ctx)
+    public void On(SomeEvent evt, ProjectionContext ctx)
     {
         Content = evt.Thing;
     }

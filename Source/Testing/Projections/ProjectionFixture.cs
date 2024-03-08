@@ -8,6 +8,7 @@ using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Projections;
 using Dolittle.SDK.Projections.Builder;
+using Dolittle.SDK.Projections.Core;
 using Dolittle.SDK.Projections.Internal;
 
 namespace Dolittle.SDK.Testing.Projections;
@@ -15,16 +16,16 @@ namespace Dolittle.SDK.Testing.Projections;
 public static class ProjectionFixture<TProjection>
     where TProjection : ReadModel, new()
 {
-    public static string? Error { get; } = default;
+    static Exception? Error { get; } = default;
     static readonly IProjection<TProjection>? _projection;
-    public static IProjection<TProjection> Projection => _projection ?? throw new TypeLoadException(Error!);
+    public static IProjection<TProjection> Projection => _projection ?? throw new TypeInitializationException("Failed to create projection", Error);
 
     static ProjectionFixture()
     {
         var id = ProjectionType<TProjection>.ProjectionModelId;
         if (id is null)
         {
-            Error = "Type is missing a [Projection] attribute.";
+            Error = new MissingProjectionAttribute(typeof(TProjection));
             _projection = null;
             return;
         }
@@ -43,7 +44,7 @@ public static class ProjectionFixture<TProjection>
         if (clientBuildResults.Failed || !new ConventionProjectionBuilder<TProjection>(id)
             .TryBuild(id, eventTypes, clientBuildResults, out var projection))
         {
-            Error = clientBuildResults.ErrorString;
+            Error = new ArgumentException(clientBuildResults.ErrorString);
             _projection = null;
             return;
         }

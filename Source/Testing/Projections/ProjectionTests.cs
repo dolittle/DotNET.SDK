@@ -19,7 +19,7 @@ public abstract class ProjectionTests<TProjection>
 {
     EventLogSequenceNumber _sequenceNumber = EventLogSequenceNumber.Initial;
     readonly Dictionary<Key, TProjection> _projections = new();
-    readonly IProjection<TProjection> _projection = ProjectionFixture<TProjection>.Projection ?? throw new Exception(ProjectionFixture<TProjection>.Error);
+    readonly IProjection<TProjection> _projection = ProjectionFixture<TProjection>.Projection;
     protected IAggregates Aggregates { get; }
 
     protected void ForAggregate<TAggregate>(EventSourceId id, Action<TAggregate> callback) where TAggregate : AggregateRoot
