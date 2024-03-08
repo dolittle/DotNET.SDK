@@ -18,9 +18,10 @@ public class AggregateProjectionTests : ProjectionTests<AggregateProjection>
     {
         WhenAggregateMutated<TestAggregate>(_eventSourceId, agg => agg.Rename("Bob"));
 
-        var projection = ReadModel(_eventSourceId.Value);
-        projection.Name.Should().Be("Bob");
-        projection.TimesChanged.Should().Be(1);
+        AssertThat.HasReadModel(_eventSourceId.Value)
+            .Where(
+                it => it.Name.Should().Be("Bob"),
+                it => it.TimesChanged.Should().Be(1));
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class AggregateProjectionTests : ProjectionTests<AggregateProjection>
             agg.Rename("Bobby");
         });
 
-        var projection = ReadModel(_eventSourceId.Value);
+        var projection = AssertThat.ReadModel(_eventSourceId.Value);
         projection.Name.Should().Be("Bobby");
         projection.TimesChanged.Should().Be(2);
     }
@@ -52,7 +53,7 @@ public class AggregateProjectionTests : ProjectionTests<AggregateProjection>
             agg.Rename("Bob");
         });
 
-        var projection = ReadModel(_eventSourceId.Value);
+        var projection = AssertThat.ReadModel(_eventSourceId.Value);
         projection.Name.Should().Be("Bob");
         projection.TimesChanged.Should().Be(3);
     }

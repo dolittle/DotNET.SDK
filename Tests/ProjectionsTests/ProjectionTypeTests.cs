@@ -22,7 +22,7 @@ public class ProjectionTypeTests : ProjectionTests<TestProjection>
             SomeNumber = 10
         }, when);
 
-        ReadModel(ProjectionKey).Should().BeEquivalentTo(new TestProjection
+        AssertThat.ReadModel(ProjectionKey).Should().BeEquivalentTo(new TestProjection
         {
             Id = ProjectionKey,
             Content = "foo",
@@ -40,7 +40,7 @@ public class ProjectionTypeTests : ProjectionTests<TestProjection>
             SomeNumber = 42
         });
 
-        ReadModel(ProjectionKey)!.TheNumber.Should().Be(42);
+        AssertThat.ReadModel(ProjectionKey)!.TheNumber.Should().Be(42);
     }
     
     [Fact]
@@ -52,6 +52,6 @@ public class ProjectionTypeTests : ProjectionTests<TestProjection>
         });
         WithEvent(ProjectionKey, new DeleteEvent { Reason = "Just because" });
 
-        ReadModelShouldBeDeleted(ProjectionKey);
+        AssertThat.ReadModelDoesNotExist(ProjectionKey);
     }
 }

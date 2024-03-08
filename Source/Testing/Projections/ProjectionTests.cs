@@ -53,18 +53,7 @@ public abstract class ProjectionTests<TProjection>
         }
     }
 
-    protected TProjection ReadModel(Key key)
-    {
-        return _projections.GetValueOrDefault(key) ?? throw new ReadModelDidNotExist(key);
-    }
-
-    protected void ReadModelShouldBeDeleted(Key key)
-    {
-        if (_projections.TryGetValue(key, out var projection))
-        {
-            throw new ReadModelExistedWhenItShouldNot(key, projection);
-        }
-    }
+    protected ProjectionAssertions<TProjection> AssertThat => new(_projections);
 
     protected ProjectionTests(Action<IServiceCollection>? configureServices = default)
     {
@@ -144,21 +133,5 @@ public abstract class ProjectionTests<TProjection>
             evt.Occurred,
             evt.ExecutionContext,
             ExecutionContexts.Test);
-    }
-}
-
-public class ReadModelExistedWhenItShouldNot : Exception
-{
-    public ReadModelExistedWhenItShouldNot(Key key, object projection)
-        : base($"Read model for {key} existed when it should not. Projection: {projection}")
-    {
-    }
-}
-
-public class ReadModelDidNotExist : Exception
-{
-    public ReadModelDidNotExist(Key key)
-        : base($"Read model for {key} did not exist")
-    {
     }
 }

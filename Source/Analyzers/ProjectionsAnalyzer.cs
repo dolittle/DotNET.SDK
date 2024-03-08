@@ -29,6 +29,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Projection.MissingBaseClass,
             DescriptorRules.Projection.InvalidOnMethodParameters,
             DescriptorRules.Projection.InvalidOnMethodReturnType,
+            DescriptorRules.Projection.InvalidOnMethodVisibility,
             DescriptorRules.Projection.EventTypeAlreadyHandled
         );
 
@@ -64,13 +65,11 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
         {
             if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax) continue;
 
-            // if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword)
-            //     || syntax.Modifiers.Any(SyntaxKind.InternalKeyword)
-            //     || syntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))
-            // {
-            //     context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Projection.MutationShouldBePrivate, syntax.GetLocation(),
-            //         onMethod.ToDisplayString()));
-            // }
+            if (!syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Projection.InvalidOnMethodVisibility, syntax.GetLocation(),
+                    onMethod.ToDisplayString()));
+            }
 
             var parameters = onMethod.Parameters;
             if (parameters.Length is not 1 and not 2)

@@ -18,7 +18,7 @@ public class ResultSignatureTests : ProjectionTests<ResultSignaturesProjection>
     {
         WithEvent(EventSourceId, new ResultProjection(ExpectedContent));
 
-        ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
+        AssertThat.ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class ResultSignatureTests : ProjectionTests<ResultSignaturesProjection>
     {
         WithEvent(EventSourceId, new ResultEvent(ExpectedContent));
 
-        ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
+        AssertThat.ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class ResultSignatureTests : ProjectionTests<ResultSignaturesProjection>
     {
         WithEvent(EventSourceId, new ResultEventContext(ExpectedContent));
 
-        ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
+        AssertThat.ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
     }
 
     [Fact]
@@ -43,6 +43,6 @@ public class ResultSignatureTests : ProjectionTests<ResultSignaturesProjection>
         WithEvent(EventSourceId, new ResultEventContext(ExpectedContent));
         WithEvent(EventSourceId, new ResultDelete());
 
-        ReadModelShouldBeDeleted(EventSourceId);
+        AssertThat.ReadModelDoesNotExist(EventSourceId);
     }
 }

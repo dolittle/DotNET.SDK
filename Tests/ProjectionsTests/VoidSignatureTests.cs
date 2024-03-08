@@ -18,7 +18,7 @@ public class VoidSignatureTests : ProjectionTests<VoidSignaturesProjection>
     {
         WithEvent(EventSourceId, new VoidProjection(ExpectedContent));
 
-        ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
+        AssertThat.ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
     }
     
     [Fact]
@@ -26,7 +26,7 @@ public class VoidSignatureTests : ProjectionTests<VoidSignaturesProjection>
     {
         WithEvent(EventSourceId, new VoidEvent(ExpectedContent));
 
-        ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
+        AssertThat.ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
     }
     
     [Fact]
@@ -34,6 +34,6 @@ public class VoidSignatureTests : ProjectionTests<VoidSignaturesProjection>
     {
         WithEvent(EventSourceId, new VoidEventContext(ExpectedContent));
 
-        ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
+        AssertThat.ReadModel(EventSourceId)!.Content.Should().Be(ExpectedContent);
     }
 }

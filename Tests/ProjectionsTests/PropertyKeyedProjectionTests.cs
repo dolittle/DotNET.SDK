@@ -39,7 +39,7 @@ public class PropertyKeyedProjectionTests : ProjectionTests<PropertyKeyedProject
     {
         WithEvent(EventSource, new AnEvent(Property, "42"));
 
-        ReadModel(Property).TheValue.Should().Be("42");
+        AssertThat.ReadModel(Property).TheValue.Should().Be("42");
     }
 
     [Fact]
@@ -48,6 +48,6 @@ public class PropertyKeyedProjectionTests : ProjectionTests<PropertyKeyedProject
         WithEvent(EventSource, new AnEvent(Property, "42"));
         WithEvent(EventSource, new ADeleteEvent(Property));
 
-        ReadModelShouldBeDeleted(Property);
+        AssertThat.ReadModelDoesNotExist(Property);
     }
 }

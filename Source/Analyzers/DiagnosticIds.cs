@@ -70,5 +70,6 @@ public static class DiagnosticIds
     public const string ProjectionMissingBaseClassRuleId = "PROJ0002";
     public const string ProjectionInvalidOnMethodParametersRuleId = "PROJ0003";
     public const string ProjectionInvalidOnMethodReturnTypeRuleId = "PROJ0004";
-    public const string ProjectionDuplicateEventHandler = "PROJ0005";
+    public const string ProjectionInvalidOnMethodVisibilityRuleId = "PROJ0005";
+    public const string ProjectionDuplicateEventHandler = "PROJ0006";
 }

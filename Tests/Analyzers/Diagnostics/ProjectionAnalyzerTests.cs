@@ -24,12 +24,43 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    private void On(NameUpdated evt)
+    public void On(NameUpdated evt)
     {
         Name = evt.Name;
     }
 }";
         await VerifyAnalyzerFindsNothingAsync(test);
+    }
+    
+    [Fact]
+    public async Task ShouldFindPrivateMethod()
+    {
+        var test = @"
+using Dolittle.SDK.Projections;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+
+    private void On(NameUpdated evt)
+    {
+        Name = evt.Name;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Projection.InvalidOnMethodVisibility)
+                .WithSpan(14, 5, 17, 6)
+                .WithArguments("SomeProjection.On(NameUpdated)")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
     }
     
     [Fact]
@@ -48,7 +79,7 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    private void On(NameUpdated evt, ProjectionContext ctx)
+    public void On(NameUpdated evt, ProjectionContext ctx)
     {
         Name = evt.Name;
     }
@@ -72,7 +103,7 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    private void On(NameUpdated evt, EventContext ctx)
+    public void On(NameUpdated evt, EventContext ctx)
     {
         Name = evt.Name;
     }
@@ -134,7 +165,7 @@ class SomeProjection: ReadModel
     public string Name {get; set;}
 
 
-    private void On(NameUpdated evt, string shouldNotBeHere)
+    public void On(NameUpdated evt, string shouldNotBeHere)
     {
         Name = evt.Name;
     }
@@ -143,7 +174,7 @@ class SomeProjection: ReadModel
         DiagnosticResult[] expected =
         {
             Diagnostic(DescriptorRules.Projection.InvalidOnMethodParameters)
-                .WithSpan(15, 38, 15, 60)
+                .WithSpan(15, 37, 15, 59)
                 .WithArguments("SomeProjection.On(NameUpdated, string)")
         };
 
@@ -166,12 +197,12 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    void On(NameUpdated evt)
+    public void On(NameUpdated evt)
     {
         Name = evt.Name;
     }
 
-    void On(NameUpdated evt, ProjectionContext ctx)
+    public void On(NameUpdated evt, ProjectionContext ctx)
     {
         Name = evt.Name;
     }
@@ -203,7 +234,7 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    void On()
+    public void On()
     {
     }
 }";
@@ -233,7 +264,7 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    private void On(NameUpdated evt)
+    public void On(NameUpdated evt)
     {
         Name = evt.Name;
     }
@@ -264,7 +295,7 @@ class SomeProjection: ReadModel
 {
     public string Name {get; set;}
 
-    private void On(NameUpdated evt)
+    public void On(NameUpdated evt)
     {
         Name = evt.Name;
     }
@@ -272,7 +303,7 @@ class SomeProjection: ReadModel
         DiagnosticResult[] expected =
         {
             Diagnostic(DescriptorRules.Events.MissingAttribute)
-                .WithSpan(14, 21, 14, 36)
+                .WithSpan(14, 20, 14, 35)
                 .WithArguments("Test.NameUpdated"),
         };
 

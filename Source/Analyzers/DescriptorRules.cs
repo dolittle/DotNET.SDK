@@ -169,7 +169,7 @@ static class DescriptorRules
             new(
                 DiagnosticIds.ProjectionInvalidOnMethodParametersRuleId,
                 title: "Invalid On-method",
-                messageFormat: "'{0}' is invalid",
+                messageFormat: "'{0}' has an invalid signature",
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
@@ -184,6 +184,16 @@ static class DescriptorRules
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
                 description: "Change the On-method to return void, ProjectionResultType or ProjectionResult<TReadModel>.");
+        
+        internal static readonly DiagnosticDescriptor InvalidOnMethodVisibility =
+            new(
+                DiagnosticIds.ProjectionInvalidOnMethodVisibilityRuleId,
+                title: "On-methods need to be public",
+                messageFormat: "'{0}' is not public",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "Change the On-method to public visibility.");
         
         internal static readonly DiagnosticDescriptor EventTypeAlreadyHandled =
             new(
