@@ -187,7 +187,7 @@ static class DescriptorRules
         
         internal static readonly DiagnosticDescriptor InvalidOnMethodVisibility =
             new(
-                DiagnosticIds.ProjectionInvalidOnMethodVisibilityRuleId,
+                DiagnosticIds.InvalidAccessibility,
                 title: "On-methods need to be public",
                 messageFormat: "'{0}' is not public",
                 DiagnosticCategories.Sdk,
