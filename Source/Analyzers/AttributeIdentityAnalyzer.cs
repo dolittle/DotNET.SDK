@@ -18,6 +18,14 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 {
+    static readonly ImmutableDictionary<string, string?> _missingProjectionBaseClassProperties =
+        ImmutableDictionary<string, string?>.Empty
+            .Add("baseClass", DolittleTypes.ReadModelClass);
+
+    static readonly ImmutableDictionary<string, string?> _missingAggregateBaseClassProperties =
+        ImmutableDictionary<string, string?>.Empty
+            .Add("baseClass", DolittleTypes.AggregateRootBaseClass);
+
     readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
 
     /// <inheritdoc />
@@ -49,24 +57,25 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
                 break;
             case "AggregateRootAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
-                CheckHasBaseClass(context, DolittleTypes.AggregateRootBaseClass);
+                CheckHasBaseClass(context, DolittleTypes.AggregateRootBaseClass, _missingAggregateBaseClassProperties);
                 break;
 
             case "ProjectionAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
-                CheckHasBaseClass(context, DolittleTypes.ReadModelClass);
+                CheckHasBaseClass(context, DolittleTypes.ReadModelClass, _missingProjectionBaseClassProperties);
                 break;
         }
     }
 
-    void CheckHasBaseClass(SyntaxNodeAnalysisContext context, string expectedBaseClass)
+    void CheckHasBaseClass(SyntaxNodeAnalysisContext context, string expectedBaseClass, ImmutableDictionary<string, string?> properties)
     {
         if (context.Node.FirstAncestorOrSelf<ClassDeclarationSyntax>() is not { } classDeclaration) return;
 
         if (classDeclaration.BaseList is null || classDeclaration.BaseList.Types.Count == 0 || !TypeExtends(classDeclaration, expectedBaseClass, context))
         {
             var className = classDeclaration.Identifier.ToString();
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.MissingBaseClass, classDeclaration.GetLocation(), className, expectedBaseClass));
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.MissingBaseClass, classDeclaration.GetLocation(), properties, className,
+                expectedBaseClass));
         }
     }
 
@@ -81,7 +90,7 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
     {
         var typeSymbol = context.SemanticModel.GetDeclaredSymbol(type);
         var baseClassType = context.SemanticModel.Compilation.GetTypeByMetadataName(expectedBaseClass);
-        
+
         return TypeExtends(typeSymbol, baseClassType);
     }
 
