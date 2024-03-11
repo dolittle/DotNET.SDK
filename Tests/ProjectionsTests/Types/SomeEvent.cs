@@ -8,5 +8,5 @@ namespace Dolittle.SDK.Projections.Types;
 [EventType("83225425-c4b8-4ef7-9638-d23530831752")]
 public class SomeEvent
 {
-    public string Thing { get; set; }
+    public required string Thing { get; set; }
 }
