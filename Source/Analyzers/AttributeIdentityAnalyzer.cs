@@ -21,8 +21,8 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
     readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity, DescriptorRules.MissingBaseClass);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -30,28 +30,74 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         _identities.Clear();
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSyntaxNodeAction(CheckHasIdentity, ImmutableArray.Create(SyntaxKind.Attribute));
+        context.RegisterSyntaxNodeAction(CheckAttribute, ImmutableArray.Create(SyntaxKind.Attribute));
     }
 
-    void CheckHasIdentity(SyntaxNodeAnalysisContext context)
+    void CheckAttribute(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not AttributeSyntax attribute) return;
         if (context.SemanticModel.GetSymbolInfo(attribute).Symbol is not IMethodSymbol symbol) return;
         if (!symbol.IsDolittleType()) return;
 
 
-        switch (symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
+        var className = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        switch (className)
         {
             case "EventTypeAttribute":
             case "EventHandlerAttribute":
+                CheckAttributeIdentity(attribute, symbol, context);
+                break;
             case "AggregateRootAttribute":
+                CheckAttributeIdentity(attribute, symbol, context);
+                CheckHasBaseClass(context, DolittleTypes.AggregateRootBaseClass);
+                break;
+
             case "ProjectionAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
-                return;
-
-            default:
-                return;
+                CheckHasBaseClass(context, DolittleTypes.ReadModelClass);
+                break;
         }
+    }
+
+    void CheckHasBaseClass(SyntaxNodeAnalysisContext context, string expectedBaseClass)
+    {
+        if (context.Node.FirstAncestorOrSelf<ClassDeclarationSyntax>() is not { } classDeclaration) return;
+
+        if (classDeclaration.BaseList is null || classDeclaration.BaseList.Types.Count == 0 || !TypeExtends(classDeclaration, expectedBaseClass, context))
+        {
+            var className = classDeclaration.Identifier.ToString();
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.MissingBaseClass, classDeclaration.GetLocation(), className, expectedBaseClass));
+        }
+    }
+
+    /// <summary>
+    /// Checks if the type is in the hierarchy of the expected base class
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="expectedBaseClass"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    static bool TypeExtends(ClassDeclarationSyntax type, string expectedBaseClass, SyntaxNodeAnalysisContext context)
+    {
+        var typeSymbol = context.SemanticModel.GetDeclaredSymbol(type);
+        var baseClassType = context.SemanticModel.Compilation.GetTypeByMetadataName(expectedBaseClass);
+        
+        return TypeExtends(typeSymbol, baseClassType);
+    }
+
+    static bool TypeExtends(INamedTypeSymbol? typeSymbol, INamedTypeSymbol? baseClassType)
+    {
+        while (typeSymbol != null)
+        {
+            if (typeSymbol.Equals(baseClassType, SymbolEqualityComparer.Default))
+            {
+                return true;
+            }
+
+            typeSymbol = typeSymbol.BaseType;
+        }
+
+        return false;
     }
 
     void CheckAttributeIdentity(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context)

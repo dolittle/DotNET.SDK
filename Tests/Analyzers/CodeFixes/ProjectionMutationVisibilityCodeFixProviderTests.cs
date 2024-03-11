@@ -7,8 +7,6 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 
 public class ProjectionMutationVisibilityCodeFixProviderTests : CodeFixProviderTests<ProjectionsAnalyzer, MethodVisibilityCodeFixProvider>
 {
-
-
     [Fact]
     public async Task ShouldFixVisibilityWhenPrivate()
     {

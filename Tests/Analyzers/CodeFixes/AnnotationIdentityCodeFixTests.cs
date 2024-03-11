@@ -123,7 +123,7 @@ class SomeHandler
 using Dolittle.SDK.Projections;
 
 [Projection("""")]
-class SomeProjection
+class SomeProjection: ReadModel
 {
 }";
 
@@ -131,7 +131,7 @@ class SomeProjection
 using Dolittle.SDK.Projections;
 
 [Projection(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
-class SomeProjection
+class SomeProjection: ReadModel
 {
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
@@ -149,7 +149,7 @@ class SomeProjection
 using Dolittle.SDK.Projections;
 
 [Projection(alias: ""Foo"", projectionId: ""invalid-id"")]
-class SomeProjection
+class SomeProjection: ReadModel
 {
 }";
 
@@ -157,7 +157,7 @@ class SomeProjection
 using Dolittle.SDK.Projections;
 
 [Projection(alias: ""Foo"", projectionId: ""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
-class SomeProjection
+class SomeProjection: ReadModel
 {
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
@@ -175,7 +175,7 @@ class SomeProjection
 using Dolittle.SDK.Aggregates;
 
 [AggregateRoot(alias: ""Foo"", id: ""invalid-id"")]
-class SomeAggregate
+class SomeAggregate: AggregateRoot
 {
 }";
 
@@ -183,7 +183,7 @@ class SomeAggregate
 using Dolittle.SDK.Aggregates;
 
 [AggregateRoot(alias: ""Foo"", id: ""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
-class SomeAggregate
+class SomeAggregate: AggregateRoot
 {
 }";
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";

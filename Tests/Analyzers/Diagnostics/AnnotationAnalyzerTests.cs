@@ -134,7 +134,7 @@ class SomeEvent
 
         await VerifyAnalyzerFindsNothingAsync(test);
     }
-    
+
     [Fact]
     public async Task ShouldDetectEventHandlerWhenQualified()
     {
@@ -149,6 +149,45 @@ class SomeEvent
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 47)
                 .WithArguments("Dolittle.SDK.Events.Handling.EventHandler", "eventHandlerId", "\"\""),
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+
+    [Fact]
+    public async Task ShouldDetectMissingAggregateRootBaseClass()
+    {
+        var test = @"
+[Dolittle.SDK.Aggregates.AggregateRoot(""c6f87322-be67-4aaf-a9f4-fdc24ac4f0fb"")]
+class SomeAggregateRoot
+{
+    public string Name {get; set;}
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.MissingBaseClass)
+                .WithSpan(2, 1, 6, 2)
+                .WithArguments("SomeAggregateRoot", "Dolittle.SDK.Aggregates.AggregateRoot")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+    
+    [Fact]
+    public async Task ShouldDetectMissingReadModelBaseClass()
+    {
+        var test = @"
+[Dolittle.SDK.Projections.Projection(""c6f87322-be67-4aaf-a9f4-fdc24ac4f0fb"")]
+class SomeProjection
+{
+    public string Name {get; set;}
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.MissingBaseClass)
+                .WithSpan(2, 1, 6, 2)
+                .WithArguments("SomeProjection", "Dolittle.SDK.Projections.ReadModel")
         };
 
         await VerifyAnalyzerAsync(test, expected);

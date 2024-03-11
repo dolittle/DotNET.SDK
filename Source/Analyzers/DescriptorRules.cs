@@ -46,6 +46,16 @@ static class DescriptorRules
             DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Assign a unique identity in the attribute");
+    
+    internal static readonly DiagnosticDescriptor MissingBaseClass =
+        new(
+            DiagnosticIds.MissingBaseClassRuleId,
+            title: "Class is missing required base class",
+            messageFormat: "'{0}' is not a base class of {1}",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Add the required base class.");
 
     internal static readonly DiagnosticDescriptor InvalidAccessibility = 
         new(
