@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Internal;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -57,6 +58,8 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         projection = default;
         buildResults.AddInformation(identifier, $"Building from type {_projectionType}");
 
+        var idleUnloadTimeout = ProjectionType<TProjection>.IdleUnloadTimeout ?? TimeSpan.FromSeconds(20);
+
         if (!HasParameterlessConstructor())
         {
             buildResults.AddFailure(identifier, $"The projection class {_projectionType} has no default/parameterless constructor",
@@ -77,7 +80,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
             return false;
         }
 
-        projection = new Projection<TProjection>(_identifier, eventTypesToMethods);
+        projection = new Projection<TProjection>(_identifier, eventTypesToMethods, idleUnloadTimeout);
         return true;
     }
 
@@ -136,7 +139,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
                     "A projection method should take in as parameters an event and a {nameof(ProjectionContext)}");
             }
 
-            if (!ParametersAreOkay(identifier, method, buildResults, out var parametersType, out var responseType))
+            if (!ParametersAreOkay(identifier, method, buildResults, out _, out _))
             {
                 shouldAddHandler = false;
             }
@@ -306,7 +309,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         if (attributes.Length == 0)
         {
             // default to EventSourceId
-            keySelector = KeySelector.EventSource();
+            keySelector = KeySelector.EventSource;
             return true;
 
             // buildResults.AddFailure(identifier, $"{method} has no key selector attribute", $"Add a key selector attribute: [{nameof(KeyFromPartitionAttribute)}], [{nameof(KeyFromPropertyAttribute)}], [{nameof(KeyFromEventSourceAttribute)}], [{nameof(StaticKeyAttribute)}] or [{nameof(KeyFromEventOccurredAttribute)}]");

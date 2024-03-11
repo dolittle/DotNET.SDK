@@ -17,6 +17,13 @@ public interface IProjectionBuilder
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <returns>The builder for continuation.</returns>
     IProjectionBuilder InScope(ScopeId scopeId);
+    
+    /// <summary>
+    /// Sets the idle unload timeout for the projection.
+    /// </summary>
+    /// <param name="timeout">The <see cref="TimeSpan" />.</param>
+    /// <returns>The builder for continuation.</returns>
+    IProjectionBuilder WithIdleUnloadTimeout(TimeSpan timeout);
 
     /// <summary>
     /// Creates a <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for the specified read model type.

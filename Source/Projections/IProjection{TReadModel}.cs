@@ -14,10 +14,7 @@ namespace Dolittle.SDK.Projections;
 public interface IProjection<TReadModel> : IProjection
     where TReadModel : ReadModel, new()
 {
-    /// <summary>
-    /// Gets the initial <typeparamref name="TReadModel"/> read model state.
-    /// </summary>
-    TReadModel InitialState { get; }
+
 
     /// <summary>
     /// Handle an event and update a read model.

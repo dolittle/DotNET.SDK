@@ -16,6 +16,9 @@ namespace Dolittle.SDK.Projections;
 public class Projection<TReadModel> : IProjection<TReadModel>
     where TReadModel : ReadModel, new()
 {
+    public static readonly TimeSpan DefaultIdleUnloadTimeout = TimeSpan.FromSeconds(10);
+    
+    public TimeSpan IdleUnloadTimeout { get; }
     readonly IDictionary<EventType, IProjectionMethod<TReadModel>> _onMethods;
 
     /// <summary>
@@ -24,10 +27,13 @@ public class Projection<TReadModel> : IProjection<TReadModel>
     /// <param name="identifier">The <see cref="ProjectionId" />.</param>
     /// <param name="scopeId">The <see cref="ScopeId" />.</param>
     /// <param name="onMethods">The on methods by <see cref="EventType" />.</param>
+    /// <param name="idleUnloadTimeout">How long the projection should be idle in memory before unloading</param>
     public Projection(
         ProjectionModelId identifier,
-        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods)
+        IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
+        TimeSpan? idleUnloadTimeout)
     {
+        IdleUnloadTimeout = idleUnloadTimeout ?? DefaultIdleUnloadTimeout;
         _onMethods = onMethods;
         Identifier = identifier.Id;
         ScopeId = identifier.Scope;
@@ -49,9 +55,6 @@ public class Projection<TReadModel> : IProjection<TReadModel>
 
     /// <inheritdoc/>
     public ScopeId ScopeId { get; }
-
-    /// <inheritdoc/>
-    public TReadModel InitialState { get; } = new();
 
     /// <inheritdoc/>
     public IImmutableDictionary<EventType, KeySelector> Events { get; }

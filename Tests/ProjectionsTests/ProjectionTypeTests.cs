@@ -1,3 +1,4 @@
+using Dolittle.SDK.Projections.Internal;
 using Dolittle.SDK.Projections.Types;
 using Dolittle.SDK.Testing.Projections;
 using FluentAssertions;
@@ -7,7 +8,14 @@ namespace Dolittle.SDK.Projections;
 
 public class ProjectionTypeTests : ProjectionTests<TestProjection>
 {
+    [Fact]
+    public void CanParseUnloadTimeouts()
+    {
+        ProjectionType<TestProjection>.IdleUnloadTimeout.Should().Be(TimeSpan.FromMinutes(1));
+    }
+
     const string ProjectionKey = "foo";
+
     [Fact]
     public void CanMutateProjections()
     {
@@ -42,7 +50,7 @@ public class ProjectionTypeTests : ProjectionTests<TestProjection>
 
         AssertThat.ReadModel(ProjectionKey)!.TheNumber.Should().Be(42);
     }
-    
+
     [Fact]
     public void CanDeleteProjections()
     {

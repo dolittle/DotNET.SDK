@@ -20,11 +20,24 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
     // ReSharper disable StaticMemberInGenericType
     public static HashSet<Type> HandledEventTypes { get; }
     public static ProjectionModelId? ProjectionModelId { get; }
+    
+    public static TimeSpan? IdleUnloadTimeout { get; }
 
     static ProjectionType()
     {
         HandledEventTypes = HandledEvents().ToHashSet();
-        ProjectionModelId = GetProjectionModelId();
+        var attributeMetadata = GetAttributeMetadata();
+        if (attributeMetadata.HasValue)
+        {
+            ProjectionModelId = attributeMetadata.Value.id;
+            IdleUnloadTimeout = attributeMetadata.Value.timeout;
+        }
+        else
+        {
+            ProjectionModelId = null;
+            IdleUnloadTimeout = null;
+        }
+        
     }
 
     static IEnumerable<Type> HandledEvents()
@@ -33,7 +46,7 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
         var methods = projectionType
             .GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic)
             // "On" methods only
-            .Where(_ => _.Name == "On");
+            .Where(method => method.Name == "On");
         foreach (var method in methods)
         {
             if (method.GetParameters().Length is 1 or 2 && method.GetParameters()[0].ParameterType.GetCustomAttribute<EventTypeAttribute>() != null)
@@ -61,11 +74,17 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
-    static ProjectionModelId? GetProjectionModelId()
+    static (ProjectionModelId id, TimeSpan? timeout)? GetAttributeMetadata()
     {
         var aggregateRootType = typeof(TProjection);
         var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<ProjectionAttribute>();
-        return aggregateRootAttribute?.GetIdentifier(aggregateRootType);
+        if (aggregateRootAttribute is null)
+        {
+            return null;
+        }
+        
+        
+        return (aggregateRootAttribute.GetIdentifier(aggregateRootType), aggregateRootAttribute.IdleUnloadTimeout);
     }
 }
 

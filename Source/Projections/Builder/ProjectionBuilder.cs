@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
@@ -19,6 +20,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     ICanTryBuildProjection? _methodsBuilder;
 
     ScopeId _scopeId = ScopeId.Default;
+    TimeSpan _idleUnloadTimeout = TimeSpan.FromSeconds(20);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionBuilder"/> class.
@@ -43,6 +45,13 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     }
 
     /// <inheritdoc />
+    public IProjectionBuilder WithIdleUnloadTimeout(TimeSpan timeout)
+    {
+        _idleUnloadTimeout = timeout;
+        return this;
+    }
+
+    /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> ForReadModel<TReadModel>()
         where TReadModel : ReadModel, new()
     {
@@ -50,7 +59,7 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
         {
             throw new ReadModelAlreadyDefinedForProjection(_projectionId, _scopeId, typeof(TReadModel));
         }
-        
+
         var builder = new ProjectionBuilderForReadModel<TReadModel>(
             _projectionId,
             _scopeId,
@@ -61,15 +70,16 @@ public class ProjectionBuilder : IProjectionBuilder, ICanTryBuildProjection
     }
 
     /// <inheritdoc/>
-    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults, [NotNullWhen(true)] out IProjection? projection)
+    public bool TryBuild(ProjectionModelId identifier, IEventTypes eventTypes, IClientBuildResults buildResults,
+        [NotNullWhen(true)] out IProjection? projection)
     {
         projection = default;
         if (_methodsBuilder != null)
         {
             return _methodsBuilder.TryBuild(identifier, eventTypes, buildResults, out projection);
         }
+
         buildResults.AddFailure(identifier, $"No read model defined for projection.");
         return false;
-
     }
 }

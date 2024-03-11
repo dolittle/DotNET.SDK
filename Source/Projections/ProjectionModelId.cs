@@ -16,12 +16,13 @@ public class ProjectionModelId : Identifier<ProjectionId, ScopeId>
     /// </summary>
     /// <param name="id">The <see cref="ProjectionId"/>.</param>
     /// <param name="scope">The <see cref="ScopeId"/>.></param>
+    /// <param name="alias"></param>
     public ProjectionModelId(ProjectionId id, ScopeId scope, string? alias)
         : base("Projection", id, alias, scope)
     {
         Scope = scope;
     }
-    
+
     /// <summary>
     /// Gets the <see cref="ScopeId"/>.
     /// </summary>
