@@ -36,7 +36,8 @@ public class ProjectionTypeTests : ProjectionTests<TestProjection>
             Content = "foo",
             LastUpdated = when,
             UpdateCount = 2,
-            TheNumber = 10
+            TheNumber = 10,
+            EventOffset = 1
         });
     }
 

@@ -74,8 +74,16 @@ public class ProjectionActor<TProjection>(
             {
                 _projection = new TProjection
                 {
-                    Id = _id!
+                    Id = _id!,
                 };
+            }
+            else
+            {
+                if(projectedEvent.Context.SequenceNumber <= _projection!.EventOffset) // Event has already been processed
+                {
+                    context.Respond(new Try<ProjectionResultType>(ProjectionResultType.Keep));
+                    return;
+                }
             }
 
             var projectionContext = new ProjectionContext(firstEvent, projectedEvent.Key, projectedEvent.Context);
@@ -84,7 +92,7 @@ public class ProjectionActor<TProjection>(
             {
                 case ProjectionResultType.Replace:
                     _projection = result.ReadModel;
-                    _projection!.SetLastUpdated(projectionContext.EventContext.Occurred);
+                    _projection!.SetLastUpdated(projectionContext.EventContext.SequenceNumber.Value,projectionContext.EventContext.Occurred);
                     await _collection!.ReplaceOneAsync(p => p.Id == _projection!.Id, _projection, new ReplaceOptions { IsUpsert = true });
                     break;
                 case ProjectionResultType.Delete:
