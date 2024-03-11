@@ -38,7 +38,7 @@ public class AggregateProjection : ReadModel
     public string Name { get; set; } = string.Empty;
     public int TimesChanged { get; set; }
 
-    public void On(NameChanged evt, ProjectionContext ctx)
+    public void On(NameChanged evt)
     {
         Name = evt.Name;
         TimesChanged++;

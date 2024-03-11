@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
@@ -23,7 +22,7 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionOf{TReadModel}"/> class.
     /// </summary>
-    /// <param name="projectionStore">The <see cref="IProjectionStore"/>.</param>
+    /// <param name="collection">The <see cref="IMongoCollection{TReadModel}"/> (tenanted).</param>
     /// <param name="identifier">The <see cref="ProjectionModelId"/>.</param>
     public ProjectionOf(IMongoCollection<TReadModel> collection, ProjectionModelId identifier) : this(collection, identifier.Id, identifier.Scope)
     {
@@ -32,7 +31,7 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectionOf{TReadModel}"/> class.
     /// </summary>
-    /// <param name="collection"></param>
+    /// <param name="collection">The <see cref="IMongoCollection{TReadModel}"/> (tenanted).</param>
     /// <param name="identifier">The <see cref="ProjectionId"/>.</param>
     /// <param name="scope">The <see cref="ScopeId"/>.</param>
     public ProjectionOf(IMongoCollection<TReadModel> collection, ProjectionId identifier, ScopeId scope)
@@ -48,17 +47,15 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     /// <inheritdoc />
     public ScopeId Scope { get; }
 
-    /// <inheritdoc />
-    public async Task<TReadModel?> Get(Key key, CancellationToken cancellation = default)
-    {
-        var id = key.Value;
-        var result = await _collection.Find(it => it.Id.Equals(id)).FirstOrDefaultAsync(cancellationToken: cancellation);
-        return result;
-        //return _projectionStore.Get<TReadModel>(key, Identifier, Scope, cancellation);
-    }
+    public Task<TReadModel?> Get(Key key, CancellationToken cancellation = default) => Get(key.Value, cancellation);
 
-    public IQueryable<TReadModel> AsQueryable()
-    {
-        return _collection.AsQueryable();
-    }
+    /// <inheritdoc />
+    public Task<TReadModel?> Get(string id, CancellationToken cancellation = default)
+        => _collection.Find(it => it.Id.Equals(id)).FirstOrDefaultAsync(cancellationToken: cancellation)!;
+
+    /// <inheritdoc />
+    public IQueryable<TReadModel> AsQueryable() => _collection.AsQueryable();
+
+    /// <inheritdoc />
+    public IQueryable<TReadModel> Query() => _collection.AsQueryable();
 }
