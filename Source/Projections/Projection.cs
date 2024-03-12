@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections.Builder;
 
@@ -16,7 +17,7 @@ namespace Dolittle.SDK.Projections;
 public class Projection<TReadModel> : IProjection<TReadModel>
     where TReadModel : ReadModel, new()
 {
-    public static readonly TimeSpan DefaultIdleUnloadTimeout = TimeSpan.FromSeconds(10);
+    static readonly TimeSpan _defaultIdleUnloadTimeout = TimeSpan.FromSeconds(10);
     
     public TimeSpan IdleUnloadTimeout { get; }
     readonly IDictionary<EventType, IProjectionMethod<TReadModel>> _onMethods;
@@ -33,11 +34,12 @@ public class Projection<TReadModel> : IProjection<TReadModel>
         IDictionary<EventType, IProjectionMethod<TReadModel>> onMethods,
         TimeSpan? idleUnloadTimeout)
     {
-        IdleUnloadTimeout = idleUnloadTimeout ?? DefaultIdleUnloadTimeout;
+        IdleUnloadTimeout = idleUnloadTimeout ?? _defaultIdleUnloadTimeout;
         _onMethods = onMethods;
         Identifier = identifier.Id;
         ScopeId = identifier.Scope;
         Events = onMethods.ToImmutableDictionary(_ => _.Key, _ => _.Value.KeySelector);
+        SupportsHistoricalQueries = Events.Values.All(selector => selector.Type == KeySelectorType.EventSourceId);
         ProjectionType = typeof(TReadModel);
 
         if (!string.IsNullOrEmpty(identifier.Alias))
@@ -64,6 +66,8 @@ public class Projection<TReadModel> : IProjection<TReadModel>
 
     /// <inheritdoc />
     public bool HasAlias => Alias is not null;
+    
+    public bool SupportsHistoricalQueries { get; }
 
     /// <inheritdoc/>
     public ProjectionResult<TReadModel> On(TReadModel readModel, object @event, EventType eventType, ProjectionContext context)

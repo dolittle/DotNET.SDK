@@ -44,6 +44,12 @@ public interface IProjection
     /// Get the idle unload timeout for the projection.
     /// </summary>
     TimeSpan IdleUnloadTimeout { get; }
+    
+    /// <summary>
+    /// Gets a value indicating whether the projection supports historical queries or not.
+    /// Only projections that limits the key selectors to eventSourceId support historical queries.
+    /// </summary>
+    bool SupportsHistoricalQueries { get; }
 
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this event handler.

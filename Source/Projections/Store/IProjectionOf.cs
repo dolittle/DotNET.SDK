@@ -44,12 +44,10 @@ public interface IProjectionOf<TReadModel> where TReadModel : ReadModel, new()
     /// <summary>
     /// Get an <see cref="IQueryable{TReadModel}"/> for the projection read model.
     /// </summary>
-    /// <returns></returns>
     IQueryable<TReadModel> AsQueryable();
     
     /// <summary>
     /// Get an <see cref="IQueryable{TReadModel}"/> for the projection read model.
     /// </summary>
-    /// <returns></returns>
     IQueryable<TReadModel> Query();
 }

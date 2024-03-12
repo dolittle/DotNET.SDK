@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Events.Store;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
@@ -38,6 +39,21 @@ public class ProjectionStore : IProjectionStore
         => new ProjectionOf<TProjection>(_providers.GetRequiredService<IMongoCollection<TProjection>>(), _projectionAssociations.GetFor<TProjection>());
 
     /// <inheritdoc />
+    public IHistoricalProjection<TProjection> Historical<TProjection>()
+        where TProjection : ReadModel, new()
+    {
+        var projection = _providers.GetRequiredService<IProjection<TProjection>>();
+        if (!projection.SupportsHistoricalQueries)
+        {
+            throw new ArgumentException(
+                "Projection type does not support historical queries. It is available if the projection uses only events keyed on EventSourceId");
+        }
+
+        return new HistoricalProjection<TProjection>(projection, _providers.GetRequiredService<IEventStore>());
+    }
+
+
+    /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
         where TReadModel : ReadModel, new()
         => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, ScopeId.Default);
@@ -62,7 +78,7 @@ public class ProjectionStore : IProjectionStore
     public Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, CancellationToken cancellation = default)
         where TReadModel : ReadModel, new()
         => Of<TReadModel>(projectionId).Get(key, cancellation);
-    
+
     /// <inheritdoc/>
     public Task<TReadModel?> Get<TReadModel>(Key key, ProjectionId projectionId, ScopeId scopeId, CancellationToken cancellation = default)
         where TReadModel : ReadModel, new()

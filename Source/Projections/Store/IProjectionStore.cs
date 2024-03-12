@@ -40,6 +40,13 @@ public interface IProjectionStore
     /// <typeparam name="TReadModel">The <see cref="Type" /> of the projection read model.</typeparam>
     /// <returns>The <see cref="IProjectionOf{TReadModel}"/> for the <typeparamref name="TReadModel"/> projection read model class.</returns>
     IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId) where TReadModel : ReadModel, new();
+
+    /// <summary>
+    /// This will allow you to query the state of a projection at a specific point in time, or all states up to a specific point in time.
+    /// Only available if the projection uses only events keyed on EventSourceId (default behavior).
+    /// </summary>
+    /// <returns>The <see cref="IHistoricalProjection{TProjection}"/> for the <typeparamref name="TProjection"/> projection read model.</returns>
+    public IHistoricalProjection<TProjection> Historical<TProjection>() where TProjection : ReadModel, new();
     
     /// <summary>
     /// Gets a projection read model by key for a projection associated with a type.
