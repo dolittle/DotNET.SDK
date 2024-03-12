@@ -25,16 +25,29 @@ public class ProjectionAttribute : Attribute, IDecoratedTypeDecorator<Projection
     /// <param name="inScope">The scope that the event handler handles events in.</param>
     /// <param name="alias">The alias for the projection.</param>
     /// <param name="idleUnloadTimeout">How long should the read model be kept in-memory after updates</param>
-    public ProjectionAttribute(string projectionId, string? inScope = null, string? alias = null, string? idleUnloadTimeout = null)
+    /// <param name="queryInMemory">If enabled, get calls will use the in-memory cached projections that are used when updating</param>
+    public ProjectionAttribute(string projectionId, string? inScope = null, string? alias = null, string? idleUnloadTimeout = null, bool queryInMemory = true)
     {
         _projectionId = projectionId;
         _scope = inScope ?? ScopeId.Default;
         _alias = alias;
-        IdleUnloadTimeout = string.IsNullOrWhiteSpace(idleUnloadTimeout) ? null : TimeSpan.TryParse(idleUnloadTimeout, CultureInfo.InvariantCulture, out var timeout) ? timeout : throw new ArgumentException($"Invalid timespan format: '{idleUnloadTimeout}'", nameof(idleUnloadTimeout));
+        QueryInMemory = queryInMemory;
+        IdleUnloadTimeout = string.IsNullOrWhiteSpace(idleUnloadTimeout) ||
+                            !TimeSpan.TryParse(idleUnloadTimeout, CultureInfo.InvariantCulture, out var timeout)
+            ? null
+            : timeout;
     }
 
     /// <inheritdoc />
     public ProjectionModelId GetIdentifier(Type decoratedType) => new(_projectionId, _scope, _alias ?? decoratedType.Name);
-    
+
+    /// <summary>
+    /// How long should the read model be kept in-memory after updates and get-queries.
+    /// </summary>
     public TimeSpan? IdleUnloadTimeout { get; }
+    
+    /// <summary>
+    /// When getting, use the in-memory cached projections that are used when updating.
+    /// </summary>
+    public bool QueryInMemory { get; }
 }

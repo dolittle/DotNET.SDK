@@ -8,7 +8,7 @@
         <PackageProjectUrl>https://dolittle.io</PackageProjectUrl>
         <PackageReleaseNotes>https://github.com/dolittle/DotNET.SDK/blob/master/CHANGELOG.md</PackageReleaseNotes>
         <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
-        <NoWarn>$(NoWarn);SYSLIB1002;SYSLIB1006;SYSLIB1007</NoWarn>
+        <NoWarn>$(NoWarn);SYSLIB1002;SYSLIB1006;SYSLIB1007;IDE0290</NoWarn>
         <Nullable>enable</Nullable>
 
         <Description>Dolittle is a decentralized, distributed, event-driven microservice platform built to harness the power of events.</Description>

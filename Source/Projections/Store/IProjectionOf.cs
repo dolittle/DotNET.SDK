@@ -40,6 +40,12 @@ public interface IProjectionOf<TReadModel> where TReadModel : ReadModel, new()
     /// <param name="cancellation">The <see cref="CancellationToken" />.</param>
     /// <returns>A <see cref="Task" /> that, when resolved, returns the <typeparamref name="TReadModel"/> read model.</returns>
     Task<TReadModel?> Get(string id, CancellationToken cancellation = default);
+
+    /// <summary>
+    /// Gets the current and later versions of the projection.
+    /// Requires the projection to implement <see cref="ICloneable"/> in order to not return the same instance.
+    /// </summary>
+    ISubscription<TP?> Subscribe<TP>(string id, CancellationToken cancellationToken) where TP: TReadModel, ICloneable;
     
     /// <summary>
     /// Get an <see cref="IQueryable{TReadModel}"/> for the projection read model.

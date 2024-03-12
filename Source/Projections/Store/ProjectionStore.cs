@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.SDK.Events;
+using Dolittle.SDK.Projections.Actors;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
@@ -35,17 +36,17 @@ public class ProjectionStore : IProjectionStore
     /// <inheritdoc />
     public IProjectionOf<TProjection> Of<TProjection>()
         where TProjection : ReadModel, new()
-        => new ProjectionOf<TProjection>(_providers.GetRequiredService<IMongoCollection<TProjection>>(), _projectionAssociations.GetFor<TProjection>());
+        => new ProjectionOf<TProjection>(_providers.GetRequiredService<IMongoCollection<TProjection>>(), _projectionAssociations.GetFor<TProjection>(), _providers.GetRequiredService<IProjectionClient<TProjection>>());
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId)
         where TReadModel : ReadModel, new()
-        => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, ScopeId.Default);
+        => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, ScopeId.Default, _providers.GetRequiredService<IProjectionClient<TReadModel>>());
 
     /// <inheritdoc />
     public IProjectionOf<TReadModel> Of<TReadModel>(ProjectionId projectionId, ScopeId scopeId)
         where TReadModel : ReadModel, new()
-        => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, scopeId);
+        => new ProjectionOf<TReadModel>(_providers.GetRequiredService<IMongoCollection<TReadModel>>(), projectionId, scopeId, _providers.GetRequiredService<IProjectionClient<TReadModel>>());
 
     /// <inheritdoc/>
     public Task<TProjection?> Get<TProjection>(Key key, CancellationToken cancellation = default)

@@ -20,8 +20,10 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
     // ReSharper disable StaticMemberInGenericType
     public static HashSet<Type> HandledEventTypes { get; }
     public static ProjectionModelId? ProjectionModelId { get; }
-    
+
     public static TimeSpan? IdleUnloadTimeout { get; }
+    public static bool QueryInMemory { get; }
+
 
     static ProjectionType()
     {
@@ -31,13 +33,14 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
         {
             ProjectionModelId = attributeMetadata.Value.id;
             IdleUnloadTimeout = attributeMetadata.Value.timeout;
+            QueryInMemory = attributeMetadata.Value.queryInMemory;
         }
         else
         {
             ProjectionModelId = null;
             IdleUnloadTimeout = null;
+            QueryInMemory = false;
         }
-        
     }
 
     static IEnumerable<Type> HandledEvents()
@@ -74,7 +77,7 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
     /// Gets the <see cref="AggregateRootId" /> of an <see cref="AggregateRoot" />.
     /// </summary>
     /// <returns>The <see cref="AggregateRootId" />.</returns>
-    static (ProjectionModelId id, TimeSpan? timeout)? GetAttributeMetadata()
+    static (ProjectionModelId id, TimeSpan? timeout, bool queryInMemory)? GetAttributeMetadata()
     {
         var aggregateRootType = typeof(TProjection);
         var aggregateRootAttribute = aggregateRootType.GetCustomAttribute<ProjectionAttribute>();
@@ -82,9 +85,9 @@ public static class ProjectionType<TProjection> where TProjection : ReadModel, n
         {
             return null;
         }
-        
-        
-        return (aggregateRootAttribute.GetIdentifier(aggregateRootType), aggregateRootAttribute.IdleUnloadTimeout);
+
+
+        return (aggregateRootAttribute.GetIdentifier(aggregateRootType), aggregateRootAttribute.IdleUnloadTimeout, aggregateRootAttribute.QueryInMemory);
     }
 }
 
