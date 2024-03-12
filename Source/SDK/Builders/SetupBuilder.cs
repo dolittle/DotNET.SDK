@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BaselineTypeDiscovery;
@@ -13,9 +12,7 @@ using Dolittle.SDK.Common.Model;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
-using Dolittle.SDK.Events.Handling;
 using Dolittle.SDK.Events.Handling.Builder;
-using Dolittle.SDK.Projections;
 using Dolittle.SDK.Projections.Builder;
 using Microsoft.Extensions.Logging;
 

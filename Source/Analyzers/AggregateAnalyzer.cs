@@ -20,6 +20,9 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AggregateAnalyzer : DiagnosticAnalyzer
 {
+    static readonly ImmutableDictionary<string, string?> _targetVisibilityPrivate = ImmutableDictionary.Create<string,string?>()
+        .Add("targetVisibility", "private");
+
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
@@ -74,7 +77,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 || syntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
-                    onMethod.ToDisplayString()));
+                    _targetVisibilityPrivate, onMethod.ToDisplayString()));
             }
 
             var parameters = onMethod.Parameters;

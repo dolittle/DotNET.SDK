@@ -115,7 +115,7 @@ public abstract class ProjectionTests<TProjection>
         {
             case ProjectionResultType.Replace:
                 var resultingModel = result.ReadModel;
-                resultingModel!.SetLastUpdated(context.Occurred);
+                resultingModel!.SetLastUpdated(context.SequenceNumber,context.Occurred);
                 _projections[key] = resultingModel;
                 break;
             case ProjectionResultType.Delete:

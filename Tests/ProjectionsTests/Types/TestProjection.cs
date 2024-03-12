@@ -3,7 +3,7 @@
 
 namespace Dolittle.SDK.Projections.Types;
 
-[Projection("055319f1-6af8-48a0-b190-323e21ba6cde")]
+[Projection("055319f1-6af8-48a0-b190-323e21ba6cde", idleUnloadTimeout: "00:01:00")]
 public class TestProjection : ReadModel
 {
     public int UpdateCount { get; set; }

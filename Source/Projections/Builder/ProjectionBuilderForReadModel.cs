@@ -24,6 +24,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
     ScopeId _scopeId;
     readonly IModelBuilder _modelBuilder;
     readonly ProjectionBuilder _parentBuilder;
+    TimeSpan _unloadTimeout;
 
     ProjectionModelId ModelId => new(_projectionId, _scopeId, _alias);
 
@@ -60,6 +61,22 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
         BindModel();
         return this;
     }
+    
+    /// <inheritdoc />
+    public IProjectionBuilderForReadModel<TReadModel> WithIdleUnloadTimeout(TimeSpan timeout)
+    {
+        UnbindModel();
+        _unloadTimeout = timeout;
+        BindModel();
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(ProjectionSignature<TReadModel, TEvent> method) where TEvent : class
+    {
+        _methods.Add(new TypedProjectionMethod<TReadModel, TEvent>(method, KeySelector.EventSource));
+        return this;
+    }    
 
     /// <inheritdoc />
     public IProjectionBuilderForReadModel<TReadModel> On<TEvent>(KeySelectorSignature<TEvent> selectorCallback, ProjectionSignature<TReadModel, TEvent> method)
@@ -107,8 +124,8 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
 
         if (eventTypesToMethods.Any())
         {
-            projection = new Projection<TReadModel>(identifier, eventTypesToMethods);
-            return true;
+            projection = new Projection<TReadModel>(identifier, eventTypesToMethods, _unloadTimeout);
+            return true;    
         }
         buildResults.AddFailure(identifier, "No projection methods are configured for projection", "Handle an event by calling one of the On-methods on the projection builder");
         return false;

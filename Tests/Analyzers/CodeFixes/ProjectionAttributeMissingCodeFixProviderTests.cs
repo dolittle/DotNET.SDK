@@ -4,33 +4,33 @@
 // using System.Threading.Tasks;
 //
 // namespace Dolittle.SDK.Analyzers.CodeFixes;
-// public class AggregateAttributeMissingCodeFixProviderTests : CodeFixProviderTests<AggregateAnalyzer, AttributeMissingCodeFixProvider>
+// public class ProjectionAttributeMissingCodeFixProviderTests : CodeFixProviderTests<ProjectionsAnalyzer, AttributeMissingCodeFixProvider>
 // {
 //     //Line ending Roslyn bugs break the test: https://github.com/dotnet/roslyn/issues/62976
 //     
 //     [Fact]
-//     public async Task FixesMissingAggregateAttributes()
+//     public async Task FixesMissingProjectionAttributes()
 //     {
 //         var test = @"
-// using Dolittle.SDK.Aggregates;
+// using Dolittle.SDK.Projections;
 //
-// class SomeAggregate: AggregateRoot
+// class SomeProjection: ReadModel
 // {
 //
 // }";
 //         var expected = @"
-// using Dolittle.SDK.Aggregates;
+// using Dolittle.SDK.Projections;
 //
-// [AggregateRoot(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
-// class SomeAggregate: AggregateRoot
+// [Projection(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+// class SomeProjection: ReadModel
 // {
 //
 // }";
 //         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
 //
-//         var diagnosticResult = Diagnostic(DescriptorRules.Aggregate.MissingAttribute)
-//             .WithSpan(4, 7, 4, 20)
-//             .WithArguments("SomeAggregate");
+//         var diagnosticResult = Diagnostic(DescriptorRules.Projection.MissingAttribute)
+//             .WithSpan(4, 7, 4, 21)
+//             .WithArguments("SomeProjection");
 //         await VerifyCodeFixAsync(test, expected, diagnosticResult);
 //     }
 //     

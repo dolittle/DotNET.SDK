@@ -21,7 +21,10 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(DiagnosticIds.AggregateMissingAttributeRuleId, DiagnosticIds.EventMissingAttributeRuleId);
+        ImmutableArray.Create(
+            DiagnosticIds.AggregateMissingAttributeRuleId,
+            DiagnosticIds.EventMissingAttributeRuleId,
+            DiagnosticIds.ProjectionMissingAttributeRuleId);
 
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -36,6 +39,7 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
         {
             case DiagnosticIds.AggregateMissingAttributeRuleId:
             case DiagnosticIds.EventMissingAttributeRuleId:
+            case DiagnosticIds.ProjectionMissingAttributeRuleId:
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Generate attribute",

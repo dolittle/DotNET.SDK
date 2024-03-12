@@ -26,7 +26,7 @@ static class ProjectionClusterKindFactory<TProjection> where TProjection : ReadM
     {
         var providerForTenant = serviceProvider.GetRequiredService<GetServiceProviderForTenant>();
         var logger = serviceProvider.GetRequiredService<ILogger<ProjectionActor<TProjection>>>();
-        var idleUnloadTimeout = TimeSpan.FromSeconds(20); // TODO: make timeouts configurable
+        var idleUnloadTimeout = projection.IdleUnloadTimeout;
 
         return new ClusterKind(ProjectionActor<TProjection>.GetKind(projection),
             Props.FromProducer(() => new ProjectionActor<TProjection>(providerForTenant, projection, logger, idleUnloadTimeout))

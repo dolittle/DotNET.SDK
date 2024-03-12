@@ -12,6 +12,7 @@ public abstract class ReadModel
 {
 #pragma warning disable IDE0032
     DateTimeOffset _lastUpdated;
+    ulong _eventOffset;
 
     /// <summary>
     /// Gets or sets the unique identifier for the read model entity.
@@ -26,11 +27,22 @@ public abstract class ReadModel
         get => _lastUpdated;
         init => _lastUpdated = value;
     }
+
+    public ulong EventOffset
+    {
+        get => _eventOffset;
+        init => _eventOffset = value;
+    }
 #pragma warning restore IDE0032
 
     /// <summary>
     /// Internal setter to avoid unintentional overwrite in On-methods.
     /// </summary>
+    /// <param name="eventLogSequence">Which event updated the state</param>
     /// <param name="lastUpdated">When the last event that updated the read model was committed</param>
-    internal void SetLastUpdated(DateTimeOffset lastUpdated) => _lastUpdated = lastUpdated;
+    internal void SetLastUpdated(ulong eventLogSequence, DateTimeOffset lastUpdated)
+    {
+        _eventOffset = eventLogSequence;
+        _lastUpdated = lastUpdated;
+    }
 }

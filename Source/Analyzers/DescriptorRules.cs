@@ -17,6 +17,16 @@ static class DescriptorRules
             isEnabledByDefault: true,
             description: "The value should be a valid DateTimeOffset.");
     
+    internal static readonly DiagnosticDescriptor InvalidTimespan =
+        new(
+            DiagnosticIds.InvalidTimeSpanParameter,
+            title: "Invalid Timespan format",
+            messageFormat: "Value '{0}' should be a valid Timespan",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The value should be a valid Timespan.");
+    
     internal static readonly DiagnosticDescriptor InvalidStartStopTimestamp =
         new(
             DiagnosticIds.InvalidStartStopTime,
@@ -46,6 +56,16 @@ static class DescriptorRules
             DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Assign a unique identity in the attribute");
+    
+    internal static readonly DiagnosticDescriptor MissingBaseClass =
+        new(
+            DiagnosticIds.MissingBaseClassRuleId,
+            title: "Class is missing required base class",
+            messageFormat: "'{0}' is not a base class of {1}",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Add the required base class.");
 
     internal static readonly DiagnosticDescriptor InvalidAccessibility = 
         new(
@@ -187,7 +207,7 @@ static class DescriptorRules
         
         internal static readonly DiagnosticDescriptor InvalidOnMethodVisibility =
             new(
-                DiagnosticIds.ProjectionInvalidOnMethodVisibilityRuleId,
+                DiagnosticIds.InvalidAccessibility,
                 title: "On-methods need to be public",
                 messageFormat: "'{0}' is not public",
                 DiagnosticCategories.Sdk,

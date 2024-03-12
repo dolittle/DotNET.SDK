@@ -99,7 +99,8 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                 serviceProvider =>
                     Activator.CreateInstance(projectionClientType, [
                         projection,
-                        serviceProvider.GetRequiredService<Cluster>()
+                        serviceProvider.GetRequiredService<Cluster>(),
+                        tenantId
                     ])!);
 
             serviceCollection.AddScoped(

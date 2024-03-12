@@ -34,6 +34,13 @@ public static class DiagnosticIds
 
     public const string EventHandlerMissingEventContext = "SDK0007";
 
+    public const string MissingBaseClassRuleId = "SDK0008";
+    
+    /// <summary>
+    /// Invalid timespan.
+    /// </summary>
+    public const string InvalidTimeSpanParameter = "SDK0009";
+
     /// <summary>
     /// Aggregate missing the required Attribute.
     /// </summary>

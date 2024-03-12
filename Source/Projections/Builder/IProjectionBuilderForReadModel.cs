@@ -22,6 +22,22 @@ public interface IProjectionBuilderForReadModel<TReadModel>
     IProjectionBuilderForReadModel<TReadModel> InScope(ScopeId scopeId);
 
     /// <summary>
+    /// Sets the idle unload timeout for the projection.
+    /// </summary>
+    /// <param name="timeout">The <see cref="TimeSpan" />.</param>
+    /// <returns>The builder for continuation.</returns>
+    IProjectionBuilderForReadModel<TReadModel> WithIdleUnloadTimeout(TimeSpan timeout);
+
+    /// <summary>
+    /// Add a method for updating a projection on an event, with EventSource as the key.
+    /// </summary>
+    /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>
+    /// <param name="method">The <see cref="ProjectionSignature{TReadModel, TEvent}" />.</param>
+    /// <returns>The <see cref="ProjectionBuilderForReadModel{TReadModel}" /> for continuation.</returns>
+    IProjectionBuilderForReadModel<TReadModel> On<TEvent>(ProjectionSignature<TReadModel, TEvent> method)
+        where TEvent : class;
+    
+    /// <summary>
     /// Add a method for updating a projection on an event.
     /// </summary>
     /// <typeparam name="TEvent">The <see cref="Type" /> of the event.</typeparam>

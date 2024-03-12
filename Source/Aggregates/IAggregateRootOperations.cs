@@ -30,7 +30,7 @@ public interface IAggregateRootOperations<TAggregate>
     /// <param name="cancellationToken">Token that can be used to cancel this operation.</param>
     /// <returns>The <see cref="Task{TResponse}" /> representing the asynchronous operation.</returns>
     Task<TResponse> Perform<TResponse>(Func<TAggregate, TResponse> method, CancellationToken cancellationToken = default);
-
+    
     /// <summary>
     /// Perform an asynchronous operation on an <see cref="AggregateRoot"/>.
     /// </summary>

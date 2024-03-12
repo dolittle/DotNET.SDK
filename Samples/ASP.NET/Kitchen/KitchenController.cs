@@ -28,7 +28,7 @@ public class KitchenController : ControllerBase
                 .ConfigureAwait(false);
             return Ok(remaining);
         }
-        catch (AggregateRootOperationFailed e) when(e.InnerException is OutOfIngredients)
+        catch (AggregateRootOperationFailed e) when (e.InnerException is OutOfIngredients)
         {
             return StatusCode(400, e.InnerException.Message);
         }

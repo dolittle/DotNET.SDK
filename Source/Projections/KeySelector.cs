@@ -24,13 +24,13 @@ public class KeySelector
     /// Creates a <see cref="KeySelectorType.PartitionId"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector Partition() => new(KeySelectorType.PartitionId, "", "", "");
+    public static KeySelector Partition { get; } = new(KeySelectorType.PartitionId, "", "", "");
 
     /// <summary>
     /// Creates a <see cref="KeySelectorType.EventSourceId"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector EventSource() => new(KeySelectorType.EventSourceId, "", "", "");
+    public static KeySelector EventSource { get; } = new(KeySelectorType.EventSourceId, "", "", "");
 
     /// <summary>
     /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.

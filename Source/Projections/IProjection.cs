@@ -39,6 +39,12 @@ public interface IProjection
     [MemberNotNullWhen(true, nameof(Alias))]
     bool HasAlias { get; }
 
+
+    /// <summary>
+    /// Get the idle unload timeout for the projection.
+    /// </summary>
+    TimeSpan IdleUnloadTimeout { get; }
+
     /// <summary>
     /// Gets the event types identified by its artifact that is handled by this event handler.
     /// </summary>

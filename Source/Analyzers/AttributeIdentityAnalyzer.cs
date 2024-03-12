@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,11 +19,21 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 {
+    const string BaseclassKey = "baseClass";
+
+    static readonly ImmutableDictionary<string, string?> _missingProjectionBaseClassProperties =
+        ImmutableDictionary<string, string?>.Empty
+            .Add(BaseclassKey, DolittleTypes.ReadModelClass);
+
+    static readonly ImmutableDictionary<string, string?> _missingAggregateBaseClassProperties =
+        ImmutableDictionary<string, string?>.Empty
+            .Add(BaseclassKey, DolittleTypes.AggregateRootBaseClass);
+
     readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity, DescriptorRules.MissingBaseClass, DescriptorRules.InvalidTimespan);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -30,28 +41,88 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         _identities.Clear();
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSyntaxNodeAction(CheckHasIdentity, ImmutableArray.Create(SyntaxKind.Attribute));
+        context.RegisterSyntaxNodeAction(CheckAttribute, ImmutableArray.Create(SyntaxKind.Attribute));
     }
 
-    void CheckHasIdentity(SyntaxNodeAnalysisContext context)
+    void CheckAttribute(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not AttributeSyntax attribute) return;
         if (context.SemanticModel.GetSymbolInfo(attribute).Symbol is not IMethodSymbol symbol) return;
         if (!symbol.IsDolittleType()) return;
 
 
-        switch (symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
+        var className = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        switch (className)
         {
             case "EventTypeAttribute":
             case "EventHandlerAttribute":
+                CheckAttributeIdentity(attribute, symbol, context);
+                break;
             case "AggregateRootAttribute":
+                CheckAttributeIdentity(attribute, symbol, context);
+                CheckHasBaseClass(context, DolittleTypes.AggregateRootBaseClass, _missingAggregateBaseClassProperties);
+                break;
+
             case "ProjectionAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
-                return;
-
-            default:
-                return;
+                CheckAttributeParseAbleIfPresent(attribute, symbol, context, "idleUnloadTimeout", IsValidTimespan, DescriptorRules.InvalidTimespan);
+                CheckHasBaseClass(context, DolittleTypes.ReadModelClass, _missingProjectionBaseClassProperties);
+                break;
         }
+    }
+
+    void CheckAttributeParseAbleIfPresent(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context, string parameterName,
+        Func<string, bool> isParseAble, DiagnosticDescriptor descriptor)
+    {
+        var parameter = symbol.Parameters.FirstOrDefault(_ => _.Name == parameterName);
+        if (parameter is null || !attribute.TryGetArgumentValue(parameter, out var value)) return;
+        if (!isParseAble(value.GetText().ToString().Trim('\"')))
+        {
+            var properties = ImmutableDictionary<string, string?>.Empty.Add("parameterName", parameterName);
+            context.ReportDiagnostic(Diagnostic.Create(descriptor, attribute.GetLocation(), properties, attribute.Name.ToString(), parameterName));
+        }
+    }
+
+    void CheckHasBaseClass(SyntaxNodeAnalysisContext context, string expectedBaseClass, ImmutableDictionary<string, string?> properties)
+    {
+        if (context.Node.FirstAncestorOrSelf<ClassDeclarationSyntax>() is not { } classDeclaration) return;
+
+        if (classDeclaration.BaseList is null || classDeclaration.BaseList.Types.Count == 0 || !TypeExtends(classDeclaration, expectedBaseClass, context))
+        {
+            var className = classDeclaration.Identifier.ToString();
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.MissingBaseClass, classDeclaration.GetLocation(), properties, className,
+                expectedBaseClass));
+        }
+    }
+
+    /// <summary>
+    /// Checks if the type is in the hierarchy of the expected base class
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="expectedBaseClass"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    static bool TypeExtends(ClassDeclarationSyntax type, string expectedBaseClass, SyntaxNodeAnalysisContext context)
+    {
+        var typeSymbol = context.SemanticModel.GetDeclaredSymbol(type);
+        var baseClassType = context.SemanticModel.Compilation.GetTypeByMetadataName(expectedBaseClass);
+
+        return TypeExtends(typeSymbol, baseClassType);
+    }
+
+    static bool TypeExtends(INamedTypeSymbol? typeSymbol, INamedTypeSymbol? baseClassType)
+    {
+        while (typeSymbol != null)
+        {
+            if (typeSymbol.Equals(baseClassType, SymbolEqualityComparer.Default))
+            {
+                return true;
+            }
+
+            typeSymbol = typeSymbol.BaseType;
+        }
+
+        return false;
     }
 
     void CheckAttributeIdentity(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context)
@@ -81,4 +152,6 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
     static void ReportDuplicateIdentity(AttributeSyntax attribute, SyntaxNodeAnalysisContext context, Guid identifier) =>
         context.ReportDiagnostic(
             Diagnostic.Create(DescriptorRules.DuplicateIdentity, attribute.GetLocation(), attribute.Name.ToString(), identifier.ToString()));
+
+    static bool IsValidTimespan(string value) => TimeSpan.TryParse(value, out _);
 }

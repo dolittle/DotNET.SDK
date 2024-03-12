@@ -20,6 +20,9 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ProjectionsAnalyzer : DiagnosticAnalyzer
 {
+    static readonly ImmutableDictionary<string, string?> _targetVisibilityPublic = ImmutableDictionary.Create<string,string?>()
+        .Add("targetVisibility", "public");
+    
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
@@ -68,7 +71,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
             if (!syntax.Modifiers.Any(SyntaxKind.PublicKeyword))
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Projection.InvalidOnMethodVisibility, syntax.GetLocation(),
-                    onMethod.ToDisplayString()));
+                    _targetVisibilityPublic, onMethod.ToDisplayString()));
             }
 
             var parameters = onMethod.Parameters;

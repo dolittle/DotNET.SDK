@@ -14,15 +14,13 @@ public class KeySelectorBuilder
     /// Select projection key from the <see cref="EventSourceId"/>.
     /// </summary>
     /// <returns>A <see cref="KeySelector"/>.</returns>
-    public static KeySelector KeyFromEventSource()
-        => KeySelector.EventSource();
+    public static KeySelector KeyFromEventSource() => KeySelector.EventSource;
 
     /// <summary>
     /// Select projection key from the <see cref="PartitionId"/>.
     /// </summary>
     /// <returns>A <see cref="KeySelector"/>.</returns>
-    public static KeySelector KeyFromPartitionId()
-        => KeySelector.Partition();
+    public static KeySelector KeyFromPartitionId() => KeySelector.Partition;
 
     /// <summary>
     /// Select projection key from a property of the event.

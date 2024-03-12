@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Events;
