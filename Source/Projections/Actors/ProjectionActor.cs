@@ -42,6 +42,7 @@ public class ProjectionActor<TProjection>(
     TimeSpan idleUnloadTimeout) : IActor where TProjection : ReadModel, new()
 {
     Dictionary<ulong, TaskCompletionSource>? _waitingForUpdate;
+    readonly TimeSpan _idleUnloadTimeout = idleUnloadTimeout > TimeSpan.Zero ? idleUnloadTimeout : TimeSpan.FromMilliseconds(100);
 
     /// <summary>
     /// The cluster kind for the projection actor.
@@ -61,7 +62,7 @@ public class ProjectionActor<TProjection>(
             switch (context.Message)
             {
                 case Started:
-                    context.SetReceiveTimeout(idleUnloadTimeout);
+                    context.SetReceiveTimeout(_idleUnloadTimeout);
                     return;
                 case ReceiveTimeout:
                     Unload(context);
@@ -132,7 +133,7 @@ public class ProjectionActor<TProjection>(
         if (_subscribers.Count == 0)
         {
             _subscribers = null;
-            context.SetReceiveTimeout(idleUnloadTimeout);
+            context.SetReceiveTimeout(_idleUnloadTimeout);
         }
     }
 
