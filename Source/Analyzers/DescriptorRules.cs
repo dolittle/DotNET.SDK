@@ -17,6 +17,16 @@ static class DescriptorRules
             isEnabledByDefault: true,
             description: "The value should be a valid DateTimeOffset.");
     
+    internal static readonly DiagnosticDescriptor InvalidTimespan =
+        new(
+            DiagnosticIds.InvalidTimeSpanParameter,
+            title: "Invalid Timespan format",
+            messageFormat: "Value '{0}' should be a valid Timespan",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The value should be a valid Timespan.");
+    
     internal static readonly DiagnosticDescriptor InvalidStartStopTimestamp =
         new(
             DiagnosticIds.InvalidStartStopTime,

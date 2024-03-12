@@ -192,4 +192,35 @@ class SomeProjection
 
         await VerifyAnalyzerAsync(test, expected);
     }
+    
+    [Fact]
+    public async Task ShouldDetectInvalidTimespan()
+    {
+        var test = @"using Dolittle.SDK.Projections;
+[Projection(""c6f87322-be67-4aaf-a9f4-fdc24ac4f0fb"", idleUnloadTimeout: ""not a timespan"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.InvalidTimespan)
+                .WithSpan(2, 2, 2, 89)
+                .WithArguments("Projection", "idleUnloadTimeout")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+    
+    [Fact]
+    public async Task ShouldNotDetectValidTimespan()
+    {
+        var test = @"using Dolittle.SDK.Projections;
+[Projection(""c6f87322-be67-4aaf-a9f4-fdc24ac4f0fb"", idleUnloadTimeout: ""00:00:30"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+}";
+        await VerifyAnalyzerFindsNothingAsync(test);
+    }
 }

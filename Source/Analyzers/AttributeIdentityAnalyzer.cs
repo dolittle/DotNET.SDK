@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,19 +19,21 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 {
+    const string BaseclassKey = "baseClass";
+
     static readonly ImmutableDictionary<string, string?> _missingProjectionBaseClassProperties =
         ImmutableDictionary<string, string?>.Empty
-            .Add("baseClass", DolittleTypes.ReadModelClass);
+            .Add(BaseclassKey, DolittleTypes.ReadModelClass);
 
     static readonly ImmutableDictionary<string, string?> _missingAggregateBaseClassProperties =
         ImmutableDictionary<string, string?>.Empty
-            .Add("baseClass", DolittleTypes.AggregateRootBaseClass);
+            .Add(BaseclassKey, DolittleTypes.AggregateRootBaseClass);
 
     readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity, DescriptorRules.MissingBaseClass);
+        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity, DescriptorRules.MissingBaseClass, DescriptorRules.InvalidTimespan);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -62,8 +65,21 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 
             case "ProjectionAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
+                CheckAttributeParseAbleIfPresent(attribute, symbol, context, "idleUnloadTimeout", IsValidTimespan, DescriptorRules.InvalidTimespan);
                 CheckHasBaseClass(context, DolittleTypes.ReadModelClass, _missingProjectionBaseClassProperties);
                 break;
+        }
+    }
+
+    void CheckAttributeParseAbleIfPresent(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context, string parameterName,
+        Func<string, bool> isParseAble, DiagnosticDescriptor descriptor)
+    {
+        var parameter = symbol.Parameters.FirstOrDefault(_ => _.Name == parameterName);
+        if (parameter is null || !attribute.TryGetArgumentValue(parameter, out var value)) return;
+        if (!isParseAble(value.GetText().ToString().Trim('\"')))
+        {
+            var properties = ImmutableDictionary<string, string?>.Empty.Add("parameterName", parameterName);
+            context.ReportDiagnostic(Diagnostic.Create(descriptor, attribute.GetLocation(), properties, attribute.Name.ToString(), parameterName));
         }
     }
 
@@ -136,4 +152,6 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
     static void ReportDuplicateIdentity(AttributeSyntax attribute, SyntaxNodeAnalysisContext context, Guid identifier) =>
         context.ReportDiagnostic(
             Diagnostic.Create(DescriptorRules.DuplicateIdentity, attribute.GetLocation(), attribute.Name.ToString(), identifier.ToString()));
+
+    static bool IsValidTimespan(string value) => TimeSpan.TryParse(value, out _);
 }
