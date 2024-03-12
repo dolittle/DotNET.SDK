@@ -1,3 +1,23 @@
+# [23.1.0] - 2024-3-12 [PR: #238](https://github.com/dolittle/DotNET.SDK/pull/238)
+## Summary
+This release focuses on Projection / read model features and performance.  
+
+In addition to new Roslyn analyzers, this adds the ability to have fine grained control over TTL for each projection type, and to select if it should go via in-memory cache when getting projections.
+
+There has also been added `IProjectionOf.Subscribe`, which enables a client to have real time updates on individual keys. Useful for streaming changes to frontend / UX when a specific read model has focus.
+
+### Added
+- Aggregates mutation method codefixes
+- Projection analyzers & codefixes
+- Ability to configure TTL for read model cache per entity
+- Ability to read through read model cache when getting individual projections
+- Projection subscriptions: Ability to get all updates to an individual key. Requires the projection to be ICloneable, as the classes are not guaranteed to be immutable.
+
+
+### Fixed
+- Projection idempotency, will now track which offset was last processed. This guarantees each event is processed only once for a single read model.
+
+
 # [23.0.0] - 2024-3-8 [PR: #237](https://github.com/dolittle/DotNET.SDK/pull/237)
 ## Summary
 
