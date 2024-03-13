@@ -24,5 +24,5 @@ public class StaticKeyAttribute : Attribute, IKeySelectorAttribute
     public Key StaticKey { get; }
 
     /// <inheritdoc/>
-    public KeySelector KeySelector => KeySelectorBuilder.StaticKey(StaticKey);
+    public KeySelector KeySelector => KeySelector.Static(StaticKey);
 }

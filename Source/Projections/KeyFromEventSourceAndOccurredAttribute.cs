@@ -7,16 +7,20 @@ using Dolittle.SDK.Projections.Builder;
 namespace Dolittle.SDK.Projections;
 
 /// <summary>
-/// Decorates a projection method with the <see cref="KeySelectorType.EventOccurred" />.
+/// Decorates a projection method with the <see cref="KeySelectorType.Property" />.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public class KeyFromEventOccurredAttribute : Attribute, IKeySelectorAttribute
+public class KeyFromEventSourceAndOccurredAttribute : Attribute, IKeySelectorAttribute
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="KeyFromEventOccurredAttribute"/> class.
+    /// Initializes a new instance of the <see cref="KeyFromPropertyAttribute"/> class.
     /// </summary>
+    /// <param name="propertyName">The name of the property.</param>
     /// <param name="occurredFormat">The date time format.</param>
-    public KeyFromEventOccurredAttribute(string occurredFormat) => OccurredFormat = occurredFormat;
+    public KeyFromEventSourceAndOccurredAttribute(string occurredFormat)
+    {
+        OccurredFormat = occurredFormat;
+    }
 
     /// <summary>
     /// Gets the <see cref="OccurredFormat" />.
@@ -24,5 +28,5 @@ public class KeyFromEventOccurredAttribute : Attribute, IKeySelectorAttribute
     public OccurredFormat OccurredFormat { get; }
 
     /// <inheritdoc/>
-    public KeySelector KeySelector => KeySelector.Occurred(OccurredFormat);
+    public KeySelector KeySelector => KeySelector.EventSourceAndOccured(OccurredFormat);
 }

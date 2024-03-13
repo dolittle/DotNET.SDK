@@ -12,46 +12,71 @@ namespace Dolittle.SDK.Projections;
 /// </summary>
 public class KeySelector
 {
-    KeySelector(KeySelectorType type, KeySelectorExpression expression, Key staticKey, OccurredFormat occurredFormat)
+    KeySelector(KeySelectorType type, KeySelectorExpression expression, Key staticKey, OccurredFormat occurredFormat, Func<object, EventContext, Key>? function)
     {
         Type = type;
         Expression = expression;
         StaticKey = staticKey;
         OccurredFormat = occurredFormat;
+        Function = function;
     }
+
+    public Func<object, EventContext, Key>? Function { get; }
 
     /// <summary>
     /// Creates a <see cref="KeySelectorType.PartitionId"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector Partition { get; } = new(KeySelectorType.PartitionId, "", "", "");
+    public static KeySelector Partition { get; } = new(KeySelectorType.PartitionId, "", "", "", null);
 
     /// <summary>
     /// Creates a <see cref="KeySelectorType.EventSourceId"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector EventSource { get; } = new(KeySelectorType.EventSourceId, "", "", "");
+    public static KeySelector EventSource { get; } = new(KeySelectorType.EventSourceId, "", "", "", null);
+
+    public static KeySelector ByFunction<TEvent>(Func<TEvent, EventContext, Key> function) where TEvent : class
+    {
+        return new KeySelector(KeySelectorType.Function, "", "", "", (evt, eventContext) => function((TEvent)evt, eventContext));
+    }
 
     /// <summary>
     /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <param name="expression">The <see cref="KeySelectorExpression"/>.</param>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector Property(KeySelectorExpression expression) => new(KeySelectorType.Property, expression, "", "");
+    public static KeySelector Property(KeySelectorExpression expression) => new(KeySelectorType.Property, expression, "", "", null);
 
     /// <summary>
     /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <param name="key">The static <see cref="Key"/>.</param>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector Static(Key key) => new(KeySelectorType.Static, "", key, "");
+    public static KeySelector Static(Key key) => new(KeySelectorType.Static, "", key, "", null);
 
     /// <summary>
-    /// Creates a <see cref="KeySelectorType.Property"/> <see cref="KeySelector"/>.
+    /// Creates a <see cref="KeySelectorType.EventOccurred"/> <see cref="KeySelector"/>.
     /// </summary>
     /// <param name="occurredFormat">The <see cref="OccurredFormat"/>.</param>
     /// <returns>The <see cref="KeySelector"/>.</returns>
-    public static KeySelector Occurred(OccurredFormat occurredFormat) => new(KeySelectorType.EventOccurred, "", "", occurredFormat);
+    public static KeySelector Occurred(OccurredFormat occurredFormat) => new(KeySelectorType.EventOccurred, "", "", occurredFormat, null);
+
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.PropertyAndEventOccurred"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <param name="expression">The <see cref="KeySelectorExpression"/>.</param>
+    /// <param name="occurredFormat">The <see cref="OccurredFormat"/>.</param>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
+    public static KeySelector PropertyAndOccured(KeySelectorExpression expression, OccurredFormat occurredFormat) =>
+        new(KeySelectorType.PropertyAndEventOccurred, expression, "", occurredFormat, null);
+
+    /// <summary>
+    /// Creates a <see cref="KeySelectorType.EventSourceIdAndOccurred"/> <see cref="KeySelector"/>.
+    /// </summary>
+    /// <param name="occurredFormat">The <see cref="OccurredFormat"/>.</param>
+    /// <returns>The <see cref="KeySelector"/>.</returns>
+    public static KeySelector EventSourceAndOccured(OccurredFormat occurredFormat) =>
+        new(KeySelectorType.EventSourceIdAndOccurred, "", "", occurredFormat, null);
 
     /// <summary>
     /// Gets the <see cref="KeySelectorType" />.
@@ -73,18 +98,21 @@ public class KeySelector
     /// </summary>
     public OccurredFormat OccurredFormat { get; }
 
-    public Key GetKey(object evt, EventContext eventContext)
-    {
-        return Type switch
+    public Key GetKey(object evt, EventContext eventContext) =>
+        Type switch
         {
             KeySelectorType.PartitionId => eventContext.EventSourceId.Value,
             KeySelectorType.EventSourceId => eventContext.EventSourceId.Value,
             KeySelectorType.Static => StaticKey,
             KeySelectorType.EventOccurred => eventContext.Occurred.ToString(OccurredFormat.Value, CultureInfo.InvariantCulture),
             KeySelectorType.Property => GetProperty(evt, Expression),
+            KeySelectorType.Function => Function!.Invoke(evt, eventContext),
+            KeySelectorType.EventSourceIdAndOccurred =>
+                $"{eventContext.EventSourceId.Value}_{eventContext.Occurred.ToString(OccurredFormat.Value, CultureInfo.InvariantCulture)}",
+            KeySelectorType.PropertyAndEventOccurred =>
+                $"{GetProperty(evt, Expression)}_{eventContext.Occurred.ToString(OccurredFormat.Value, CultureInfo.InvariantCulture)}",
             _ => eventContext.EventSourceId.Value
         };
-    }
 
     static string GetProperty(object evt, KeySelectorExpression expression)
     {

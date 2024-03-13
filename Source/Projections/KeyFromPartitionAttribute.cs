@@ -13,5 +13,5 @@ namespace Dolittle.SDK.Projections;
 public class KeyFromPartitionAttribute : Attribute, IKeySelectorAttribute
 {
     /// <inheritdoc/>
-    public KeySelector KeySelector { get; } = KeySelectorBuilder.KeyFromPartitionId();
+    public KeySelector KeySelector => KeySelector.Partition;
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq.Expressions;
+using Dolittle.SDK.Events;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -28,5 +29,19 @@ public class KeySelectorBuilder<TEvent> : KeySelectorBuilder
         }
 
         throw new KeySelectorExpressionWasNotAMemberExpression();
+    }
+
+    /// <summary>
+    /// Select projection key from a property of the event.
+    /// </summary>
+    /// <typeparam name="TProperty">The property type.</typeparam>
+    /// <param name="function">The function for getting the projection key (id).</param>
+    /// <returns>A <see cref="KeySelector"/>.</returns>
+    /// <exception cref="KeySelectorExpressionWasNotAMemberExpression">Is thrown when the provided property expression is not a member expression.</exception>
+    public KeySelector KeyFromFunction(Func<TEvent, EventContext, Key> function)
+    {
+        if (function is null) throw new ArgumentNullException(nameof(function));
+
+        return KeySelector.ByFunction(function);
     }
 }
