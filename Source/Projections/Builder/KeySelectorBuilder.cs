@@ -14,13 +14,13 @@ public class KeySelectorBuilder
     /// Select projection key from the <see cref="EventSourceId"/>.
     /// </summary>
     /// <returns>A <see cref="KeySelector"/>.</returns>
-    public static KeySelector KeyFromEventSource() => KeySelector.EventSource;
+    public static KeySelector KeyFromEventSource => KeySelector.EventSource;
 
     /// <summary>
     /// Select projection key from the <see cref="PartitionId"/>.
     /// </summary>
     /// <returns>A <see cref="KeySelector"/>.</returns>
-    public static KeySelector KeyFromPartitionId() => KeySelector.Partition;
+    public static KeySelector KeyFromPartitionId => KeySelector.Partition;
 
     /// <summary>
     /// Select projection key from a property of the event.
@@ -46,4 +46,21 @@ public class KeySelectorBuilder
     /// <returns>A <see cref="KeySelector"/>.</returns>
     public static KeySelector KeyFromEventOccurred(OccurredFormat occurredFormat)
         => KeySelector.Occurred(occurredFormat);
+    
+    /// <summary>
+    /// Select projection key from a property of the event.
+    /// </summary>
+    /// <param name="selectorExpression">The property on the event.</param>
+    /// <param name="occurredFormat">The date time format.</param>
+    /// <returns>A <see cref="KeySelector"/>.</returns>
+    public static KeySelector KeyFromPropertyAndEventOccurred(KeySelectorExpression selectorExpression, OccurredFormat occurredFormat)
+        => KeySelector.PropertyAndOccured(selectorExpression, occurredFormat);
+    
+    /// <summary>
+    /// Select projection key from when an event occurred.
+    /// </summary>
+    /// <param name="occurredFormat">The date time format.</param>
+    /// <returns>A <see cref="KeySelector"/>.</returns>
+    public static KeySelector KeyFromEventSourceIdAndOccurred(OccurredFormat occurredFormat)
+        => KeySelector.EventSourceAndOccured(occurredFormat);
 }

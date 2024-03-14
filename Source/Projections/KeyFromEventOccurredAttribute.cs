@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Projections.Builder;
 
 namespace Dolittle.SDK.Projections;
 
@@ -15,7 +14,7 @@ public class KeyFromEventOccurredAttribute : Attribute, IKeySelectorAttribute
     /// <summary>
     /// Initializes a new instance of the <see cref="KeyFromEventOccurredAttribute"/> class.
     /// </summary>
-    /// <param name="occurredFormat">The name of the property.</param>
+    /// <param name="occurredFormat">The date time format.</param>
     public KeyFromEventOccurredAttribute(string occurredFormat) => OccurredFormat = occurredFormat;
 
     /// <summary>
@@ -24,5 +23,5 @@ public class KeyFromEventOccurredAttribute : Attribute, IKeySelectorAttribute
     public OccurredFormat OccurredFormat { get; }
 
     /// <inheritdoc/>
-    public KeySelector KeySelector => KeySelectorBuilder.KeyFromEventOccurred(OccurredFormat);
+    public KeySelector KeySelector => KeySelector.Occurred(OccurredFormat);
 }

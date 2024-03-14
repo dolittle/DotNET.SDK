@@ -29,7 +29,22 @@ public enum KeySelectorType
     Static,
     
     /// <summary>
-    /// Gets the key the event occurred metadata.
+    /// Gets the key from the event occurred metadata.
     /// </summary>
     EventOccurred,
+    
+    /// <summary>
+    /// Gets the key from a named property on the event content and the event occurred metadata.
+    /// </summary>
+    PropertyAndEventOccurred,
+    
+    /// <summary>
+    /// Gets the key Gets the key from the event source id and the event occurred metadata.
+    /// </summary>
+    EventSourceIdAndOccurred,
+    
+    /// <summary>
+    /// The key is returned as a function of the event and the event context.
+    /// </summary>
+    Function
 }
