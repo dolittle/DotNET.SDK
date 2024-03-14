@@ -1,3 +1,17 @@
+# [23.2.0] - 2024-3-14 [PR: #239](https://github.com/dolittle/DotNET.SDK/pull/239)
+## Summary
+Added the ability to use projections keyed both on event properties, eventSourceId and when the event occurred.
+
+This enables projections to be used for aggregations over time, and to optimize read  model for specific statistics.
+
+In addition there has been added the ability to key by function, which gives complete control over which id to target
+
+### Added
+- `KeyFromPropertyAndOccurredAttribute`
+- `KeyFromEventSourceAndOccurredAttribute`
+- `KeyFromFunctionAttribute`
+
+
 # [23.1.0] - 2024-3-12 [PR: #238](https://github.com/dolittle/DotNET.SDK/pull/238)
 ## Summary
 This release focuses on Projection / read model features and performance.  
