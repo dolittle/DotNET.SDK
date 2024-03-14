@@ -49,3 +49,32 @@ public class SalesPerDayTotalByEventSource : ReadModel
         TotalSales += evt.Quantity * evt.Price;
     }
 }
+
+class ProductKeySelector: IKeySelector<ProductSold>
+{
+    public Key Selector(ProductSold evt, EventContext ctx) => $"{evt.Store}_{ctx.Occurred.Year}-{ctx.Occurred.Month:D2}-{ctx.Occurred.Day:D2}";
+}
+
+[Projection("3dce944f-279e-4150-bef3-dd9e113220c6")]
+public class SalesPerDayTotalByFunction : ReadModel
+{
+    public string Store { get; private set; }
+    public DateOnly Date { get; private set; }
+
+    public decimal TotalSales { get; private set; }
+
+    [KeyFromFunction<ProductKeySelector, ProductSold>]
+    public void On(ProductSold evt, EventContext ctx)
+    {
+        if (string.IsNullOrEmpty(Store))
+        {
+            Store = evt.Store;
+            Date = new DateOnly(ctx.Occurred.Year, ctx.Occurred.Month, ctx.Occurred.Day);
+        }
+
+        TotalSales += evt.Quantity * evt.Price;
+    }
+    
+    public static string GetKey(ProductSold evt, EventContext ctx) => $"{evt.Store}_{ctx.Occurred.Year}-{ctx.Occurred.Month:D2}-{ctx.Occurred.Day:D2}";
+}
+

@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Projections;
 public class KeyFromEventSourceAndOccurredAttribute : Attribute, IKeySelectorAttribute
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="KeyFromPropertyAttribute"/> class.
+    /// Initializes a new instance of the <see cref="KeyFromEventSourceAndOccurredAttribute"/> class.
     /// </summary>
     /// <param name="propertyName">The name of the property.</param>
     /// <param name="occurredFormat">The date time format.</param>
