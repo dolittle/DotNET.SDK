@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Dolittle.SDK.Projections.Builder;
 
 namespace Dolittle.SDK.Projections;
 
@@ -22,7 +21,6 @@ public class KeyFromPropertyAndOccurredAttribute : Attribute, IKeySelectorAttrib
         Expression = propertyName;
         OccurredFormat = occurredFormat;
     }
-
 
     /// <summary>
     /// Gets the <see cref="KeySelector" />.
