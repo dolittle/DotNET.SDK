@@ -22,4 +22,8 @@
         <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="$(MongoDBOpenTelemetryVersion)" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Actors\" />
+    </ItemGroup>
+
 </Project>

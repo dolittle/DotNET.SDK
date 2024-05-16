@@ -55,10 +55,11 @@ public interface IProjectionClient<TProjection>
     Subscription<TP?> Subscribe<TP>(string id, CancellationToken cancellationToken) where TP : TProjection, ICloneable;
 }
 
-public class ProjectionClient<TProjection>(IProjection<TProjection> projection, Cluster cluster, TenantId tenantId)
+public class ProjectionClient<TProjection>(IProjection<TProjection> projection, IRootContext rootContext, TenantId tenantId)
     : IProjectionClient<TProjection> where TProjection : ReadModel, new()
 {
     readonly string _kind = ProjectionActor<TProjection>.GetKind(projection);
+    readonly Cluster _cluster = rootContext.System.Cluster();
 
     public async Task<ProjectionResultType> On(object @event, EventType eventType, EventContext context, CancellationToken cancellationToken)
     {
@@ -67,11 +68,16 @@ public class ProjectionClient<TProjection>(IProjection<TProjection> projection, 
             throw new UnhandledEventType($"Projection {projection.Identifier} does not handle event type {eventType}.", eventType);
         }
 
+        if (!_cluster.JoinedCluster.IsCompleted)
+        {
+            await _cluster.JoinedCluster;
+        }
+
         var key = keySelector.GetKey(@event, context);
         var message = new ProjectedEvent(key, @event, eventType, context);
 
         var clusterIdentity = GetIdentity(context, key);
-        var response = await cluster.RequestAsync<Try<ProjectionResultType>>(clusterIdentity, message, cancellationToken);
+        var response = await _cluster.RequestAsync<Try<ProjectionResultType>>(clusterIdentity, message, rootContext, cancellationToken);
         response.ThrowIfFailed();
 
         return response.Result;
@@ -81,7 +87,7 @@ public class ProjectionClient<TProjection>(IProjection<TProjection> projection, 
     public async Task<TProjection?> Get(string id, CancellationToken cancellationToken = default)
     {
         var clusterIdentity = GetIdentity(tenantId, id);
-        var response = await cluster.RequestAsync<Try<TProjection?>>(clusterIdentity, GetProjectionRequest.GetCurrentValue, cancellationToken);
+        var response = await _cluster.RequestAsync<Try<TProjection?>>(clusterIdentity, GetProjectionRequest.GetCurrentValue, rootContext, cancellationToken);
         response.ThrowIfFailed();
 
         return response.Result;
@@ -91,9 +97,10 @@ public class ProjectionClient<TProjection>(IProjection<TProjection> projection, 
     public async Task<TProjection?> GetAfter(string id, ulong eventSequenceNumber, CancellationToken cancellationToken = default)
     {
         var clusterIdentity = GetIdentity(tenantId, id);
-        var response = await cluster.RequestAsync<Try<TProjection?>>(
+        var response = await _cluster.RequestAsync<Try<TProjection?>>(
             clusterIdentity,
             new GetProjectionRequest(eventSequenceNumber),
+            rootContext,
             cancellationToken);
         response.ThrowIfFailed();
 
@@ -108,7 +115,7 @@ public class ProjectionClient<TProjection>(IProjection<TProjection> projection, 
 
         var channel = Channel.CreateUnbounded<TCloneableProjection?>();
 
-        cluster.System.Root.Spawn(Props.FromProducer(() =>
+        rootContext.Spawn(Props.FromProducer(() =>
         {
             var projectionActorIdentity = GetIdentity(tenantId, id);
             return new SubscriptionActor<TCloneableProjection>(channel.Writer, projectionActorIdentity, linkedCts.Token);

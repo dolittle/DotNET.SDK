@@ -87,8 +87,12 @@ static class ServiceCollectionExtensions
             return system;
         });
 
+
+
         self.AddSingleton(p => p.GetRequiredService<ActorSystem>().Cluster());
-        self.AddSingleton(p => p.GetRequiredService<ActorSystem>().Root.WithTracing());
+        self.AddSingleton(p =>
+            p.GetRequiredService<ActorSystem>()
+                .Root.WithSenderMiddleware(OpenTelemetryTracingExtensions.OpenTelemetrySenderMiddleware));
         self.AddHostedService(p =>
             new ProtoActorLifecycleHost(
                 p.GetRequiredService<ActorSystem>(),

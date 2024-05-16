@@ -90,7 +90,7 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Eve
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error processing projection event {Event} for ", committedEvent);
+            _logger.ErrorProcessingProjectionEvent(e, committedEvent);
             activity?.RecordException(e);
             throw;
         }

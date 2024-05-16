@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dolittle.SDK.Projections.Store;
 using Microsoft.AspNetCore.Mvc;
@@ -27,4 +29,15 @@ public class CustomerController : ControllerBase
 
         return state?.Dishes ?? Array.Empty<string>();
     }
+    
+    [HttpGet("All")]
+    public async Task<List<DishesEaten>> GetDishesEaten()
+    {
+        var states = _dishesEaten
+            .Query()
+            .ToList();
+
+        return states;
+    }
+    
 }
