@@ -16,8 +16,8 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.8.0" />
         <PackageReference Include="Proto.OpenTelemetry" Version="$(ProtoActorVersion)" />
         <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="$(MongoDBOpenTelemetryVersion)" />
     </ItemGroup>
