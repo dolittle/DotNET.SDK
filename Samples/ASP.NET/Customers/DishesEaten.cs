@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Linq;
+using Dolittle.SDK.Events;
 using Dolittle.SDK.Projections;
 
 namespace Customers;
@@ -10,7 +11,7 @@ namespace Customers;
 public class DishesEaten: ReadModel
 {
     public string[] Dishes { get; set; } = {};
-    
+
     public void On(DishEaten evt, ProjectionContext ctx)
     {
         Dishes = Dishes.Append(evt.Dish).ToArray();

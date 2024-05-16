@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Proto;
 using Proto.Cluster;
+using Proto.OpenTelemetry;
 
 namespace Dolittle.SDK.Projections.Actors;
 
@@ -21,15 +22,18 @@ static class ProjectionClusterKindFactory
 
 static class ProjectionClusterKindFactory<TProjection> where TProjection : ReadModel, new()
 {
+
     // ReSharper disable once UnusedMember.Global - Called by reflection
     public static ClusterKind CreateKind(IServiceProvider serviceProvider, IProjection<TProjection> projection)
     {
         var providerForTenant = serviceProvider.GetRequiredService<GetServiceProviderForTenant>();
         var logger = serviceProvider.GetRequiredService<ILogger<ProjectionActor<TProjection>>>();
         var idleUnloadTimeout = projection.IdleUnloadTimeout;
-
+        
         return new ClusterKind(ProjectionActor<TProjection>.GetKind(projection),
             Props.FromProducer(() => new ProjectionActor<TProjection>(providerForTenant, projection, logger, idleUnloadTimeout))
-                .WithClusterRequestDeduplication(TimeSpan.FromMinutes(5)));
+                .WithTracing()
+                .WithClusterRequestDeduplication(TimeSpan.FromMinutes(5))
+            );
     }
 }

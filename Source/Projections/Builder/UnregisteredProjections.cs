@@ -19,7 +19,7 @@ using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using Proto.Cluster;
+using Proto;
 
 namespace Dolittle.SDK.Projections.Builder;
 
@@ -33,7 +33,8 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     /// </summary>
     /// <param name="projections">The unique <see cref="IProjection"/> projections.</param>
     /// <param name="readModelTypes">The <see cref="IProjectionReadModelTypes"/>.</param>
-    public UnregisteredProjections(IUniqueBindings<ProjectionModelId, IProjection> projections, IProjectionReadModelTypes readModelTypes)
+    public UnregisteredProjections(IUniqueBindings<ProjectionModelId, IProjection> projections,
+        IProjectionReadModelTypes readModelTypes)
         : base(projections)
     {
         ReadModelTypes = readModelTypes;
@@ -65,19 +66,22 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     /// <inheritdoc />
     public IProjectionReadModelTypes ReadModelTypes { get; }
 
-    static EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse> CreateProjectionsProcessor(
-        IProjection projection,
-        IEventProcessingConverter processingConverter,
-        ILoggerFactory loggerFactory)
+    static EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>
+        CreateProjectionsProcessor(
+            IProjection projection,
+            IEventProcessingConverter processingConverter,
+            ILoggerFactory loggerFactory)
     {
         var processorType = typeof(ProjectionsProcessor<>).MakeGenericType(projection.ProjectionType);
         // var clientType = typeof(IProjectionClient<>).MakeGenericType(projection.ProjectionType);
         var instance = Activator.CreateInstance(
-            processorType,
-            projection,
-            processingConverter,
-            loggerFactory.CreateLogger(processorType)) ?? throw new InvalidOperationException($"Could not create an instance of {processorType}");
-        return (EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>)instance;
+                           processorType,
+                           projection,
+                           processingConverter,
+                           loggerFactory.CreateLogger(processorType)) ??
+                       throw new InvalidOperationException($"Could not create an instance of {processorType}");
+        return (EventProcessor<ProjectionId, EventHandlerRegistrationRequest, HandleEventRequest, EventHandlerResponse>)
+            instance;
     }
 
     void AddToContainer(TenantId tenantId, IServiceCollection serviceCollection)
@@ -86,7 +90,8 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
         {
             var readModelType = projection.ProjectionType;
 
-            var collectionName = MongoDBProjectionCollectionName.From(projection.Identifier, projection.Alias?.Value).Value;
+            var collectionName = MongoDBProjectionCollectionName.From(projection.Identifier, projection.Alias?.Value)
+                .Value;
             serviceCollection.AddScoped(
                 typeof(IMongoCollection<>).MakeGenericType(readModelType),
                 serviceProvider => GetCollectionMethodForReadModel(readModelType).Invoke(
@@ -99,7 +104,7 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
                 serviceProvider =>
                     Activator.CreateInstance(projectionClientType, [
                         projection,
-                        serviceProvider.GetRequiredService<Cluster>(),
+                        serviceProvider.GetRequiredService<IRootContext>(),
                         tenantId
                     ])!);
 

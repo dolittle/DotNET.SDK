@@ -52,6 +52,7 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
     /// <inheritdoc />
     public ScopeId Scope { get; }
 
+    /// <inheritdoc />
     public Task<TReadModel?> Get(Key key, CancellationToken cancellation = default)
     {
         return Get(key.Value, cancellation);
@@ -68,6 +69,7 @@ public class ProjectionOf<TReadModel> : IProjectionOf<TReadModel>
         return _collection.Find(it => it.Id.Equals(id)).FirstOrDefaultAsync(cancellationToken: cancellation)!;
     }
 
+    /// <inheritdoc />
     public ISubscription<TP?> Subscribe<TP>(string id, CancellationToken cancellationToken) where TP : TReadModel, ICloneable
         => _projectionClient.Subscribe<TP>(id, cancellationToken);
 

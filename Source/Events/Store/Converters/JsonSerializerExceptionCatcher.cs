@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -15,6 +16,7 @@ public class JsonSerializerExceptionCatcher
     /// <summary>
     /// Gets a value indicating whether the serializer operation failed or not.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Error))]
     public bool Failed { get; private set; }
 
     /// <summary>

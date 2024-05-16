@@ -7,13 +7,12 @@
         <MachineSpecificationsRunnerVersion>2.9.0</MachineSpecificationsRunnerVersion>
         <MachineSpecificationsVersion>1.0.0</MachineSpecificationsVersion>
         <MicrosoftExtensionsVersion>8.0.0</MicrosoftExtensionsVersion>
-        <MicrosoftDotNetTestVersion>17.7.2</MicrosoftDotNetTestVersion>
         <ProtoActorVersion>1.6.0</ProtoActorVersion>
         <RxVersion>4.4.1</RxVersion>
-        <ProtobufVersion>3.25.3</ProtobufVersion>
-        <GrpcVersion>2.61.0</GrpcVersion>
+        <ProtobufVersion>3.26.1</ProtobufVersion>
+        <GrpcVersion>2.62.0</GrpcVersion>
         <MongoDBDriverVersion>2.24.0</MongoDBDriverVersion>
-        <OpenTelemetryVersion>1.7.0</OpenTelemetryVersion>
+        <OpenTelemetryVersion>1.8.1</OpenTelemetryVersion>
         <MongoDBOpenTelemetryVersion>1.0.0</MongoDBOpenTelemetryVersion>
         <NewtonsoftVersion>13.0.3</NewtonsoftVersion>
         <SystemImmutableVersion>7.0.0</SystemImmutableVersion>

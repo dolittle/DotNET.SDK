@@ -31,6 +31,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
     readonly IRootContext _context;
     readonly DefaultAggregatePerformTimeout _defaultTimeout;
     readonly ClusterIdentity _clusterIdentity;
+    readonly Cluster _cluster;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AggregateRootOperations{TAggregate}"/> class.
@@ -45,6 +46,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         _defaultTimeout = defaultTimeout;
         _eventSourceId = eventSourceId;
         _clusterIdentity = ClusterIdentityMapper.GetClusterIdentity<TAggregate>(tenantId, eventSourceId);
+        _cluster = _context.System.Cluster();
     }
 
     /// <inheritdoc/>
@@ -68,9 +70,14 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
         using var activity = Tracing.ActivitySource.StartActivity($"{typeof(TAggregate).Name}.PerformWithResponse")
             ?.Tag(_eventSourceId);
 
+        if (!_cluster.JoinedCluster.IsCompleted)
+        {
+            await _cluster.JoinedCluster;
+        }
+        
         try
         {
-            var result = await _context.System.Cluster()
+            var result = await _cluster
                 .RequestAsync<Try<object?>>(_clusterIdentity, new PerformAndRespond<TAggregate>(agg => method(agg), cancellationToken), _context,
                     cancellationToken);
 
@@ -109,7 +116,7 @@ public class AggregateRootOperations<TAggregate> : IAggregateRootOperations<TAgg
 
         try
         {
-            var result = await _context.System.Cluster()
+            var result = await _cluster
                 .RequestAsync<Try<bool>>(_clusterIdentity, new Perform<TAggregate>(method, cancellationToken), _context,
                     cancellationToken);
 

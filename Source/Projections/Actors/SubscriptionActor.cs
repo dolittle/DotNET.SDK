@@ -31,11 +31,18 @@ public class SubscriptionActor<T> : IActor
             switch (context.Message)
             {
                 case Started:
-                    var response = await context.Cluster().RequestAsync<Try<T?>>(_target, new SubscriptionRequest(context.Self), _stopSubscription);
+                    if (!context.Cluster().JoinedCluster.IsCompleted)
+                    {
+                        await context.Cluster().JoinedCluster;
+                    }
+
+                    var response = await context.Cluster().RequestAsync<Try<T?>>(_target,
+                        new SubscriptionRequest(context.Self), _stopSubscription);
                     await Handle(context, response);
                     context.ReenterAfterCancellation(_stopSubscription, () =>
                     {
-                        _ = context.Cluster().RequestAsync<Unsubscribed>(_target, new Unsubscribe(context.Self), context.CancellationToken);
+                        _ = context.Cluster().RequestAsync<Unsubscribed>(_target, new Unsubscribe(context.Self),
+                            context.CancellationToken);
                         Stop(context);
                     });
                     break;
