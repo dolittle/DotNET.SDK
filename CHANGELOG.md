@@ -1,3 +1,13 @@
+# [23.2.1] - 2024-5-16 [PR: #240](https://github.com/dolittle/DotNET.SDK/pull/240)
+## Summary
+- Ensure proto.cluster messages wait for system readiness to begin processing. Previously it could start before Proto.Cluster had started, and logged errors. This did not affect the projection result itself, as the projection would be processed in a retry.
+- Added projection tracing
+- Updated OTEL & Grpc dependencies
+
+Reduced OTEL resource usage:
+- Skip send activity / span for Proto.Actor traces for root context.
+
+
 # [23.2.0] - 2024-3-14 [PR: #239](https://github.com/dolittle/DotNET.SDK/pull/239)
 ## Summary
 Added the ability to use projections keyed both on event properties, eventSourceId and when the event occurred.
