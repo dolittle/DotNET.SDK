@@ -22,5 +22,5 @@ class and_operation_does_not_fail : given.an_aggregate_with_default_constructor
     It should_after_last_operation_have_the_correct_event = () => aggregate_of.AfterLastOperationOn(event_source).ShouldHaveEvent<EventCausingNoStateChange>()
         .CountOf(1)
         .AtEnd()
-        .Where(_ => _.EventSourceId.ShouldEqual(event_source.Value));
+        .AndThat(_ => _.EventSourceId.ShouldEqual(event_source.Value));
 }

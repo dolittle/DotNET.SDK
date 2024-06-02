@@ -30,7 +30,13 @@ public class EventValueAssertion<T>
     /// Asserts that the event passes the specified assertions.
     /// </summary>
     /// <param name="assertions">>A collection of assertions that you wish to perform.</param>
-    public void Where(params Action<T>[] assertions)
+    public void Where(params Action<T>[] assertions) => AndThat(assertions);
+    
+    /// <summary>
+    /// Asserts that the event passes the specified assertions.
+    /// </summary>
+    /// <param name="assertions">>A collection of assertions that you wish to perform.</param>
+    public void AndThat(params Action<T>[] assertions)
     {
         foreach (var assert in assertions)
         {

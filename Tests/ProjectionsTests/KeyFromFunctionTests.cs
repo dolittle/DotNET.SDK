@@ -24,19 +24,19 @@ public class KeyFromFunctionTests : ProjectionTests<SalesPerDayTotalByFunction>
 
         using var _ = new AssertionScope();
         
-        AssertThat.HasReadModel("store1_2024-01-01").Where(
+        AssertThat.HasReadModel("store1_2024-01-01").AndThat(
             it => it.TotalSales.Should().Be(2000),
             it => it.Store.Should().Be("store1"),
             it => it.Date.Should().Be(new DateOnly(2024, 1, 1))
         );
         
-        AssertThat.HasReadModel("store1_2024-01-02").Where(
+        AssertThat.HasReadModel("store1_2024-01-02").AndThat(
             it => it.TotalSales.Should().Be(100),
             it => it.Store.Should().Be("store1"),
             it => it.Date.Should().Be(new DateOnly(2024, 1, 2))
         );
         
-        AssertThat.HasReadModel("store2_2024-01-01").Where(
+        AssertThat.HasReadModel("store2_2024-01-01").AndThat(
             it => it.TotalSales.Should().Be(50),
             it => it.Store.Should().Be("store2"),
             it => it.Date.Should().Be(new DateOnly(2024, 1, 1))

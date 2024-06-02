@@ -7,6 +7,9 @@ using Dolittle.SDK.Testing.Aggregates.Events;
 
 namespace Dolittle.SDK.Testing.Aggregates;
 
+/// <summary>
+/// Represents a set of extensions for <see cref="AggregateRoot"/>.
+/// </summary>
 public static class AggregateRootExtensions
 {
     /// <summary>

@@ -2,8 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using Dolittle.SDK.Testing.Aggregates.Events;
 
-namespace Dolittle.SDK.Testing.Aggregates.Events;
+namespace Dolittle.SDK.Testing.Projections;
 
 /// <summary>
 /// Fluent interface element allowing assertions against a specific event.
@@ -25,7 +26,13 @@ public class ReadModelValueAssertion<T>(T model)
     /// Asserts that the event passes the specified assertions.
     /// </summary>
     /// <param name="assertions">>A collection of assertions that you wish to perform.</param>
-    public void Where(params Action<T>[] assertions)
+    public void Where(params Action<T>[] assertions) => AndThat(assertions);
+    
+    /// <summary>
+    /// Asserts that the event passes the specified assertions.
+    /// </summary>
+    /// <param name="assertions">>A collection of assertions that you wish to perform.</param>
+    public void AndThat(params Action<T>[] assertions)
     {
         foreach (var assert in assertions)
         {

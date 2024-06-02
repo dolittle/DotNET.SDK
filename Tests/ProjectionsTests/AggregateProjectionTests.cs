@@ -19,7 +19,7 @@ public class AggregateProjectionTests : ProjectionTests<AggregateProjection>
         WhenAggregateMutated<TestAggregate>(_eventSourceId, agg => agg.Rename("Bob"));
 
         AssertThat.HasReadModel(_eventSourceId.Value)
-            .Where(
+            .AndThat(
                 it => it.Name.Should().Be("Bob"),
                 it => it.TimesChanged.Should().Be(1));
     }

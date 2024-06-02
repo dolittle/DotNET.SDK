@@ -141,9 +141,9 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
 
     TAggregate GetOrAddAggregate(EventSourceId eventSource)
     {
-        if (_aggregates.ContainsKey(eventSource))
+        if (_aggregates.TryGetValue(eventSource, out var aggregate))
         {
-            return _aggregates[eventSource];
+            return aggregate;
         }
 
         var freshAggregate = _createAggregateRoot(eventSource);
