@@ -78,7 +78,7 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
     /// Perform an action on the aggregate and make the output events available to assert on the result.
     /// </summary>
     /// <param name="action">The callback on the aggregate</param>
-    /// <returns></returns>
+    /// <returns>The <see cref="AggregateRootAssertion"/> to assert on</returns>
     protected AggregateRootAssertion WhenPerforming(Action<T> action)
     {
         // last perform is the one that is asserted on

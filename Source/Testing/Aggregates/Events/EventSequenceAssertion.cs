@@ -134,7 +134,7 @@ public class EventSequenceAssertion<T>
     /// <summary>
     /// Asserts that each event of the specified type conforms to the given predicate. 
     /// </summary>
-    /// <param name="predicate">The predicate that each event should conform to.</param>
+    /// <param name="assertions">The assertions that should hold for all events.</param>
     public void WhereAll(params Action<T>[] assertions)
     {
         foreach (var @event in _conformingEvents)
