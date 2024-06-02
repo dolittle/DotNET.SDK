@@ -14,19 +14,56 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dolittle.SDK.Testing.Projections;
 
+/// <summary>
+/// Base class for testing projections.
+/// </summary>
+/// <typeparam name="TProjection"></typeparam>
 public abstract class ProjectionTests<TProjection>
     where TProjection : ReadModel, new()
 {
     EventLogSequenceNumber _sequenceNumber = EventLogSequenceNumber.Initial;
     readonly Dictionary<Key, TProjection> _projections = new();
     readonly IProjection<TProjection> _projection = ProjectionFixture<TProjection>.Projection;
+
+    /// <summary>
+    /// Gets the <see cref="IAggregates"/> for the test.
+    /// This allows the test to perform actions on aggregates, and have the projections react to the events.
+    /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global - We want to expose this to the test
     protected IAggregates Aggregates { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProjectionTests{TProjection}"/> class.
+    /// </summary>
+    /// <param name="configureServices">Allows any required services to be registered</param>
+    protected ProjectionTests(Action<IServiceCollection>? configureServices = default)
+    {
+        var serviceCollection = new ServiceCollection();
+        configureServices?.Invoke(serviceCollection);
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        Aggregates = new AggregatesMock(serviceProvider, OnAggregateEvents);
+    }
+
+    /// <summary>
+    /// Perform an action on an aggregate. This will cause the aggregate to emit events, which will be picked up by the projection.
+    /// This allows the test code to treat the events as a black box, and only focus on the aggregate and projection state.
+    /// </summary>
+    /// <param name="id">The aggregate ID</param>
+    /// <param name="callback">The "Perform" statement</param>
+    /// <typeparam name="TAggregate">The aggregate type</typeparam>
     protected void WhenAggregateMutated<TAggregate>(EventSourceId id, Action<TAggregate> callback) where TAggregate : AggregateRoot
     {
         Aggregates.Get<TAggregate>(id).Perform(callback, CancellationToken.None).GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    /// Emit an event from an event source. This will cause the projection to react to the event.
+    /// </summary>
+    /// <param name="eventSource">The eventSourceId</param>
+    /// <param name="evt">The event being produced</param>
+    /// <param name="occurred">The timestamp of the event metadata</param>
+    /// <typeparam name="TEvent">The type of the event</typeparam>
+    /// <exception cref="ArgumentException"></exception>
     protected void WithEvent<TEvent>(EventSourceId eventSource, TEvent evt, DateTimeOffset? occurred = null) where TEvent : class
     {
         var eventType = EventTypeMetadata<TEvent>.EventType ?? throw new ArgumentException($"{typeof(TEvent)} is missing event type annotation");
@@ -45,6 +82,10 @@ public abstract class ProjectionTests<TProjection>
         }
     }
 
+    /// <summary>
+    /// Emit an event from an event source. This will cause the projection to react to the event.
+    /// </summary>
+    /// <param name="committedEvent"></param>
     protected void WithEvent(CommittedEvent committedEvent)
     {
         lock (this)
@@ -53,15 +94,10 @@ public abstract class ProjectionTests<TProjection>
         }
     }
 
+    /// <summary>
+    /// Assert against the state of the projection.
+    /// </summary>
     protected ProjectionAssertions<TProjection> AssertThat => new(_projections);
-
-    protected ProjectionTests(Action<IServiceCollection>? configureServices = default)
-    {
-        var serviceCollection = new ServiceCollection();
-        configureServices?.Invoke(serviceCollection);
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        Aggregates = new AggregatesMock(serviceProvider, OnAggregateEvents);
-    }
 
     void OnAggregateEvents(UncommittedAggregateEvents events)
     {
@@ -75,7 +111,7 @@ public abstract class ProjectionTests<TProjection>
         }
     }
 
-    CommittedEvent ToCommittedEvent(UncommittedAggregateEvents events, UncommittedAggregateEvent evt, EventLogSequenceNumber sequenceNumber)
+    static CommittedEvent ToCommittedEvent(UncommittedAggregateEvents events, UncommittedAggregateEvent evt, EventLogSequenceNumber sequenceNumber)
     {
         return new CommittedEvent(
             sequenceNumber,
@@ -124,7 +160,7 @@ public abstract class ProjectionTests<TProjection>
         }
     }
 
-    EventContext ToEventContext(CommittedEvent evt)
+    static EventContext ToEventContext(CommittedEvent evt)
     {
         return new EventContext(
             evt.EventLogSequenceNumber,

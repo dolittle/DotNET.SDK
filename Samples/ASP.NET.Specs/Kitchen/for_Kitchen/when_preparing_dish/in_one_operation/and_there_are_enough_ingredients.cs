@@ -29,7 +29,7 @@ class and_there_are_enough_ingredients : given.a_kitchen_with_no_prepared_dishes
     
     It should_only_prepare_one_dish = () => KitchenWithAllEvents().ShouldHaveEvent<DishPrepared>()
         .CountOf(2)
-        .AtEnd().Where(
+        .AtEnd().AndThat(
             _ => _.Chef.ShouldEqual(chef),
             _ => _.Dish.ShouldEqual(dish));
 

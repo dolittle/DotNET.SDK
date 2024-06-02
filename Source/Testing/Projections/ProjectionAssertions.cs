@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Dolittle.SDK.Projections;
-using Dolittle.SDK.Testing.Aggregates.Events;
 
 namespace Dolittle.SDK.Testing.Projections;
 

@@ -13,11 +13,22 @@ using Dolittle.SDK.Projections.Internal;
 
 namespace Dolittle.SDK.Testing.Projections;
 
+/// <summary>
+/// Singleton class that provides a projection for a given projection type.
+/// </summary>
+/// <typeparam name="TProjection"></typeparam>
 public static class ProjectionFixture<TProjection>
     where TProjection : ReadModel, new()
 {
+    // ReSharper disable once StaticMemberInGenericType - Supposed to be static
     static Exception? Error { get; } = default;
+    
     static readonly IProjection<TProjection>? _projection;
+    
+    /// <summary>
+    /// Gets the projection, if it is valid. If not, throws TypeInitializationException.
+    /// </summary>
+    /// <exception cref="TypeInitializationException"></exception>
     public static IProjection<TProjection> Projection => _projection ?? throw new TypeInitializationException("Failed to create projection", Error);
 
     static ProjectionFixture()

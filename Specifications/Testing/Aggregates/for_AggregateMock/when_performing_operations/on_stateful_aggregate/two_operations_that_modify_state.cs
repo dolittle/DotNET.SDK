@@ -24,13 +24,13 @@ class two_operations_that_modify_state : given.an_aggregate_of_stateful_aggregat
     It should_after_last_operation_have_the_correct_event = () => aggregate_of.AfterLastOperationOn(event_source).ShouldHaveEvent<EventCausingStateChange>()
         .CountOf(1)
         .AtEnd()
-        .Where(_ => _.NewState.ShouldEqual(final_state));
+        .AndThat(_ => _.NewState.ShouldEqual(final_state));
     It should_assert_that_it_the_correct_first_event = () => aggregate_of.AssertThat(event_source).ShouldHaveEvent<EventCausingStateChange>()
         .CountOf(2)
         .First()
-        .Where(_ => _.NewState.ShouldEqual(first_state));
+        .AndThat(_ => _.NewState.ShouldEqual(first_state));
     It should_assert_that_it_the_correct_last_event = () => aggregate_of.AssertThat(event_source).ShouldHaveEvent<EventCausingStateChange>()
         .CountOf(2)
         .Last()
-        .Where(_ => _.NewState.ShouldEqual(final_state));
+        .AndThat(_ => _.NewState.ShouldEqual(final_state));
 }

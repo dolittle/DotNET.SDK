@@ -23,9 +23,9 @@ class and_operation_does_not_fail : given.an_aggregate_of_stateful_aggregate
     It should_after_last_operation_have_the_correct_event = () => aggregate_of.AfterLastOperationOn(event_source).ShouldHaveEvent<EventCausingStateChange>()
         .CountOf(1)
         .AtEnd()
-        .Where(_ => _.NewState.ShouldEqual(new_state));
+        .AndThat(_ => _.NewState.ShouldEqual(new_state));
     It should_assert_that_it_the_correct_event = () => aggregate_of.AssertThat(event_source).ShouldHaveEvent<EventCausingStateChange>()
         .CountOf(1)
         .AtEnd()
-        .Where(_ => _.NewState.ShouldEqual(new_state));
+        .AndThat(_ => _.NewState.ShouldEqual(new_state));
 }
