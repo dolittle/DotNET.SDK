@@ -1,3 +1,15 @@
+# [23.2.2] - 2024-6-2 [PR: #241](https://github.com/dolittle/DotNET.SDK/pull/241)
+## Summary
+
+Improved documentation on the test helper methods. 
+Minor test lib refactoring
+
+
+### Added
+- `EventValueAssertion.AndThat`
+- `ReadModelValueAssertion.AndThat`
+
+
 # [23.2.1] - 2024-5-16 [PR: #240](https://github.com/dolittle/DotNET.SDK/pull/240)
 ## Summary
 - Ensure proto.cluster messages wait for system readiness to begin processing. Previously it could start before Proto.Cluster had started, and logged errors. This did not affect the projection result itself, as the projection would be processed in a retry.
