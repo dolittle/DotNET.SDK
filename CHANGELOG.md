@@ -1,3 +1,18 @@
+# [23.2.3] - 2024-6-10 [PR: #242](https://github.com/dolittle/DotNET.SDK/pull/242)
+## Summary
+
+Adds a few new test helpers to validate exceptional behavior in aggregates. (`VerifyThrows` & `VerifyThrowsExactly`)
+
+Added example project demonstrating how to use test helpers.
+
+
+
+
+### Added
+- Test helpers `VerifyThrows` & `VerifyThrowsExactly`
+- Example project `ASP.NET.Tests`
+
+
 # [23.2.2] - 2024-6-2 [PR: #241](https://github.com/dolittle/DotNET.SDK/pull/241)
 ## Summary
 
