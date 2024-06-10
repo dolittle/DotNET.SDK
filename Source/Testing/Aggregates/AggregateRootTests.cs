@@ -100,7 +100,7 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
     /// </summary>
     /// <param name="action">Aggregate callback</param>
     /// <exception cref="DolittleAssertionFailed">Thrown when expectation is not met.</exception>
-    protected void VerifyThrows(Action<T> action) => VerifyThrowsExactly<Exception>(action);
+    protected Exception VerifyThrows(Action<T> action) => VerifyThrowsExactly<Exception>(action);
 
     /// <summary>
     /// Verify that an exception of the specific type is thrown when performing an action on the aggregate.
@@ -108,27 +108,26 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
     /// <param name="action">Aggregate callback</param>
     /// <typeparam name="TException">The expected Exception type to be thrown</typeparam>
     /// <exception cref="DolittleAssertionFailed">Thrown when expectation is not met.</exception>
-    protected void VerifyThrowsExactly<TException>(Action<T> action) where TException : Exception
+    protected TException VerifyThrowsExactly<TException>(Action<T> action) where TException : Exception
     {
-        WhenPerforming(agg =>
+        try
         {
-            try
+            WhenPerforming(action);
+            throw new DolittleAssertionFailed(
+                $"Expected exception of type {typeof(TException).Name} but no exception was thrown");
+        }
+        catch (Exception e)
+        {
+            if (e is TException exception)
             {
-                action(agg);
-                throw new DolittleAssertionFailed(
-                    $"Expected exception of type {typeof(TException).Name} but no exception was thrown");
+                // Expectation met
+                return exception;
             }
-            catch (Exception e)
-            {
-                if (e is TException)
-                {
-                    // Expectation met
-                    return;
-                }
 
-                throw new DolittleAssertionFailed(
-                    $"Expected exception of type {typeof(TException).Name} but got {e.GetType().Name}");
-            }
-        });
+            throw new DolittleAssertionFailed(
+                $"Expected exception of type {typeof(TException).Name} but got {e.GetType().Name}");
+        }
+        
+        
     }
 }

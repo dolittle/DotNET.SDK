@@ -20,16 +20,28 @@ public class Kitchen : AggregateRoot
 
     string Name => EventSourceId;
 
+    public void Restock(int amount, string supplier)
+    {
+        if (amount <= 0) throw new ArgumentException("Amount must be greater than 0", nameof(amount));
+        ArgumentException.ThrowIfNullOrEmpty(supplier, nameof(supplier));
+
+        Apply(new Restocked(amount, supplier));
+        Console.WriteLine($"Kitchen {EventSourceId} restocked with {amount} ingredients.");
+    }
+
     public int PrepareDish(string chef, string dish)
     {
+        ArgumentException.ThrowIfNullOrEmpty(chef, nameof(chef));
+        ArgumentException.ThrowIfNullOrEmpty(dish, nameof(dish));
+
         if (_ingredients <= 0) throw new OutOfIngredients($"Kitchen {Name} has run out of ingredients, sorry!");
         Apply(new DishPrepared(dish, chef));
         Console.WriteLine($"Kitchen {EventSourceId} prepared a {dish}, there are {_ingredients} ingredients left.");
         return _ingredients;
     }
 
-    void On(DishPrepared @event)
-        => _ingredients--;
+    void On(DishPrepared _) => _ingredients--;
+    void On(Restocked evt) => _ingredients += evt.Amount;
 }
 
 public class OutOfIngredients : Exception
