@@ -309,4 +309,73 @@ class SomeProjection: ReadModel
 
         await VerifyAnalyzerAsync(test, expected);
     }
+    
+    [Fact]
+    public async Task ShouldFindDateTimeNow()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Projections;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+    public DateTime LastUpdated {get; set;}
+
+    public void On(NameUpdated evt)
+    {
+        Name = evt.Name;
+        LastUpdated = DateTime.Now;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Projection.MutationsCannotUseCurrentTime)
+                .WithSpan(19, 23, 19, 35)
+                .WithArguments("DateTime.Now")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ShouldFindDateTimeOffsetNow()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Projections;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+    public DateTimeOffset LastUpdated {get; set;}
+
+    public void On(NameUpdated evt)
+    {
+        Name = evt.Name;
+        LastUpdated = DateTimeOffset.UtcNow;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Projection.MutationsCannotUseCurrentTime)
+                .WithSpan(19, 23, 19, 44)
+                .WithArguments("DateTimeOffset.UtcNow")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+    
 }

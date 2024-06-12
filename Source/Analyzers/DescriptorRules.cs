@@ -234,6 +234,16 @@ static class DescriptorRules
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
                 description: "The event type is already handled by another On-method.");
+        
+        internal static readonly DiagnosticDescriptor MutationsCannotUseCurrentTime =
+            new(
+                DiagnosticIds.ProjectionMutationsCannotUseCurrentTime,
+                title: "On-methods must only use data from the event or EventContext",
+                messageFormat: "'{0}' is invalid, On-methods must only use data from the event or EventContext",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Warning,
+                isEnabledByDefault: true,
+                description: "If you need to get the committed time of the event, use EventContext.Occurred.");
     }
 
 }
