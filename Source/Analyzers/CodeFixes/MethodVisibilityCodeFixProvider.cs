@@ -13,15 +13,21 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
+/// <summary>
+/// Fixes the visibility of a method
+/// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MethodVisibilityCodeFixProvider))]
 public class MethodVisibilityCodeFixProvider : CodeFixProvider
 {
+    /// <inheritdoc />
     public sealed override ImmutableArray<string> FixableDiagnosticIds =>
         ImmutableArray.Create(DiagnosticIds.InvalidAccessibility,
             DiagnosticIds.AggregateMutationShouldBePrivateRuleId);
 
-    public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+    /// <inheritdoc />
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+    /// <inheritdoc />
     public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var diagnostic = context.Diagnostics.First();
@@ -43,7 +49,7 @@ public class MethodVisibilityCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-    void RegisterMakePublicCodeFix(CodeFixContext context, Diagnostic diagnostic)
+    static void RegisterMakePublicCodeFix(CodeFixContext context, Diagnostic diagnostic)
     {
         context.RegisterCodeFix(
             CodeAction.Create(
@@ -53,7 +59,7 @@ public class MethodVisibilityCodeFixProvider : CodeFixProvider
             diagnostic);
     }
 
-    void RegisterMakePrivateCodeFix(CodeFixContext context, Diagnostic diagnostic)
+    static void RegisterMakePrivateCodeFix(CodeFixContext context, Diagnostic diagnostic)
     {
         context.RegisterCodeFix(
             CodeAction.Create(
@@ -63,7 +69,7 @@ public class MethodVisibilityCodeFixProvider : CodeFixProvider
             diagnostic);
     }
 
-    async Task<Document> MakePublicAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
+    static async Task<Document> MakePublicAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
     {
         var syntaxRoot = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
@@ -79,25 +85,25 @@ public class MethodVisibilityCodeFixProvider : CodeFixProvider
         // If exists remove it
         if (modifier != null)
         {
-            newMethod = methodDecl.WithModifiers(methodDecl
+            newMethod = newMethod.WithModifiers(methodDecl
                 .Modifiers.Remove(modifier)
                 .Add(SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
                 .WithLeadingTrivia(modifier.LeadingTrivia);
         }
         else
         {
+            // Add the 'public' modifier
             var newModifiers = methodDecl.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
-            newMethod = methodDecl.WithModifiers(newModifiers);
+            newMethod = newMethod.WithModifiers(newModifiers);
             
         }
-        // Add the 'public' modifier
 
         var newSyntaxRoot = syntaxRoot.ReplaceNode(methodDecl, newMethod);
 
         return context.Document.WithSyntaxRoot(newSyntaxRoot);
     }
 
-    async Task<Document> MakePrivateAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
+    static async Task<Document> MakePrivateAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
     {
         var syntaxRoot = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
