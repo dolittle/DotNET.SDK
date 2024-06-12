@@ -32,7 +32,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters,
             DescriptorRules.Aggregate.MutationsCannotProduceEvents,
             DescriptorRules.Events.MissingAttribute,
-            DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState
+            DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState,
+            DescriptorRules.Aggregate.MutationsCannotUseCurrentTime
         );
 
     /// <inheritdoc />
@@ -86,6 +87,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters, syntax.GetLocation(),
                     onMethod.ToDisplayString()));
             }
+            EnsureMutationDoesNotAccessCurrentTime(syntax, context);
+            
 
             if (parameters.Length > 0)
             {
@@ -105,6 +108,43 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         }
 
         return eventTypesHandled;
+    }
+
+    /// <summary>
+    /// Checks if the method gets the current time via DateTime or DateTimeOffset
+    /// Since this is not allowed for the mutations, we need to report a diagnostic
+    /// </summary>
+    /// <param name="onMethod"></param>
+    /// <param name="context"></param>
+    static void EnsureMutationDoesNotAccessCurrentTime(MethodDeclarationSyntax onMethod, SyntaxNodeAnalysisContext context)
+    {
+        var currentTimeInvocations = onMethod.DescendantNodes()
+            .OfType<MemberAccessExpressionSyntax>()
+            .Where(memberAccess =>
+            {
+                var now = memberAccess.Name
+                    is IdentifierNameSyntax { Identifier.Text: "Now" }
+                    or IdentifierNameSyntax { Identifier.Text: "UtcNow" };
+                if (!now)
+                {
+                    return false;
+                }
+                
+                var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression);
+                // Check if the type is DateTime or DateTimeOffset
+                return typeInfo.Type?.ToDisplayString() == "System.DateTime" || typeInfo.Type?.ToDisplayString() == "System.DateTimeOffset";
+                
+            }).ToArray();
+
+        foreach (var currentTimeInvocation in currentTimeInvocations)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DescriptorRules.Aggregate.MutationsCannotUseCurrentTime,
+                currentTimeInvocation.GetLocation(),
+                new[] { currentTimeInvocation.ToFullString() }
+            ));
+        }
+        
     }
 
     static void CheckAggregateRootAttributePresent(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateClass)

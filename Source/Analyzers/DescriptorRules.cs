@@ -140,7 +140,17 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Change the On-method to take a single event as a parameter");
+                description: "Change the On-method to take a single event as a parameter.");
+        
+        internal static readonly DiagnosticDescriptor MutationsCannotUseCurrentTime =
+            new(
+                DiagnosticIds.AggregateMutationsCannotUseCurrentTime,
+                title: "On-methods must only use data from the event",
+                messageFormat: "'{0}' is invalid, On-methods must only use data from the event",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "If you need to capture the time of the event in the aggregate state, you must include it in the event.");
 
         internal static readonly DiagnosticDescriptor MutationsCannotProduceEvents = new(
             DiagnosticIds.AggregateMutationsCannotProduceEvents,

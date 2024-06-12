@@ -72,6 +72,10 @@ public static class DiagnosticIds
     /// </summary>
     public const string PublicMethodsCannotMutateAggregateState = "AGG0006";
 
+    /// <summary>
+    /// Current time can not be used in an On-method, use the timestamp from the event instead.
+    /// </summary>
+    public const string AggregateMutationsCannotUseCurrentTime = "AGG0007";
 
     public const string ProjectionMissingAttributeRuleId = "PROJ0001";
     public const string ProjectionMissingBaseClassRuleId = "PROJ0002";
