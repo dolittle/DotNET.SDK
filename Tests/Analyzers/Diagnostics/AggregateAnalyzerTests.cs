@@ -691,5 +691,131 @@ class SomeAggregate: AggregateRoot
 
         await VerifyAnalyzerAsync(test, expected);
     }
+
+    [Fact]
+    public async Task ShouldFindDateTimeUsage()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public SomeAggregate(){
+        Name = ""John Doe"";
+    }
+
+    string Name {get; set;}
+    DateTime Timestamp { get; set; }
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    private void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        Timestamp = DateTime.UtcNow;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.MutationsCannotUseCurrentTime)
+                .WithSpan(28, 21, 28, 36)
+                .WithArguments("DateTime.UtcNow")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ShouldFindDateTimeUsageWhenQualified()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public SomeAggregate(){
+        Name = ""John Doe"";
+    }
+
+    string Name {get; set;}
+    System.DateTime Timestamp { get; set; }
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    private void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        Timestamp = System.DateTime.UtcNow;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.MutationsCannotUseCurrentTime)
+                .WithSpan(27, 21, 27, 43)
+                .WithArguments("System.DateTime.UtcNow")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
     
+    [Fact]
+    public async Task ShouldFindDateTimeOffsetUsageWhenQualified()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public SomeAggregate(){
+        Name = ""John Doe"";
+    }
+
+    string Name {get; set;}
+    System.DateTimeOffset Timestamp { get; set; }
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    private void On(NameUpdated @event)
+    {
+        Name = @event.Name;
+        Timestamp = System.DateTimeOffset.UtcNow;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.Aggregate.MutationsCannotUseCurrentTime)
+                .WithSpan(27, 21, 27, 49)
+                .WithArguments("System.DateTimeOffset.UtcNow")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
 }

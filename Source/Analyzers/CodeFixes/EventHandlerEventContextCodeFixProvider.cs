@@ -14,13 +14,21 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeMissingCodeFixProvider)), Shared]
+/// <summary>
+/// Code fix provider for adding EventContext parameter to event handler methods
+/// </summary>
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(EventHandlerEventContextCodeFixProvider)), Shared]
 public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
 {
+    /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
         DiagnosticIds.EventHandlerMissingEventContext
     );
 
+    /// inheritdoc
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+    
+    /// inheritdoc
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var document = context.Document;
@@ -44,7 +52,7 @@ public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-    async Task<Document> AddEventContextParameter(CodeFixContext context, Diagnostic diagnostic, Document document, CancellationToken ct)
+    async Task<Document> AddEventContextParameter(CodeFixContext context, Diagnostic diagnostic, Document document, CancellationToken _)
     {
         var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         if (root is null) return document;
@@ -67,7 +75,7 @@ public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
     /// </summary>
     /// <param name="methodDeclaration"></param>
     /// <returns></returns>
-    MethodDeclarationSyntax WithEventContextParameter(MethodDeclarationSyntax methodDeclaration)
+    static MethodDeclarationSyntax WithEventContextParameter(MethodDeclarationSyntax methodDeclaration)
     {
         var existingParameters = methodDeclaration.ParameterList.Parameters;
         // Get the first parameter that is not the EventContext parameter
@@ -101,7 +109,7 @@ public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
         return methodDeclaration;
     }
 
-    public static CompilationUnitSyntax EnsureNamespaceImported(CompilationUnitSyntax root, string namespaceToInclude)
+    static CompilationUnitSyntax EnsureNamespaceImported(CompilationUnitSyntax root, string namespaceToInclude)
     {
         var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceToInclude));
         var existingUsings = root.Usings;
@@ -111,7 +119,7 @@ public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
             // Namespace is already imported.
             return root;
         }
-        var lineEndingTrivia = root.DescendantTrivia().First(_ => _.IsKind(SyntaxKind.EndOfLineTrivia));
+        var lineEndingTrivia = root.DescendantTrivia().First(it => it.IsKind(SyntaxKind.EndOfLineTrivia));
         usingDirective = usingDirective.WithTrailingTrivia(lineEndingTrivia);
 
         return root.WithUsings(existingUsings.Add(usingDirective));

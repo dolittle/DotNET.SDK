@@ -140,7 +140,17 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Change the On-method to take a single event as a parameter");
+                description: "Change the On-method to take a single event as a parameter.");
+        
+        internal static readonly DiagnosticDescriptor MutationsCannotUseCurrentTime =
+            new(
+                DiagnosticIds.AggregateMutationsCannotUseCurrentTime,
+                title: "On-methods must only use data from the event",
+                messageFormat: "'{0}' is invalid, On-methods must only use data from the event",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: "If you need to capture the time of the event in the aggregate state, you must include it in the event.");
 
         internal static readonly DiagnosticDescriptor MutationsCannotProduceEvents = new(
             DiagnosticIds.AggregateMutationsCannotProduceEvents,
@@ -224,6 +234,16 @@ static class DescriptorRules
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
                 description: "The event type is already handled by another On-method.");
+        
+        internal static readonly DiagnosticDescriptor MutationUsedCurrentTime =
+            new(
+                DiagnosticIds.ProjectionMutationUsedCurrentTime,
+                title: "On-methods must only use data from the event or EventContext",
+                messageFormat: "'{0}' is invalid, On-methods must only use data from the event or EventContext",
+                DiagnosticCategories.Sdk,
+                DiagnosticSeverity.Warning,
+                isEnabledByDefault: true,
+                description: "If you need to get the committed time of the event, use EventContext.Occurred.");
     }
 
 }

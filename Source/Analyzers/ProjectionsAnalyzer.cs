@@ -33,7 +33,8 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Projection.InvalidOnMethodParameters,
             DescriptorRules.Projection.InvalidOnMethodReturnType,
             DescriptorRules.Projection.InvalidOnMethodVisibility,
-            DescriptorRules.Projection.EventTypeAlreadyHandled
+            DescriptorRules.Projection.EventTypeAlreadyHandled,
+            DescriptorRules.Projection.MutationUsedCurrentTime
         );
 
     /// <inheritdoc />
@@ -61,7 +62,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
     static void CheckOnMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol projectionType)
     {
         var members = projectionType.GetMembers();
-        var onMethods = members.Where(_ => _.Name.Equals("On")).OfType<IMethodSymbol>().ToArray();
+        var onMethods = members.Where(method => method.Name.Equals("On")).OfType<IMethodSymbol>().ToArray();
         var eventTypesHandled = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var onMethod in onMethods)
@@ -117,6 +118,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
             }
             
             CheckOnReturnType(context, projectionType, onMethod, syntax);
+            EnsureMutationDoesNotAccessCurrentTime(context, syntax);
         }
     }
 
@@ -156,6 +158,39 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
         }
     }
 
+    /// <summary>
+    /// Checks if the method gets the current time via DateTime or DateTimeOffset
+    /// Since this is not allowed for the mutations, we need to report a diagnostic
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="onMethod"></param>
+    static void EnsureMutationDoesNotAccessCurrentTime(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax onMethod)
+    {
+        foreach (var memberAccess in onMethod.DescendantNodes().OfType<MemberAccessExpressionSyntax>())
+        {
+            var property = memberAccess.Name.Identifier.Text;
+            if (property != "Now" && property != "UtcNow")
+            {
+                continue;
+            }
+                
+            var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression);
+            // Check if the type is DateTime or DateTimeOffset
+            var qualifiedType = typeInfo.Type?.ToDisplayString();
+            if (qualifiedType is "System.DateTime" or "System.DateTimeOffset")
+            {
+                var properties = ImmutableDictionary.Create<string, string?>()
+                    .Add("expression", qualifiedType + "." + property);
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DescriptorRules.Projection.MutationUsedCurrentTime,
+                    memberAccess.GetLocation(),
+                    properties: properties,
+                    new[] { memberAccess.ToFullString() }
+                ));
+            }
+        }
+    }
+    
     static void CheckProjectionAttributePresent(SyntaxNodeAnalysisContext context, INamedTypeSymbol projectionClass)
     {
         var hasAttribute = projectionClass.GetAttributes()

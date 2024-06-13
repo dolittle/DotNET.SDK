@@ -21,7 +21,7 @@ public class AttributeIdentityCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AttributeInvalidIdentityRuleId);
-
+    
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
@@ -31,7 +31,6 @@ public class AttributeIdentityCodeFixProvider : CodeFixProvider
         {
             return Task.CompletedTask;
         }
-
         switch (diagnostic.Id)
         {
             case DiagnosticIds.AttributeInvalidIdentityRuleId:

@@ -25,7 +25,7 @@ public class AttributeMissingCodeFixProvider : CodeFixProvider
             DiagnosticIds.AggregateMissingAttributeRuleId,
             DiagnosticIds.EventMissingAttributeRuleId,
             DiagnosticIds.ProjectionMissingAttributeRuleId);
-
+    
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {

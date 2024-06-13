@@ -32,7 +32,7 @@ public class SalesPerDayByStoreProperty : ReadModel
 [Projection("3dce944f-279e-4150-bef3-dd9e113220c6")]
 public class SalesPerDayTotalByEventSource : ReadModel
 {
-    public string Store { get; private set; }
+    public string Store { get; private set; } = null!;
     public DateOnly Date { get; private set; }
 
     public decimal TotalSales { get; private set; }
@@ -58,7 +58,7 @@ class ProductKeySelector: IKeySelector<ProductSold>
 [Projection("3dce944f-279e-4150-bef3-dd9e113220c6")]
 public class SalesPerDayTotalByFunction : ReadModel
 {
-    public string Store { get; private set; }
+    public string Store { get; private set; } = null!;
     public DateOnly Date { get; private set; }
 
     public decimal TotalSales { get; private set; }

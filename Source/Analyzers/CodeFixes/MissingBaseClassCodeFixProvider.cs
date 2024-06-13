@@ -13,11 +13,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MethodVisibilityCodeFixProvider))]
+/// <summary>
+/// Codefix provider for adding missing base classes according to the diagnostic
+/// </summary>
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MissingBaseClassCodeFixProvider))]
 public class MissingBaseClassCodeFixProvider : CodeFixProvider
 {
+    /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.MissingBaseClassRuleId);
 
+    /// <inheritdoc />
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+
+    /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var diagnostic = context.Diagnostics.First();
@@ -40,7 +48,7 @@ public class MissingBaseClassCodeFixProvider : CodeFixProvider
 
    
     
-    async Task<Document> AddBaseClassAsync(Document document, Diagnostic diagnostic, string missingClass, CancellationToken cancellationToken)
+    static async Task<Document> AddBaseClassAsync(Document document, Diagnostic diagnostic, string missingClass, CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
@@ -56,7 +64,7 @@ public class MissingBaseClassCodeFixProvider : CodeFixProvider
         var newClassDeclaration = classDeclaration.AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(baseClassType.Name))).NormalizeWhitespace();
     
         // Add using directive for the namespace if it's not already there
-        var namespaceToAdd = baseClassType?.ContainingNamespace?.ToDisplayString();
+        var namespaceToAdd = baseClassType.ContainingNamespace?.ToDisplayString();
         if (!string.IsNullOrEmpty(namespaceToAdd) && root is CompilationUnitSyntax compilationUnitSyntax &&
             !NamespaceImported(compilationUnitSyntax, namespaceToAdd!))
         {
@@ -72,7 +80,7 @@ public class MissingBaseClassCodeFixProvider : CodeFixProvider
 
 
 
-    bool NamespaceImported(CompilationUnitSyntax root, string namespaceName)
+    static bool NamespaceImported(CompilationUnitSyntax root, string namespaceName)
     {
         return root.Usings.Any(usingDirective => usingDirective.Name?.ToString() == namespaceName);
     }

@@ -16,13 +16,20 @@ using Microsoft.CodeAnalysis.Formatting;
 namespace Dolittle.SDK.Analyzers.CodeFixes;
 
 /// <summary>
-/// Adds On-method for the specific event type
+/// Adds On-method (mutation) for the specific event type
 /// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AggregateMutationCodeFixProvider)), Shared]
 public class AggregateMutationCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AggregateMissingMutationRuleId);
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } =
+        ImmutableArray.Create(DiagnosticIds.AggregateMissingMutationRuleId);
+
+    /// <summary>
+    /// Gets the fix all provider
+    /// </summary>
+    /// <returns></returns>
+    public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -48,7 +55,7 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
-    async Task<Document> GenerateStub(CodeFixContext context, Document document, string eventType, CancellationToken ct)
+    static async Task<Document> GenerateStub(CodeFixContext context, Document document, string eventType, CancellationToken ct)
     {
         if (await context.Document.GetSyntaxRootAsync(ct) is not CompilationUnitSyntax root) return document;
 
@@ -56,7 +63,8 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
         if (member is not MethodDeclarationSyntax method) return document;
 
 
-        var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().First(declaration => declaration.Span.Contains(context.Span));
+        var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
+            .First(declaration => declaration.Span.Contains(context.Span));
 
         var replacedNode = root.ReplaceNode(classDeclaration,
             Formatter.Format(WithMutationMethod(classDeclaration, method), document.Project.Solution.Workspace));

@@ -13,19 +13,24 @@ static class Extensions
 {
     static readonly LineEndingsRewriter _lineEndingsRewriter = new();
 
-    public static T WithLfLineEndings<T>(this T replacedNode) where T : SyntaxNode => (T)_lineEndingsRewriter.Visit(replacedNode);
+    public static T WithLfLineEndings<T>(this T replacedNode) where T : SyntaxNode =>
+        (T)_lineEndingsRewriter.Visit(replacedNode);
 
-    public static CompilationUnitSyntax AddMissingUsingDirectives(this CompilationUnitSyntax root, params INamespaceSymbol[] namespaces)
+    public static CompilationUnitSyntax AddMissingUsingDirectives(this CompilationUnitSyntax root,
+        params INamespaceSymbol[] namespaces)
     {
-        return root.AddMissingUsingDirectives(namespaces.Select(_ => _.ToDisplayString()).ToArray());
+        return root.AddMissingUsingDirectives(namespaces.Select(it => it.ToDisplayString()).ToArray());
     }
-    public static CompilationUnitSyntax AddMissingUsingDirectives(this CompilationUnitSyntax root, params string[] namespaces)
+
+    public static CompilationUnitSyntax AddMissingUsingDirectives(this CompilationUnitSyntax root,
+        params string[] namespaces)
     {
         var usingDirectives = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToList();
         var nonImportedNamespaces = namespaces.ToImmutableHashSet();
 
         foreach (var usingDirective in usingDirectives)
         {
+            if (usingDirective.Name is null) continue;
             var usingDirectiveName = usingDirective.Name.ToString();
             if (nonImportedNamespaces.Contains(usingDirectiveName))
             {
@@ -35,8 +40,9 @@ static class Extensions
 
         if (!nonImportedNamespaces.Any()) return root;
 
-        var newUsingDirectives = nonImportedNamespaces.Select(namespaceName => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))).ToArray();
-        
+        var newUsingDirectives = nonImportedNamespaces
+            .Select(namespaceName => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName))).ToArray();
+
         return root.AddUsings(newUsingDirectives).NormalizeWhitespace();
     }
 }
