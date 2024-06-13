@@ -1,3 +1,14 @@
+# [23.2.4] - 2024-6-13 [PR: #243](https://github.com/dolittle/DotNET.SDK/pull/243)
+## Summary
+
+Updates analyzers to make sure current time is not being used to populate read models or hydrate aggregate state.
+Using current time will cause the state to no longer be idempotent, and breaks the abstraction. This also adds a code fix to change the time provider to be the time when the event was committed.
+
+### Added
+- Analysis & Codefix for projections
+- Analysis for aggregate roots.
+
+
 # [23.2.3] - 2024-6-10 [PR: #242](https://github.com/dolittle/DotNET.SDK/pull/242)
 ## Summary
 
