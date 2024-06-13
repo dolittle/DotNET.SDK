@@ -17,7 +17,7 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 /// <summary>
 /// Code fix provider for adding EventContext parameter to event handler methods
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeMissingCodeFixProvider)), Shared]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(EventHandlerEventContextCodeFixProvider)), Shared]
 public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />

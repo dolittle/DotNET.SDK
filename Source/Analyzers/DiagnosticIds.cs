@@ -83,5 +83,5 @@ public static class DiagnosticIds
     public const string ProjectionInvalidOnMethodReturnTypeRuleId = "PROJ0004";
     public const string ProjectionInvalidOnMethodVisibilityRuleId = "PROJ0005";
     public const string ProjectionDuplicateEventHandler = "PROJ0006";
-    public const string ProjectionMutationsCannotUseCurrentTime = "PROJ0007";
+    public const string ProjectionMutationUsedCurrentTime = "PROJ0007";
 }

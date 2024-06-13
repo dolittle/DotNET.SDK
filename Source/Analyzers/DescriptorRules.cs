@@ -235,9 +235,9 @@ static class DescriptorRules
                 isEnabledByDefault: true,
                 description: "The event type is already handled by another On-method.");
         
-        internal static readonly DiagnosticDescriptor MutationsCannotUseCurrentTime =
+        internal static readonly DiagnosticDescriptor MutationUsedCurrentTime =
             new(
-                DiagnosticIds.ProjectionMutationsCannotUseCurrentTime,
+                DiagnosticIds.ProjectionMutationUsedCurrentTime,
                 title: "On-methods must only use data from the event or EventContext",
                 messageFormat: "'{0}' is invalid, On-methods must only use data from the event or EventContext",
                 DiagnosticCategories.Sdk,

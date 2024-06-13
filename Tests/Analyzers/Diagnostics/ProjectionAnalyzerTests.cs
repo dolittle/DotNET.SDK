@@ -336,7 +336,7 @@ class SomeProjection: ReadModel
 }";
         DiagnosticResult[] expected =
         {
-            Diagnostic(DescriptorRules.Projection.MutationsCannotUseCurrentTime)
+            Diagnostic(DescriptorRules.Projection.MutationUsedCurrentTime)
                 .WithSpan(19, 23, 19, 35)
                 .WithArguments("DateTime.Now")
         };
@@ -370,7 +370,7 @@ class SomeProjection: ReadModel
 }";
         DiagnosticResult[] expected =
         {
-            Diagnostic(DescriptorRules.Projection.MutationsCannotUseCurrentTime)
+            Diagnostic(DescriptorRules.Projection.MutationUsedCurrentTime)
                 .WithSpan(19, 23, 19, 44)
                 .WithArguments("DateTimeOffset.UtcNow")
         };

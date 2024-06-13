@@ -16,7 +16,7 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 /// <summary>
 /// Codefix provider for adding missing base classes according to the diagnostic
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MethodVisibilityCodeFixProvider))]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MissingBaseClassCodeFixProvider))]
 public class MissingBaseClassCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
