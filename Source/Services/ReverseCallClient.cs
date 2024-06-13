@@ -100,7 +100,10 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         await _clientToServer.WriteAsync(connectMessage).ConfigureAwait(false);
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        linkedCts.CancelAfter(_pingInterval.Multiply(3));
+        if (ShouldPingPong)
+        {
+            linkedCts.CancelAfter(_pingInterval.Multiply(3));
+        }
 
         try
         {
@@ -126,7 +129,10 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                     _logger.ReceivedNonPingOrResponseDuringConnect();
                 }
 
-                linkedCts.CancelAfter(_pingInterval.Multiply(3));
+                if (ShouldPingPong)
+                {
+                    linkedCts.CancelAfter(_pingInterval.Multiply(3));
+                }
             }
 
             _logger.TimedOutDuringConnect();
@@ -167,7 +173,10 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         }
 
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        linkedCts.CancelAfter(_pingInterval.Multiply(3));
+        if (ShouldPingPong)
+        {
+            linkedCts.CancelAfter(_pingInterval.Multiply(3));
+        }
         try
         {
             while (await _serverToClient.MoveNext(linkedCts.Token).ConfigureAwait(false))
@@ -197,7 +206,10 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
                     _logger.ReceivedNonPingOrRequestDuringHandling();
                 }
 
-                linkedCts.CancelAfter(_pingInterval.Multiply(3));
+                if (ShouldPingPong)
+                {
+                    linkedCts.CancelAfter(_pingInterval.Multiply(3));
+                }
             }
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
@@ -248,7 +260,7 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
         {
             HeadId = Guid.NewGuid().ToProtobuf(),
             ExecutionContext = _executionContext.ToProtobuf(),
-            PingInterval = Duration.FromTimeSpan(_pingInterval),
+            PingInterval = ShouldPingPong ? Duration.FromTimeSpan(_pingInterval) : Duration.FromTimeSpan(TimeSpan.FromSeconds(Duration.MaxSeconds))
         };
 
     async Task WritePong(CancellationToken cancellationToken)
@@ -334,6 +346,8 @@ public class ReverseCallClient<TClientMessage, TServerMessage, TConnectArguments
 
         return Task.CompletedTask;
     }
+
+    bool ShouldPingPong => _pingInterval != TimeSpan.MaxValue;
 
     static void ThrowIfInvalidPingInterval(TimeSpan pingInterval)
     {
