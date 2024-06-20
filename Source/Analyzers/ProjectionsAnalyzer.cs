@@ -27,6 +27,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
             // DescriptorRules.DuplicateIdentity,
+            DescriptorRules.ExceptionInMutation,
             DescriptorRules.Events.MissingAttribute,
             DescriptorRules.Projection.MissingAttribute,
             DescriptorRules.Projection.MissingBaseClass,
@@ -114,14 +115,41 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Projection.InvalidOnMethodParameters, loc,
                         onMethod.ToDisplayString()));
                 }
-                
             }
             
             CheckOnReturnType(context, projectionType, onMethod, syntax);
             EnsureMutationDoesNotAccessCurrentTime(context, syntax);
+            EnsureMutationDoesNotThrowExceptions(context, syntax);
         }
     }
 
+    static void EnsureMutationDoesNotThrowExceptions(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax onMethod)
+    {
+        var throwStatements = onMethod.DescendantNodes().OfType<ThrowStatementSyntax>().ToArray();
+        foreach (var throwStatement in throwStatements)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DescriptorRules.ExceptionInMutation,
+                throwStatement.GetLocation()
+            ));
+        }
+        
+        var throwIfMethods = onMethod.DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Where(invocation =>
+                invocation.Expression is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax identifier } &&
+                identifier.Identifier.ValueText.StartsWith("ThrowIf", StringComparison.Ordinal))
+            .ToArray();
+        
+        foreach (var throwIfMethod in throwIfMethods)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DescriptorRules.ExceptionInMutation,
+                throwIfMethod.GetLocation()
+            ));
+        }
+    }
+    
     static void CheckOnReturnType(SyntaxNodeAnalysisContext context, INamedTypeSymbol projectionType, IMethodSymbol onMethod,
         MethodDeclarationSyntax syntax)
     {

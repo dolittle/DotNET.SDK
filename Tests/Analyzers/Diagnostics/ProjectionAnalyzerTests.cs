@@ -378,4 +378,77 @@ class SomeProjection: ReadModel
         await VerifyAnalyzerAsync(test, expected);
     }
     
+    [Fact]
+    public async Task ShouldFindThrows()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Projections;
+using Dolittle.SDK.Events;
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+
+    public void On(NameUpdated evt)
+    {
+        if(evt.Name == null) throw new ArgumentNullException(nameof(evt.Name));
+        Name = evt.Name;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.ExceptionInMutation)
+                .WithSpan(16, 30, 16, 80)
+                .WithArguments("throw new ArgumentNullException(nameof(evt.Name)).UtcNow")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ShouldFindThrowIf()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Projections;
+using Dolittle.SDK.Events;
+
+// Stand-in since we are targeting .NET standard
+public class AnArgumentException
+{
+    public static void ThrowIfNullOrEmpty(string value)
+    {
+        if(string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+    }
+}
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[Projection(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+
+    public void On(NameUpdated evt)
+    {
+        AnArgumentException.ThrowIfNullOrEmpty(evt.Name);
+        Name = evt.Name;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.ExceptionInMutation)
+                .WithSpan(25, 9, 25, 57)
+                .WithArguments("AnArgumentException.ThrowIfNullOrEmpty(evt.Name)")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
 }
