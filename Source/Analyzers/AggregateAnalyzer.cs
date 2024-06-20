@@ -20,12 +20,14 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AggregateAnalyzer : DiagnosticAnalyzer
 {
-    static readonly ImmutableDictionary<string, string?> _targetVisibilityPrivate = ImmutableDictionary.Create<string,string?>()
+    static readonly ImmutableDictionary<string, string?> _targetVisibilityPrivate = ImmutableDictionary
+        .Create<string, string?>()
         .Add("targetVisibility", "private");
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
+            DescriptorRules.ExceptionInMutation,
             DescriptorRules.Aggregate.MissingAttribute,
             DescriptorRules.Aggregate.MissingMutation,
             DescriptorRules.Aggregate.MutationShouldBePrivate,
@@ -71,24 +73,29 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
         foreach (var onMethod in onMethods)
         {
-            if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax) continue;
+            if (onMethod.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not MethodDeclarationSyntax syntax)
+                continue;
 
             if (syntax.Modifiers.Any(SyntaxKind.PublicKeyword)
                 || syntax.Modifiers.Any(SyntaxKind.InternalKeyword)
                 || syntax.Modifiers.Any(SyntaxKind.ProtectedKeyword))
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate, syntax.GetLocation(),
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationShouldBePrivate,
+                    syntax.GetLocation(),
                     _targetVisibilityPrivate, onMethod.ToDisplayString()));
             }
 
             var parameters = onMethod.Parameters;
             if (parameters.Length != 1)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters, syntax.GetLocation(),
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DescriptorRules.Aggregate.MutationHasIncorrectNumberOfParameters, syntax.GetLocation(),
                     onMethod.ToDisplayString()));
             }
+
             EnsureMutationDoesNotAccessCurrentTime(context, syntax);
-            
+            EnsureMutationDoesNotThrowExceptions(context, syntax);
+
 
             if (parameters.Length > 0)
             {
@@ -110,13 +117,42 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         return eventTypesHandled;
     }
 
+    static void EnsureMutationDoesNotThrowExceptions(SyntaxNodeAnalysisContext context,
+        MethodDeclarationSyntax onMethod)
+    {
+        var throwStatements = onMethod.DescendantNodes().OfType<ThrowStatementSyntax>().ToArray();
+        foreach (var throwStatement in throwStatements)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DescriptorRules.ExceptionInMutation,
+                throwStatement.GetLocation()
+            ));
+        }
+
+        var throwIfMethods = onMethod.DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Where(invocation =>
+                invocation.Expression is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax identifier } &&
+                identifier.Identifier.ValueText.StartsWith("ThrowIf", StringComparison.Ordinal))
+            .ToArray();
+        
+        foreach (var throwIfMethod in throwIfMethods)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DescriptorRules.ExceptionInMutation,
+                throwIfMethod.GetLocation()
+            ));
+        }
+    }
+
     /// <summary>
     /// Checks if the method gets the current time via DateTime or DateTimeOffset
     /// Since this is not allowed for the mutations, we need to report a diagnostic
     /// </summary>
     /// <param name="context"></param>
     /// <param name="onMethod"></param>
-    static void EnsureMutationDoesNotAccessCurrentTime(SyntaxNodeAnalysisContext context, MethodDeclarationSyntax onMethod)
+    static void EnsureMutationDoesNotAccessCurrentTime(SyntaxNodeAnalysisContext context,
+        MethodDeclarationSyntax onMethod)
     {
         var currentTimeInvocations = onMethod.DescendantNodes()
             .OfType<MemberAccessExpressionSyntax>()
@@ -129,11 +165,11 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 {
                     return false;
                 }
-                
+
                 var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression);
                 // Check if the type is DateTime or DateTimeOffset
-                return typeInfo.Type?.ToDisplayString() == "System.DateTime" || typeInfo.Type?.ToDisplayString() == "System.DateTimeOffset";
-                
+                return typeInfo.Type?.ToDisplayString() == "System.DateTime" ||
+                       typeInfo.Type?.ToDisplayString() == "System.DateTimeOffset";
             }).ToArray();
 
         foreach (var currentTimeInvocation in currentTimeInvocations)
@@ -149,7 +185,9 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
     static void CheckAggregateRootAttributePresent(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateClass)
     {
         var hasAttribute = aggregateClass.GetAttributes()
-            .Any(attribute => attribute.AttributeClass?.ToDisplayString().Equals(DolittleTypes.AggregateRootAttribute, StringComparison.Ordinal) == true);
+            .Any(attribute =>
+                attribute.AttributeClass?.ToDisplayString()
+                    .Equals(DolittleTypes.AggregateRootAttribute, StringComparison.Ordinal) == true);
 
         if (!hasAttribute)
         {
@@ -176,18 +214,20 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             if (typeInfo.Type is not { } type) continue;
             if (!type.HasEventTypeAttribute())
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(),
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute,
+                    invocation.GetLocation(),
                     type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), type.ToString()));
             }
 
             if (!handledEventTypes.Contains(type))
             {
-                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation, invocation.GetLocation(), type.ToMinimalTypeNameProps(),
+                context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Aggregate.MissingMutation,
+                    invocation.GetLocation(), type.ToMinimalTypeNameProps(),
                     type.ToString()));
             }
         }
     }
-    
+
     static void CheckApplyInvocationsInOnMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
     {
         var onMethods = aggregateType
@@ -209,7 +249,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 .OfType<InvocationExpressionSyntax>()
                 .Where(invocation => invocation.Expression is IdentifierNameSyntax { Identifier.Text: "Apply" })
                 .ToArray();
-            
+
             foreach (var applyInvocation in applyInvocations)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
@@ -218,14 +258,15 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                     new[] { onMethod.ToDisplayString() }
                 ));
             }
-            
+
             var memberApplyInvocations = syntax
                 .DescendantNodes()
                 .OfType<MemberAccessExpressionSyntax>()
                 .Where(memberAccess => memberAccess.Name is IdentifierNameSyntax { Identifier.Text: "Apply" })
-                .Where(memberAccess => memberAccess.Name is IdentifierNameSyntax { Identifier.Text: "Apply" } && memberAccess.Expression is ThisExpressionSyntax or BaseExpressionSyntax)
+                .Where(memberAccess => memberAccess.Name is IdentifierNameSyntax { Identifier.Text: "Apply" } &&
+                                       memberAccess.Expression is ThisExpressionSyntax or BaseExpressionSyntax)
                 .ToArray();
-            
+
             foreach (var invocation in memberApplyInvocations)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
@@ -236,9 +277,9 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             }
         }
     }
-    
-        static void CheckMutationsInPublicMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
-        {
+
+    static void CheckMutationsInPublicMethods(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
+    {
         var publicMethods = aggregateType
             .GetMembers()
             .Where(member => !member.Name.Equals("On"))
@@ -249,6 +290,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
+
         var walker = new MutationWalker(context, aggregateType);
 
         foreach (var onMethod in publicMethods)
@@ -257,41 +299,45 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             {
                 continue;
             }
+
             walker.Visit(syntax);
         }
     }
 
-        class MutationWalker : CSharpSyntaxWalker
+    class MutationWalker : CSharpSyntaxWalker
+    {
+        readonly SyntaxNodeAnalysisContext _context;
+        readonly INamedTypeSymbol _aggregateType;
+
+        public MutationWalker(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
         {
-           readonly SyntaxNodeAnalysisContext _context;
-           readonly INamedTypeSymbol _aggregateType;
+            _context = context;
+            _aggregateType = aggregateType;
+        }
 
-            public MutationWalker(SyntaxNodeAnalysisContext context, INamedTypeSymbol aggregateType)
+        public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+        {
+            var leftExpression = node.Left;
+
+            if (leftExpression is IdentifierNameSyntax || leftExpression is MemberAccessExpressionSyntax)
             {
-                _context = context;
-                _aggregateType = aggregateType;
-            }
-
-            public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
-            {
-                var leftExpression = node.Left;
-
-                if (leftExpression is IdentifierNameSyntax || leftExpression is MemberAccessExpressionSyntax)
+                var symbolInfo = _context.SemanticModel.GetSymbolInfo(leftExpression);
+                if (symbolInfo.Symbol is IFieldSymbol || symbolInfo.Symbol is IPropertySymbol)
                 {
-                    var symbolInfo = _context.SemanticModel.GetSymbolInfo(leftExpression);
-                    if (symbolInfo.Symbol is IFieldSymbol || symbolInfo.Symbol is IPropertySymbol)
+                    var containingType = symbolInfo.Symbol.ContainingType;
+                    if (containingType != null && SymbolEqualityComparer.Default.Equals(_aggregateType, containingType))
                     {
-                        var containingType = symbolInfo.Symbol.ContainingType;
-                        if (containingType != null && SymbolEqualityComparer.Default.Equals(_aggregateType, containingType))
-                        {
-                            var diagnostic = Diagnostic.Create(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState, leftExpression.GetLocation());
-                            _context.ReportDiagnostic(diagnostic);
-                        }
+                        var diagnostic =
+                            Diagnostic.Create(DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState,
+                                leftExpression.GetLocation());
+                        _context.ReportDiagnostic(diagnostic);
                     }
                 }
-
-                base.VisitAssignmentExpression(node);
             }
 
-            // You can also add other types of mutations like increments, decrements, method calls etc.
-        }}
+            base.VisitAssignmentExpression(node);
+        }
+
+        // You can also add other types of mutations like increments, decrements, method calls etc.
+    }
+}

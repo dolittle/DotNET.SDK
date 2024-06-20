@@ -77,6 +77,17 @@ static class DescriptorRules
             isEnabledByDefault: true,
             description: "Change the accessibility level to '{1}'.");
 
+
+    internal static readonly DiagnosticDescriptor ExceptionInMutation =
+        new(
+            DiagnosticIds.ExceptionInMutation,
+            title: "Exceptions can not be thrown from mutation methods",
+            messageFormat: "On-methods can not throw exceptions",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "On-methods can not throw exceptions. This will prevent the system from being able to replay events.");
+    
     internal static class Events
     {
         internal static readonly DiagnosticDescriptor MissingAttribute =

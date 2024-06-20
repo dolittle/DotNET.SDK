@@ -818,4 +818,100 @@ class SomeAggregate: AggregateRoot
 
         await VerifyAnalyzerAsync(test, expected);
     }
+    
+    [Fact]
+    public async Task ShouldFindThrows()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public SomeAggregate(){
+        Name = ""John Doe"";
+    }
+
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    private void On(NameUpdated @event)
+    {
+        if(string.IsNullOrWhiteSpace(@event.Name))
+        {
+            throw new System.ArgumentNullException(nameof(@event.Name));
+        }
+        Name = @event.Name;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.ExceptionInMutation)
+                .WithSpan(28, 13, 28, 73)
+                .WithArguments("throw new System.ArgumentNullException(nameof(@event.Name))")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ShouldFindThrowIf()
+    {
+        var test = @"
+using System;
+using Dolittle.SDK.Aggregates;
+using Dolittle.SDK.Events;
+
+// Stand-in since we are targeting .NET standard
+public class AnArgumentException
+{
+    public static void ThrowIfNullOrEmpty(string value)
+    {
+        if(string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+    }
+}
+
+[EventType(""5dc02e84-c6fc-4e1b-997c-ec33d0048a3b"")]
+record NameUpdated(string Name);
+
+[AggregateRoot(""10ef9f40-3e61-444a-9601-f521be2d547e"")]
+class SomeAggregate: AggregateRoot
+{
+    public SomeAggregate(){
+        Name = ""John Doe"";
+    }
+
+    public string Name {get; set;}
+
+    public void UpdateName(string name)
+    {
+        Apply(new NameUpdated(name));
+    }
+
+    private void On(NameUpdated @event)
+    {
+        AnArgumentException.ThrowIfNullOrEmpty(@event.Name);
+        Name = @event.Name;
+    }
+}";
+        DiagnosticResult[] expected =
+        {
+            Diagnostic(DescriptorRules.ExceptionInMutation)
+                .WithSpan(34, 9, 34, 60)
+                .WithArguments("AnArgumentException.ThrowIfNullOrEmpty(@event.Name)")
+        };
+
+        await VerifyAnalyzerAsync(test, expected);
+    }
+
 }

@@ -16,7 +16,7 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
 {
     readonly EventSourceId _eventSourceId;
     readonly AggregateOfMock<T> _aggregateOf;
-    
+
     /// <summary>
     /// Gets the <see cref="AggregateRootAssertion"/> that allows for asserting on the aggregate root.
     /// </summary>
@@ -94,7 +94,7 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
             throw e.InnerException ?? e;
         }
     }
-    
+
     /// <summary>
     /// Verify that an exception is thrown when performing an action on the aggregate.
     /// </summary>
@@ -103,16 +103,32 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
     protected Exception VerifyThrows(Action<T> action) => VerifyThrowsExactly<Exception>(action);
 
     /// <summary>
+    /// Verify that an exception is thrown when performing an action
+    /// </summary>
+    /// <param name="action">Aggregate callback</param>
+    /// <exception cref="DolittleAssertionFailed">Thrown when expectation is not met.</exception>
+    protected Exception VerifyThrows(Action action) => VerifyThrowsExactly<Exception>(action);
+
+    /// <summary>
     /// Verify that an exception of the specific type is thrown when performing an action on the aggregate.
     /// </summary>
     /// <param name="action">Aggregate callback</param>
     /// <typeparam name="TException">The expected Exception type to be thrown</typeparam>
     /// <exception cref="DolittleAssertionFailed">Thrown when expectation is not met.</exception>
-    protected TException VerifyThrowsExactly<TException>(Action<T> action) where TException : Exception
+    protected TException VerifyThrowsExactly<TException>(Action<T> action) where TException : Exception =>
+        VerifyThrowsExactly<TException>(() => WhenPerforming(action));
+
+    /// <summary>
+    /// Verify that an exception of the specific type is thrown when performing an action
+    /// </summary>
+    /// <param name="action">Aggregate callback</param>
+    /// <typeparam name="TException">The expected Exception type to be thrown</typeparam>
+    /// <exception cref="DolittleAssertionFailed">Thrown when expectation is not met.</exception>
+    protected TException VerifyThrowsExactly<TException>(Action action) where TException : Exception
     {
         try
         {
-            WhenPerforming(action);
+            action();
             throw new DolittleAssertionFailed(
                 $"Expected exception of type {typeof(TException).Name} but no exception was thrown");
         }
@@ -127,7 +143,5 @@ public abstract class AggregateRootTests<T> where T : AggregateRoot
             throw new DolittleAssertionFailed(
                 $"Expected exception of type {typeof(TException).Name} but got {e.GetType().Name}");
         }
-        
-        
     }
 }
