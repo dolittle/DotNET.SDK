@@ -1,3 +1,13 @@
+# [23.2.5] - 2024-6-20 [PR: #244](https://github.com/dolittle/DotNET.SDK/pull/244)
+## Summary
+
+This patch adds analyzers to verify that mutations do not throw exceptions. In addition it adds a few new helper methods to aggregate test classes
+
+### Added
+- Diagnostic: `ExceptionInMutation`
+- AggregateRootTests exception helpers
+
+
 # [23.2.4] - 2024-6-13 [PR: #243](https://github.com/dolittle/DotNET.SDK/pull/243)
 ## Summary
 
