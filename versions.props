@@ -2,7 +2,6 @@
     <PropertyGroup>
         <AutofacVersion>8.0.0</AutofacVersion>
         <AutofacExtensionsDependencyInjectionVersion>9.0.0</AutofacExtensionsDependencyInjectionVersion>
-        <BaselineTypeDiscoveryVersion>1.1.3</BaselineTypeDiscoveryVersion>
         <ContractsVersion>7.8.0</ContractsVersion>
         <MachineSpecificationsRunnerVersion>2.10.2</MachineSpecificationsRunnerVersion>
         <MachineSpecificationsVersion>1.0.0</MachineSpecificationsVersion>
