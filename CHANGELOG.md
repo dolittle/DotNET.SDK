@@ -1,3 +1,19 @@
+# [23.3.0] - 2024-7-31 [PR: #245](https://github.com/dolittle/DotNET.SDK/pull/245)
+## Summary
+
+This release is primarily focused on update and maintenance of SDK dependencies. 
+
+In addition it has updates to the aggregate test helpers.
+
+### Changed
+- Aggregate test helpers refactored
+  - Changed `ShouldHaveEvent` -> `ShouldHaveEvents`, to assert on potentially several events of a type
+  - Added new `ShouldHaveEvent` to assert on a single event of a type
+
+### Removed
+- Removed dependency on `BaselineTypeDiscovery`.
+
+
 # [23.2.5] - 2024-6-20 [PR: #244](https://github.com/dolittle/DotNET.SDK/pull/244)
 ## Summary
 
