@@ -9,9 +9,7 @@ services:
       driver: none
   
   consumer-runtime:
-    image: dolittle/runtime:8.9.1
-    environment:
-      - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
+    image: dolittle/runtime:9.6.1
     volumes:
       - ./consumer-runtime.yml:/app/.dolittle/runtime.yml
     ports:
@@ -19,9 +17,7 @@ services:
       - 50055:50053
 
   producer-runtime:
-    image: dolittle/runtime:8.9.1
-    environment:
-      - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
+    image: dolittle/runtime:9.6.1
     volumes:
       - ./producer-runtime.yml:/app/.dolittle/runtime.yml
     ports:

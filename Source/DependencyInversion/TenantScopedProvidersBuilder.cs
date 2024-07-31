@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using BaselineTypeDiscovery;
 using Dolittle.SDK.Tenancy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -97,7 +96,6 @@ public class TenantScopedProvidersBuilder
     static IEnumerable<Assembly> GetAllAssemblies()
     {
         return AssemblyFinder.FindAssemblies(
-            _ => { },
             _ => true,
             false);
     }

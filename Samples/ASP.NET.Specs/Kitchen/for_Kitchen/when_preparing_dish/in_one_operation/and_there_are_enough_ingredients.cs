@@ -21,13 +21,13 @@ class and_there_are_enough_ingredients : given.a_kitchen_with_no_prepared_dishes
         _.PrepareDish(chef, dish);
     });
 
-    It should_after_last_operation_only_prepare_one_dish = () => KitchenAfterLastOperation().ShouldHaveEvent<DishPrepared>()
+    It should_after_last_operation_only_prepare_one_dish = () => KitchenAfterLastOperation().ShouldHaveEvents<DishPrepared>()
         .CountOf(2)
         .WhereAll(
             _ => _.Chef.ShouldEqual(chef),
             _ => _.Dish.ShouldEqual(dish));
     
-    It should_only_prepare_one_dish = () => KitchenWithAllEvents().ShouldHaveEvent<DishPrepared>()
+    It should_only_prepare_one_dish = () => KitchenWithAllEvents().ShouldHaveEvents<DishPrepared>()
         .CountOf(2)
         .AtEnd().AndThat(
             _ => _.Chef.ShouldEqual(chef),

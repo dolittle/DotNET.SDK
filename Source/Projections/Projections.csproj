@@ -11,7 +11,7 @@
         <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
         <PackageReference Include="Proto.Cluster" Version="$(ProtoActorVersion)" />
         <PackageReference Include="Proto.OpenTelemetry" Version="$(ProtoActorVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftAbstractionsVersion)" />
         <PackageReference Include="MongoDB.Driver" Version="$(MongoDBDriverVersion)" />
     </ItemGroup>
 

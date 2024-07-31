@@ -10,12 +10,23 @@ namespace Diagnostics;
 /// </summary>
 public static class Extensions
 {
-    
+    const string MongodbDriverActivitySource = "MongoDB.Driver.Core.Extensions.DiagnosticSources";
+
     /// <summary>
-    /// Enable tracing in 
+    /// Enable tracing for Dolittle SDK
     /// </summary>
     /// <param name="builder"></param>
     /// <returns></returns>
     public static TracerProviderBuilder AddDolittleInstrumentation(this TracerProviderBuilder builder)
         => builder.AddSource(Tracing.ActivitySourceName);
+    
+    // ReSharper disable once InconsistentNaming
+    /// <summary>
+    /// Enable tracing for MongoDB
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static TracerProviderBuilder AddMongoDBInstrumentation(this TracerProviderBuilder builder)
+        => builder.AddSource(MongodbDriverActivitySource);
+    
 }

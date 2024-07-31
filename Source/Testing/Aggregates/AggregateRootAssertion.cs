@@ -42,9 +42,21 @@ public class AggregateRootAssertion
     /// </summary>
     /// <typeparam name="T"><see cref="Type" /> of the event that you wish to assert against.</typeparam>
     /// <returns>An <see cref="EventSequenceAssertion{T}" /> scoped to your event type.</returns>
-    public EventSequenceAssertion<T> ShouldHaveEvent<T>()
+    public EventSequenceAssertion<T> ShouldHaveEvents<T>()
         where T : class
-        => ShouldHaveEvent<T>(false);
+        => ShouldHaveEvents<T>(false);
+
+    /// <summary>
+    /// Asserts that there was produced exactly one event of the specified type. Returns the Event value assertion for the event.
+    /// </summary>
+    /// <typeparam name="T"><see cref="Type" /> of the event that you wish to assert against.</typeparam>
+    /// <returns>An <see cref="EventValueAssertion{T}" /> for your event type.</returns>
+    public EventValueAssertion<T> ShouldHaveEvent<T>() where T : class
+    {
+        var ofCorrectType = ShouldHaveEvents<T>();
+        ofCorrectType.CountOf(1);
+        return ofCorrectType.Single();
+    }
     
     /// <summary>
     /// Asserts that there was produced exactly one event, and of the specified type. Returns the Event value assertion for the event.
@@ -57,7 +69,7 @@ public class AggregateRootAssertion
         // Ensure that there is only one event
         ShouldHaveNumberOfEvents(1);
         // And that it is the correct type. Return the value assertion for the event
-        return ShouldHaveEvent<T>(false).Single();
+        return ShouldHaveEvents<T>(false).Single();
     }
 
     /// <summary>
@@ -67,9 +79,9 @@ public class AggregateRootAssertion
     /// <returns>An <see cref="EventSequenceAssertion{T}" /> scoped to your event type.</returns>
     public EventSequenceAssertion<T> ShouldHavePublicEvent<T>()
         where T : class
-        => ShouldHaveEvent<T>(true);
+        => ShouldHaveEvents<T>(true);
     
-    EventSequenceAssertion<T> ShouldHaveEvent<T>(bool isPublic)
+    EventSequenceAssertion<T> ShouldHaveEvents<T>(bool isPublic)
         where T : class
     {
         var events = _events.Where(_ => _.Public == isPublic).Select(_ => _.Event).OfType<T>();

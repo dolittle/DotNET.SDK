@@ -19,8 +19,7 @@ class and_operation_does_not_fail : given.an_aggregate_with_default_constructor
     
     Because of = () => aggregate_of.Get(event_source).Perform(_ => _.EventCausingNoStateChange()).GetAwaiter().GetResult();
 
-    It should_after_last_operation_have_the_correct_event = () => aggregate_of.AfterLastOperationOn(event_source).ShouldHaveEvent<EventCausingNoStateChange>()
-        .CountOf(1)
-        .AtEnd()
+    It should_after_last_operation_have_the_correct_event = () => aggregate_of.AfterLastOperationOn(event_source)
+        .ShouldHaveEvent<EventCausingNoStateChange>()
         .AndThat(_ => _.EventSourceId.ShouldEqual(event_source.Value));
 }

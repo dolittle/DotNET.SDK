@@ -15,16 +15,16 @@ var host = Host.CreateDefaultBuilder()
             .Handle((@event, eventContext) =>
             {
                 Console.WriteLine($"Filtering event {@event} to public streams");
-                return Task.FromResult(new PartitionedFilterResult(true, eventContext.EventSourceId.Value));
+                return Task.FromResult(new PartitionedFilterResult(true, Guid.Empty));
             })))
     .Build();
 
 await host.StartAsync();
 
 var client = await host.GetDolittleClient();
-var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
-await client.EventStore
-    .ForTenant(TenantId.Development)
-    .CommitPublicEvent(preparedTaco, "Dolittle Tacos");
+    var preparedTaco = new DishPrepared("Bean Blaster Taco", "Mr. Taco");
+    await client.EventStore
+        .ForTenant(TenantId.Development)
+        .CommitPublicEvent(preparedTaco, "Dolittle Tacos");
 
 await host.WaitForShutdownAsync();

@@ -14,8 +14,7 @@ class when_a_dish_has_been_prepared : given.the_handler
     It should_get_the_correct_customer = () => customers.TryGetAggregate(customer_name, out _).ShouldBeTrue(); 
     
     It the_customer_should_have_eaten_the_dish_once = () => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
-        .CountOf(1)
-        .First().AndThat(_ => _.Dish.ShouldEqual(@event.Dish));
+        .AndThat(_ => _.Dish.ShouldEqual(@event.Dish));
 
     It the_customer_should_have_only_eaten_one_dish = () => customers.AssertThat(customer_name).ShouldHaveNumberOfEvents(1);
     

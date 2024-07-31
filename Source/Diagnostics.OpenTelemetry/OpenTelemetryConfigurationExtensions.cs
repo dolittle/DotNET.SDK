@@ -20,6 +20,7 @@ namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
 /// </summary>
 public static class OpenTelemetryConfigurationExtensions
 {
+
     /// <summary>
     /// Configures open telemetry tracing and logging.
     /// </summary>

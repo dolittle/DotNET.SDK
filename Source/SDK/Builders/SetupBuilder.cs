@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using BaselineTypeDiscovery;
 using Dolittle.SDK.Aggregates.Builders;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
+using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.EventHorizon;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Filters.Builders;
@@ -157,7 +157,6 @@ public class SetupBuilder : ISetupBuilder
     static IEnumerable<Assembly> GetAllAssemblies()
     {
         return AssemblyFinder.FindAssemblies(
-            _ => { },
             _ => true,
             false);
     }

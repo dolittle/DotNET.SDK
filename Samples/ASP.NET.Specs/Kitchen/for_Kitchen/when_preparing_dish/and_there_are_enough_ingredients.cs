@@ -16,16 +16,9 @@ class and_there_are_enough_ingredients : given.a_kitchen_with_no_prepared_dishes
     };
 
     Because of = async () => await OnKitchen().Perform(_ => _.PrepareDish(chef, dish));
-
-    It should_after_last_operation_only_prepare_one_dish = () => KitchenAfterLastOperation().ShouldHaveEvent<DishPrepared>()
-        .CountOf(1)
-        .AtEnd().AndThat(
-            _ => _.Chef.ShouldEqual(chef),
-            _ => _.Dish.ShouldEqual(dish));
     
     It should_only_prepare_one_dish = () => KitchenWithAllEvents().ShouldHaveEvent<DishPrepared>()
-        .CountOf(1)
-        .AtEnd().AndThat(
+        .AndThat(
             _ => _.Chef.ShouldEqual(chef),
             _ => _.Dish.ShouldEqual(dish));
 
