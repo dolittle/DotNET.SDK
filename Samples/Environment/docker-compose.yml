@@ -1,4 +1,3 @@
-version: '3.1'
 services:
   mongo:
     image: dolittle/mongodb
@@ -8,31 +7,12 @@ services:
     ports:
       - 27017:27017
  
-  runtime-basic:
+  runtime:
     image: dolittle/runtime:9.6.1
-    environment:
-      DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION: "V7"
     volumes:
-      - ./resources-basic.json:/app/.dolittle/resources.json
-      - ./tenants.json:/app/.dolittle/tenants.json
-      - ./microservices.json:/app/.dolittle/microservices.json
-      - ./event-horizon-consents.json:/app/.dolittle/event-horizon-consents.json
+      - ./runtime.yml:/app/.dolittle/runtime.yml
       - ./appsettings.json:/app/appsettings.json
     ports:
       - 9700:9700
       - 50052:50052
       - 50053:50053
-
-  runtime-eventhorizon:
-    image: dolittle/runtime:9.6.1
-    environment:
-      DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION: "V7"
-    volumes:
-      - ./resources-eventhorizon.json:/app/.dolittle/resources.json
-      - ./tenants.json:/app/.dolittle/tenants.json
-      - ./microservices.json:/app/.dolittle/microservices.json
-      - ./appsettings.json:/app/appsettings.json
-    ports:
-      - 9701:9700
-      - 50054:50052
-      - 50055:50053

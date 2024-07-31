@@ -10,8 +10,6 @@ services:
   
   consumer-runtime:
     image: dolittle/runtime:9.6.1
-    environment:
-      - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
     volumes:
       - ./consumer-runtime.yml:/app/.dolittle/runtime.yml
     ports:
@@ -20,8 +18,6 @@ services:
 
   producer-runtime:
     image: dolittle/runtime:9.6.1
-    environment:
-      - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
     volumes:
       - ./producer-runtime.yml:/app/.dolittle/runtime.yml
     ports:
