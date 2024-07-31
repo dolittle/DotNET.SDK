@@ -25,7 +25,16 @@ public static class AggregateRootExtensions
     /// <param name="aggregateRoot">The <see cref="AggregateRoot" /> containing the events to assert against.</param>
     /// <typeparam name="T"><see cref="Type" /> of the event that you wish to assert against.</typeparam>
     /// <returns>An <see cref="EventSequenceAssertion{T}" /> scoped to your event type.</returns>
-    public static EventSequenceAssertion<T> ShouldHaveEvent<T>(this AggregateRoot aggregateRoot)
+    public static EventSequenceAssertion<T> ShouldHaveEvents<T>(this AggregateRoot aggregateRoot)
+        where T : class
+        => aggregateRoot.AssertThat().ShouldHaveEvents<T>();
+    
+    /// <summary>
+    /// Asserts that there was produced exactly one event of the specified type. Returns the Event value assertion for the event.
+    /// </summary>
+    /// <typeparam name="T"><see cref="Type" /> of the event that you wish to assert against.</typeparam>
+    /// <returns>An <see cref="EventValueAssertion{T}" /> for your event type.</returns>
+    public static EventValueAssertion<T> ShouldHaveEvent<T>(this AggregateRoot aggregateRoot)
         where T : class
         => aggregateRoot.AssertThat().ShouldHaveEvent<T>();
 

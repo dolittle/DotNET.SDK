@@ -32,16 +32,15 @@ class when_two_dishes_have_been_prepared : given.the_handler
     It should_get_the_correct_customer = () => customers.TryGetAggregate(customer_name, out _).ShouldBeTrue(); 
     
     It the_customer_should_have_only_eaten_second_dish_after_last_operation = () => customers.AfterLastOperationOn(customer_name).ShouldHaveEvent<DishEaten>()
-        .CountOf(1)
-        .First().AndThat(_ => _.Dish.ShouldEqual(second_dish.Dish));
+        .AndThat(_ => _.Dish.ShouldEqual(second_dish.Dish));
 
     It the_customer_should_have_only_eaten_one_dish_after_last_operation = () => customers.AfterLastOperationOn(customer_name).ShouldHaveNumberOfEvents(1);
 
-    It the_customer_should_have_eaten_first_dish_first = () => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
+    It the_customer_should_have_eaten_first_dish_first = () => customers.AssertThat(customer_name).ShouldHaveEvents<DishEaten>()
         .AtBeginning()
         .AndThat(_ => _.Dish.ShouldEqual(first_dish.Dish));
     
-    It the_customer_should_have_eaten_second_dish_last = () => customers.AssertThat(customer_name).ShouldHaveEvent<DishEaten>()
+    It the_customer_should_have_eaten_second_dish_last = () => customers.AssertThat(customer_name).ShouldHaveEvents<DishEaten>()
         .AtEnd()
         .AndThat(_ => _.Dish.ShouldEqual(second_dish.Dish));
 

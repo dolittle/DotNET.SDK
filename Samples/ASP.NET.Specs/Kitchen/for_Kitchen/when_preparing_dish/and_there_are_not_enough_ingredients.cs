@@ -25,7 +25,7 @@ class and_there_are_not_enough_ingredients : given.a_kitchen_with_no_prepared_di
 
     It should_after_last_operation_not_have_done_anything = () => KitchenAfterLastOperation().ShouldHaveNoEvents();
     
-    It should_only_have_prepared_two_dishes_before = () => KitchenWithAllEvents().ShouldHaveEvent<DishPrepared>().CountOf(2);
+    It should_only_have_prepared_two_dishes_before = () => KitchenWithAllEvents().ShouldHaveEvents<DishPrepared>().CountOf(2);
 
     It should_have_done_nothing_else = () => KitchenWithAllEvents().ShouldHaveNumberOfEvents(2);
 
