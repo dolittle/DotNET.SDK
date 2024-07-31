@@ -9,7 +9,7 @@ services:
       driver: none
   
   consumer-runtime:
-    image: dolittle/runtime:8.9.1
+    image: dolittle/runtime:9.6.1
     environment:
       - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
     volumes:
@@ -19,7 +19,7 @@ services:
       - 50055:50053
 
   producer-runtime:
-    image: dolittle/runtime:8.9.1
+    image: dolittle/runtime:9.6.1
     environment:
       - "DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION=V7"
     volumes:

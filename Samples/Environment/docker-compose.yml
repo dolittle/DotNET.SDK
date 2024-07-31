@@ -9,7 +9,7 @@ services:
       - 27017:27017
  
   runtime-basic:
-    image: dolittle/runtime:8.7.2
+    image: dolittle/runtime:9.6.1
     environment:
       DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION: "V7"
     volumes:
@@ -24,7 +24,7 @@ services:
       - 50053:50053
 
   runtime-eventhorizon:
-    image: dolittle/runtime:8.7.2
+    image: dolittle/runtime:9.6.1
     environment:
       DOLITTLE__RUNTIME__EVENTSTORE__BACKWARDSCOMPATIBILITY__VERSION: "V7"
     volumes:
