@@ -14,7 +14,7 @@ Host.CreateDefaultBuilder()
                     .FromProducerMicroservice("f39b1f61-d360-4675-b859-53c05c87c0e6")
                     .FromProducerTenant(TenantId.Development)
                     .FromProducerStream("2c087657-b318-40b1-ae92-a400de44e507")
-                    .FromProducerPartition("Dolittle Tacos")
+                    .FromProducerPartition(Guid.Empty)
                     .ToScope("808ddde4-c937-4f5c-9dc2-140580f6919e"))
         )
         .WithEventHandlers(_ => _
