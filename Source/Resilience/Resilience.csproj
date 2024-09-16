@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
+    <PackageReference Include="System.Reactive"/>
   </ItemGroup>
 
 </Project>

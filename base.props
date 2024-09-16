@@ -1,6 +1,4 @@
 <Project>
-    <Import Project="versions.props"/>
-    
     <PropertyGroup>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <LangVersion>latest</LangVersion>

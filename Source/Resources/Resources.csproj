@@ -8,10 +8,10 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MongoDB.Driver" Version="$(MongoDBDriverVersion)" />
-        <PackageReference Include="OpenTelemetry" Version="$(OpenTelemetryVersion)" />
-        <PackageReference Include="MongoDB.Driver.Core.Extensions.DiagnosticSources" Version="$(MongoDBDiagnosticSourcesVersion)" />
-        <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
+        <PackageReference Include="MongoDB.Driver"/>
+        <PackageReference Include="OpenTelemetry.Api"/>
+        <PackageReference Include="MongoDB.Driver.Core.Extensions.DiagnosticSources"/>
+        <PackageReference Include="Dolittle.Contracts"/>
     </ItemGroup>
 
   <ItemGroup>

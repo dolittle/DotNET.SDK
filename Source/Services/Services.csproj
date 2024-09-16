@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
-    <PackageReference Include="Google.Protobuf" Version="$(ProtobufVersion)" />
-    <PackageReference Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftAbstractionsVersion)" />
-    <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
+    <PackageReference Include="Dolittle.Contracts"/>
+    <PackageReference Include="Google.Protobuf"/>
+    <PackageReference Include="Grpc.Net.Client"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+    <PackageReference Include="System.Reactive"/>
   </ItemGroup>
 
   <ItemGroup>

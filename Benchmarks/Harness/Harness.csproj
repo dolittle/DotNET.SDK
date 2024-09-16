@@ -5,8 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-      <PackageReference Include="Docker.DotNet" Version="3.125.15" />
+      <PackageReference Include="BenchmarkDotNet"/>
+      <PackageReference Include="Docker.DotNet"/>
     </ItemGroup>
 
 </Project>

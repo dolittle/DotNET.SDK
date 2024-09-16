@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftAbstractionsVersion)" />
+        <PackageReference Include="Dolittle.Contracts"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
     </ItemGroup>
 
     <ItemGroup>
