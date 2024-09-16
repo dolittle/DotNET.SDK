@@ -17,9 +17,9 @@ namespace Dolittle.Benchmarks.SDK;
 
 public class SingleRuntimeSetup
 {
-    Harness.Harness _harness; 
-    Harness.IRuntimeWithMongo _singleRuntime;
-    protected IEventStore _eventStore;
+    Harness.Harness? _harness; 
+    Harness.IRuntimeWithMongo? _singleRuntime;
+    protected IEventStore? EventStore;
     
     [GlobalSetup]
     public void GlobalSetup()
@@ -31,8 +31,8 @@ public class SingleRuntimeSetup
 
         _singleRuntime.Start().Wait();
         var client = GetConnectedClient();
-        _eventStore = client.EventStore.ForTenant(TenantId.Development);
-        _eventStore.Commit(_ => _.CreateEvent(new some_event())
+        EventStore = client.EventStore.ForTenant(TenantId.Development);
+        EventStore.Commit(it => it.CreateEvent(new some_event())
             .FromEventSource("source")
             .WithEventType("3065740c-f2e3-4ef4-9738-fe2b1a104399")).Wait();
         
@@ -53,7 +53,7 @@ public class SingleRuntimeSetup
     [GlobalCleanup]
     public async Task GlobalCleanup()
     {
-        _harness.Dispose();
+        _harness?.Dispose();
         if (_singleRuntime is not null)
         {
             await _singleRuntime.DisposeAsync().ConfigureAwait(false);
@@ -64,7 +64,7 @@ public class SingleRuntimeSetup
         => GetConnectedClient(_ => _.WithoutDiscovery());
     public IDolittleClient GetConnectedClient(SetupDolittleClient setup)
         => Host.CreateDefaultBuilder().UseDolittle(setup).Build().GetDolittleClient(_ => _
-            .WithRuntimeOn("localhost", (ushort)_singleRuntime.Endpoints.Private)
+            .WithRuntimeOn("localhost", (ushort)_singleRuntime!.Endpoints.Private)
             .WithServiceProvider(new ServiceCollection().BuildServiceProvider())
             .WithLogging(new NullLoggerFactory())).GetAwaiter().GetResult();
 }

@@ -10,7 +10,7 @@ namespace Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 
 public class committing_100_events : SingleRuntimeSetup
 {
-    IEventStore _eventStore;
+    IEventStore _eventStore = null!;
 
     public override void IterationSetup()
     {

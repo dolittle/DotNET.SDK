@@ -19,7 +19,7 @@ public class committing_100_events_with_warmup : SingleRuntimeSetup
     {
         for (var i = 0; i < 100; i++)
         {
-            await _eventStore.Commit(_ => _.CreateEvent(new some_event())
+            await EventStore!.Commit(builder => builder.CreateEvent(new some_event())
                     .FromEventSource("source")
                     .WithEventType("3065740c-f2e3-4ef4-9738-fe2b1a104399"))
                 .ConfigureAwait(false);
@@ -29,7 +29,7 @@ public class committing_100_events_with_warmup : SingleRuntimeSetup
     public async Task Commit100()
     {
         var @event = new some_event();
-        await _eventStore.Commit(_ =>
+        await EventStore!.Commit(_ =>
         {
             for (var i = 0; i < 100; i++)
             {
@@ -43,6 +43,6 @@ public class committing_100_events_with_warmup : SingleRuntimeSetup
     public async Task Commit1()
     {
         var @event = new some_event();
-        await _eventStore.Commit(_ => _.CreateEvent(@event).FromEventSource("source").WithEventType("3065740c-f2e3-4ef4-9738-fe2b1a104399")).ConfigureAwait(false);
+        await EventStore!.Commit(_ => _.CreateEvent(@event).FromEventSource("source").WithEventType("3065740c-f2e3-4ef4-9738-fe2b1a104399")).ConfigureAwait(false);
     }
 }

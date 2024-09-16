@@ -11,17 +11,17 @@ namespace Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant;
 
 public class applying_events_with_100_events_to_replay : SingleRuntimeSetup
 {
-    IAggregates _aggregates;
-    EventSourceId aggregate_root_event_source = "aggregate root source"; 
+    IAggregates _aggregates = null!;
+    readonly EventSourceId _aggregateRootEventSource = "aggregate root source"; 
     public override void IterationSetup()
     {
         base.IterationSetup();
         var client = GetConnectedClient(_ => _
-            .WithEventTypes(_ => _.Register<AnEvent>().Register<LastEvent>())
+            .WithEventTypes(types => types.Register<AnEvent>().Register<LastEvent>())
             .WithAggregateRoots(_ => _
                 .Register<AnAggregateRoot>()));
         _aggregates = client.Aggregates.ForTenant(TenantId.Development);
-        _aggregates.Get<AnAggregateRoot>(aggregate_root_event_source).Perform(_ =>
+        _aggregates.Get<AnAggregateRoot>(_aggregateRootEventSource).Perform(_ =>
         {
             for (var i = 0; i < 100; i++)
             {
@@ -33,13 +33,13 @@ public class applying_events_with_100_events_to_replay : SingleRuntimeSetup
     [Benchmark]
     public async Task Applying1EventWith100EventsToReplay()
     {
-        await _aggregates.Get<AnAggregateRoot>(aggregate_root_event_source).Perform(_ => _.Finish()).ConfigureAwait(false);
+        await _aggregates.Get<AnAggregateRoot>(_aggregateRootEventSource).Perform(_ => _.Finish()).ConfigureAwait(false);
     }
     
     [Benchmark]
     public async Task Applying100EventsWith100EventsToReplay()
     {
-        await _aggregates.Get<AnAggregateRoot>(aggregate_root_event_source).Perform(_ =>
+        await _aggregates.Get<AnAggregateRoot>(_aggregateRootEventSource).Perform(_ =>
         {
             for (var i = 0; i < 99; i++)
             {
@@ -54,8 +54,8 @@ public class applying_events_with_100_events_to_replay : SingleRuntimeSetup
     {
         for (var i = 0; i < 99; i++)
         {
-            await _aggregates.Get<AnAggregateRoot>(aggregate_root_event_source).Perform(_ => _.DoSomething()).ConfigureAwait(false);
+            await _aggregates.Get<AnAggregateRoot>(_aggregateRootEventSource).Perform(_ => _.DoSomething()).ConfigureAwait(false);
         }
-        await _aggregates.Get<AnAggregateRoot>(aggregate_root_event_source).Perform(_ => _.Finish()).ConfigureAwait(false);
+        await _aggregates.Get<AnAggregateRoot>(_aggregateRootEventSource).Perform(_ => _.Finish()).ConfigureAwait(false);
     }
 }
