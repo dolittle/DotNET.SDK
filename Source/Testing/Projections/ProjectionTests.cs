@@ -24,6 +24,7 @@ public abstract class ProjectionTests<TProjection>
     EventLogSequenceNumber _sequenceNumber = EventLogSequenceNumber.Initial;
     readonly Dictionary<Key, TProjection> _projections = new();
     readonly IProjection<TProjection> _projection = ProjectionFixture<TProjection>.Projection;
+    readonly ServiceProvider _serviceProvider;
 
     /// <summary>
     /// Gets the <see cref="IAggregates"/> for the test.
@@ -40,8 +41,8 @@ public abstract class ProjectionTests<TProjection>
     {
         var serviceCollection = new ServiceCollection();
         configureServices?.Invoke(serviceCollection);
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        Aggregates = new AggregatesMock(serviceProvider, OnAggregateEvents);
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+        Aggregates = new AggregatesMock(_serviceProvider, OnAggregateEvents);
     }
 
     /// <summary>
@@ -138,10 +139,17 @@ public abstract class ProjectionTests<TProjection>
         var existed = _projections.TryGetValue(key, out var projection);
         if (!existed)
         {
-            _projections[key] = projection = new TProjection
+            var readModel = new TProjection
             {
                 Id = key.Value,
             };
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if(readModel is IRequireDependencies<TProjection> requireDependencies)
+            {
+                requireDependencies.Resolve(_serviceProvider);
+            }
+            _projections[key] = projection = readModel;
+            
         }
 
         var projectionContext = new ProjectionContext(!existed, key, context);

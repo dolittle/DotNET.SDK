@@ -42,7 +42,9 @@ public class ProjectionActor<TProjection>(
     TimeSpan idleUnloadTimeout) : IActor where TProjection : ReadModel, new()
 {
     Dictionary<ulong, TaskCompletionSource>? _waitingForUpdate;
-    readonly TimeSpan _idleUnloadTimeout = idleUnloadTimeout > TimeSpan.Zero ? idleUnloadTimeout : TimeSpan.FromMilliseconds(100);
+
+    readonly TimeSpan _idleUnloadTimeout =
+        idleUnloadTimeout > TimeSpan.Zero ? idleUnloadTimeout : TimeSpan.FromMilliseconds(100);
 
     /// <summary>
     /// The cluster kind for the projection actor.
@@ -54,6 +56,7 @@ public class ProjectionActor<TProjection>(
     TProjection? _projection;
     bool _initialized;
     HashSet<PID>? _subscribers;
+    IServiceProvider? _serviceProvider;
 
     public async Task ReceiveAsync(IContext context)
     {
@@ -211,6 +214,7 @@ public class ProjectionActor<TProjection>(
             {
                 Id = _id!,
             };
+            InitDependencies(_projection, _serviceProvider);
         }
         else
         {
@@ -227,9 +231,11 @@ public class ProjectionActor<TProjection>(
         {
             case ProjectionResultType.Replace:
                 _projection = result.ReadModel;
-                _projection!.SetLastUpdated(projectionContext.EventContext.SequenceNumber.Value, projectionContext.EventContext.Occurred);
+                _projection!.SetLastUpdated(projectionContext.EventContext.SequenceNumber.Value,
+                    projectionContext.EventContext.Occurred);
                 OnReplace(_projection, context);
-                await _collection!.ReplaceOneAsync(p => p.Id == _projection!.Id, _projection, new ReplaceOptions { IsUpsert = true });
+                await _collection!.ReplaceOneAsync(p => p.Id == _projection!.Id, _projection,
+                    new ReplaceOptions { IsUpsert = true });
                 break;
             case ProjectionResultType.Delete:
                 OnDeleted(context);
@@ -313,9 +319,19 @@ public class ProjectionActor<TProjection>(
         var (tenantId, key) = ClusterIdentityMapper.GetTenantAndKey(id);
         _id = key.Value;
 
-        var sp = await getServiceProvider(tenantId);
-        _collection = sp.GetRequiredService<IMongoCollection<TProjection>>();
+        _serviceProvider = await getServiceProvider(tenantId);
+        _collection = _serviceProvider.GetRequiredService<IMongoCollection<TProjection>>();
         _projection = await _collection.Find(p => p.Id == _id).SingleOrDefaultAsync();
+        InitDependencies(_projection, _serviceProvider);
+
         _initialized = true;
+    }
+
+    static void InitDependencies(TProjection? projection, IServiceProvider? sp)
+    {
+        if (projection is IRequireDependencies<TProjection> requiresDependencies && sp is not null)
+        {
+            requiresDependencies.Resolve(sp);
+        }
     }
 }
