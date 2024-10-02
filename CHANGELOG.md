@@ -1,3 +1,12 @@
+# [23.4.0] - 2024-10-2 [PR: #246](https://github.com/dolittle/DotNET.SDK/pull/246)
+## Summary
+
+Allow projection read models to get dependencies from `IServiceProvider`  By extending `IRequireDependencies<T>`. It will then get a callback when initialized, and can resolve external dependencies scoped to its current tenant. This can enable logging use cases on init, mutations etc.
+
+### Added
+`Dolittle.SDK.Projections.IRequireDependencies<T>`, interface for read models to be able to inject dependencies
+
+
 # [23.3.0] - 2024-7-31 [PR: #245](https://github.com/dolittle/DotNET.SDK/pull/245)
 ## Summary
 
