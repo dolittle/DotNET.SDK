@@ -26,15 +26,38 @@ public record GetProjectionRequest(ulong WaitForOffset)
     public static readonly GetProjectionRequest GetCurrentValue = new(0);
 }
 
+/// <summary>
+/// Message to subscribe to updates for the current projection id.
+/// </summary>
+/// <param name="Subscriber"></param>
 public record SubscriptionRequest(PID Subscriber);
 
+/// <summary>
+/// Message to unsubscribe from projection updates
+/// </summary>
+/// <param name="Subscriber"></param>
 public record Unsubscribe(PID Subscriber);
 
+/// <summary>
+/// Message to indicate that the actor has been unsubscribed.
+/// </summary>
+/// <param name="Exception"></param>
 public record Unsubscribed(Exception? Exception)
 {
     public static readonly Unsubscribed Normally = new((Exception?)null);
 }
 
+/// <summary>
+/// This actor is responsible for managing a projection.
+/// In addition to holding the current state of the projection, it also manages subscriptions, and allows
+/// clients to subscribe to updates for the specific ID it manages.
+/// Actors with active subscriptions will not be unloaded from memory.
+/// </summary>
+/// <param name="getServiceProvider"></param>
+/// <param name="projectionType"></param>
+/// <param name="logger"></param>
+/// <param name="idleUnloadTimeout">The projection will unload from memory if it has been idle for this duration</param>
+/// <typeparam name="TProjection"></typeparam>
 public class ProjectionActor<TProjection>(
     GetServiceProviderForTenant getServiceProvider,
     IProjection<TProjection> projectionType,
@@ -58,6 +81,10 @@ public class ProjectionActor<TProjection>(
     HashSet<PID>? _subscribers;
     IServiceProvider? _serviceProvider;
 
+    /// <summary>
+    /// Process the incoming message.
+    /// </summary>
+    /// <param name="context"></param>
     public async Task ReceiveAsync(IContext context)
     {
         try
@@ -119,7 +146,7 @@ public class ProjectionActor<TProjection>(
         context.CancelReceiveTimeout(); // Keep the actor alive as long as there are subscribers
     }
 
-    public void OnUnsubscribe(Unsubscribe request, IContext context)
+    void OnUnsubscribe(Unsubscribe request, IContext context)
     {
         RemoveSubscriber(context, request.Subscriber);
         context.Respond(Unsubscribed.Normally);
@@ -314,8 +341,7 @@ public class ProjectionActor<TProjection>(
             return;
         }
 
-        var id = context.ClusterIdentity();
-
+        var id = context.ClusterIdentity() ?? throw new InvalidOperationException("No cluster identity");
         var (tenantId, key) = ClusterIdentityMapper.GetTenantAndKey(id);
         _id = key.Value;
 
@@ -329,6 +355,7 @@ public class ProjectionActor<TProjection>(
 
     static void InitDependencies(TProjection? projection, IServiceProvider? sp)
     {
+        // ReSharper disable once SuspiciousTypeConversion.Global
         if (projection is IRequireDependencies<TProjection> requiresDependencies && sp is not null)
         {
             requiresDependencies.Resolve(sp);
