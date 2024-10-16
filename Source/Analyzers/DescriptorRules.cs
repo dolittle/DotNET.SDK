@@ -97,6 +97,16 @@ static class DescriptorRules
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: "The field should be nullable since the value can be deleted.");
+    
+    internal static readonly DiagnosticDescriptor IncorrectRedactableFieldType =
+        new(
+            DiagnosticIds.RedactableFieldIncorrectType,
+            title: "Generic Type must match the property type",
+            messageFormat: "The generic type for RedactablePersonalDataAttribute was {0}, must match the property type {1}",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The generic type must match the property type.");
 
     
     internal static class Events

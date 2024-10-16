@@ -16,10 +16,13 @@ namespace Dolittle.SDK.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class RedactablePropertyAnalyzer : DiagnosticAnalyzer
 {
-    static readonly DiagnosticDescriptor _rule = DescriptorRules.NonNullableRedactableField;
+    static readonly DiagnosticDescriptor _nonNullableRule = DescriptorRules.NonNullableRedactableField;
+    static readonly DiagnosticDescriptor _incorrectTypeRule = DescriptorRules.IncorrectRedactableFieldType;
+
 
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = [_rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+        [_nonNullableRule, _incorrectTypeRule];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -38,21 +41,37 @@ public class RedactablePropertyAnalyzer : DiagnosticAnalyzer
 
         if (propertySymbol == null) return;
 
-        var hasAttribute = propertySymbol.GetAttributes()
-            .Any(attr => attr.AttributeClass?.Name == "RedactablePersonalDataAttribute");
+        var personalDataAttribute = propertySymbol.GetAttributes()
+            .FirstOrDefault(attr => attr.AttributeClass?.Name == "RedactablePersonalDataAttribute");
 
-        if (!hasAttribute) return;
+        if (personalDataAttribute == null) return;
 
-        if (propertySymbol.Type.NullableAnnotation != NullableAnnotation.Annotated)
+        if (personalDataAttribute.AttributeClass is { IsGenericType: true } namedTypeSymbol)
         {
-            context.ReportDiagnostic(Diagnostic.Create(_rule, propertyDeclaration.GetLocation(), propertySymbol.Name));
+            // If the RedactablePersonalDataAttribute is generic, the type parameter must match the property type
+            var typeArgument = namedTypeSymbol.TypeArguments.First();
+            if (!typeArgument.Equals(propertySymbol.Type, SymbolEqualityComparer.Default))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(_incorrectTypeRule, personalDataAttribute.ApplicationSyntaxReference?.GetSyntax().GetLocation() ?? propertyDeclaration.GetLocation(),
+                    typeArgument.Name, propertySymbol.Type.Name));
+            }
+
+        }
+        else
+        {
+            // If it the non
+            if (propertySymbol.Type.NullableAnnotation != NullableAnnotation.Annotated)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(_nonNullableRule, propertyDeclaration.GetLocation(),
+                    propertySymbol.Name));
+            }
         }
     }
-    
+
     private static void AnalyzeRecordDeclaration(SyntaxNodeAnalysisContext context)
     {
         var recordDeclaration = (RecordDeclarationSyntax)context.Node;
-            
+
         // Check if it's a record with a primary constructor
         if (recordDeclaration.ParameterList == null) return;
 
@@ -65,13 +84,13 @@ public class RedactablePropertyAnalyzer : DiagnosticAnalyzer
             {
                 continue;
             }
-            
+
             var parameterSymbol = context.SemanticModel.GetDeclaredSymbol(parameter);
             if (!IsNullable(parameterSymbol))
             {
-                context.ReportDiagnostic(Diagnostic.Create(_rule, parameter.GetLocation(), parameterSymbol.Name));
+                context.ReportDiagnostic(Diagnostic.Create(_nonNullableRule, parameter.GetLocation(),
+                    parameterSymbol.Name));
             }
-
         }
     }
 
