@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -10,9 +11,14 @@ namespace Dolittle.SDK.Events.Redaction;
 /// Event that triggers redaction of the given personal data
 /// It will target the given event type and redact the properties specified within the EventSourceId of the event
 /// </summary>
-[EventType("de1e7e17-bad5-da7a-fad4-fbc6ec3c0ea5")]
+[EventType(PersonalDataRedactedId)]
 public class PersonalDataRedactedForEvent
 {
+    /// <summary>
+    /// This is recognized by the runtime, and triggers redaction of the selected personal data
+    /// </summary>
+    public const string PersonalDataRedactedId = "de1e7e17-bad5-da7a-fad4-fbc6ec3c0ea5";
+    private static readonly Guid _id = Guid.Parse(PersonalDataRedactedId);
     public string EventId { get; init; }
     public string EventAlias { get; init; }
     public Dictionary<string, object?> RedactedProperties { get; init; }
@@ -51,6 +57,12 @@ public class PersonalDataRedactedForEvent
         if (eventType?.Id is null)
         {
             error = $"EventType not defined for type {typeof(TEvent).Name}";
+            return false;
+        }
+
+        if (eventType.Id.Equals(_id))
+        {
+            error = "Cannot create redaction event for redaction event";
             return false;
         }
 
