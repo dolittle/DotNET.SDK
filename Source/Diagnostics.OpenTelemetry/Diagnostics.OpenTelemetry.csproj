@@ -20,6 +20,7 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime"/>
         <PackageReference Include="Proto.OpenTelemetry"/>
         <PackageReference Include="MongoDB.Driver.Core.Extensions.DiagnosticSources"/>
+        <PackageReference Include="System.Text.Json" />
     </ItemGroup>
 
     <ItemGroup>

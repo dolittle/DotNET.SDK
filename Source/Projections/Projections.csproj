@@ -13,6 +13,7 @@
         <PackageReference Include="Proto.OpenTelemetry"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
         <PackageReference Include="MongoDB.Driver"/>
+        <PackageReference Include="System.Text.Json" />
     </ItemGroup>
 
     <ItemGroup>
