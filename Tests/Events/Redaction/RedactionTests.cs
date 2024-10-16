@@ -48,9 +48,9 @@ public class RedactionTests
         RedactedType<RedactedEvent>.RedactedProperties
             .Should().BeEquivalentTo(new Dictionary<string, object?>
             {
-                { "SomeVal", null },
+                { "SomeVal", -1 },
                 { "SomeImportantPii", "<fjernet pga gdpr-forespørsel>" },
-                { "BirthDate", -1 },
+                { "BirthDate", null },
             });
     }
 
