@@ -44,6 +44,8 @@ public static class DiagnosticIds
 
     public const string ExceptionInMutation = "SDK0010";
 
+    public const string NonNullableRedactableField = "SDK0011";
+    
     /// <summary>
     /// Aggregate missing the required Attribute.
     /// </summary>
