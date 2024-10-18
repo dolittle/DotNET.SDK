@@ -128,11 +128,10 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
     void CheckAttributeIdentity(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context)
     {
         var identityParameter = symbol.Parameters[0];
-        if (!attribute.TryGetArgumentValue(identityParameter, out var id)) return;
-        var identityText = id.GetText().ToString();
+        if (!TryGetStringValue(attribute, identityParameter, context, out var identityText)) return;
         var attributeName = attribute.Name.ToString();
 
-        if (!Guid.TryParse(identityText.Trim('"'), out var identifier))
+        if (!Guid.TryParse(identityText!.Trim('"'), out var identifier))
         {
             var properties = ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
             context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.InvalidIdentity, attribute.GetLocation(), properties,
@@ -147,6 +146,37 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
                 ReportDuplicateIdentity(attribute, context, identifier);
             }
         }
+    }
+
+    static bool TryGetStringValue(AttributeSyntax attribute, IParameterSymbol parameter, SyntaxNodeAnalysisContext context, out string? argumentString)
+    {
+        if (!attribute.TryGetArgumentValue(parameter, out var expression))
+        {
+            argumentString = null;
+            return true;
+        }
+        
+        // Check if the argument is a string literal or a constant
+        if (expression is LiteralExpressionSyntax { Token.Value: string value })
+        {
+            argumentString = value;
+            return true;
+        }
+
+        if (expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            // If the argument is a member access, check if it's a constant
+            // Then retrieve the constant value
+            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess).Symbol;
+            if (symbol is IFieldSymbol { HasConstantValue: true } field)
+            {
+                argumentString = field.ConstantValue?.ToString();
+                return true;
+            }
+        }
+
+        argumentString = null;
+        return false;
     }
 
     static void ReportDuplicateIdentity(AttributeSyntax attribute, SyntaxNodeAnalysisContext context, Guid identifier) =>

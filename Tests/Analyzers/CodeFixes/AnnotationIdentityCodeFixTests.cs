@@ -30,7 +30,7 @@ class SomeEvent
         IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 15)
-            .WithArguments("EventType", "eventTypeId", @"""""");
+            .WithArguments("EventType", "eventTypeId", "");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
 
@@ -58,7 +58,7 @@ class SomeEvent
 
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 28)
-            .WithArguments("EventType", "eventTypeId", @"""""");
+            .WithArguments("EventType", "eventTypeId", "");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
     
@@ -86,7 +86,7 @@ class SomeEvent
 
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 42)
-            .WithArguments("EventType", "eventTypeId", @"""""");
+            .WithArguments("EventType", "eventTypeId", "");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
     
@@ -112,7 +112,7 @@ class SomeHandler
 
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 58)
-            .WithArguments("EventHandler", "eventHandlerId", @"""invalid-id""");
+            .WithArguments("EventHandler", "eventHandlerId", "invalid-id");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
 
@@ -138,7 +138,7 @@ class SomeProjection: ReadModel
 
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 16)
-            .WithArguments("Projection", "projectionId", "\"\"");
+            .WithArguments("Projection", "projectionId", "");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
 
@@ -164,7 +164,7 @@ class SomeProjection: ReadModel
 
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 54)
-            .WithArguments("Projection", "projectionId", @"""invalid-id""");
+            .WithArguments("Projection", "projectionId", "invalid-id");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
 
@@ -190,7 +190,7 @@ class SomeAggregate: AggregateRoot
 
         var diagnosticResult = Diagnostic(DescriptorRules.InvalidIdentity)
             .WithSpan(4, 2, 4, 47)
-            .WithArguments("AggregateRoot", "id", @"""invalid-id""");
+            .WithArguments("AggregateRoot", "id", "invalid-id");
         await VerifyCodeFixAsync(test, expected, diagnosticResult);
     }
 }
