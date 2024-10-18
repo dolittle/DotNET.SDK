@@ -27,6 +27,84 @@ public class RedactedEvent
     [RedactablePersonalData] public DateTimeOffset? BirthDate { get; set; }
 }
 
+[EventType("f8e38583-d9a4-4783-8ac5-29cc0d006e8c")]
+public class NestedRedactedEvent
+{
+    public string SomeId { get; set; }
+    
+    [RedactablePersonalData]
+    public string? SomePii { get; set; }
+    
+    public Nesting NestedObject { get; set; }
+    
+    public class Nesting
+    {
+        [RedactablePersonalData<int>(-1)] public int SomeVal { get; set; }
+
+        [RedactablePersonalData<string>("<fjernet pga gdpr-forespørsel>")]
+        public string? SomeImportantPii { get; set; }
+
+        public string SomethingElse { get; set; }
+
+        [RedactablePersonalData] public DateTimeOffset? BirthDate { get; set; }
+    }
+}
+
+[EventType("f8e38583-d9a4-4783-8ac5-29cc0d006e8c")]
+public class RedactedAtTopLevelEvent
+{
+    public string SomeId { get; set; }
+    
+    [RedactablePersonalData]
+    public string? SomePii { get; set; }
+    
+    [RedactablePersonalData]
+    public Nesting? NestedObject { get; set; }
+    
+    public class Nesting
+    {
+        [RedactablePersonalData<int>(-1)] public int SomeVal { get; set; }
+
+        [RedactablePersonalData<string>("<fjernet pga gdpr-forespørsel>")]
+        public string? SomeImportantPii { get; set; }
+
+        public string SomethingElse { get; set; }
+
+        [RedactablePersonalData] public DateTimeOffset? BirthDate { get; set; }
+    }
+}
+
+[EventType("f8e38583-d9a4-4783-8ac5-29cc0d006e8c")]
+public class VeryNestedRedactedEvent
+{
+    public string SomeId { get; set; }
+    
+    [RedactablePersonalData]
+    public string? SomePii { get; set; }
+    
+    public Nesting NestedObject { get; set; }
+    
+    public class Nesting
+    {
+        [RedactablePersonalData<string>("")]
+        public string SomeOtherPii { get; set; }
+        
+        public MoreNesting AnotherOne { get; set; }
+    }
+
+    public class MoreNesting
+    {
+        [RedactablePersonalData<int>(-1)] public int SomeVal { get; set; }
+
+        [RedactablePersonalData<string>("<fjernet pga gdpr-forespørsel>")]
+        public string? SomeImportantPii { get; set; }
+
+        public string SomethingElse { get; set; }
+
+        [RedactablePersonalData] public DateTimeOffset? BirthDate { get; set; }
+    }
+}
+
 [EventType("5577fe91-5955-4b93-98b0-6399647ffdf3")]
 public record RedactedRecord(
     [property: RedactablePersonalData] string? RedactedParam,
@@ -51,6 +129,44 @@ public class RedactionTests
                 { "SomeVal", -1 },
                 { "SomeImportantPii", "<fjernet pga gdpr-forespørsel>" },
                 { "BirthDate", null },
+            });
+    }
+    
+    [Fact]
+    public void WhenTypeHasNestedRedactableProperties()
+    {
+        RedactedType<NestedRedactedEvent>.RedactedProperties
+            .Should().BeEquivalentTo(new Dictionary<string, object?>
+            {
+                { "SomePii", null },
+                { "NestedObject.SomeVal", -1 },
+                { "NestedObject.SomeImportantPii", "<fjernet pga gdpr-forespørsel>" },
+                { "NestedObject.BirthDate", null },
+            });
+    }
+    
+    [Fact]
+    public void WhenTypeHasBeenRedactedAtTopLevel()
+    {
+        RedactedType<RedactedAtTopLevelEvent>.RedactedProperties
+            .Should().BeEquivalentTo(new Dictionary<string, object?>
+            {
+                { "SomePii", null },
+                { "NestedObject", null },
+            });
+    }
+    
+    [Fact]
+    public void WhenTypeHasDeeplyNestedRedactableProperties()
+    {
+        RedactedType<VeryNestedRedactedEvent>.RedactedProperties
+            .Should().BeEquivalentTo(new Dictionary<string, object?>
+            {
+                { "SomePii", null },
+                { "NestedObject.SomeOtherPii", "" },
+                { "NestedObject.AnotherOne.SomeVal", -1 },
+                { "NestedObject.AnotherOne.SomeImportantPii", "<fjernet pga gdpr-forespørsel>" },
+                { "NestedObject.AnotherOne.BirthDate", null },
             });
     }
 

@@ -37,10 +37,44 @@ public static class RedactedType<T> where T : class
 
     private static IEnumerable<KeyValuePair<string, object?>> GetRedactableReplacedProperties()
     {
-        return typeof(T).GetProperties()
+        var properties = typeof(T).GetProperties();
+        var redactableProperties = properties
             .Where(prop => Attribute.IsDefined(prop, typeof(RedactablePersonalDataAttribute)))
             .Select(ToReplacement)
-            .OfType<KeyValuePair<string, object?>>();
+            .OfType<KeyValuePair<string, object?>>()
+            .ToList();
+
+        var nestedCandidates =
+            properties.Where(prop =>
+                prop.PropertyType.IsClass && prop.PropertyType != typeof(string) &&
+                !Attribute.IsDefined(prop, typeof(RedactablePersonalDataAttribute))).ToList();
+
+        if (nestedCandidates.Count == 0)
+        {
+            return redactableProperties;
+        }
+
+        foreach (var nestedProp in nestedCandidates)
+        {
+            // Get generic version of RedactedType<>
+            try
+            {
+                var redactedType = typeof(RedactedType<>).MakeGenericType(nestedProp.PropertyType);
+                // get RedactedProperties from the generic type
+                var redactedProperties = redactedType.GetProperty("RedactedProperties")?.GetValue(null);
+                if (redactedProperties is ImmutableDictionary<string, object?> nestedProperties)
+                {
+                    redactableProperties.AddRange(nestedProperties.Select(pair =>
+                        new KeyValuePair<string, object?>($"{nestedProp.Name}.{pair.Key}", pair.Value)));
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        return redactableProperties;
     }
 
     static KeyValuePair<string, object?>? ToReplacement(PropertyInfo prop)
@@ -50,6 +84,7 @@ public static class RedactedType<T> where T : class
         {
             return null;
         }
+
         return new KeyValuePair<string, object?>(prop.Name, attribute.ReplacementValue);
     }
 }

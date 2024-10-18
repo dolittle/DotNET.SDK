@@ -21,6 +21,11 @@ public class PersonalDataRedactedForEvent
     private static readonly Guid _id = Guid.Parse(PersonalDataRedactedId);
     public string EventId { get; init; }
     public string EventAlias { get; init; }
+    
+    /// <summary>
+    /// The properties that will be redacted, and the replacement values.
+    /// Can be null, in which case the properties will be redacted with a default value
+    /// </summary>
     public Dictionary<string, object?> RedactedProperties { get; init; }
     public string RedactedBy { get; init; }
     public string Reason { get; init; }
