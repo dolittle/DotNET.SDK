@@ -68,7 +68,7 @@ class RedactionEvent: Dolittle.SDK.Events.Redaction.PersonalDataRedactedForEvent
         {
             Diagnostic(DescriptorRules.IncorrectRedactedEventTypePrefix)
                 .WithSpan(8, 2, 8, 71)
-                .WithArguments("de1e7e17-0000-da7a-aaaa-fbc6ec3c0ea6"),
+                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "de1e7e17-0000-da7a-aaaa-fbc6ec3c0ea6"),
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -94,7 +94,7 @@ class RedactionEvent: Dolittle.SDK.Events.Redaction.PersonalDataRedactedForEvent
         {
             Diagnostic(DescriptorRules.IncorrectRedactedEventTypePrefix)
                 .WithSpan(8, 2, 8, 68)
-                .WithArguments("hello-0000-da7a-aaaa-fbc6ec3c0ea6"),
+                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "hello-0000-da7a-aaaa-fbc6ec3c0ea6"),
         };
 
         await VerifyAnalyzerAsync(test, expected);

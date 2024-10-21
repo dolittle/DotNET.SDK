@@ -145,7 +145,7 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         if (!TryGetStringValue(attribute, identityParameter, context, out var identityText)) return;
         var attributeName = attribute.Name.ToString();
 
-        if (FlagRedactionIdentity(symbol, attribute, context, identityText!)) return;
+        if (FlagRedactionIdentity(symbol, attribute, context, identityParameter, attributeName, identityText!)) return;
 
         if (!Guid.TryParse(identityText!.Trim('"'), out var identifier))
         {
@@ -165,7 +165,9 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    bool FlagRedactionIdentity(IMethodSymbol symbol, AttributeSyntax attribute, SyntaxNodeAnalysisContext context, string identifier)
+    bool FlagRedactionIdentity(IMethodSymbol symbol, AttributeSyntax attribute, SyntaxNodeAnalysisContext context,
+        IParameterSymbol identityParameter,
+        string attributeName, string identifier)
     {
         // Only relevant for EventTypeAttribute on a class extending PersonalDataRedacted
         if (symbol.ReceiverType?.Name != "EventTypeAttribute") return false;
@@ -175,29 +177,30 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         // At this point we know that the attribute is an EventTypeAttribute on a class extending PersonalDataRedacted
         // If the identifier does not contain the redaction prefix, we report an error
 
-        if (Guid.TryParse(identifier.Trim('"'), out var guid))
+        if (IsValidRedactionIdentifier())
         {
-            if (guid.ToString()
-                .StartsWith(DolittleConstants.Identifiers.RedactionIdentityPrefix,
-                    StringComparison.InvariantCultureIgnoreCase))
+            return false;
+        }
+        
+        context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.IncorrectRedactedEventTypePrefix,
+            attribute.GetLocation(),
+            properties: ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name),
+            attributeName, identityParameter.Name, identifier));
+        
+        return true;
+
+
+        bool IsValidRedactionIdentifier()
+        {
+            if (!Guid.TryParse(identifier.Trim('"'), out var guid))
             {
                 return false;
             }
 
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.IncorrectRedactedEventTypePrefix,
-                attribute.GetLocation(), identifier));
-            return true;
+            var asString = guid.ToString();
+            return asString.StartsWith(DolittleConstants.Identifiers.RedactionIdentityPrefix,
+                    StringComparison.InvariantCultureIgnoreCase);
         }
-
-
-        if (!identifier.StartsWith(DolittleConstants.Identifiers.RedactionIdentityPrefix,
-                StringComparison.InvariantCultureIgnoreCase))
-        {
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.IncorrectRedactedEventTypePrefix,
-                attribute.GetLocation(), identifier));
-        }
-
-        return true;
     }
 
     static bool TryGetStringValue(AttributeSyntax attribute, IParameterSymbol parameter,
