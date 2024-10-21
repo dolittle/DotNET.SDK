@@ -28,13 +28,6 @@ public static class RedactedType<T> where T : class
         return redactableRemovedProperties;
     }
 
-    // private static IEnumerable<KeyValuePair<string, object?>> GetRemovedProperties()
-    // {
-    //     return typeof(T).GetProperties()
-    //         .Where(prop => Attribute.IsDefined(prop, typeof(RedactablePersonalDataAttribute)))
-    //         .Select(it => new KeyValuePair<string, object?>(it.Name, it));
-    // }
-
     private static IEnumerable<KeyValuePair<string, object?>> GetRedactableReplacedProperties()
     {
         var properties = typeof(T).GetProperties();

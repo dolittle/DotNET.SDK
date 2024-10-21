@@ -35,7 +35,7 @@ static class AnalysisExtensions
         var baseType = typeSymbol.BaseType;
         while (baseType != null)
         {
-            if (baseType.ToString() == DolittleTypes.AggregateRootBaseClass)
+            if (baseType.ToString() == DolittleConstants.Types.AggregateRootBaseClass)
             {
                 return true;
             }
@@ -56,7 +56,7 @@ static class AnalysisExtensions
         var baseType = typeSymbol.BaseType;
         while (baseType != null)
         {
-            if (baseType.ToString() == DolittleTypes.ReadModelClass)
+            if (baseType.ToString() == DolittleConstants.Types.ReadModelClass)
             {
                 return true;
             }
@@ -67,9 +67,9 @@ static class AnalysisExtensions
         return false;
     }
 
-    public static bool HasEventTypeAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.EventTypeAttribute);
-    public static bool HasAggregateRootAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.AggregateRootAttribute);
-    public static bool HasEventHandlerAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleTypes.EventHandlerAttribute);
+    public static bool HasEventTypeAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleConstants.Types.EventTypeAttribute);
+    public static bool HasAggregateRootAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleConstants.Types.AggregateRootAttribute);
+    public static bool HasEventHandlerAttribute(this ITypeSymbol type) => type.HasAttribute(DolittleConstants.Types.EventHandlerAttribute);
 
     public static bool HasAttribute(this ITypeSymbol type, string attributeName)
     {

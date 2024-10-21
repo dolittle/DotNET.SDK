@@ -111,6 +111,10 @@ public record RedactedRecord(
     [property: RedactablePersonalData<int>(-999)] int AnotherRedactedParam,
     string NonRedactedParam);
 
+
+[EventType("de1e7e17-bad5-da7a-aaaa-fbc6ec3c0ea6")]
+public class SomeRecordRedacted : PersonalDataRedactedForEvent<RedactedRecord>;
+
 public class RedactionTests
 {
     [Fact]
@@ -180,7 +184,7 @@ public class RedactionTests
                 { "AnotherRedactedParam", -999 },
             });
     }
-
+    
     [Fact]
     public void WhenRecordHasNoRedactableProperties()
     {
@@ -194,10 +198,11 @@ public class RedactionTests
         var reason = "Some reason";
         var redactedBy = "Some person";
         var success =
-            PersonalDataRedactedForEvent.TryCreate<RedactedEvent>(reason, redactedBy, out var redactionEvent,
+            Redactions.TryCreate<RedactedEvent>(reason, redactedBy, out var redactionEvent,
                 out var error);
 
         success.Should().BeTrue();
+        error.Should().BeNull();
         redactionEvent.Should().NotBeNull();
         redactionEvent!.EventId.Should().Be("f8e38583-d9a4-4783-8ac5-29cc0d006e8b");
         redactionEvent.EventAlias.Should().Be(nameof(RedactedEvent));
@@ -210,14 +215,38 @@ public class RedactionTests
         redactionEvent.RedactedBy.Should().Be(redactedBy);
         redactionEvent.Reason.Should().Be(reason);
     }
+    
+    [Fact]
+    public void WhenCreatingCustomRedactionEvent()
+    {
+        var reason = "Some reason";
+        var redactedBy = "Some person";
+        var success =
+            Redactions.TryCreate<RedactedRecord, SomeRecordRedacted>(reason, redactedBy, out var redactionEvent,
+                out var error);
+
+        success.Should().BeTrue();
+        error.Should().BeNull();
+        redactionEvent.Should().NotBeNull();
+        redactionEvent!.EventId.Should().Be("5577fe91-5955-4b93-98b0-6399647ffdf3");
+        redactionEvent.EventAlias.Should().Be(nameof(RedactedRecord));
+        redactionEvent.RedactedProperties.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            { "RedactedParam", null },
+            { "AnotherRedactedParam", -999 },
+        });
+        redactionEvent.RedactedBy.Should().Be(redactedBy);
+        redactionEvent.Reason.Should().Be(reason);
+    }
+    
+    
 
     [Theory]
     [InlineData("", "Some person", "Reason cannot be empty")]
     [InlineData("Some reason", "", "RedactedBy cannot be empty")]
     public void WhenProvidingInsufficientInput(string reason, string redactedBy, string expectedError)
     {
-        var success =
-            PersonalDataRedactedForEvent.TryCreate<RedactedEvent>(reason, redactedBy, out var redactionEvent,
+        var success = Redactions.TryCreate<RedactedEvent>(reason, redactedBy, out var redactionEvent,
                 out var error);
 
         success.Should().BeFalse();

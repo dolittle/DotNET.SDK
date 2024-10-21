@@ -38,7 +38,7 @@ public class EventsHaveAnnotationAnalyzer : DiagnosticAnalyzer
         if (methodName != "CommitEvent" && methodName != "CommitPublicEvent") return;
 
         if (context.SemanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol) return;
-        if (!methodSymbol.ContainingTypeHasInterface(DolittleTypes.ICommitEventsInterface)) return;
+        if (!methodSymbol.ContainingTypeHasInterface(DolittleConstants.Types.CommitEventsInterface)) return;
 
         var argument = invocation.ArgumentList.Arguments[0];
 
@@ -50,6 +50,6 @@ public class EventsHaveAnnotationAnalyzer : DiagnosticAnalyzer
         if (typeInfo.Type.HasEventTypeAttribute()) return; // All good
 
         context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute, invocation.GetLocation(),
-            typeInfo.Type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), typeInfo.Type.Name));
+            typeInfo.Type.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute), typeInfo.Type.Name));
     }
 }

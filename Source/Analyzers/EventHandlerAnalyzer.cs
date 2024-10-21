@@ -33,7 +33,7 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
     {
         var classSyntax = (ClassDeclarationSyntax)context.Node;
         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classSyntax);
-        if (classSymbol is null || !classSymbol.HasAttribute(DolittleTypes.EventHandlerAttribute))
+        if (classSymbol is null || !classSymbol.HasAttribute(DolittleConstants.Types.EventHandlerAttribute))
         {
             return;
         }
@@ -73,13 +73,13 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
         if (!parameter.Type.HasEventTypeAttribute())
         {
             var diagnostic = Diagnostic.Create(DescriptorRules.Events.MissingAttribute, parameter.Locations[0],
-                parameter.Type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), parameter.Type.Name);
+                parameter.Type.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute), parameter.Type.Name);
             context.ReportDiagnostic(diagnostic);
         }
         
         // Check that the method takes an EventContext as the second parameter
         var secondParameter = handleMethod.Parameters.Skip(1).FirstOrDefault();
-        if(secondParameter is null || secondParameter.Type.ToString() != DolittleTypes.EventContext)
+        if(secondParameter is null || secondParameter.Type.ToString() != DolittleConstants.Types.EventContext)
         {
             var diagnostic = Diagnostic.Create(DescriptorRules.Events.MissingEventContext, handleMethod.Locations[0], handleMethod.Name);
             context.ReportDiagnostic(diagnostic);
@@ -89,7 +89,7 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
     static void AnalyzeEventHandlerAttribute(SyntaxNodeAnalysisContext context, INamedTypeSymbol classSymbol)
     {
         var eventHandlerAttribute = classSymbol.GetAttributes()
-            .Single(attribute => attribute.AttributeClass?.ToDisplayString() == DolittleTypes.EventHandlerAttribute);
+            .Single(attribute => attribute.AttributeClass?.ToDisplayString() == DolittleConstants.Types.EventHandlerAttribute);
         if (eventHandlerAttribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is not AttributeSyntax attributeSyntaxNode)
         {
             return;

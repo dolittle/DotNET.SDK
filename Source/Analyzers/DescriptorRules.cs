@@ -108,6 +108,15 @@ static class DescriptorRules
             isEnabledByDefault: true,
             description: "The generic type must match the property type.");
 
+    internal static readonly DiagnosticDescriptor IncorrectRedactedEventTypePrefix =
+        new(
+            DiagnosticIds.RedactionEventIncorrectPrefix,
+            title: "Redaction events must have the correct prefix",
+            messageFormat: "The prefix for redaction events types should be 'de1e7e17-bad5-da7a', was '{0}'",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "In order for redaction events to be recognized by the runtime, it must have the correct prefix.");
     
     internal static class Events
     {
