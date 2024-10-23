@@ -23,17 +23,23 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 
     static readonly ImmutableDictionary<string, string?> _missingProjectionBaseClassProperties =
         ImmutableDictionary<string, string?>.Empty
-            .Add(BaseclassKey, DolittleTypes.ReadModelClass);
+            .Add(BaseclassKey, DolittleConstants.Types.ReadModelClass);
 
     static readonly ImmutableDictionary<string, string?> _missingAggregateBaseClassProperties =
         ImmutableDictionary<string, string?>.Empty
-            .Add(BaseclassKey, DolittleTypes.AggregateRootBaseClass);
+            .Add(BaseclassKey, DolittleConstants.Types.AggregateRootBaseClass);
 
     readonly ConcurrentDictionary<(string type, Guid id), AttributeSyntax> _identities = new();
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(DescriptorRules.InvalidIdentity, DescriptorRules.DuplicateIdentity, DescriptorRules.MissingBaseClass, DescriptorRules.InvalidTimespan);
+        ImmutableArray.Create(
+            DescriptorRules.InvalidIdentity,
+            DescriptorRules.DuplicateIdentity,
+            DescriptorRules.MissingBaseClass,
+            DescriptorRules.InvalidTimespan,
+            DescriptorRules.IncorrectRedactedEventTypePrefix
+        );
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -60,18 +66,22 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
                 break;
             case "AggregateRootAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
-                CheckHasBaseClass(context, DolittleTypes.AggregateRootBaseClass, _missingAggregateBaseClassProperties);
+                CheckHasBaseClass(context, DolittleConstants.Types.AggregateRootBaseClass,
+                    _missingAggregateBaseClassProperties);
                 break;
 
             case "ProjectionAttribute":
                 CheckAttributeIdentity(attribute, symbol, context);
-                CheckAttributeParseAbleIfPresent(attribute, symbol, context, "idleUnloadTimeout", IsValidTimespan, DescriptorRules.InvalidTimespan);
-                CheckHasBaseClass(context, DolittleTypes.ReadModelClass, _missingProjectionBaseClassProperties);
+                CheckAttributeParseAbleIfPresent(attribute, symbol, context, "idleUnloadTimeout", IsValidTimespan,
+                    DescriptorRules.InvalidTimespan);
+                CheckHasBaseClass(context, DolittleConstants.Types.ReadModelClass,
+                    _missingProjectionBaseClassProperties);
                 break;
         }
     }
 
-    void CheckAttributeParseAbleIfPresent(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context, string parameterName,
+    void CheckAttributeParseAbleIfPresent(AttributeSyntax attribute, IMethodSymbol symbol,
+        SyntaxNodeAnalysisContext context, string parameterName,
         Func<string, bool> isParseAble, DiagnosticDescriptor descriptor)
     {
         var parameter = symbol.Parameters.FirstOrDefault(_ => _.Name == parameterName);
@@ -79,18 +89,22 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
         if (!isParseAble(value.GetText().ToString().Trim('\"')))
         {
             var properties = ImmutableDictionary<string, string?>.Empty.Add("parameterName", parameterName);
-            context.ReportDiagnostic(Diagnostic.Create(descriptor, attribute.GetLocation(), properties, attribute.Name.ToString(), parameterName));
+            context.ReportDiagnostic(Diagnostic.Create(descriptor, attribute.GetLocation(), properties,
+                attribute.Name.ToString(), parameterName));
         }
     }
 
-    void CheckHasBaseClass(SyntaxNodeAnalysisContext context, string expectedBaseClass, ImmutableDictionary<string, string?> properties)
+    void CheckHasBaseClass(SyntaxNodeAnalysisContext context, string expectedBaseClass,
+        ImmutableDictionary<string, string?> properties)
     {
         if (context.Node.FirstAncestorOrSelf<ClassDeclarationSyntax>() is not { } classDeclaration) return;
 
-        if (classDeclaration.BaseList is null || classDeclaration.BaseList.Types.Count == 0 || !TypeExtends(classDeclaration, expectedBaseClass, context))
+        if (classDeclaration.BaseList is null || classDeclaration.BaseList.Types.Count == 0 ||
+            !TypeExtends(classDeclaration, expectedBaseClass, context))
         {
             var className = classDeclaration.Identifier.ToString();
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.MissingBaseClass, classDeclaration.GetLocation(), properties, className,
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.MissingBaseClass, classDeclaration.GetLocation(),
+                properties, className,
                 expectedBaseClass));
         }
     }
@@ -128,30 +142,104 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
     void CheckAttributeIdentity(AttributeSyntax attribute, IMethodSymbol symbol, SyntaxNodeAnalysisContext context)
     {
         var identityParameter = symbol.Parameters[0];
-        if (!attribute.TryGetArgumentValue(identityParameter, out var id)) return;
-        var identityText = id.GetText().ToString();
+        if (!TryGetStringValue(attribute, identityParameter, context, out var identityText)) return;
         var attributeName = attribute.Name.ToString();
 
-        if (!Guid.TryParse(identityText.Trim('"'), out var identifier))
+        if (FlagRedactionIdentity(symbol, attribute, context, identityParameter, attributeName, identityText!)) return;
+
+        if (!Guid.TryParse(identityText!.Trim('"'), out var identifier))
         {
-            var properties = ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
-            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.InvalidIdentity, attribute.GetLocation(), properties,
+            var properties =
+                ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name);
+            context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.InvalidIdentity, attribute.GetLocation(),
+                properties,
                 attributeName, identityParameter.Name, identityText));
+            return;
         }
-        else
+
+        var key = (attributeName, identifier);
+        if (!_identities.TryAdd(key, attribute))
         {
-            var key = (attributeName, identifier);
-            if (!_identities.TryAdd(key, attribute))
-            {
-                // Only reports secondary sightings, not the first one
-                ReportDuplicateIdentity(attribute, context, identifier);
-            }
+            // Only reports secondary sightings, not the first one
+            ReportDuplicateIdentity(attribute, context, identifier);
         }
     }
 
-    static void ReportDuplicateIdentity(AttributeSyntax attribute, SyntaxNodeAnalysisContext context, Guid identifier) =>
+    bool FlagRedactionIdentity(IMethodSymbol symbol, AttributeSyntax attribute, SyntaxNodeAnalysisContext context,
+        IParameterSymbol identityParameter,
+        string attributeName, string identifier)
+    {
+        // Only relevant for EventTypeAttribute on a class extending PersonalDataRedacted
+        if (symbol.ReceiverType?.Name != "EventTypeAttribute") return false;
+        if (context.Node.FirstAncestorOrSelf<ClassDeclarationSyntax>() is not { } classDeclaration) return false;
+        if (!TypeExtends(classDeclaration, DolittleConstants.Types.RedactedEvent, context)) return false;
+
+        // At this point we know that the attribute is an EventTypeAttribute on a class extending PersonalDataRedacted
+        // If the identifier does not contain the redaction prefix, we report an error
+
+        if (IsValidRedactionIdentifier())
+        {
+            return false;
+        }
+        
+        context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.IncorrectRedactedEventTypePrefix,
+            attribute.GetLocation(),
+            properties: ImmutableDictionary<string, string?>.Empty.Add("identityParameter", identityParameter.Name),
+            attributeName, identityParameter.Name, identifier));
+        
+        return true;
+
+
+        bool IsValidRedactionIdentifier()
+        {
+            if (!Guid.TryParse(identifier.Trim('"'), out var guid))
+            {
+                return false;
+            }
+
+            var asString = guid.ToString();
+            return asString.StartsWith(DolittleConstants.Identifiers.RedactionIdentityPrefix,
+                    StringComparison.InvariantCultureIgnoreCase);
+        }
+    }
+
+    static bool TryGetStringValue(AttributeSyntax attribute, IParameterSymbol parameter,
+        SyntaxNodeAnalysisContext context, out string? argumentString)
+    {
+        if (!attribute.TryGetArgumentValue(parameter, out var expression))
+        {
+            argumentString = null;
+            return true;
+        }
+
+        // Check if the argument is a string literal or a constant
+        if (expression is LiteralExpressionSyntax { Token.Value: string value })
+        {
+            argumentString = value;
+            return true;
+        }
+
+        if (expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            // If the argument is a member access, check if it's a constant
+            // Then retrieve the constant value
+            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess).Symbol;
+            if (symbol is IFieldSymbol { HasConstantValue: true } field)
+            {
+                argumentString = field.ConstantValue?.ToString();
+                return true;
+            }
+        }
+
+        argumentString = null;
+        return false;
+    }
+
+    static void ReportDuplicateIdentity(AttributeSyntax attribute, SyntaxNodeAnalysisContext context,
+        Guid identifier) =>
         context.ReportDiagnostic(
-            Diagnostic.Create(DescriptorRules.DuplicateIdentity, attribute.GetLocation(), attribute.Name.ToString(), identifier.ToString()));
+            Diagnostic.Create(DescriptorRules.DuplicateIdentity, attribute.GetLocation(), attribute.Name.ToString(),
+                identifier.ToString()));
 
     static bool IsValidTimespan(string value) => TimeSpan.TryParse(value, out _);
 }

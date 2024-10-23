@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
-    <PackageReference Include="Google.Protobuf" Version="$(ProtobufVersion)" />
+    <PackageReference Include="Dolittle.Contracts"/>
+    <PackageReference Include="Google.Protobuf"/>
   </ItemGroup>
 
   <ItemGroup>

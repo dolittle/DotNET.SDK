@@ -52,7 +52,7 @@ class SomeEvent
         {
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(4, 2, 4, 15)
-                .WithArguments("EventType", "eventTypeId", "\"\"")
+                .WithArguments("EventType", "eventTypeId", "")
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -71,7 +71,7 @@ class SomeEvent
         {
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 35)
-                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "\"\""),
+                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", ""),
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -102,6 +102,36 @@ class SomeEvent
 
         await VerifyAnalyzerFindsNothingAsync(test);
     }
+    
+    [Fact]
+    public async Task WhenHasConstAsId()
+    {
+        var test = @"
+[Dolittle.SDK.Events.EventType(Id)]
+class SomeEvent
+{
+    const string Id = ""c6f87322-be67-4aaf-a9f4-fdc24ac4f0fb"";
+
+    public string Name {get; set;}
+}";
+
+        await VerifyAnalyzerFindsNothingAsync(test);
+    }
+    
+    [Fact]
+    public async Task WhenHasConstAsIdWithAlias()
+    {
+        var test = @"
+[Dolittle.SDK.Events.EventType(alias: ""Bob"", eventTypeId: Id)]
+class SomeEvent
+{
+    const string Id = ""c6f87322-be67-4aaf-a9f4-fdc24ac4f0fb"";
+
+    public string Name {get; set;}
+}";
+
+        await VerifyAnalyzerFindsNothingAsync(test);
+    }
 
     [Fact]
     public async Task ShouldDetectEventTypeWithInvalidNamedArguments()
@@ -116,7 +146,7 @@ class SomeEvent
         {
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 80)
-                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "\"c6f87322-be67-4aaf\"")
+                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "c6f87322-be67-4aaf")
         };
 
         await VerifyAnalyzerAsync(test, expected);
@@ -148,7 +178,7 @@ class SomeEvent
         {
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 47)
-                .WithArguments("Dolittle.SDK.Events.Handling.EventHandler", "eventHandlerId", "\"\""),
+                .WithArguments("Dolittle.SDK.Events.Handling.EventHandler", "eventHandlerId", ""),
         };
 
         await VerifyAnalyzerAsync(test, expected);

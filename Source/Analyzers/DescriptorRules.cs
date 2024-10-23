@@ -88,6 +88,36 @@ static class DescriptorRules
             isEnabledByDefault: true,
             description: "On-methods can not throw exceptions. This will prevent the system from being able to replay events.");
     
+    internal static readonly DiagnosticDescriptor NonNullableRedactableField =
+        new(
+            DiagnosticIds.NonNullableRedactableField,
+            title: "Redactable fields must be nullable",
+            messageFormat: "Since the value can be deleted, the field '{0}' should be nullable",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "The field should be nullable since the value can be deleted.");
+    
+    internal static readonly DiagnosticDescriptor IncorrectRedactableFieldType =
+        new(
+            DiagnosticIds.RedactableFieldIncorrectType,
+            title: "Generic Type must match the property type",
+            messageFormat: "The generic type for RedactablePersonalDataAttribute was {0}, must match the property type {1}",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The generic type must match the property type.");
+
+    internal static readonly DiagnosticDescriptor IncorrectRedactedEventTypePrefix =
+        new(
+            DiagnosticIds.RedactionEventIncorrectPrefix,
+            title: "Redaction events must have the correct prefix",
+            messageFormat: "The prefix for redaction events types should be 'de1e7e17-bad5-da7a', was '{0}'",
+            DiagnosticCategories.Sdk,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "In order for redaction events to be recognized by the runtime, it must have the correct prefix.");
+    
     internal static class Events
     {
         internal static readonly DiagnosticDescriptor MissingAttribute =

@@ -50,7 +50,7 @@ public class SalesPerDayTotalByEventSource : ReadModel
     }
 }
 
-class ProductKeySelector: IKeySelector<ProductSold>
+sealed class ProductKeySelector: IKeySelector<ProductSold>
 {
     public Key Selector(ProductSold evt, EventContext ctx) => $"{evt.Store}_{ctx.Occurred.Year}-{ctx.Occurred.Month:D2}-{ctx.Occurred.Day:D2}";
 }

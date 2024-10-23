@@ -22,7 +22,7 @@ public abstract class DefaultAnalysisSuppressorTest<TSuppressor>
 
     protected Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
     {
-        var test = new CSharpAnalyzerTest<TSuppressor, XUnitVerifier>
+        var test = new CSharpAnalyzerTest<TSuppressor, DefaultVerifier>
         {
             TestState =
             {
@@ -38,15 +38,5 @@ public abstract class DefaultAnalysisSuppressorTest<TSuppressor>
         }
 
         return test.RunAsync();
-    }
-
-    protected DiagnosticResult Diagnostic()
-    {
-        return AnalyzerVerifier<TSuppressor>.Diagnostic();
-    }
-
-    protected DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor)
-    {
-        return AnalyzerVerifier<TSuppressor>.Diagnostic(descriptor);
     }
 }

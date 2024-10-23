@@ -3,6 +3,8 @@
 
 using Dolittle.SDK.Events;
 using Machine.Specifications;
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Local
 
 namespace Dolittle.SDK.Testing.Aggregates.for_AggregateMock.when_performing_operations.on_default_constructor_aggregate;
 
@@ -14,7 +16,6 @@ class and_operation_does_not_fail : given.an_aggregate_with_default_constructor
     Establish context = () =>
     {
         event_source = "event source";
-        new_state = 3;
     };
     
     Because of = () => aggregate_of.Get(event_source).Perform(_ => _.EventCausingNoStateChange()).GetAwaiter().GetResult();

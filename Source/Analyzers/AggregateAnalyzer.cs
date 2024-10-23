@@ -107,7 +107,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Diagnostic.Create(
                         DescriptorRules.Events.MissingAttribute,
                         parameters[0].DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(),
-                        eventType.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute),
+                        eventType.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute),
                         eventType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat))
                     );
                 }
@@ -187,14 +187,14 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
         var hasAttribute = aggregateClass.GetAttributes()
             .Any(attribute =>
                 attribute.AttributeClass?.ToDisplayString()
-                    .Equals(DolittleTypes.AggregateRootAttribute, StringComparison.Ordinal) == true);
+                    .Equals(DolittleConstants.Types.AggregateRootAttribute, StringComparison.Ordinal) == true);
 
         if (!hasAttribute)
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 DescriptorRules.Aggregate.MissingAttribute,
                 aggregateClass.Locations[0],
-                aggregateClass.ToTargetClassAndAttributeProps(DolittleTypes.AggregateRootAttribute),
+                aggregateClass.ToTargetClassAndAttributeProps(DolittleConstants.Types.AggregateRootAttribute),
                 aggregateClass.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
             ));
         }
@@ -216,7 +216,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Events.MissingAttribute,
                     invocation.GetLocation(),
-                    type.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute), type.ToString()));
+                    type.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute), type.ToString()));
             }
 
             if (!handledEventTypes.Contains(type))

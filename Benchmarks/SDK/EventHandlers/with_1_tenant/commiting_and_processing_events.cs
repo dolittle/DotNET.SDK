@@ -22,16 +22,16 @@ public class commiting_and_processing_events : SingleRuntimeSetup
     public override void IterationSetup()
     {
         base.IterationSetup();
-        var client = GetConnectedClient(_ => _
-            .WithEventTypes(_ => _.Register<AnEvent>().Register<LastEvent>())
-            .WithEventHandlers(_ => _
+        _finishedProcessing = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var client = GetConnectedClient(builder => builder
+            .WithEventTypes(types => types.Register<AnEvent>().Register<LastEvent>())
+            .WithEventHandlers(handlers => handlers
                 .Create("63c974e5-1381-4757-a5de-04ef9d729d16")
                 .WithConcurrency(Concurrency)
                 .Partitioned()
                 .Handle<AnEvent>((evt, ctx) => { })
                 .Handle<LastEvent>((evt, ctx) => { _finishedProcessing.SetResult(true); })));
         _eventStore = client.EventStore.ForTenant(TenantId.Development);
-        _finishedProcessing = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         _eventStore.CommitEvent(_anEvent, "source").Wait();
         _eventSources = new EventSourceId[EventSourceIds];
         for (var i = 0; i < EventSourceIds; i++)

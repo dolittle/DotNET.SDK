@@ -97,7 +97,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Diagnostic.Create(
                         DescriptorRules.Events.MissingAttribute,
                         parameters[0].DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation(),
-                        eventType.ToTargetClassAndAttributeProps(DolittleTypes.EventTypeAttribute),
+                        eventType.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute),
                         eventType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat))
                     );
                 }
@@ -107,8 +107,8 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
             {
                 var secondParameterTypeSymbol = parameters[1].Type;
                 var contextType = secondParameterTypeSymbol.ToDisplayString();
-                if (!contextType.Equals(DolittleTypes.ProjectionContextType, StringComparison.Ordinal)
-                    && !contextType.Equals(DolittleTypes.EventContext, StringComparison.Ordinal)
+                if (!contextType.Equals(DolittleConstants.Types.ProjectionContextType, StringComparison.Ordinal)
+                    && !contextType.Equals(DolittleConstants.Types.EventContext, StringComparison.Ordinal)
                     )
                 {
                     var loc = parameters[1].DeclaringSyntaxReferences.First().GetSyntax().GetLocation();
@@ -178,7 +178,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
         }
         else
         {
-            if (namedReturnType.ToDisplayString() != DolittleTypes.ProjectionResultType)
+            if (namedReturnType.ToDisplayString() != DolittleConstants.Types.ProjectionResultType)
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Projection.InvalidOnMethodReturnType, syntax.GetLocation(),
                     onMethod.ToDisplayString()));
@@ -222,14 +222,14 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
     static void CheckProjectionAttributePresent(SyntaxNodeAnalysisContext context, INamedTypeSymbol projectionClass)
     {
         var hasAttribute = projectionClass.GetAttributes()
-            .Any(attribute => attribute.AttributeClass?.ToDisplayString().Equals(DolittleTypes.ProjectionAttribute, StringComparison.Ordinal) == true);
+            .Any(attribute => attribute.AttributeClass?.ToDisplayString().Equals(DolittleConstants.Types.ProjectionAttribute, StringComparison.Ordinal) == true);
 
         if (!hasAttribute)
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 DescriptorRules.Projection.MissingAttribute,
                 projectionClass.Locations[0],
-                projectionClass.ToTargetClassAndAttributeProps(DolittleTypes.ProjectionAttribute),
+                projectionClass.ToTargetClassAndAttributeProps(DolittleConstants.Types.ProjectionAttribute),
                 projectionClass.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
             ));
         }

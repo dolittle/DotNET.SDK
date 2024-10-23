@@ -8,10 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftAbstractionsVersion)" />
-        <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
-        <PackageReference Include="System.Reactive" Version="$(RxVersion)" />
+        <PackageReference Include="Dolittle.Contracts"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+        <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="System.Reactive"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -45,7 +45,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public TimeSpan AggregateIdleTimeout { get; private set; } = TimeSpan.FromSeconds(30);
     
     /// <summary>
-    /// The default timeout for performing an aggregate operation (potentially including hydration & commits).
+    /// The default timeout for performing an aggregate operation (potentially including hydration and commits).
     /// If no CancellationToken is provided, this timeout will be used.
     /// </summary>
     public TimeSpan? DefaultAggregatePerformTimeout { get; private set; }

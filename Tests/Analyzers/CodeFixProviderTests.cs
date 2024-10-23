@@ -21,7 +21,7 @@ public abstract class CodeFixProviderTests<TAnalyzer, TCodeFix> : AnalyzerTest<T
         source = ToLfLineEndings(source);
         expectedResult = ToLfLineEndings(expectedResult);
         
-        var test = new CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>
+        var test = new CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>
         {
             TestCode = source,
             TestState =

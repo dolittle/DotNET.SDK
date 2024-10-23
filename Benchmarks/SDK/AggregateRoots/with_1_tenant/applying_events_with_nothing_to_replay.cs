@@ -10,14 +10,13 @@ namespace Dolittle.Benchmarks.SDK.AggregateRoots.with_1_tenant;
 
 public class applying_events_with_nothing_to_replay : SingleRuntimeSetup
 {
-    IAggregates _aggregates;
+    IAggregates _aggregates = null!;
     public override void IterationSetup()
     {
         base.IterationSetup();
-        var client = GetConnectedClient(_ => _
-            .WithEventTypes(_ => _.Register<AnEvent>().Register<LastEvent>())
-            .WithAggregateRoots(_ => _
-                .Register<AnAggregateRoot>()));
+        var client = GetConnectedClient(builder => builder
+            .WithEventTypes(types => types.Register<AnEvent>().Register<LastEvent>())
+            .WithAggregateRoots(roots => roots.Register<AnAggregateRoot>()));
         _aggregates = client.Aggregates.ForTenant(TenantId.Development);
         client.EventStore.ForTenant(TenantId.Development).CommitEvent(new AnEvent(), "source").Wait();
     }
@@ -31,7 +30,7 @@ public class applying_events_with_nothing_to_replay : SingleRuntimeSetup
     [Benchmark]
     public async Task Applying100EventsWithNothingToReplay()
     {
-        await _aggregates.Get<AnAggregateRoot>("an aggregate").Perform(_ =>
+        await _aggregates!.Get<AnAggregateRoot>("an aggregate").Perform(_ =>
         {
             for (var i = 0; i < 99; i++)
             {

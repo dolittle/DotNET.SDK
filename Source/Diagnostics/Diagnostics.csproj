@@ -5,7 +5,7 @@
         <RootNamespace>Dolittle.SDK.Diagnostics.OpenTelemetry</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="OpenTelemetry.Api" Version="$(OpenTelemetryVersion)"/>
+        <PackageReference Include="OpenTelemetry.Api"/>
     </ItemGroup>
 
 

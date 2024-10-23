@@ -44,6 +44,10 @@ public static class DiagnosticIds
 
     public const string ExceptionInMutation = "SDK0010";
 
+    public const string NonNullableRedactableField = "SDK0011";
+    public const string RedactableFieldIncorrectType = "SDK0012";
+    public const string RedactionEventIncorrectPrefix = "SDK0013";
+    
     /// <summary>
     /// Aggregate missing the required Attribute.
     /// </summary>
