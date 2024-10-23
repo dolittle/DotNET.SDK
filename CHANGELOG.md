@@ -1,3 +1,91 @@
+# [23.5.0] - 2024-10-23 [PR: #247](https://github.com/dolittle/DotNET.SDK/pull/247)
+# Summary
+This adds support for retroactively redacting personal data details from previously committed events. Redactions are scoped to a single EventSourceId, and a single event type, and allow you to overwrite or remove specific fields. 
+
+## How to use it
+
+Events that should be redacted must be annotated to target the fields that should be updated or removed
+
+```csharp
+[EventType("24e3a119-57d5-45d7-b7ef-a736fe6331e7")]
+public class CustomerRegistered
+{
+    // The generic type will replace the value
+    [RedactablePersonalData<string>("<redacted>")]
+    public string Name { get; init; }
+    
+    //  The non-generic one will remove the field altogether
+    [RedactablePersonalData]
+    public Address? CustomerAddress { get; init; }
+}
+```
+
+They can then be redacted by committing a targeted redaction event on the same eventsourceId as the redacted events.
+
+It can either be done with the built-in event
+
+```csharp
+    public void GdprForget(string reason, string performedBy)
+    {
+        Apply(Redactions.Create<CustomerRegistered>(reason, performedBy));
+    }
+```
+
+or a user-created event
+
+```csharp
+[EventType("de1e7e17-bad5-da7a-a4f7-e409ae1785dc")]
+public class CustomerDetailsForgotten : PersonalDataRedactedForEvent<CustomerRegistered>
+{
+}
+```
+Applied like this
+```csharp
+    public void GdprForget(string reason, string performedBy)
+    {
+        Apply(Redactions.Create<CustomerRegistered, CustomerDetailsForgotten>(reason, performedBy));
+    }
+```
+
+## What about read models and aggregate state ?
+
+Aggregates and read models should handle the redactions as normal events, and update state accordingly.
+
+Ex
+```csharp
+    public void On(CustomerDetailsForgotten evt)
+    {
+        _address = null;
+        _name = null;
+        _gdprRedacted = true;
+    }
+```
+
+Read models are not automagically updated, but should handle the redaction events themselves. Redaction events after being committed behave exactly as any other event, and can be processed by both eventhandlers and projections.
+
+Since you would want the eventhandlers to only handle as few events as needed, user defined redaction events are the suggested way to perform redactions.
+
+
+
+
+
+## How does it work?
+The runtime will recognize the redaction event type with the redaction prefix `"de1e7e17-bad5-da7a"`, and if the events have the correctly formatted structure, it will perform the redactions in the same transaction as the new events are being added.
+
+It will replace overridden properties as specified in `RedactedProperties`, and remove properties that are defined with null values.
+
+Redaction events themselves cannot be redacted, to ensure auditability of the system.
+
+### Added
+
+- `Dolittle.SDK.Events.Redaction.PersonalDataRedactedForEvent` - Built in event that can redact any event type
+- `Dolittle.SDK.Events.Redaction.PersonalDataRedactedForEvent<TEvent>` - Class to extend in order to create redactions for specific events
+- `Dolittle.SDK.Events.Redaction` - Use this to simplify creation of redaction events
+
+### Updated
+- The solution was updated to use [centralized package management](https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management) to simplify dependency maintenance. Dependencies have also been upgraded.
+
+
 # [23.4.0] - 2024-10-2 [PR: #246](https://github.com/dolittle/DotNET.SDK/pull/246)
 ## Summary
 
