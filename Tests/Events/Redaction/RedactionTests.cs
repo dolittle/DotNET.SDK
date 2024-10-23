@@ -113,7 +113,10 @@ public record RedactedRecord(
 
 
 [EventType("de1e7e17-bad5-da7a-aaaa-fbc6ec3c0ea6")]
-public class SomeRecordRedacted : PersonalDataRedactedForEvent<RedactedRecord>;
+public class RecordRedacted : PersonalDataRedactedForEvent<RedactedRecord>
+{
+    public string MoreDetailsWeWantToKeep { get; set; }
+}
 
 public class RedactionTests
 {
@@ -193,7 +196,26 @@ public class RedactionTests
     }
 
     [Fact]
-    public void WhenCreatingRedactionEvent()
+    public void WhenCreatingRedactionRecord()
+    {
+        var reason = "Some reason";
+        var redactedBy = "Some person";
+        var evt = Redactions.Create<RedactedRecord>(reason, redactedBy);
+
+        evt.Should().NotBeNull();
+        evt!.EventId.Should().Be("5577fe91-5955-4b93-98b0-6399647ffdf3");
+        evt.EventAlias.Should().Be(nameof(RedactedRecord));
+        evt.RedactedProperties.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            { "RedactedParam", null },
+            { "AnotherRedactedParam", -999 },
+        });
+        evt.RedactedBy.Should().Be(redactedBy);
+        evt.Reason.Should().Be(reason);
+    }
+    
+    [Fact]
+    public void WhenTryCreatingRedactionEvent()
     {
         var reason = "Some reason";
         var redactedBy = "Some person";
@@ -221,22 +243,19 @@ public class RedactionTests
     {
         var reason = "Some reason";
         var redactedBy = "Some person";
-        var success =
-            Redactions.TryCreate<RedactedRecord, SomeRecordRedacted>(reason, redactedBy, out var redactionEvent,
-                out var error);
+        var evt = Redactions.Create<RedactedRecord, RecordRedacted>(reason, redactedBy);
+        evt!.MoreDetailsWeWantToKeep = "Some details";
 
-        success.Should().BeTrue();
-        error.Should().BeNull();
-        redactionEvent.Should().NotBeNull();
-        redactionEvent!.EventId.Should().Be("5577fe91-5955-4b93-98b0-6399647ffdf3");
-        redactionEvent.EventAlias.Should().Be(nameof(RedactedRecord));
-        redactionEvent.RedactedProperties.Should().BeEquivalentTo(new Dictionary<string, object?>
+        evt.Should().NotBeNull();
+        evt!.EventId.Should().Be("5577fe91-5955-4b93-98b0-6399647ffdf3");
+        evt.EventAlias.Should().Be(nameof(RedactedRecord));
+        evt.RedactedProperties.Should().BeEquivalentTo(new Dictionary<string, object?>
         {
             { "RedactedParam", null },
             { "AnotherRedactedParam", -999 },
         });
-        redactionEvent.RedactedBy.Should().Be(redactedBy);
-        redactionEvent.Reason.Should().Be(reason);
+        evt.RedactedBy.Should().Be(redactedBy);
+        evt.Reason.Should().Be(reason);
     }
     
     
