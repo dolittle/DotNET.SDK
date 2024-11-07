@@ -1,3 +1,14 @@
+# [23.5.1] - 2024-11-7 [PR: #248](https://github.com/dolittle/DotNET.SDK/pull/248)
+## Summary
+This PR upgrades the included MongoDB drivers to the latest version.
+
+It also adds a Roslyn code fix for missing identity parameters on EventType, Projections, EventHandler and AggregateRoot.
+
+### Added
+
+- Codefix for CS7036, when there is no attribute identity specified on an identity attribute.
+
+
 # [23.5.0] - 2024-10-23 [PR: #247](https://github.com/dolittle/DotNET.SDK/pull/247)
 # Summary
 This adds support for retroactively redacting personal data details from previously committed events. Redactions are scoped to a single EventSourceId, and a single event type, and allow you to overwrite or remove specific fields. 
