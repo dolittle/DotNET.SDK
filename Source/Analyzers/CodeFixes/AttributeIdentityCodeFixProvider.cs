@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Immutable;
 using System.Composition;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -21,14 +23,25 @@ delegate string CreateIdentity();
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AttributeIdentityCodeFixProvider)), Shared]
 public class AttributeIdentityCodeFixProvider : CodeFixProvider
 {
+    const string NoArgumentCorrespondsToRequiredParameter = "CS7036";
+    
     /// <inheritdoc />
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.AttributeInvalidIdentityRuleId, DiagnosticIds.RedactionEventIncorrectPrefix);
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = [
+        NoArgumentCorrespondsToRequiredParameter,
+        DiagnosticIds.AttributeInvalidIdentityRuleId,
+        DiagnosticIds.RedactionEventIncorrectPrefix];
     
     /// <inheritdoc />
     public override Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var document = context.Document;
         var diagnostic = context.Diagnostics[0];
+        if(diagnostic.Id.Equals(NoArgumentCorrespondsToRequiredParameter, StringComparison.Ordinal))
+        {
+            RegisterCs7036IfApplicable(context, diagnostic, document);
+            return Task.CompletedTask;
+        }
+        
         if (!diagnostic.Properties.TryGetValue("identityParameter", out var identityParameterName))
         {
             return Task.CompletedTask;
@@ -54,8 +67,56 @@ public class AttributeIdentityCodeFixProvider : CodeFixProvider
         return Task.CompletedTask;
     }
 
+    void RegisterCs7036IfApplicable(CodeFixContext context, Diagnostic diagnostic, Document document)
+    {
+        try
+        {
+            var (identityParameterName, type) = Extract7036Arguments(diagnostic);
+
+            switch (type, identityParameterName)
+            {
+                case ("EventTypeAttribute", "eventTypeId"):
+                case ("EventHandlerAttribute", "eventHandlerId"):
+                case ("ProjectionAttribute", "projectionId"):
+                case ("AggregateRootAttribute", "id"):
+                    break;
+                default:
+                    return;
+            }
+
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    "Add identity",
+                    ct => AddIdentity(context, document, identityParameterName, IdentityGenerator.Generate, ct),
+                    nameof(AttributeIdentityCodeFixProvider) + ".AddIdentity"),
+                diagnostic);
+
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    (string parameterName, string typeName) Extract7036Arguments(Diagnostic diagnostic)
+    {
+        var message = diagnostic.GetMessage();
+        var parts = message.Split('\'');
+        return (parts[1], parts[3].Split('.').FirstOrDefault());
+    }
 
     static async Task<Document> UpdateIdentity(CodeFixContext context, Document document, string identityParameterName,
+        CreateIdentity createIdentity,
+        CancellationToken cancellationToken)
+    {
+        var root = await context.Document.GetSyntaxRootAsync(cancellationToken);
+        if (root is null) return document;
+        if (!TryGetTargetNode(context, root, out AttributeSyntax attribute)) return document; // Target not found
+        var updatedRoot = root.ReplaceNode(attribute, GenerateIdentityAttribute(attribute, identityParameterName, createIdentity));
+        return document.WithSyntaxRoot(updatedRoot);
+    }
+    
+    static async Task<Document> AddIdentity(CodeFixContext context, Document document, string identityParameterName,
         CreateIdentity createIdentity,
         CancellationToken cancellationToken)
     {
