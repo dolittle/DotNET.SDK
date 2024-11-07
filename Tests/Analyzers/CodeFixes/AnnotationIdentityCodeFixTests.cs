@@ -35,6 +35,112 @@ class SomeEvent
     }
 
     [Fact]
+    public async Task FixEventTypeAttributeWithNoIdentity()
+    {
+        var test = @"
+using Dolittle.SDK.Events;
+
+[EventType]
+class SomeEvent
+{
+    public string Name {get; set;}
+}";
+
+        var expected = @"
+using Dolittle.SDK.Events;
+
+[EventType(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeEvent
+{
+    public string Name {get; set;}
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+        var diagnosticResult = DiagnosticResult.CompilerError("CS7036")
+            .WithSpan(4, 2, 4, 11)
+            .WithArguments("eventTypeId", "Dolittle.SDK.Events.EventTypeAttribute.EventTypeAttribute(string, uint, string?)");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
+    
+    [Fact]
+    public async Task FixEventHandlerAttributeWithNoIdentity()
+    {
+        var test = @"
+using Dolittle.SDK.Events.Handling;
+
+[EventHandler]
+class SomeHandler
+{
+    public string Name {get; set;}
+}";
+
+        var expected = @"
+using Dolittle.SDK.Events.Handling;
+
+[EventHandler(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeHandler
+{
+    public string Name {get; set;}
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+        var diagnosticResult = DiagnosticResult.CompilerError("CS7036")
+            .WithSpan(4, 2, 4, 14)
+            .WithArguments("eventHandlerId", "Dolittle.SDK.Events.Handling.EventHandlerAttribute.EventHandlerAttribute(string, bool, string?, string?, int, Dolittle.SDK.Events.Handling.ProcessFrom, string?, string?)");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
+
+    [Fact]
+    public async Task FixProjectionAttributeWithNoIdentity()
+    {
+        var test = @"
+using Dolittle.SDK.Projections;
+
+[Projection]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+}";
+
+        var expected = @"
+using Dolittle.SDK.Projections;
+
+[Projection(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeProjection: ReadModel
+{
+    public string Name {get; set;}
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+        var diagnosticResult = DiagnosticResult.CompilerError("CS7036")
+            .WithSpan(4, 2, 4, 12)
+            .WithArguments("projectionId", "Dolittle.SDK.Projections.ProjectionAttribute.ProjectionAttribute(string, string?, string?, string?, bool)");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }
+    
+    [Fact]
+    public async Task FixAggregateRootAttributeWithNoIdentity()
+    {
+        var test = @"
+using Dolittle.SDK.Aggregates;
+
+[AggregateRoot]
+class SomeAggregate: AggregateRoot
+{
+}";
+
+        var expected = @"
+using Dolittle.SDK.Aggregates;
+
+[AggregateRoot(""61359cf4-3ae7-4a26-8a81-6816d3877f81"")]
+class SomeAggregate: AggregateRoot
+{
+}";
+        IdentityGenerator.Override = "61359cf4-3ae7-4a26-8a81-6816d3877f81";
+
+        var diagnosticResult = DiagnosticResult.CompilerError("CS7036")
+            .WithSpan(4, 2, 4, 15)
+            .WithArguments("id", "Dolittle.SDK.Aggregates.AggregateRootAttribute.AggregateRootAttribute(string, string?)");
+        await VerifyCodeFixAsync(test, expected, diagnosticResult);
+    }    
+    [Fact]
     public async Task FixesAttributeWithInvalidIdentityWithNamedArguments()
     {
         var test = @"
