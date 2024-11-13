@@ -3,6 +3,7 @@
 
 using System;
 using Dolittle.Runtime.Resources.Contracts;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Dolittle.SDK.Resources.MongoDB.Internal;
@@ -34,7 +35,6 @@ public class MongoDBResource : IMongoDBResource
     /// <inheritdoc />
     public IMongoDatabase GetDatabase(Action<MongoDatabaseSettings>? databaseSettingsCallback = default)
     {
-        DolittleMongoConventions.EnsureConventionsAreRegistered();
         var databaseSettings = new MongoDatabaseSettings();
         databaseSettingsCallback?.Invoke(databaseSettings);
         return _mongoClient.GetDatabase(_mongoUrl.DatabaseName, databaseSettings);

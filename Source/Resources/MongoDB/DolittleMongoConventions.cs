@@ -1,8 +1,10 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace Dolittle.SDK.Resources.MongoDB;
 
@@ -22,7 +24,7 @@ public static class DolittleMongoConventions
     /// <summary>
     /// Ensured that the default Mongo Conventions are registered;
     /// </summary>
-    public static void EnsureConventionsAreRegistered()
+    public static void EnsureConventionsAreRegistered(GuidRepresentation defaultRepresentation)
     {
         if (_isRegistered)
         {
@@ -36,6 +38,10 @@ public static class DolittleMongoConventions
             }
             _isRegistered = true;
             BsonSerializer.RegisterSerializationProvider(new ConceptSerializationProvider());
+            if (defaultRepresentation != GuidRepresentation.Unspecified)
+            {
+                BsonSerializer.RegisterSerializer(new GuidSerializer(defaultRepresentation));
+            }
             var pack = new ConventionPack();
             pack.AddClassMapConvention("Ignore extra elements", _ => _.SetIgnoreExtraElements(true));
             ConventionRegistry.Register(ConventionPackName, pack,  _ => true);
