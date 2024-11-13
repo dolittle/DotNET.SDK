@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Optimize>true</Optimize>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <RootNamespace>Dolittle.Benchmarks.SDK</RootNamespace>
         <Nullable>enable</Nullable>
     </PropertyGroup>

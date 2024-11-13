@@ -4,6 +4,7 @@
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Testing.Projections;
 using FluentAssertions;
+using MongoDB.Bson.Serialization.Attributes;
 using Xunit;
 
 namespace Dolittle.SDK.Projections;
