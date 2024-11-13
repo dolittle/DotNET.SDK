@@ -23,12 +23,12 @@ public class CouldNotDeserializeEventContent : Exception
         EventLogSequenceNumber sequenceNumber,
         string json,
         Exception innerException,
-        Type type = default)
+        Type? type = default)
         : base(CreateExceptionMessage(eventType, sequenceNumber, json, type), innerException)
     {
     }
 
-    static string CreateExceptionMessage(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, Type type)
+    static string CreateExceptionMessage(EventType eventType, EventLogSequenceNumber sequenceNumber, string json, Type? type)
         => type == default
             ? $"Could not deserialize event with sequence number {sequenceNumber} and event type {eventType}. Content is {json}"
             : $"Could not deserialize event with sequence number {sequenceNumber} and event type {eventType} to {type}. Content is {json}";

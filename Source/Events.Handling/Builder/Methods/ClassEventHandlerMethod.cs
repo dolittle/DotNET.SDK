@@ -44,11 +44,7 @@ public class ClassEventHandlerMethod<TEventHandler> : IEventHandlerMethod
     public async Task<Try> TryHandle(object @event, EventContext context, IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
-        var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
-        if (eventHandler == null)
-        {
-            throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
-        }
+        var eventHandler = scope.ServiceProvider.GetService<TEventHandler>() ?? throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
         return await _method(eventHandler, @event, context).TryTask().ConfigureAwait(false);
     }
 }

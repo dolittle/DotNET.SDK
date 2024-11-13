@@ -69,9 +69,9 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     public bool CanCoexistWith(IIdentifier identifier) => identifier is IIdentifier<TId> typedIdentifier && CanCoexistWith(typedIdentifier);
 
     /// <inheritdoc />
-    public bool Equals(Artifact<TId> other)
+    public bool Equals(Artifact<TId>? other)
     {
-        if (ReferenceEquals(null, other))
+        if (other is null)
         {
             return false;
         }
@@ -83,9 +83,9 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (obj is null)
         {
             return false;
         }

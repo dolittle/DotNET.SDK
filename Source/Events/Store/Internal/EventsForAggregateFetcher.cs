@@ -125,10 +125,10 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         IAsyncEnumerable<CommittedAggregateEvents> batches)
     {
         var fetchedEvents =
-            new CommittedAggregateEvents(eventSourceId, aggregateRootId, AggregateRootVersion.Initial, ImmutableList<CommittedAggregateEvent>.Empty);
+            new CommittedAggregateEvents(eventSourceId, aggregateRootId, AggregateRootVersion.Initial, []);
         await foreach (var batch in batches)
         {
-            fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, batch.AggregateRootVersion, fetchedEvents.Concat(batch).ToList());
+            fetchedEvents = new CommittedAggregateEvents(eventSourceId, aggregateRootId, batch.AggregateRootVersion, [.. fetchedEvents, .. batch]);
         }
 
         return fetchedEvents;

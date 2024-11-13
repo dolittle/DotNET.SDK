@@ -22,6 +22,6 @@ public static class ActivityExtensions
     {
         activity
             .SetStatus(ActivityStatusCode.Error)
-            .RecordException(e);
+            .AddException(e);
     }
 }

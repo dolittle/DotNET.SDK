@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Events.Store;
 /// </summary>
 public class UncommittedEvents : IList<UncommittedEvent>
 {
-    readonly List<UncommittedEvent> _events = new();
+    readonly List<UncommittedEvent> _events = [];
 
     /// <summary>
     /// Gets a value indicating whether or not there are any events in the committed sequence.

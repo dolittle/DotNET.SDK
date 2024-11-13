@@ -18,7 +18,7 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForReadModel<TReadModel>, ICanTryBuildProjection
     where TReadModel : ReadModel, new()
 {
-    readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
+    readonly IList<IProjectionMethod<TReadModel>> _methods = [];
     readonly ProjectionId _projectionId;
     ProjectionAlias _alias;
     ScopeId _scopeId;

@@ -25,7 +25,7 @@ public interface IEventHandler
     ScopeId ScopeId { get; }
 
     /// <summary>
-    /// Gets a value indicating whether or not the event handler is partitioned.
+    /// Gets a value indicating whether the event handler is partitioned.
     /// </summary>
     bool Partitioned { get; }
 
@@ -44,9 +44,27 @@ public interface IEventHandler
     /// </summary>
     bool HasAlias { get; }
 
+    /// <summary>
+    /// Sets the concurrency for the event handler. Defaults to 1, meaning that the event handler is single threaded.
+    /// If > 1, the handler can process multiple events concurrently, so long as they are on separte partitions (event source)
+    /// </summary>
     int Concurrency { get; }
+    
+    /// <summary>
+    /// Should it start from the end of the current stream or from the beginning.
+    /// </summary>
     ProcessFrom ResetTo { get; }
+    
+    /// <summary>
+    /// The handler can be configured to start from a specific point in time.
+    /// Events that were committed before this point in time will not be processed.
+    /// </summary>
     DateTimeOffset? StartFrom { get; }
+    
+    /// <summary>
+    /// The handler can be configured to stop at a specific point in time.
+    /// Events that were committed after this point in time will not be processed.
+    /// </summary>
     DateTimeOffset? StopAt { get; }
 
     /// <summary>

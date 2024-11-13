@@ -213,7 +213,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
                     DescriptorRules.Projection.MutationUsedCurrentTime,
                     memberAccess.GetLocation(),
                     properties: properties,
-                    new[] { memberAccess.ToFullString() }
+                    [memberAccess.ToFullString()]
                 ));
             }
         }

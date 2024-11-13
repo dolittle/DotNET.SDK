@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Events.Store;
 /// </summary>
 public class UncommittedAggregateEvents : IList<UncommittedAggregateEvent>
 {
-    readonly List<UncommittedAggregateEvent> _events = new();
+    readonly List<UncommittedAggregateEvent> _events = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UncommittedAggregateEvents"/> class.

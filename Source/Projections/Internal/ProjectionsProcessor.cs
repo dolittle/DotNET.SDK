@@ -91,7 +91,7 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Eve
         catch (Exception e)
         {
             _logger.ErrorProcessingProjectionEvent(e, committedEvent);
-            activity?.RecordException(e);
+            activity?.AddException(e);
             throw;
         }
     }

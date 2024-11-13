@@ -14,7 +14,7 @@ namespace Dolittle.SDK.EventHorizon;
 public class SubscriptionsBuilder
 {
     readonly SubscriptionCallbacks _callbacks = new();
-    readonly IList<SubscriptionsBuilderForConsumerTenant> _builders = new List<SubscriptionsBuilderForConsumerTenant>();
+    readonly IList<SubscriptionsBuilderForConsumerTenant> _builders = [];
 
     /// <summary>
     /// Sets the event horizon subscriptions for the consumer tenant through the <see cref="SubscriptionsBuilderForConsumerTenant"/>.

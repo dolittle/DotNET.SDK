@@ -16,7 +16,7 @@ namespace Dolittle.SDK.EventHorizon;
 public class SubscriptionsBuilderForConsumerTenant
 {
     readonly SubscriptionCallbacks _callbacks = new();
-    readonly IList<SubscriptionBuilderForProducerMicroservice> _builders = new List<SubscriptionBuilderForProducerMicroservice>();
+    readonly IList<SubscriptionBuilderForProducerMicroservice> _builders = [];
     readonly TenantId _consumerTenantId;
 
     /// <summary>

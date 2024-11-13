@@ -12,7 +12,7 @@ namespace Dolittle.SDK.Events.Store.Builders;
 public class UncommittedAggregateEventsBuilder
 {
     readonly EventSourceId _eventSourceId;
-    readonly IList<EventBuilder> _builders = new List<EventBuilder>();
+    readonly IList<EventBuilder> _builders = [];
     readonly AggregateRootId _aggregateRootId;
     readonly AggregateRootVersion _expectedVersion;
 

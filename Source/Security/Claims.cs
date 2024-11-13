@@ -17,7 +17,7 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     /// <summary>
     /// Gets the empty representation of <see cref="Claims"/>.
     /// </summary>
-    public static readonly Claims Empty = new(Array.Empty<Claim>());
+    public static readonly Claims Empty = new([]);
 
     readonly List<Claim> _claims = [];
 

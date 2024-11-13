@@ -10,7 +10,7 @@ namespace Dolittle.SDK.Events.Store.Builders;
 /// </summary>
 public class UncommittedEventsBuilder
 {
-    readonly IList<UncommittedEventBuilder> _builders = new List<UncommittedEventBuilder>();
+    readonly IList<UncommittedEventBuilder> _builders = [];
 
     /// <summary>
     /// Build an event.

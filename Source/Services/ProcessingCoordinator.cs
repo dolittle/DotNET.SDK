@@ -11,7 +11,7 @@ namespace Dolittle.SDK.Services;
 /// </summary>
 public class ProcessingCoordinator : ICoordinateProcessing
 {
-    readonly List<Task> _processors = new();
+    readonly List<Task> _processors = [];
 
     /// <inheritdoc/>
     public Task Completion => Task.WhenAll(_processors);
