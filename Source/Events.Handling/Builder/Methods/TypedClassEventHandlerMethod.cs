@@ -50,12 +50,7 @@ public class TypedClassEventHandlerMethod<TEventHandler, TEvent> : IEventHandler
         }
 
         using var scope = serviceProvider.CreateScope();
-        var eventHandler = scope.ServiceProvider.GetService<TEventHandler>();
-        if (eventHandler == null)
-        {
-            throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
-        }
-
+        var eventHandler = scope.ServiceProvider.GetService<TEventHandler>() ?? throw new CouldNotInstantiateEventHandler(typeof(TEventHandler));
         return await _method(eventHandler, typedEvent, context).TryTask().ConfigureAwait(false);
     }
 }

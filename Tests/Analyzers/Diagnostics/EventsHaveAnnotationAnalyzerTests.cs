@@ -126,11 +126,11 @@ public class Committer
 }
 ";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Events.MissingAttribute)
                 .WithSpan(22, 15, 22, 89)
                 .WithArguments("SomeInvalidEvent")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -168,11 +168,11 @@ public class ClientTest
 }
 ";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Events.MissingAttribute)
                 .WithSpan(26, 15, 26, 73)
                 .WithArguments("SomeInvalidEvent")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }

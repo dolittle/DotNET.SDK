@@ -1,6 +1,7 @@
 // Copyright (c) Dolittle. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -13,7 +14,11 @@ namespace Dolittle.SDK.Resources.MongoDB;
 /// </summary>
 public static class DolittleMongoConventions
 {
+#if NET9_0_OR_GREATER
+    static readonly Lock _registerLock = new();
+#else
     static readonly object _registerLock = new();
+#endif
     static bool _isRegistered;
     
     /// <summary>

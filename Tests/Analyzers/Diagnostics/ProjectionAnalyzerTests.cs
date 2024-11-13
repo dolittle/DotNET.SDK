@@ -54,11 +54,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.InvalidOnMethodVisibility)
                 .WithSpan(14, 5, 17, 6)
                 .WithArguments("SomeProjection.On(NameUpdated)")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -172,11 +172,11 @@ class SomeProjection: ReadModel
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.InvalidOnMethodParameters)
                 .WithSpan(15, 37, 15, 59)
                 .WithArguments("SomeProjection.On(NameUpdated, string)")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -209,11 +209,11 @@ class SomeProjection: ReadModel
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.EventTypeAlreadyHandled)
                 .WithSpan(19, 5, 22, 6)
                 .WithArguments("NameUpdated")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -240,11 +240,11 @@ class SomeProjection: ReadModel
 }";
 
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.InvalidOnMethodParameters)
                 .WithSpan(14, 5, 16, 6)
                 .WithArguments("SomeProjection.On()")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -270,11 +270,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.MissingAttribute)
                 .WithSpan(9, 7, 9, 21)
                 .WithArguments("SomeProjection")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -301,11 +301,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Events.MissingAttribute)
                 .WithSpan(14, 20, 14, 35)
-                .WithArguments("Test.NameUpdated"),
-        };
+                .WithArguments("Test.NameUpdated")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -335,11 +335,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.MutationUsedCurrentTime)
                 .WithSpan(19, 23, 19, 35)
                 .WithArguments("DateTime.Now")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -369,11 +369,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.Projection.MutationUsedCurrentTime)
                 .WithSpan(19, 23, 19, 44)
                 .WithArguments("DateTimeOffset.UtcNow")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -401,11 +401,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.ExceptionInMutation)
                 .WithSpan(16, 30, 16, 80)
                 .WithArguments("throw new ArgumentNullException(nameof(evt.Name)).UtcNow")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -442,11 +442,11 @@ class SomeProjection: ReadModel
     }
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.ExceptionInMutation)
                 .WithSpan(25, 9, 25, 57)
                 .WithArguments("AnArgumentException.ThrowIfNullOrEmpty(evt.Name)")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }

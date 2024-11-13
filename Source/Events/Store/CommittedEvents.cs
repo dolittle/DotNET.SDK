@@ -27,7 +27,7 @@ public class CommittedEvents : IReadOnlyList<CommittedEvent>
             if (i > 0) ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
         }
 
-        _events = ImmutableList<CommittedEvent>.Empty.AddRange(events);
+        _events = [.. events];
     }
 
     /// <summary>

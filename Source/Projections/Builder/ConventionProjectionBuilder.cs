@@ -248,7 +248,7 @@ public class ConventionProjectionBuilder<TProjection> : ICanTryBuildProjection
         var projectionSignature = typeof(ProjectionSignatureFactory<TProjection>)
             .GetMethod("TryMap")?
             .MakeGenericMethod(eventParameterType)
-            .Invoke(null, new object[] {method});
+            .Invoke(null, [method]);
         
         return Activator.CreateInstance(
             typeof(TypedProjectionMethod<,>).MakeGenericType(_projectionType, eventParameterType),

@@ -15,8 +15,8 @@ namespace Dolittle.SDK.Common.Model;
 /// </summary>
 public class ModelBuilder : IModelBuilder
 {
-    readonly IdentifierMap<Type> _typesByIdentifier = new();
-    readonly IdentifierMap<object> _processorBuildersByIdentifier = new();
+    readonly IdentifierMap<Type> _typesByIdentifier = [];
+    readonly IdentifierMap<object> _processorBuildersByIdentifier = [];
 
     /// <inheritdoc />
     public void BindIdentifierToType<TIdentifier, TId>(TIdentifier identifier, Type type)
@@ -104,13 +104,13 @@ public class ModelBuilder : IModelBuilder
             var (coexistentTypes, conflictingTypes) = SplitCoexistingAndConflictingBindings(singlyBoundTypes, id);
             var (coexistentProcessorBuilders, conflictingProcessorBuilders) = SplitCoexistingAndConflictingBindings(singlyBoundProcessorBuilders, id);
 
-            if (!conflictingTypes.Any() && !conflictingProcessorBuilders.Any())
+            if (conflictingTypes.Length == 0 && conflictingProcessorBuilders.Length == 0)
             {
                 validBindings.AddRange(coexistentTypes.Select(_ => _.Binding).Concat(coexistentProcessorBuilders.Select(_ => _.Binding)));
                 continue;
             }
             AddFailedBuildResultsForConflictingBindings(id, conflictingTypes, conflictingProcessorBuilders, buildResults);
-            if (coexistentTypes.Any() || coexistentProcessorBuilders.Any())
+            if (coexistentTypes.Length != 0 || coexistentProcessorBuilders.Length != 0)
             {
                 AddFailedBuildResultsForCoexistentBindings(id, coexistentTypes, coexistentProcessorBuilders, buildResults);
             }
@@ -125,11 +125,11 @@ public class ModelBuilder : IModelBuilder
         IClientBuildResults buildResults)
     {
         var conflicts = new List<string>();
-        if (conflictingTypes.Any())
+        if (conflictingTypes.Length != 0)
         {
             conflicts.Add("types");
         }
-        if (conflictingProcessorBuilders.Any())
+        if (conflictingProcessorBuilders.Length != 0)
         {
             conflicts.Add("processors");
         }

@@ -25,8 +25,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
     
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(
-            // DescriptorRules.DuplicateIdentity,
+        [
             DescriptorRules.ExceptionInMutation,
             DescriptorRules.Events.MissingAttribute,
             DescriptorRules.Projection.MissingAttribute,
@@ -36,7 +35,8 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Projection.InvalidOnMethodVisibility,
             DescriptorRules.Projection.EventTypeAlreadyHandled,
             DescriptorRules.Projection.MutationUsedCurrentTime
-        );
+,
+        ];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -170,7 +170,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
         if (namedReturnType.IsGenericType)
         {
             var genericType = namedReturnType.TypeArguments[0];
-            if (!genericType.Equals(projectionType))
+            if (!genericType.Equals(projectionType, SymbolEqualityComparer.Default))
             {
                 context.ReportDiagnostic(Diagnostic.Create(DescriptorRules.Projection.InvalidOnMethodReturnType, syntax.GetLocation(),
                     onMethod.ToDisplayString()));
@@ -213,7 +213,7 @@ public class ProjectionsAnalyzer : DiagnosticAnalyzer
                     DescriptorRules.Projection.MutationUsedCurrentTime,
                     memberAccess.GetLocation(),
                     properties: properties,
-                    new[] { memberAccess.ToFullString() }
+                    [memberAccess.ToFullString()]
                 ));
             }
         }

@@ -3,7 +3,7 @@
 
 using OpenTelemetry.Trace;
 
-namespace Diagnostics;
+namespace Dolittle.SDK.Diagnostics;
 
 /// <summary>
 /// Used to enable diagnostics for Dolittle SDK

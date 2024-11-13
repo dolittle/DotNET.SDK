@@ -21,7 +21,11 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     where TAggregate : AggregateRoot
 {
     readonly EventSourceId _eventSourceId;
+#if NET9_0_OR_GREATER
+    readonly Lock _concurrencyLock;
+#else
     readonly object _concurrencyLock;
+#endif
     readonly TAggregate _aggregateRoot;
     readonly Func<TAggregate> _createAggregate;
     readonly Action<TAggregate> _persistOldAggregate;
@@ -40,7 +44,11 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <param name="appendEvents">Optional callback on applied events</param>
     public AggregateRootOperationsMock(
         EventSourceId eventSourceId,
-        object concurrencyLock,
+#if NET9_0_OR_GREATER
+        Lock concurrencyLock,
+#else
+    object concurrencyLock,
+#endif
         TAggregate aggregateRoot,
         Func<TAggregate> createAggregate,
         Action<TAggregate> persistOldAggregate,
@@ -58,12 +66,13 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
 
     /// <inheritdoc />
     public Task Perform(Action<TAggregate> method, CancellationToken cancellationToken = default)
-        => Perform(_ =>
+        => Perform(instance =>
         {
-            method(_);
+            method(instance);
             return Task.CompletedTask;
         }, cancellationToken);
 
+    /// <inheritdoc />
     public Task<TResponse> Perform<TResponse>(Func<TAggregate, TResponse> method, CancellationToken cancellationToken = default)
     {
         lock (_concurrencyLock)
@@ -94,9 +103,9 @@ public class AggregateRootOperationsMock<TAggregate> : IAggregateRootOperations<
     /// <param name="method">The method to perform.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     public void PerformSync(Action<TAggregate> method, CancellationToken cancellationToken = default)
-        => Perform(_ =>
+        => Perform(instance =>
         {
-            method(_);
+            method(instance);
             return Task.CompletedTask;
         }, cancellationToken).GetAwaiter().GetResult();
 

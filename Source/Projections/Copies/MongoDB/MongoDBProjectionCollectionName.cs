@@ -68,5 +68,8 @@ public partial record MongoDBProjectionCollectionName(string Value) : ConceptAs<
         return input;
     }
 
-    static readonly System.Text.RegularExpressions.Regex _aliasReplacerRegex = new("[^a-zA-Z0-9]");
+    static readonly System.Text.RegularExpressions.Regex _aliasReplacerRegex = AliasReplaceRegex();
+
+    [System.Text.RegularExpressions.GeneratedRegex("[^a-zA-Z0-9]")]
+    private static partial System.Text.RegularExpressions.Regex AliasReplaceRegex();
 }

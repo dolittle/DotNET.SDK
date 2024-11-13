@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
+using Dolittle.SDK.Diagnostics;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;
@@ -140,7 +140,7 @@ class AggregateWrapper<TAggregate> where TAggregate : AggregateRoot
     /// <returns></returns>
     static IEnumerable<EventType> GetEventTypes(IEventTypes eventTypes)
         => IsStateLess
-            ? Enumerable.Empty<EventType>()
+            ? []
             :  AggregateRootMetadata<TAggregate>.MethodsPerEventType.Keys.Select(eventTypes.GetFor);
 
     Task<CommittedAggregateEvents> CommitAppliedEvents(TAggregate aggregateRoot, AggregateRootId aggregateRootId)

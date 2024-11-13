@@ -17,7 +17,7 @@ public record ADeleteEvent(string TheProperty);
 [Projection("f850fb88-2f09-45ca-a987-94b7fbb115a5")]
 public class PropertyKeyedProjection : ReadModel
 {
-    public string TheValue { get; set; }
+    public string? TheValue { get; set; }
 
     [KeyFromProperty(nameof(AnEvent.TheProperty))]
     public void On(AnEvent evt)

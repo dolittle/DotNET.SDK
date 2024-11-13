@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
 using Dolittle.Runtime.Events.Processing.Contracts;
 using Dolittle.SDK.Concepts;
 using Dolittle.SDK.Execution;
@@ -70,7 +69,7 @@ public abstract class EventProcessor<TIdentifier, TRegisterArguments, TRequest, 
         }
         catch (Exception ex)
         {
-            activity?.RecordError(ex);
+            activity?.AddException(ex);
             
             var retrySeconds = retryProcessingState == default ? 5 : Math.Min(5 * (retryProcessingState.RetryCount + 2), 60);
             var retryTimeout = new Duration

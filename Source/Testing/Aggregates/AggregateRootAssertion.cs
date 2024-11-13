@@ -89,7 +89,7 @@ public class AggregateRootAssertion
         {
             Throw($"there are no {(isPublic ? "public": "")} {typeof(T)} events.");
         }
-        var sequenceValidation = new EventSequenceAssertion<T>(_events.ToList(), isPublic, Throw);
+        var sequenceValidation = new EventSequenceAssertion<T>([.. _events], isPublic, Throw);
         return sequenceValidation;
     }
     
@@ -112,7 +112,11 @@ public class AggregateRootAssertion
     void ShouldNotHaveEvent<T>(bool isPublic)
         where T : class
     {
-        if (_events.Where(_ => _.Public == isPublic).Select(_ => _.Event).OfType<T>().Any())
+        if (_events
+            .Where(it => it.Public == isPublic)
+            .Select(it => it.Event)
+            .OfType<T>()
+            .Any())
         {
             Throw($"there are one or more {(isPublic ? "public": "")} {typeof(T)} events.");
         }

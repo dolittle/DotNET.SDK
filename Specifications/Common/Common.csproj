@@ -8,9 +8,4 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Source\Common\Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="System.Net.Http" />
-      <PackageReference Include="System.Text.RegularExpressions" />
-    </ItemGroup>
 </Project>

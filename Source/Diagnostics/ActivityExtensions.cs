@@ -3,9 +3,8 @@
 
 using System;
 using System.Diagnostics;
-using OpenTelemetry.Trace;
 
-namespace Diagnostics;
+namespace Dolittle.SDK.Diagnostics;
 
 /// <summary>
 /// System.Diagnostics.Activity extensions
@@ -22,6 +21,6 @@ public static class ActivityExtensions
     {
         activity
             .SetStatus(ActivityStatusCode.Error)
-            .RecordException(e);
+            .AddException(e);
     }
 }

@@ -20,7 +20,7 @@ static class MongoClientSettingsExtensions
     public static void AddTelemetry(this ClusterBuilder builder)
     {
         HashSet<string> commandsToFilter = new(
-            new[] { "ping", "isMaster", "buildInfo", "saslStart", "saslContinue" },
+            ["ping", "isMaster", "buildInfo", "saslStart", "saslContinue"],
             StringComparer.OrdinalIgnoreCase);
         builder.Subscribe(
             new DiagnosticsActivityEventSubscriber(

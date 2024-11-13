@@ -13,12 +13,12 @@ namespace Dolittle.SDK.Analyzers;
 static class AssembliesUnderTest
 {
     public static readonly Assembly[] Assemblies =
-    {
+    [
         typeof(AggregateRootAttribute).Assembly,
         typeof(EventTypeAttribute).Assembly,
         typeof(ProjectionAttribute).Assembly,
         typeof(EventHandlerAttribute).Assembly,
         typeof(Tenant).Assembly,
         typeof(IDolittleClient).Assembly
-    };
+    ];
 }

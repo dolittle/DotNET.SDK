@@ -32,18 +32,18 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
         _isTenantRootContainer = isTenantRootContainer;
     }
 
-    internal IEnumerable<IComponentRegistration> Registrations { private get; set; } = Enumerable.Empty<IComponentRegistration>();
+    internal IEnumerable<IComponentRegistration> Registrations { private get; set; } = [];
 
     /// <inheritdoc />
     public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<ServiceRegistration>> registrationAccessor)
     {
         if (service is not IServiceWithType serviceWithType)
         {
-            return Enumerable.Empty<IComponentRegistration>();
+            return [];
         }
         if (RegisteredInContainer(service) || !IsRegisteredInRootContainer(serviceWithType.ServiceType))
         {
-            return Enumerable.Empty<IComponentRegistration>();
+            return [];
         }
 
         var serviceType = serviceWithType.ServiceType;
@@ -55,18 +55,17 @@ public class UnknownServiceOnTenantContainerRegistrationSource : IRegistrationSo
             new CurrentScopeLifetime(),
             InstanceSharing.None,
             InstanceOwnership.ExternallyOwned,
-            new[]
-            {
+            [
                 service
-            },
+            ],
             new Dictionary<string, object>
             {
                 [MetadataKey] = null
             });
-        return new[]
-        {
+        return
+        [
             registration
-        };
+        ];
     }
 
     /// <inheritdoc />

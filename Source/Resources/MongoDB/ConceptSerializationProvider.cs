@@ -31,7 +31,7 @@ public class ConceptSerializationProvider : IBsonSerializationProvider
         var createConceptSerializerGenericMethod = GetType().GetMethod("CreateConceptSerializer").MakeGenericMethod(type);
 #pragma warning restore CS8602
 #pragma warning disable CS8600
-        return (dynamic)createConceptSerializerGenericMethod.Invoke(null, Array.Empty<object>());
+        return (dynamic)createConceptSerializerGenericMethod.Invoke(null, []);
 #pragma warning restore CS8600
 
     }

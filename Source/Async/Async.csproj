@@ -3,6 +3,7 @@
   <Import Project="../../default.props"/>
 
   <PropertyGroup>
+    <RootNamespace>Dolittle.SDK.Async</RootNamespace>
     <AssemblyName>Dolittle.SDK.Async</AssemblyName>
   </PropertyGroup>
 

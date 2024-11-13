@@ -11,7 +11,6 @@ namespace Dolittle.SDK.Testing.Aggregates.for_AggregateMock.when_performing_oper
 class and_operation_does_not_fail : given.an_aggregate_with_default_constructor
 {
     static EventSourceId event_source;
-    static int new_state;
 
     Establish context = () =>
     {

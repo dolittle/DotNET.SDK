@@ -141,7 +141,7 @@ public class ProjectionActor<TProjection>(
         }
 
         RespondWithCurrentValue(context);
-        _subscribers ??= new HashSet<PID>();
+        _subscribers ??= [];
         _subscribers.Add(request.Subscriber);
         context.CancelReceiveTimeout(); // Keep the actor alive as long as there are subscribers
     }
@@ -190,7 +190,7 @@ public class ProjectionActor<TProjection>(
             return;
         }
 
-        _waitingForUpdate ??= new Dictionary<ulong, TaskCompletionSource>();
+        _waitingForUpdate ??= [];
 
         if (!_waitingForUpdate.TryGetValue(requestedOffset, out var tcs))
         {

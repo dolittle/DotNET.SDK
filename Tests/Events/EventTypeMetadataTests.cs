@@ -1,11 +1,11 @@
 using Dolittle.SDK.Artifacts;
-using Dolittle.SDK.Events;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
+
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace Events;
+namespace Dolittle.SDK.Events;
 
 [EventType("0f025f6c-41be-4192-895d-c1c771832bae")]
 record SomeEventRecord(string Thing);

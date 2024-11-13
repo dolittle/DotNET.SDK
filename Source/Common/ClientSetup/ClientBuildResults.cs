@@ -14,8 +14,8 @@ namespace Dolittle.SDK.Common.ClientSetup;
 /// </summary>
 public class ClientBuildResults : IClientBuildResults
 {
-    readonly List<ClientBuildResult> _results = new();
-    readonly List<IdentifiableClientBuildResult> _identifiableResults = new();
+    readonly List<ClientBuildResult> _results = [];
+    readonly List<IdentifiableClientBuildResult> _identifiableResults = [];
 
     /// <inheritdoc />
     public IEnumerable<ClientBuildResult> AllNonIdentifiable => _results;

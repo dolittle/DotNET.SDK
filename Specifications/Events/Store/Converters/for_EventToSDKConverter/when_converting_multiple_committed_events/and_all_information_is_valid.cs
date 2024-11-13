@@ -59,7 +59,7 @@ public class and_all_information_is_valid : given.a_committed_event_and_a_conver
         SetupDeserializeToReturnObject(second_content_string, second_object_from_serializer);
     };
 
-    Because of = () => try_result = converter.TryConvert(new[] { committed_event, second_committed_event }, out converted_events, out exception);
+    Because of = () => try_result = converter.TryConvert([committed_event, second_committed_event], out converted_events, out exception);
 
     It should_return_true = () => try_result.ShouldBeTrue();
     It should_have_no_exception = () => exception.ShouldBeNull();

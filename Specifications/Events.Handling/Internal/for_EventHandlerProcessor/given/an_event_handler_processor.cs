@@ -27,11 +27,11 @@ public class an_event_handler_processor
         event_handler_id = "1d6f4e60-6453-423e-baa0-3dda3ecaa719";
         event_handler_scope = "35b14dda-ac5e-4ab2-9bf3-c710ffb17d69";
         partitioned = true;
-        handled_event_types = new EventType[]
-        {
+        handled_event_types =
+        [
             new("a57ecc5a-9fca-47a3-89d0-24064a6f9e34"),
             new("3caf8431-d1c7-42a0-92fd-04ca4dcdf77c")
-        };
+        ];
 
         event_handler.SetupGet(_ => _.Identifier).Returns(event_handler_id);
         event_handler.SetupGet(_ => _.ScopeId).Returns(event_handler_scope);

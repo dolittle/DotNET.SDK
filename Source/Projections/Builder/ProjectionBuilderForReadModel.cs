@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;
@@ -18,7 +17,7 @@ namespace Dolittle.SDK.Projections.Builder;
 public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForReadModel<TReadModel>, ICanTryBuildProjection
     where TReadModel : ReadModel, new()
 {
-    readonly IList<IProjectionMethod<TReadModel>> _methods = new List<IProjectionMethod<TReadModel>>();
+    readonly IList<IProjectionMethod<TReadModel>> _methods = [];
     readonly ProjectionId _projectionId;
     ProjectionAlias _alias;
     ScopeId _scopeId;
@@ -122,7 +121,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
             return false;
         }
 
-        if (eventTypesToMethods.Any())
+        if (eventTypesToMethods.Count != 0)
         {
             projection = new Projection<TReadModel>(identifier, eventTypesToMethods, _unloadTimeout);
             return true;    

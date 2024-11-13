@@ -29,7 +29,7 @@ public class an_execution_context
         version = new Version(3, 2, 1, 23, "pre-release");
         environment = "some environment";
         correlation_id = "d1fa2359-52a9-479f-9b6d-72c6f72d7c3b";
-        claims = new Claims(new[] { new Claim("some name", "some value", "some value type") });
+        claims = new Claims([new Claim("some name", "some value", "some value type")]);
         culture_info = CultureInfo.InvariantCulture;
         span_id = ActivitySpanId.CreateFromString("cafecafecafecafe");
         execution_context = new ExecutionContext(microservice, tenant, version, environment, correlation_id, claims, culture_info, span_id);

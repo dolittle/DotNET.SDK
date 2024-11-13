@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Dolittle. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -8,16 +11,21 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Dolittle.SDK.Analyzers;
 
+/// <summary>
+/// This analyzer checks for common mistakes in event handlers.
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class EventHandlerAnalyzer : DiagnosticAnalyzer
 {
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+    /// <inheritdoc/>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+    [
         DescriptorRules.InvalidTimestamp,
         DescriptorRules.InvalidStartStopTimestamp,
         DescriptorRules.InvalidAccessibility,
         DescriptorRules.Events.MissingAttribute,
-        DescriptorRules.Events.MissingEventContext
-        );
+        DescriptorRules.Events.MissingEventContext,
+    ];
 
     const int StartFromTimestampOffset = 6;
     const int StopAtTimestampOffset = 7;
@@ -59,29 +67,33 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
         // Check that it is public
         if (!handleMethod.DeclaredAccessibility.HasFlag(Accessibility.Public))
         {
-            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidAccessibility, handleMethod.Locations[0], handleMethod.Name, Accessibility.Public);
+            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidAccessibility, handleMethod.Locations[0],
+                handleMethod.Name, Accessibility.Public);
             context.ReportDiagnostic(diagnostic);
         }
-        
+
         // Get the first parameter and get the type
         var parameter = handleMethod.Parameters.FirstOrDefault();
         if (parameter is null)
         {
             return;
         }
+
         // Check if the type has the EventType attribute
         if (!parameter.Type.HasEventTypeAttribute())
         {
             var diagnostic = Diagnostic.Create(DescriptorRules.Events.MissingAttribute, parameter.Locations[0],
-                parameter.Type.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute), parameter.Type.Name);
+                parameter.Type.ToTargetClassAndAttributeProps(DolittleConstants.Types.EventTypeAttribute),
+                parameter.Type.Name);
             context.ReportDiagnostic(diagnostic);
         }
-        
+
         // Check that the method takes an EventContext as the second parameter
         var secondParameter = handleMethod.Parameters.Skip(1).FirstOrDefault();
-        if(secondParameter is null || secondParameter.Type.ToString() != DolittleConstants.Types.EventContext)
+        if (secondParameter is null || secondParameter.Type.ToString() != DolittleConstants.Types.EventContext)
         {
-            var diagnostic = Diagnostic.Create(DescriptorRules.Events.MissingEventContext, handleMethod.Locations[0], handleMethod.Name);
+            var diagnostic = Diagnostic.Create(DescriptorRules.Events.MissingEventContext, handleMethod.Locations[0],
+                handleMethod.Name);
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -89,8 +101,10 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
     static void AnalyzeEventHandlerAttribute(SyntaxNodeAnalysisContext context, INamedTypeSymbol classSymbol)
     {
         var eventHandlerAttribute = classSymbol.GetAttributes()
-            .Single(attribute => attribute.AttributeClass?.ToDisplayString() == DolittleConstants.Types.EventHandlerAttribute);
-        if (eventHandlerAttribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is not AttributeSyntax attributeSyntaxNode)
+            .Single(attribute =>
+                attribute.AttributeClass?.ToDisplayString() == DolittleConstants.Types.EventHandlerAttribute);
+        if (eventHandlerAttribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is not
+            AttributeSyntax attributeSyntaxNode)
         {
             return;
         }
@@ -99,30 +113,38 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
     }
 
 
-    static void AnalyzeEventHandlerStartFromStopAt(SyntaxNodeAnalysisContext context, AttributeData eventHandlerAttribute, AttributeSyntax syntaxNode)
+    static void AnalyzeEventHandlerStartFromStopAt(SyntaxNodeAnalysisContext context,
+        AttributeData eventHandlerAttribute, AttributeSyntax syntaxNode)
     {
-        var startFrom = GetAttributeArgument(eventHandlerAttribute, syntaxNode, StartFromTimestampOffset, "startFromTimestamp");
-        if (startFrom?.value is not null && !DateTimeOffset.TryParse(startFrom.Value.value.ToString(), out var parsedStartFrom))
+        var startFrom = GetAttributeArgument(eventHandlerAttribute, syntaxNode, StartFromTimestampOffset,
+            "startFromTimestamp");
+        if (startFrom?.value is not null &&
+            !DateTimeOffset.TryParse(startFrom.Value.value.ToString(), out var parsedStartFrom))
         {
-            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidTimestamp, startFrom.Value.location, "startFromTimestamp");
+            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidTimestamp, startFrom.Value.location,
+                "startFromTimestamp");
             context.ReportDiagnostic(diagnostic);
         }
 
         var stopAt = GetAttributeArgument(eventHandlerAttribute, syntaxNode, StopAtTimestampOffset, "stopAtTimestamp");
         if (stopAt?.value is not null && !DateTimeOffset.TryParse(stopAt.Value.value.ToString(), out var parsedStopAt))
         {
-            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidTimestamp, stopAt.Value.location, "stopAtTimestamp");
+            var diagnostic =
+                Diagnostic.Create(DescriptorRules.InvalidTimestamp, stopAt.Value.location, "stopAtTimestamp");
             context.ReportDiagnostic(diagnostic);
         }
-        
-        if(parsedStartFrom > DateTimeOffset.MinValue && parsedStopAt > DateTimeOffset.MinValue && parsedStartFrom >= parsedStopAt)
+
+        if (parsedStartFrom > DateTimeOffset.MinValue && parsedStopAt > DateTimeOffset.MinValue &&
+            parsedStartFrom >= parsedStopAt)
         {
-            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidStartStopTimestamp, syntaxNode.GetLocation(), "startFromTimestamp", "stopAtTimestamp");
+            var diagnostic = Diagnostic.Create(DescriptorRules.InvalidStartStopTimestamp, syntaxNode.GetLocation(),
+                "startFromTimestamp", "stopAtTimestamp");
             context.ReportDiagnostic(diagnostic);
         }
     }
 
-    public static (object? value, Location location)? GetAttributeArgument(AttributeData eventHandlerAttribute, AttributeSyntax syntaxNode, int offset,
+    public static (object? value, Location location)? GetAttributeArgument(AttributeData eventHandlerAttribute,
+        AttributeSyntax syntaxNode, int offset,
         string argumentName)
     {
         if (syntaxNode.ArgumentList is null)
@@ -140,7 +162,8 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
 
         foreach (var argumentSyntax in syntaxNode.ArgumentList.Arguments)
         {
-            if (argumentSyntax.NameColon?.Name?.Identifier.Text.Equals(argumentName, StringComparison.OrdinalIgnoreCase) == true)
+            if (argumentSyntax.NameColon?.Name?.Identifier.Text.Equals(argumentName,
+                    StringComparison.OrdinalIgnoreCase) == true)
             {
                 return (argument.Value, argumentSyntax.GetLocation());
             }
@@ -151,7 +174,7 @@ public class EventHandlerAnalyzer : DiagnosticAnalyzer
             var positionalSyntax = syntaxNode.ArgumentList.Arguments[offset];
             return (argument.Value, positionalSyntax.GetLocation());
         }
-        
+
         return (argument.Value, syntaxNode.GetLocation());
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Dolittle.SDK.Aggregates;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Events;
@@ -20,7 +21,12 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     where TAggregate : AggregateRoot
 {
     readonly Func<EventSourceId, TAggregate> _createAggregateRoot;
+#if NET9_0_OR_GREATER
+    readonly ConcurrentDictionary<EventSourceId, System.Threading.Lock> _aggregateLocks = new();
+#else
     readonly ConcurrentDictionary<EventSourceId, object> _aggregateLocks = new();
+
+#endif
     readonly ConcurrentDictionary<EventSourceId, TAggregate> _aggregates = new();
     readonly ConcurrentDictionary<EventSourceId, int> _numEventsBeforeLastOperation = new();
     readonly Action<UncommittedAggregateEvents>? _appendEvents;
@@ -112,7 +118,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
     /// <param name="eventSource">The <see cref="EventSourceId"/> of the aggregate.</param>
     /// <param name="aggregate">The aggregate.</param>
     /// <returns>True if operations has been performed on aggregate, false if not.</returns>
-    public bool TryGetAggregate(EventSourceId eventSource, out TAggregate aggregate)
+    public bool TryGetAggregate(EventSourceId eventSource, [NotNullWhen(true)] out TAggregate? aggregate)
         => _aggregates.TryGetValue(eventSource, out aggregate);
 
     /// <summary>
@@ -147,7 +153,7 @@ public class AggregateOfMock<TAggregate> : IAggregateOf<TAggregate>
         }
 
         var freshAggregate = _createAggregateRoot(eventSource);
-        _aggregateLocks.TryAdd(eventSource, new object());
+        _aggregateLocks.TryAdd(eventSource, new());
         return _aggregates.GetOrAdd(eventSource, freshAggregate);
     }
 }

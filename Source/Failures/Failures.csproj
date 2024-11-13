@@ -3,6 +3,7 @@
   <Import Project="../../default.props" />
 
   <PropertyGroup>
+    <RootNamespace>Dolittle.SDK.Failures</RootNamespace>
     <AssemblyName>Dolittle.SDK.Failures</AssemblyName>
   </PropertyGroup>
 

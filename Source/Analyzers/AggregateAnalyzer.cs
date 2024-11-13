@@ -26,7 +26,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(
+        [
             DescriptorRules.ExceptionInMutation,
             DescriptorRules.Aggregate.MissingAttribute,
             DescriptorRules.Aggregate.MissingMutation,
@@ -36,7 +36,8 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             DescriptorRules.Events.MissingAttribute,
             DescriptorRules.Aggregate.PublicMethodsCannotMutateAggregateState,
             DescriptorRules.Aggregate.MutationsCannotUseCurrentTime
-        );
+,
+        ];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -177,7 +178,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(
                 DescriptorRules.Aggregate.MutationsCannotUseCurrentTime,
                 currentTimeInvocation.GetLocation(),
-                new[] { currentTimeInvocation.ToFullString() }
+                [currentTimeInvocation.ToFullString()]
             ));
         }
     }
@@ -255,7 +256,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(
                     DescriptorRules.Aggregate.MutationsCannotProduceEvents,
                     applyInvocation.GetLocation(),
-                    new[] { onMethod.ToDisplayString() }
+                    [onMethod.ToDisplayString()]
                 ));
             }
 
@@ -272,7 +273,7 @@ public class AggregateAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(
                     DescriptorRules.Aggregate.MutationsCannotProduceEvents,
                     invocation.GetLocation(),
-                    new[] { onMethod.ToDisplayString() }
+                    [onMethod.ToDisplayString()]
                 ));
             }
         }

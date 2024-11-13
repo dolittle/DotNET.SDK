@@ -43,7 +43,7 @@ public class CommittedAggregateEvents : IReadOnlyList<CommittedAggregateEvent>
             ThrowIfEventLogVersionIsOutOfOrder(@event, events[i - 1]);
         }
 
-        _events = ImmutableList<CommittedAggregateEvent>.Empty.AddRange(events);
+        _events = [.. events];
     }
 
     /// <summary>

@@ -3,7 +3,7 @@
 
 
 using System.Diagnostics;
-using Diagnostics;
+using Dolittle.SDK.Diagnostics;
 
 namespace Dolittle.SDK.Execution;
 

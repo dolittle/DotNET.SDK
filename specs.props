@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <IsTestProject>true</IsTestProject>
         <NoWarn>IDE0044;IDE0051;IDE0052;IDE0060;CS0618</NoWarn>
     </PropertyGroup>

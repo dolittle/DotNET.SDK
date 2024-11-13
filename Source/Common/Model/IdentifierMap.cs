@@ -21,7 +21,7 @@ public class IdentifierMap<TValue> : Dictionary<Guid, List<IdentifierMapBinding<
     {
         if (!TryGetValue(binding.Identifier.Id, out var bindings))
         {
-            bindings = new List<IdentifierMapBinding<TValue>>();
+            bindings = [];
         }
         bindings.Add(new IdentifierMapBinding<TValue>(binding, bindingValue));
         this[binding.Identifier.Id] = bindings;

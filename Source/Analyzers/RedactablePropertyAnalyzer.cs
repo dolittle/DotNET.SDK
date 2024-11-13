@@ -86,7 +86,7 @@ public class RedactablePropertyAnalyzer : DiagnosticAnalyzer
             }
 
             var parameterSymbol = context.SemanticModel.GetDeclaredSymbol(parameter);
-            if (!IsNullable(parameterSymbol))
+            if (parameterSymbol is not null && !IsNullable(parameterSymbol))
             {
                 context.ReportDiagnostic(Diagnostic.Create(_nonNullableRule, parameter.GetLocation(),
                     parameterSymbol.Name));

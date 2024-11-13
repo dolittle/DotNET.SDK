@@ -21,8 +21,10 @@ public class MethodVisibilityCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
     public sealed override ImmutableArray<string> FixableDiagnosticIds =>
-        ImmutableArray.Create(DiagnosticIds.InvalidAccessibility,
-            DiagnosticIds.AggregateMutationShouldBePrivateRuleId);
+    [
+        DiagnosticIds.InvalidAccessibility,
+            DiagnosticIds.AggregateMutationShouldBePrivateRuleId
+    ];
 
     /// <inheritdoc />
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

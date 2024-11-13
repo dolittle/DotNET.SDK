@@ -65,7 +65,7 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
             return (T)ValueType
                 .GetConstructors()
                 .Single(_ => _.GetParameters().Length == 1 && _.GetParameters().First().ParameterType == valueType)
-                .Invoke(new[] { value });
+                .Invoke([value]);
         }
         catch (Exception ex)
         {

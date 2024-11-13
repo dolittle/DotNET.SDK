@@ -5,6 +5,7 @@
   <PropertyGroup>
     <AssemblyName>Dolittle.SDK.Testing</AssemblyName>
     <RootNamespace>Dolittle.SDK.Testing</RootNamespace>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
     
   <ItemGroup>

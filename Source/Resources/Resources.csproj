@@ -3,8 +3,9 @@
   <Import Project="../../default.props" />
 
   <PropertyGroup>
-    <AssemblyName>Dolittle.SDK.Resources</AssemblyName>
-    <RootNamespace>Dolittle.SDK.Resources</RootNamespace>
+      <AssemblyName>Dolittle.SDK.Resources</AssemblyName>
+      <RootNamespace>Dolittle.SDK.Resources</RootNamespace>
+      <LangVersion>Preview</LangVersion>
   </PropertyGroup>
 
     <ItemGroup>

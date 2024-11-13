@@ -33,13 +33,14 @@ public class AttributeIdentityAnalyzer : DiagnosticAnalyzer
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(
+        [
             DescriptorRules.InvalidIdentity,
             DescriptorRules.DuplicateIdentity,
             DescriptorRules.MissingBaseClass,
             DescriptorRules.InvalidTimespan,
             DescriptorRules.IncorrectRedactedEventTypePrefix
-        );
+,
+        ];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)

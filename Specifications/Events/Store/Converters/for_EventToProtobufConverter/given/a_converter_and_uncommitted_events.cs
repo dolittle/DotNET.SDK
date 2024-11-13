@@ -45,11 +45,11 @@ public class a_converter_and_uncommitted_events : a_content_serializer_and_an_ex
         var event_one = new UncommittedEvent(event_source_one, event_type_one, content_one, is_public_one);
         var event_two = new UncommittedEvent(event_source_two, event_type_two, content_two, is_public_two);
 
-        uncommitted_events = new UncommittedEvents
-        {
+        uncommitted_events =
+        [
             event_one,
             event_two,
             event_two
-        };
+        ];
     };
 }

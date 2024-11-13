@@ -3,7 +3,7 @@
 
 using System.Diagnostics;
 
-namespace Diagnostics;
+namespace Dolittle.SDK.Diagnostics;
 
 /// <summary>
 /// Diagnostics constants

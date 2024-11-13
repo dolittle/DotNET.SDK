@@ -17,9 +17,9 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     /// <summary>
     /// Gets the empty representation of <see cref="Claims"/>.
     /// </summary>
-    public static readonly Claims Empty = new(Array.Empty<Claim>());
+    public static readonly Claims Empty = new([]);
 
-    readonly List<Claim> _claims = new();
+    readonly List<Claim> _claims = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Claims"/> class.
@@ -27,7 +27,7 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     /// <param name="claims">The claims to populate.</param>
     public Claims(IEnumerable<Claim> claims)
     {
-        _claims.AddRange(claims ?? Enumerable.Empty<Claim>());
+        _claims.AddRange(claims ?? []);
     }
 
     /// <summary>
@@ -58,9 +58,9 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     }
 
     /// <inheritdoc/>
-    public bool Equals(Claims other)
+    public bool Equals(Claims? other)
     {
-        if (other == null || other.Count() != this.Count())
+        if (other is null || other.Count() != this.Count())
         {
             return false;
         }
@@ -80,7 +80,7 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     }
 
     /// <inheritdoc/>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         return Equals(other as Claims);
     }

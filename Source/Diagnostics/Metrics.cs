@@ -4,7 +4,7 @@
 using System;
 using System.Diagnostics.Metrics;
 
-namespace Dolittle.SDK.Diagnostics.OpenTelemetry;
+namespace Dolittle.SDK.Diagnostics;
 
 /// <summary>
 /// Represents the metrics for the Dolittle SDK.

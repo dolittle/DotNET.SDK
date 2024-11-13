@@ -15,7 +15,7 @@ namespace Dolittle.SDK.Failures;
 /// </summary>
 public static class Exceptions
 {
-    static readonly IDictionary<FailureId, Func<string, Exception>> _exceptionMappings = new Dictionary<FailureId, Func<string, Exception>>
+    static readonly Dictionary<FailureId, Func<string, Exception>> _exceptionMappings = new()
     {
         // Event Store failures
         { "b6fcb5dd-a32b-435b-8bf4-ed96e846d460", _ => new EventStoreUnavailable(_) },

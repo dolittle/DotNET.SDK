@@ -21,9 +21,10 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 public class ProjectionMutationEventTimeCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } =
+    [
         DiagnosticIds.ProjectionMutationUsedCurrentTime
-    );
+    ];
 
     /// inheritdoc
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -85,7 +86,7 @@ public class ProjectionMutationEventTimeCodeFixProvider : CodeFixProvider
         var (parameterList, eventContextParameterName) = GetParameterListAndContextName(existingMethod.ParameterList);
 
 
-        root = root.ReplaceNodes(new[] { existingMethod.ParameterList, dateTimeNode }, (original, _) =>
+        root = root.ReplaceNodes([existingMethod.ParameterList, dateTimeNode], (original, _) =>
         {
             if (original == existingMethod.ParameterList)
             {

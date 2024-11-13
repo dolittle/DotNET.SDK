@@ -13,7 +13,8 @@ namespace Dolittle.SDK.Analyzers.Suppressors;
 public class AggregateMutationNotUsedSuppressor : DiagnosticSuppressor
 {
     /// <inheritdoc />
-    public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions { get; } = ImmutableArray.Create(SuppressionDescriptors.IDE0051Unused);
+    public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions { get; } = [SuppressionDescriptors.IDE0051Unused
+    ];
 
     /// <inheritdoc />
     public override void ReportSuppressions(SuppressionAnalysisContext context)

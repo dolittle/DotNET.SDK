@@ -9,7 +9,7 @@ namespace Customers;
 [Projection("185107c2-f897-40c8-bb06-643b3642f230")]
 public class DishesEaten: ReadModel
 {
-    public string[] Dishes { get; set; } = {};
+    public string[] Dishes { get; set; } = [];
 
     public void On(DishEaten evt, ProjectionContext ctx)
     {

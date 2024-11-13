@@ -13,8 +13,8 @@ namespace Dolittle.SDK.Events.Handling.Builder.Methods;
 /// </summary>
 public class EventHandlerMethodsBuilder : IEventHandlerMethodsBuilder
 {
-    readonly List<(Type, IEventHandlerMethod)> _handleMethodAndTypes = new();
-    readonly List<(EventType, IEventHandlerMethod)> _handleMethodAndArtifacts = new();
+    readonly List<(Type, IEventHandlerMethod)> _handleMethodAndTypes = [];
+    readonly List<(EventType, IEventHandlerMethod)> _handleMethodAndArtifacts = [];
     readonly EventHandlerId _eventHandlerId;
 
     /// <summary>

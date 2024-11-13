@@ -16,11 +16,8 @@ static class ClusterIdentityMapper
 
     public static (TenantId, EventSourceId) GetTenantAndEventSourceId(ClusterIdentity clusterIdentity)
     {
-        if (clusterIdentity is null)
-        {
-            throw new ArgumentNullException(nameof(clusterIdentity));
-        }
-        var separator = clusterIdentity.Identity.IndexOf(":", StringComparison.Ordinal);
+        ArgumentNullException.ThrowIfNull(clusterIdentity);
+        var separator = clusterIdentity.Identity.IndexOf(':');
         
         if(separator == -1)
         {

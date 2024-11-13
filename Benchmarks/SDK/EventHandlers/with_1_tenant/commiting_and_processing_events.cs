@@ -29,8 +29,8 @@ public class commiting_and_processing_events : SingleRuntimeSetup
                 .Create("63c974e5-1381-4757-a5de-04ef9d729d16")
                 .WithConcurrency(Concurrency)
                 .Partitioned()
-                .Handle<AnEvent>((evt, ctx) => { })
-                .Handle<LastEvent>((evt, ctx) => { _finishedProcessing.SetResult(true); })));
+                .Handle<AnEvent>((_, _) => { })
+                .Handle<LastEvent>((_, _) => { _finishedProcessing.SetResult(true); })));
         _eventStore = client.EventStore.ForTenant(TenantId.Development);
         _eventStore.CommitEvent(_anEvent, "source").Wait();
         _eventSources = new EventSourceId[EventSourceIds];

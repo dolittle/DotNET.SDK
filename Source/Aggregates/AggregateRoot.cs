@@ -18,7 +18,7 @@ namespace Dolittle.SDK.Aggregates;
 /// </summary>
 public abstract class AggregateRoot
 {
-    readonly List<AppliedEvent> _appliedEvents = new();
+    readonly List<AppliedEvent> _appliedEvents = [];
     EventSourceId? _eventSourceId;
 
     /// <summary>
@@ -195,7 +195,7 @@ public abstract class AggregateRoot
                 var eventContent = @event.Content;
                 if (onMethods.TryGetValue(eventContent.GetType(), out var handleMethod))
                 {
-                    handleMethod.Invoke(this, new[] { eventContent });
+                    handleMethod.Invoke(this, [eventContent]);
                 }
             }
         }
@@ -226,7 +226,7 @@ public abstract class AggregateRoot
     {
         if (this.TryGetOnMethod(@event, out var handleMethod))
         {
-            handleMethod.Invoke(this, new[] { @event });
+            handleMethod.Invoke(this, [@event]);
         }
     }
 

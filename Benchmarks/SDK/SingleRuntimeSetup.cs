@@ -61,7 +61,7 @@ public class SingleRuntimeSetup
     }
 
     public IDolittleClient GetConnectedClient(bool withDiscovery = false)
-        => GetConnectedClient(_ => _.WithoutDiscovery());
+        => GetConnectedClient(builder => builder.WithoutDiscovery());
     public IDolittleClient GetConnectedClient(SetupDolittleClient setup)
         => Host.CreateDefaultBuilder().UseDolittle(setup).Build().GetDolittleClient(_ => _
             .WithRuntimeOn("localhost", (ushort)_singleRuntime!.Endpoints.Private)

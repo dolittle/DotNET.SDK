@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Concepts;
@@ -94,7 +93,7 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
         }
         catch
         {
-            return Enumerable.Empty<Type>();
+            return [];
         }
     }
 }

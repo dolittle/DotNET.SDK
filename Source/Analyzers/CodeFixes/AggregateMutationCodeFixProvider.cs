@@ -23,7 +23,7 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(DiagnosticIds.AggregateMissingMutationRuleId);
+        [DiagnosticIds.AggregateMissingMutationRuleId];
 
     /// <summary>
     /// Gets the fix all provider
@@ -79,6 +79,6 @@ public class AggregateMutationCodeFixProvider : CodeFixProvider
         var methodDeclarationSyntax = method.WithLeadingTrivia(SyntaxFactory.LineFeed);
         return lastOnMethod is null
             ? classDeclaration.AddMembers(methodDeclarationSyntax)
-            : classDeclaration.InsertNodesAfter(lastOnMethod, new[] { methodDeclarationSyntax });
+            : classDeclaration.InsertNodesAfter(lastOnMethod, [methodDeclarationSyntax]);
     }
 }
