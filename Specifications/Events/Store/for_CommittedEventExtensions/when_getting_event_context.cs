@@ -30,10 +30,9 @@ public class when_getting_event_context
                 new Version(1, 2, 3, 4, "likpaudvie"),
                 "wasovurozevp",
                 "a40674d1-7aff-4bdc-84c7-e89869ae90de",
-                new Claims(new[]
-                {
+                new Claims([
                     new Claim("zizgukouwl", "kegefobeci", "kiajrabija")
-                }),
+                ]),
                 CultureInfo.InvariantCulture,
                 ActivitySpanId.CreateFromString("b00db00db00cb00a")),
             new EventType("c2bf94fd-491f-494a-bbf6-f3ef397bf5fc", 76),
@@ -46,10 +45,9 @@ public class when_getting_event_context
             new Version(5, 6, 7, 8, "feuhumewogsikeo"),
             "hedcarojizanafs",
             "638c09e1-b127-4c77-88a5-f0a21efacd36",
-            new Claims(new[]
-            {
+            new Claims([
                 new Claim("janduthiwl", "wivjuwpesm", "vohocecouw")
-            }),
+            ]),
             CultureInfo.InvariantCulture,
             ActivitySpanId.CreateFromString("b00cb00cb00cb00c"));
     };

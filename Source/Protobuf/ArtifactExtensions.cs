@@ -60,14 +60,14 @@ public static class ArtifactExtensions
         try
         {
             
-            var constructor = typeof(TArtifact).GetConstructor(new[] { idType, generationType });
+            var constructor = typeof(TArtifact).GetConstructor([idType, generationType]);
             if (constructor == default)
             {
                 error = new ArtifactTypeDoesNotHaveConstructorWithIdAndGeneration(typeof(TArtifact), source);
                 return false;
             }
 
-            artifact = constructor.Invoke(new object[] { artifactId, (Generation)source.Generation }) as TArtifact;
+            artifact = constructor.Invoke([artifactId, (Generation)source.Generation]) as TArtifact;
             if (artifact == default)
             {
                 error = new CouldNotConvertProtobufArtifact(typeof(TArtifact), source, "Could not create instance of artifact");

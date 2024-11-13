@@ -20,7 +20,7 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 public class MissingBaseClassCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(DiagnosticIds.MissingBaseClassRuleId);
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = [DiagnosticIds.MissingBaseClassRuleId];
 
     /// <inheritdoc />
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

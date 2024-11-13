@@ -6,4 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dolittle.SDK.Tenancy;
 
+/// <summary>
+/// Delegate for getting the <see cref="IServiceProvider"/> for a tenant.
+/// </summary>
 public delegate Task<IServiceProvider> GetServiceProviderForTenant(TenantId tenantId);

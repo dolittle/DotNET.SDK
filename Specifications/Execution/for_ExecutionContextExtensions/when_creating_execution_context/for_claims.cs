@@ -11,7 +11,8 @@ public class for_claims : given.an_execution_context
     static Claims new_claims;
     static ExecutionContext result;
 
-    Establish context = () => new_claims = new Claims(new[] { new Claim("some other name", "some other value", "some other value type") });
+    Establish context = () => new_claims = new Claims([new Claim("some other name", "some other value", "some other value type")
+    ]);
     Because of = () => result = execution_context.ForClaims(new_claims);
 
     It should_not_be_the_same_as_the_original_execution_context = () => result.ShouldNotEqual(execution_context);

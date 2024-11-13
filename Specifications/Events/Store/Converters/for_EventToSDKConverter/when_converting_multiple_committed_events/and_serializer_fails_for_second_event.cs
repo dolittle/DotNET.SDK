@@ -59,7 +59,7 @@ public class and_serializer_fails_for_second_event : given.a_committed_event_and
         SetupDeserializeToFail(second_content_string, exception_from_serializer);
     };
 
-    Because of = () => try_result = converter.TryConvert(new[] { committed_event, second_committed_event }, out converted_events, out exception);
+    Because of = () => try_result = converter.TryConvert([committed_event, second_committed_event], out converted_events, out exception);
 
     It should_return_false = () => try_result.ShouldBeFalse();
     It should_out_default_event = () => converted_events.ShouldEqual(default);

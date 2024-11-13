@@ -27,11 +27,11 @@ public class when_creating
         scope_id = "455b99e2-7647-4851-b77c-3bee89902ac3";
         partitioned = true;
         alias = "some alias";
-        event_types = new[]
-        {
+        event_types =
+        [
             new EventType("1b9680f7-92bd-4e1f-ac4b-1aae55944209"),
             new EventType("27a6d373-1ae6-42ed-a149-e0d69e8aac7c")
-        };
+        ];
         event_handler_methods = new Dictionary<EventType, IEventHandlerMethod>(
             event_types.ToDictionary(
                 _ => _,

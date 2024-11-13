@@ -22,13 +22,13 @@ public class PropertyConversions : IPropertyConversions
         
         public Conversion ConvertTo { get; set; } = Conversion.None;
         public PropertyName RenameTo { get; set; }
-        public Dictionary<PropertyName, PropertyConversionNode> Children { get; } = new();
+        public Dictionary<PropertyName, PropertyConversionNode> Children { get; } = [];
 
         public PropertyConversion ToConversion()
             => new(_propertyName, ConvertTo, Children.Values.Select(_ => _.ToConversion()), RenameTo);
     }
 
-    readonly Dictionary<PropertyName, PropertyConversionNode> _conversions = new();
+    readonly Dictionary<PropertyName, PropertyConversionNode> _conversions = [];
     
     /// <summary>
     /// Adds a conversion.

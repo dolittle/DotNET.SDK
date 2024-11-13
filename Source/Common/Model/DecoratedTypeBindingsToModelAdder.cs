@@ -94,7 +94,7 @@ public class DecoratedTypeBindingsToModelAdder<TDecorator, TIdentifier, TId>
         }
         catch
         {
-            return Enumerable.Empty<Type>();
+            return [];
         }
     }
 }

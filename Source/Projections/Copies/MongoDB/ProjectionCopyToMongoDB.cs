@@ -18,7 +18,7 @@ public record ProjectionCopyToMongoDB(bool ShouldCopy, MongoDBProjectionCollecti
     /// <summary>
     /// The default representation of <see cref="ProjectionCopyToMongoDB"/>.
     /// </summary>
-    public static ProjectionCopyToMongoDB Default => new(false, "", Enumerable.Empty<PropertyConversion>());
+    public static ProjectionCopyToMongoDB Default => new(false, "", []);
     
     /// <summary>
     /// Creates a Protobuf representation of this <see cref="ProjectionCopyToMongoDB"/>.

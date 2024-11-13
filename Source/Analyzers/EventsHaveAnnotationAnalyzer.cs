@@ -17,7 +17,8 @@ namespace Dolittle.SDK.Analyzers;
 public class EventsHaveAnnotationAnalyzer : DiagnosticAnalyzer
 {
     /// <inheritdoc />
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(DescriptorRules.Events.MissingAttribute);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = [DescriptorRules.Events.MissingAttribute
+    ];
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)

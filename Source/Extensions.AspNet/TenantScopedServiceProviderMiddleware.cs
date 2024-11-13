@@ -67,7 +67,7 @@ public partial class TenantScopedServiceProviderMiddleware
             }
 
             var availableTenantIds = _client.Tenants.Select(_ => _.Id).ToArray();
-            if (!availableTenantIds.Any())
+            if (availableTenantIds.Length == 0)
             {
                 NoTenantsConfigured();
                 await _next(context).ConfigureAwait(false);

@@ -17,7 +17,7 @@ namespace Dolittle.SDK.DependencyInversion;
 /// </summary>
 public class TenantScopedProvidersBuilder
 {
-    readonly List<ConfigureTenantServices> _configureServicesForTenantCallbacks = new();
+    readonly List<ConfigureTenantServices> _configureServicesForTenantCallbacks = [];
     readonly IServiceProvider _serviceProvider;
     readonly CreateTenantServiceProvider _factory;
 
@@ -81,7 +81,7 @@ public class TenantScopedProvidersBuilder
         }
         catch
         {
-            return Enumerable.Empty<Type>();
+            return [];
         }
     }
     

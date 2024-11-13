@@ -21,9 +21,10 @@ namespace Dolittle.SDK.Analyzers.CodeFixes;
 public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
 {
     /// <inheritdoc />
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } =
+    [
         DiagnosticIds.EventHandlerMissingEventContext
-    );
+    ];
 
     /// inheritdoc
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -91,11 +92,10 @@ public class EventHandlerEventContextCodeFixProvider : CodeFixProvider
         var originalParameterList = methodDeclaration.ParameterList;
         var newParameterList = SyntaxFactory.ParameterList(
                 SyntaxFactory.SeparatedList(
-                    new[]
-                    {
+                    [
                         eventParameter,
                         eventContextParameter
-                    }
+                    ]
                 )
             ).WithLeadingTrivia(originalParameterList.GetLeadingTrivia())
             .WithTrailingTrivia(originalParameterList.GetTrailingTrivia());

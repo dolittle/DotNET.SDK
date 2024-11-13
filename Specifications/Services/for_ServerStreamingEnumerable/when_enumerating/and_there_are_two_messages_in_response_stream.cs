@@ -16,11 +16,11 @@ public class and_there_are_two_messages_in_response_stream : given.all_dependenc
     static IEnumerable<Message> result;
     Establish context = () =>
     {
-        messages_in_response_stream = new[]
-        {
+        messages_in_response_stream =
+        [
             new Message(41),
             new Message(52)
-        };
+        ];
         enumerable = create_enumerable(new FakeAsyncStreamReader<Message>(messages_in_response_stream));
     };
 

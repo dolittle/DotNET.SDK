@@ -9,7 +9,7 @@ namespace Dolittle.Benchmarks.SDK;
 
 // Inspiration from https://github.com/dotnet/performance/blob/main/src/harness/BenchmarkDotNet.Extensions/Extensions.cs
 
-class Program
+sealed class Program
 {
     static int Main(string[] args)
     {

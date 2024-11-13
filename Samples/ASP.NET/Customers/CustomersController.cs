@@ -27,7 +27,7 @@ public class CustomerController : ControllerBase
             .Get(customer, HttpContext.RequestAborted)
             .ConfigureAwait(false);
 
-        return state?.Dishes ?? Array.Empty<string>();
+        return state?.Dishes ?? [];
     }
     
     [HttpGet("All")]

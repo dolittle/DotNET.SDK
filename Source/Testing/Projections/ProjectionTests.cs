@@ -22,7 +22,7 @@ public abstract class ProjectionTests<TProjection>
     where TProjection : ReadModel, new()
 {
     EventLogSequenceNumber _sequenceNumber = EventLogSequenceNumber.Initial;
-    readonly Dictionary<Key, TProjection> _projections = new();
+    readonly Dictionary<Key, TProjection> _projections = [];
     readonly IProjection<TProjection> _projection = ProjectionFixture<TProjection>.Projection;
     readonly ServiceProvider _serviceProvider;
 

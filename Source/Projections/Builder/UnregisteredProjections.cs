@@ -122,20 +122,18 @@ public class UnregisteredProjections : UniqueBindings<ProjectionModelId, IProjec
     static MethodInfo GetOfMethodForReadModel(Type readModelType)
         => typeof(IProjectionStore).GetMethod(
                 nameof(IProjectionStore.Of),
-                new[]
-                {
+                [
                     typeof(ProjectionId),
                     typeof(ScopeId)
-                })
+                ])
             ?.MakeGenericMethod(readModelType);
 
     static MethodInfo GetCollectionMethodForReadModel(Type readModelType)
         => typeof(IMongoDatabase).GetMethod(
                 nameof(IMongoDatabase.GetCollection),
-                new[]
-                {
+                [
                     typeof(string),
                     typeof(MongoCollectionSettings)
-                })
+                ])
             ?.MakeGenericMethod(readModelType);
 }

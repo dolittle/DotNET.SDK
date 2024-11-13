@@ -19,7 +19,7 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     /// </summary>
     public static readonly Claims Empty = new(Array.Empty<Claim>());
 
-    readonly List<Claim> _claims = new();
+    readonly List<Claim> _claims = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Claims"/> class.
@@ -27,7 +27,7 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     /// <param name="claims">The claims to populate.</param>
     public Claims(IEnumerable<Claim> claims)
     {
-        _claims.AddRange(claims ?? Enumerable.Empty<Claim>());
+        _claims.AddRange(claims ?? []);
     }
 
     /// <summary>

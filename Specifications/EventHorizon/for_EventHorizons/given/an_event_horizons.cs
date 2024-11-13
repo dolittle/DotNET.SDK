@@ -32,11 +32,10 @@ public class an_event_horizons
             new Version(9, 8, 7, 1000, "bihpojekec"),
             "agdafuubge",
             "6b83676e-e6d6-45ad-bab0-db183120a3dd",
-            new Claims(new[]
-            {
+            new Claims([
                 new Claim("kesoifzatf", "pupboowuep", "jihisgocru"),
-                new Claim("tazgecmiuc", "ridpezvado", "achizuwrag"),
-            }),
+                new Claim("tazgecmiuc", "ridpezvado", "achizuwrag")
+            ]),
             CultureInfo.InvariantCulture, null);
 
         var logger = Mock.Of<ILogger>();

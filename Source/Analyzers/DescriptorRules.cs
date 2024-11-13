@@ -151,7 +151,7 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Mark the class with an attribute to assign an identifier to it");
+                description: "Mark the class with an attribute to assign an identifier to it.");
 
         internal static readonly DiagnosticDescriptor MissingMutation =
             new(
@@ -161,7 +161,7 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Info,
                 isEnabledByDefault: true,
-                description: "Consider adding a mutation method for the event type");
+                description: "Consider adding a mutation method for the event type.");
 
         internal static readonly DiagnosticDescriptor MutationShouldBePrivate =
             new(

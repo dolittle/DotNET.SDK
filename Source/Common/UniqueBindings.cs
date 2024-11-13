@@ -12,10 +12,10 @@ namespace Dolittle.SDK.Common;
 /// </summary>
 /// <typeparam name="TKey">The <see cref="Type" /> of the unique key.</typeparam>
 /// <typeparam name="TValue">The <see cref="Type" /> of the unique value to associate with the unique key.</typeparam>
-public class UniqueBindings<TKey, TValue> : IUniqueBindings<TKey, TValue>
+public class UniqueBindings<TKey, TValue> : IUniqueBindings<TKey, TValue> where TValue : notnull where TKey : notnull
 {
-    readonly Dictionary<TValue, TKey> _valueToKey = new();
-    readonly Dictionary<TKey, TValue> _keyToValue = new();
+    readonly Dictionary<TValue, TKey> _valueToKey = [];
+    readonly Dictionary<TKey, TValue> _keyToValue = [];
 
     /// <summary>
     /// Initializes an instance of the <see cref="UniqueBindings{TIdentifier,TValue}"/> class.
