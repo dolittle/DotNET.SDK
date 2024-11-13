@@ -12,5 +12,7 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="Machine.Specifications.Runner.VisualStudio"/>
         <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="System.Net.Http" />
+        <PackageReference Include="System.Text.RegularExpressions" />
     </ItemGroup>
 </Project>
