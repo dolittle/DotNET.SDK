@@ -1,3 +1,17 @@
+# [24.0.0] - 2024-11-13 [PR: #250](https://github.com/dolittle/DotNET.SDK/pull/250)
+## Summary
+This release adds support for .NET 9, while removing .NET 6 & 7, as they are no longer in support.
+
+There are some minor optimizations related to .NET 9 features, but there should not be any other breaking changes than the removed dotnet versions.
+
+### Added
+- .NET 9 builds
+
+### Removed
+- .NET 6 support
+- .NET 7 support
+
+
 # [23.5.2] - 2024-11-13 [PR: #249](https://github.com/dolittle/DotNET.SDK/pull/249)
 ## Summary
 This release fixes some issues that can be experienced if you use Guids in read models without annotating the type with `BsonGuidRepresentation`. 
