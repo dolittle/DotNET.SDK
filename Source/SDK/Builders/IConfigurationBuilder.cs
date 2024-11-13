@@ -109,7 +109,8 @@ public interface IConfigurationBuilder
     /// <summary>
     /// Configures the default <see cref="GuidRepresentation"/> to use when serializing and deserializing <see cref="Guid"/> values.
     /// To disable default GuidRepresentation, set to <see cref="GuidRepresentation.Unspecified"/>.
-    /// This will break serialization for <see cref="Guid"/> values that do not explicitly specify a representation.
+    /// If you disable it, it will break serialization for <see cref="Guid"/> values that do not explicitly
+    /// specify a representation, so use with caution.
     /// </summary>
     /// <param name="guidRepresentation">The <see cref="GuidRepresentation"/> to use.</param>
     /// <returns></returns>
