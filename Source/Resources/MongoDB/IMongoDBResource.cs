@@ -17,4 +17,14 @@ public interface IMongoDBResource
     /// <param name="databaseSettingsCallback">The <see cref="Action{T}"/> callback for creating <see cref="MongoDatabaseSettings"/> used to create the <see cref="IMongoDatabase"/>.</param>
     /// <returns>An <see cref="IMongoDatabase"/>.</returns>
     IMongoDatabase GetDatabase(Action<MongoDatabaseSettings>? databaseSettingsCallback = default);
+    
+    /// <summary>
+    /// Gets the connection string that is used to connect to the MongoDB resource.
+    /// </summary>
+    string ConnectionString { get; }
+    
+    /// <summary>
+    /// Gets the <see cref="MongoUrl"/> that is used to connect to the MongoDB resource.
+    /// </summary>
+    MongoUrl ConnectionUrl { get; }
 }

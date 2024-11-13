@@ -30,6 +30,7 @@ using Dolittle.SDK.Projections.Builder;
 using Dolittle.SDK.Projections.Store.Builders;
 using Dolittle.SDK.Resources;
 using Dolittle.SDK.Resources.Internal;
+using Dolittle.SDK.Resources.MongoDB;
 using Dolittle.SDK.Services;
 using Dolittle.SDK.Tenancy;
 using Dolittle.SDK.Tenancy.Client.Internal;
@@ -54,7 +55,6 @@ public class DolittleClient : IDisposable, IDolittleClient
     readonly IUnregisteredAggregateRoots _unregisteredAggregateRoots;
     readonly IUnregisteredEventFilters _unregisteredEventFilters;
     readonly IUnregisteredEventHandlers _unregisteredEventHandlers;
-    readonly IUnregisteredProjections _unregisteredProjections;
     readonly SubscriptionsBuilder _eventHorizonsBuilder;
     readonly EventSubscriptionRetryPolicy _eventHorizonRetryPolicy;
     readonly SemaphoreSlim _connectLock = new(1, 1);
@@ -101,7 +101,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         _unregisteredAggregateRoots = unregisteredAggregateRoots;
         _unregisteredEventFilters = unregisteredEventFilters;
         _unregisteredEventHandlers = unregisteredEventHandlers;
-        _unregisteredProjections = unregisteredProjections;
+        ProjectionTypes = unregisteredProjections;
         _eventHorizonsBuilder = eventHorizonsBuilder;
         _eventHorizonRetryPolicy = eventHorizonRetryPolicy;
     }
@@ -113,7 +113,7 @@ public class DolittleClient : IDisposable, IDolittleClient
     public Task Connected => _connectedCompletionSource.Task;
 
     internal IAggregateRootTypes AggregateRootTypes => _unregisteredAggregateRoots;
-    internal IUnregisteredProjections ProjectionTypes => _unregisteredProjections;
+    internal IUnregisteredProjections ProjectionTypes { get; }
 
     /// <inheritdoc />
     public IEventTypes EventTypes { get; }
@@ -334,7 +334,7 @@ public class DolittleClient : IDisposable, IDolittleClient
         Projections = new ProjectionStoreBuilder(
             TenantServiceProvider,
             executionContext,
-            _unregisteredProjections.ReadModelTypes,
+            ProjectionTypes.ReadModelTypes,
             loggerFactory);
         Resources = await new ResourcesFetcher(
             methodCaller,
@@ -386,7 +386,7 @@ public class DolittleClient : IDisposable, IDolittleClient
             eventProcessingConverter,
             loggerFactory,
             _clientCancellationTokenSource.Token);
-        _unregisteredProjections.Register(
+        ProjectionTypes.Register(
             eventProcessors,
             eventProcessingConverter,
             loggerFactory,
@@ -432,12 +432,14 @@ public class DolittleClient : IDisposable, IDolittleClient
 
     void ConfigureContainer(DolittleClientConfiguration config)
     {
+        DolittleMongoConventions.EnsureConventionsAreRegistered(config.DefaultGuidRepresentation);
+
         var builder = new TenantScopedProvidersBuilder(config.ServiceProvider, config.TenantServiceProviderFactory)
             .AddTenantServices(AddBuilderServices)
             .AddTenantServices((_, collection) => collection.AddScoped(services => services.GetRequiredService<IResources>().MongoDB.GetDatabase(config.ConfigureMongoDatabaseSettings)))
             .AddTenantServices(_unregisteredEventHandlers.AddTenantScopedServices)
             .AddTenantServices(_unregisteredAggregateRoots.AddTenantScopedServices)
-            .AddTenantServices(_unregisteredProjections.AddTenantScopedServices)
+            .AddTenantServices(ProjectionTypes.AddTenantScopedServices)
             .AddTenantServices(config.ConfigureTenantServices);
         Services = builder.Build(_tenants.Select(_ => _.Id).ToImmutableHashSet());
     }

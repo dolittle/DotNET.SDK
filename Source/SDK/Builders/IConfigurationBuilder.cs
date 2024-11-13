@@ -5,6 +5,7 @@ using System;
 using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Version = Dolittle.SDK.Microservices.Version;
@@ -69,7 +70,7 @@ public interface IConfigurationBuilder
     public IConfigurationBuilder WithAggregateIdleTimout(TimeSpan timeout);
 
     /// <summary>
-    /// Sets the default timeout for performing an aggregate operation (potentially including hydration & commits).
+    /// Sets the default timeout for performing an aggregate operation (potentially including hydration and committing).
     /// If no CancellationToken is provided, this timeout will be used.
     /// Not set by default
     /// </summary>
@@ -104,6 +105,16 @@ public interface IConfigurationBuilder
     /// <param name="configureMongoDatabase">The callback for configuring <see cref="MongoDatabaseSettings"/>.</param>
     /// <returns>The builder for continuation.</returns>
     IConfigurationBuilder WithMongoDatabaseSettings(Action<MongoDatabaseSettings> configureMongoDatabase);
+    
+    /// <summary>
+    /// Configures the default <see cref="GuidRepresentation"/> to use when serializing and deserializing <see cref="Guid"/> values.
+    /// To disable default GuidRepresentation, set to <see cref="GuidRepresentation.Unspecified"/>.
+    /// If you disable it, it will break serialization for <see cref="Guid"/> values that do not explicitly
+    /// specify a representation, so use with caution.
+    /// </summary>
+    /// <param name="guidRepresentation">The <see cref="GuidRepresentation"/> to use.</param>
+    /// <returns></returns>
+    IConfigurationBuilder WithDefaultGuidRepresentation(GuidRepresentation guidRepresentation);
     
     /// <summary>
     /// Configures the <see cref="MongoClient"/> used. Please note that setting this will override the default configured tracing of MongoDB.

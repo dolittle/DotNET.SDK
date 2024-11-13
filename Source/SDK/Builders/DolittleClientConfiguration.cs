@@ -7,6 +7,7 @@ using Dolittle.SDK.DependencyInversion;
 using Dolittle.SDK.Diagnostics.OpenTelemetry;
 using Dolittle.SDK.Microservices;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Newtonsoft.Json;
@@ -84,6 +85,11 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     /// Gets the callback for configuring the <see cref="MongoDatabaseSettings"/>.
     /// </summary>
     public Action<MongoDatabaseSettings>? ConfigureMongoDatabaseSettings { get; private set; }
+    
+    /// <summary>
+    /// Gets the default <see cref="GuidRepresentation"/>.
+    /// </summary>
+    public GuidRepresentation DefaultGuidRepresentation { get; private set; } = GuidRepresentation.CSharpLegacy;
 
     /// <summary>
     /// Gets the callback for configuring the <see cref="MongoClientSettings"/>.
@@ -133,7 +139,7 @@ public class DolittleClientConfiguration : IConfigurationBuilder
             result.OpenTelemetrySettingsProvider = () => new OpenTelemetrySettings
             {
                 Endpoint = config.Otlp.Endpoint,
-                ServiceName = config.Otlp.ServiceName,
+                ServiceName = config.Otlp.ServiceName ?? AppDomain.CurrentDomain.FriendlyName,
             };
         }
 
@@ -235,6 +241,13 @@ public class DolittleClientConfiguration : IConfigurationBuilder
     public IConfigurationBuilder WithMongoDatabaseSettings(Action<MongoDatabaseSettings> configureMongoDatabase)
     {
         ConfigureMongoDatabaseSettings = configureMongoDatabase;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IConfigurationBuilder WithDefaultGuidRepresentation(GuidRepresentation guidRepresentation)
+    {
+        DefaultGuidRepresentation = guidRepresentation;
         return this;
     }
 

@@ -12,7 +12,6 @@ namespace Dolittle.SDK.Resources.MongoDB.Internal;
 /// </summary>
 public class MongoDBResource : IMongoDBResource
 {
-    readonly MongoUrl _mongoUrl;
     readonly MongoClient _mongoClient;
 
     /// <summary>
@@ -23,8 +22,9 @@ public class MongoDBResource : IMongoDBResource
     public MongoDBResource(GetMongoDBResponse runtimeMongoDbResponse,
         Action<MongoClientSettings>? clientSettingsCallback)
     {
-        _mongoUrl = MongoUrl.Create(runtimeMongoDbResponse.ConnectionString);
-        var clientSettings = MongoClientSettings.FromUrl(_mongoUrl);
+        ConnectionString = runtimeMongoDbResponse.ConnectionString;
+        ConnectionUrl = MongoUrl.Create(runtimeMongoDbResponse.ConnectionString);
+        var clientSettings = MongoClientSettings.FromUrl(ConnectionUrl);
         ConfigureSettings(clientSettingsCallback, clientSettings);
 
         _mongoClient = new MongoClient(clientSettings.Freeze());
@@ -34,11 +34,15 @@ public class MongoDBResource : IMongoDBResource
     /// <inheritdoc />
     public IMongoDatabase GetDatabase(Action<MongoDatabaseSettings>? databaseSettingsCallback = default)
     {
-        DolittleMongoConventions.EnsureConventionsAreRegistered();
         var databaseSettings = new MongoDatabaseSettings();
         databaseSettingsCallback?.Invoke(databaseSettings);
-        return _mongoClient.GetDatabase(_mongoUrl.DatabaseName, databaseSettings);
+        return _mongoClient.GetDatabase(ConnectionUrl.DatabaseName, databaseSettings);
     }
+
+    public string ConnectionString { get; }
+
+    /// <inheritdoc />
+    public MongoUrl ConnectionUrl { get; }
 
     /// <summary>
     /// Configures <see cref="MongoClientSettings"/> class.

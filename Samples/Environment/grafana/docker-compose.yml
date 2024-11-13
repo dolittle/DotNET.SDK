@@ -1,49 +1,51 @@
-version: "3"
 services:
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.6.1
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
-      - ./tempo-local.yaml:/etc/tempo.yaml
+      - ./tempo.yaml:/etc/tempo.yaml
       - ./tempo-data:/tmp/tempo
     ports:
-      - "3200:3200"   # tempo
+      # - "3200:3200"   # tempo
+      - "127.0.0.1:3200:3200"
       # - "14268:14268"  # jaeger ingest
       # - "4317:4317"  # otlp grpc
       # - "4318:4318"  # otlp http
       # - "9411:9411"   # zipkin
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.52.0
+    image: otel/opentelemetry-collector-contrib:0.101.0
     depends_on:
       - tempo
     command: [ "--config=/etc/otel-collector.yaml", "--set=service.telemetry.logs.level=debug"]
     volumes:
       - ./otel-collector.yaml:/etc/otel-collector.yaml
     ports:
-      - "4317:4317"  # otlp grpc
+      - "127.0.0.1:4317:4317"  # otlp grpc
 
   loki:
-    image: grafana/loki:2.5.0
+    image: grafana/loki:3.2.1
     ports:
-      - "3100:3100"
+      # - "3100:3100"
+      - "127.0.0.1:3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
 
   prometheus:
-    image: prom/prometheus:latest
-    command: [ "--config.file=/etc/prometheus.yaml", "--web.enable-remote-write-receiver", "--enable-feature=exemplar-storage"]
+    image: prom/prometheus:v2.54.1
+    command: [ "--config.file=/etc/prometheus.yaml", "--web.enable-remote-write-receiver", "--enable-feature=otlp-write-receiver,exemplar-storage"]
     volumes:
       - ./prometheus.yaml:/etc/prometheus.yaml
     ports:
       - "9090:9090"
 
   grafana:
-    image: grafana/grafana:8.5.3
+    image: grafana/grafana:11.2.2
     volumes:
       - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQLStreaming metricsSummary
     ports:
-      - "3000:3000"
+      - "4000:3000"

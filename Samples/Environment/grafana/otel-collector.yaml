@@ -8,22 +8,33 @@ exporters:
     endpoint: tempo:4317
     tls:
       insecure: true
-
-  loki:
-    endpoint: http://loki:3100/loki/api/v1/push
-    format: json
+  otlphttp:
+    endpoint: http://prometheus:9090/api/v1/otlp
     tls:
       insecure: true
-    # tenant_id: "example"
-    labels:
-      resource:
-        container.name: "container_name"
-        service.name: "service_name"
-        service.version: "service_version"
-        service.instance.id: "service_instance_id"
+
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+    tls:
+      insecure: true
+#    labels:
+#      resource:
+#        container.name: "container_name"
+#        service.name: "service_name"
+#        service.version: "service_version"
+#        service.instance.id: "service_instance_id"
+  # prometheusremotewrite:
+  #   endpoint: http://prometheus:9090/api/v1/write
+  #   target_info:
 
 processors:
   batch:
+    timeout: 200ms
+  resource:
+    attributes:
+    - key: environment
+      value: "dev"
+      action: upsert
 
 extensions:
   health_check:
@@ -35,9 +46,13 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
+      processors: [resource, batch]
       exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [otlphttp]
     logs:
       receivers: [otlp]
-      processors: [batch]
+      processors: [resource, batch]
       exporters: [loki]
