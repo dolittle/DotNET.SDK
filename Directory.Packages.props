@@ -42,7 +42,7 @@
     <PackageVersion Include="MongoDB.Driver" Version="3.0.0" />
     <PackageVersion Include="MongoDB.Driver.Core.Extensions.DiagnosticSources" Version="2.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
-    <PackageVersion Include="FluentAssertions" Version="6.12.1" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.2" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Polly" Version="8.4.1" />
     <PackageVersion Include="Proto.Actor" Version="1.7.1-alpha.0.1" />
