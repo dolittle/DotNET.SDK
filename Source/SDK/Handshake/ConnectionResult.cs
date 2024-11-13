@@ -13,4 +13,5 @@ namespace Dolittle.SDK.Handshake;
 /// </summary>
 /// <param name="ExecutionContext">The initial <see cref="ExecutionContext"/> for the Dolittle Client.</param>
 /// <param name="Tenants">The <see cref="IEnumerable{TResult}"/> of <see cref="Tenant"/> configured for the Dolittle Runtime.</param>
+/// <param name="OTLPEndpoint">The <see cref="Uri"/> for the OpenTelemetry endpoint.</param>
 public record ConnectionResult(ExecutionContext ExecutionContext, IEnumerable<Tenant> Tenants, Uri? OTLPEndpoint);

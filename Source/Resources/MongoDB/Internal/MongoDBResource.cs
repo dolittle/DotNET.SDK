@@ -3,7 +3,6 @@
 
 using System;
 using Dolittle.Runtime.Resources.Contracts;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Dolittle.SDK.Resources.MongoDB.Internal;
