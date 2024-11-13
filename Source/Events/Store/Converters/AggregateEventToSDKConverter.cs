@@ -138,9 +138,4 @@ public class AggregateEventToSDKConverter : IConvertAggregateEventsToSDK
             source.Public);
         return true;
     }
-
-    object NotNullWhen(bool b)
-    {
-        throw new NotImplementedException();
-    }
 }

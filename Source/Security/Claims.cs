@@ -58,9 +58,9 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     }
 
     /// <inheritdoc/>
-    public bool Equals(Claims other)
+    public bool Equals(Claims? other)
     {
-        if (other == null || other.Count() != this.Count())
+        if (other is null || other.Count() != this.Count())
         {
             return false;
         }
@@ -80,7 +80,7 @@ public class Claims : IEnumerable<Claim>, IEquatable<Claims>
     }
 
     /// <inheritdoc/>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
     {
         return Equals(other as Claims);
     }

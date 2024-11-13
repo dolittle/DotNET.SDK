@@ -13,7 +13,7 @@ namespace Dolittle.SDK.DependencyInversion;
 /// </summary>
 public class TenantScopedProviders : ITenantScopedProviders
 {
-    readonly IReadOnlyDictionary<TenantId, IServiceProvider> _serviceProviders;
+    readonly ReadOnlyDictionary<TenantId, IServiceProvider> _serviceProviders;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TenantScopedProviders"/> class.

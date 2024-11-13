@@ -11,7 +11,7 @@ public record ProductSold(string Store, string Product, decimal Quantity, decima
 [Projection("3dce944f-279e-4150-bef3-dd9e113220c6")]
 public class SalesPerDayByStoreProperty : ReadModel
 {
-    public string Store { get; private set; }
+    public string Store { get; private set; } = null!;
     public DateOnly Date { get; private set; }
 
     public decimal TotalSales { get; private set; }

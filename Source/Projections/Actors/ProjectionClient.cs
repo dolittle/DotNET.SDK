@@ -61,6 +61,7 @@ public class ProjectionClient<TProjection>(IProjection<TProjection> projection, 
     readonly string _kind = ProjectionActor<TProjection>.GetKind(projection);
     readonly Cluster _cluster = rootContext.System.Cluster();
 
+    /// <inheritdoc />
     public async Task<ProjectionResultType> On(object @event, EventType eventType, EventContext context, CancellationToken cancellationToken)
     {
         if (!projection.Events.TryGetValue(eventType, out var keySelector))

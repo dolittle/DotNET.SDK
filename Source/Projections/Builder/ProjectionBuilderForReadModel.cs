@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Dolittle.SDK.Artifacts;
 using Dolittle.SDK.Common.ClientSetup;
 using Dolittle.SDK.Common.Model;

@@ -19,7 +19,7 @@ public class EventSequenceAssertion<T>
     readonly IList<AppliedEvent> _allEvents;
     readonly OnDolittleAssertionFailed _throwError;
     readonly Func<AppliedEvent, bool> _isWantedEvent;
-    readonly IList<T> _conformingEvents;
+    readonly List<T> _conformingEvents;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventSequenceAssertion{T}"/> class.

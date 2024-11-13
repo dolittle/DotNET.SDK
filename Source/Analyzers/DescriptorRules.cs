@@ -128,7 +128,7 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Mark the event with an EventTypeAttribute and assign an identifier to it");
+                description: "Mark the event with an EventTypeAttribute and assign an identifier to it.");
         
         internal static readonly DiagnosticDescriptor MissingEventContext =
             new(
@@ -138,7 +138,7 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Add the EventContext as the second parameter to the Handle method");
+                description: "Add the EventContext as the second parameter to the Handle method.");
     }
 
     internal static class Aggregate
@@ -222,7 +222,7 @@ static class DescriptorRules
                 DiagnosticCategories.Sdk,
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true,
-                description: "Mark the class with an attribute to assign an identifier to it");
+                description: "Mark the class with an attribute to assign an identifier to it.");
 
         // ProjectionMissingBaseClassRuleId
         

@@ -25,8 +25,8 @@ public interface ICreateProjectionStoreRequest
     /// <summary>
     /// /// Creates the <see cref="GetAllRequest"/>.
     /// </summary>
-    /// <param name="scopedProjectionId">The <see cref="ProjectionModelId"/>.</param>
+    /// <param name="id">The <see cref="ProjectionId"/>.</param>
     /// <param name="executionContext">The <see cref="ExecutionContext"/>.</param>
-    /// <returns>The created <see cref="GetOneRequest"/> request.</returns>
+    /// <returns>The created <see cref="GetAllRequest"/> request.</returns>
     public GetAllRequest CreateGetAll(ProjectionId id, ScopeId scope, ExecutionContext executionContext);
 }

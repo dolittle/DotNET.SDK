@@ -100,6 +100,7 @@ public abstract class Artifact<TId> : IIdentifier<TId>, IEquatable<Artifact<TId>
     public override int GetHashCode()
         => HashCode.Combine(Id, Generation);
 
+    /// <inheritdoc />
     public override string ToString()
         => string.IsNullOrEmpty(Alias)
             ? $"{GetType().Name}({Id.Value} Generation: {Generation})"
