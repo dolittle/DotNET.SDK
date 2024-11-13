@@ -1,3 +1,18 @@
+# [23.5.2] - 2024-11-13 [PR: #249](https://github.com/dolittle/DotNET.SDK/pull/249)
+## Summary
+This release fixes some issues that can be experienced if you use Guids in read models without annotating the type with `BsonGuidRepresentation`. 
+
+It also gives access to the underlying connection string & MongoUrl per tenant, if the user requires more control over connection setup.
+
+
+### Added
+- Default serialized representation of `Guid`, with the ability to override defaults. By default, this brings the behavior back to MongoDB's pre 3.0.0-drivers.
+- Ability to access underlying connection string / `MongoUrl` per tenant
+
+### Fixed
+- Now allows non-annotated Guids in read models again
+
+
 # [23.5.1] - 2024-11-7 [PR: #248](https://github.com/dolittle/DotNET.SDK/pull/248)
 ## Summary
 This PR upgrades the included MongoDB drivers to the latest version.
