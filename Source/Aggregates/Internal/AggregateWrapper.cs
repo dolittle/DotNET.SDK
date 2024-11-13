@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
+using Dolittle.SDK.Diagnostics;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Events.Builders;
 using Dolittle.SDK.Events.Store;

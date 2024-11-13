@@ -4,8 +4,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
 using Dolittle.Runtime.Events.Contracts;
+using Dolittle.SDK.Diagnostics;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Services;

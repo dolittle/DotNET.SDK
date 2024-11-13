@@ -1,9 +1,7 @@
-using Dolittle.SDK.Events;
-using Dolittle.SDK.Events.Redaction;
 using FluentAssertions;
 using Xunit;
 
-namespace Events.Tests.Redaction;
+namespace Dolittle.SDK.Events.Redaction;
 
 [EventType("fa553ad4-9feb-4ae8-915b-5a7cb27b549e")]
 public class NonRedactedEvent

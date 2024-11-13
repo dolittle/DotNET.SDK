@@ -8,12 +8,6 @@ namespace Dolittle.Benchmarks.SDK.EventStore.with_1_tenant;
 
 public class committing_100_events_with_warmup : SingleRuntimeSetup
 {
-
-    public override void IterationSetup()
-    {
-        base.IterationSetup();
-    }
-
     [Benchmark(OperationsPerInvoke = 100)]
     public async Task Commit100Loop()
     {

@@ -4,9 +4,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
 using Dolittle.SDK.Aggregates.Actors;
 using Dolittle.SDK.Async;
+using Dolittle.SDK.Diagnostics;
 using Dolittle.SDK.Events;
 using Dolittle.SDK.Tenancy;
 using Proto;

@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
 using Dolittle.SDK.Aggregates.Internal;
 using Dolittle.SDK.Async;
 using Dolittle.SDK.Events;
@@ -91,7 +90,7 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
         catch (Exception e)
         {
             _logger.FailedToCreate(e, typeof(TAggregate));
-            Activity.Current?.RecordError(e);
+            Activity.Current?.AddException(e);
             throw;
         }
     }
@@ -110,7 +109,7 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
         }
         catch (Exception e)
         {
-            Activity.Current?.RecordError(e);
+            Activity.Current?.AddException(e);
             context.Respond(new Try<bool>(e));
         }
         finally
@@ -132,7 +131,7 @@ class AggregateActor<TAggregate> : IActor where TAggregate : AggregateRoot
         }
         catch (Exception e)
         {
-            Activity.Current?.RecordError(e);
+            Activity.Current?.AddException(e);
             context.Respond(new Try<object?>(e));
         }
         finally

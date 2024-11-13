@@ -12,7 +12,7 @@ public static class SummaryExtensions
     public static int ToExitCode(this IEnumerable<Summary> summaries)
     {
         var enumerable = summaries as Summary[] ?? summaries.ToArray();
-        if (!enumerable.Any())
+        if (enumerable.Length == 0)
         {
             return 1;
         }

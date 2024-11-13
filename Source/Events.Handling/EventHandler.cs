@@ -7,8 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using Diagnostics;
-using Dolittle.SDK.Diagnostics.OpenTelemetry;
+using Dolittle.SDK.Diagnostics;
 using Dolittle.SDK.Events.Handling.Builder.Methods;
 using Dolittle.SDK.Execution;
 

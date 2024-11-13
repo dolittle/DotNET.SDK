@@ -2,13 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Dolittle.Runtime.Events.Contracts;
-using Dolittle.SDK.Diagnostics.OpenTelemetry;
+using Dolittle.SDK.Diagnostics;
 using Dolittle.SDK.Events.Store.Converters;
 using Dolittle.SDK.Failures;
 using Dolittle.SDK.Protobuf;
@@ -104,7 +104,7 @@ public class EventsForAggregateFetcher : IFetchEventsForAggregate
         return DoFetchForAggregate(request, cancellationToken);
     }
 
-    async IAsyncEnumerable<CommittedAggregateEvents> DoFetchForAggregate(FetchForAggregateInBatchesRequest request, CancellationToken cancellationToken)
+    async IAsyncEnumerable<CommittedAggregateEvents> DoFetchForAggregate(FetchForAggregateInBatchesRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var response in _caller.Call(_fetchForAggregateInBatchesMethod, request, cancellationToken))
         {

@@ -3,6 +3,7 @@
   <Import Project="../../default.props" />
 
   <PropertyGroup>
+    <RootNamespace>Dolittle.SDK.Execution</RootNamespace>
     <AssemblyName>Dolittle.SDK.Execution</AssemblyName>
   </PropertyGroup>
 

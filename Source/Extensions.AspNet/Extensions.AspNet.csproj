@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="../../default.props" />
     <PropertyGroup>
+        <RootNamespace>Dolittle.SDK.Extensions.AspNet</RootNamespace>
         <AssemblyName>Dolittle.SDK.Extensions.AspNet</AssemblyName>
     </PropertyGroup>
 

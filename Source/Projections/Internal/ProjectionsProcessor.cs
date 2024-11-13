@@ -15,7 +15,6 @@ using Dolittle.SDK.Projections.Actors;
 using Dolittle.SDK.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Trace;
 using ExecutionContext = Dolittle.SDK.Execution.ExecutionContext;
 
 namespace Dolittle.SDK.Projections.Internal;

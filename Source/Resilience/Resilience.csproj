@@ -3,6 +3,7 @@
   <Import Project="../../default.props" />
 
   <PropertyGroup>
+    <RootNamespace>Dolittle.SDK.Resilience</RootNamespace>
     <AssemblyName>Dolittle.SDK.Resilience</AssemblyName>
   </PropertyGroup>
 

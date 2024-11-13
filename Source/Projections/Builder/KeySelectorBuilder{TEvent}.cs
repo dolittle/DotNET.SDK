@@ -40,7 +40,7 @@ public class KeySelectorBuilder<TEvent> : KeySelectorBuilder
     /// <exception cref="KeySelectorExpressionWasNotAMemberExpression">Is thrown when the provided property expression is not a member expression.</exception>
     public KeySelector KeyFromFunction(Func<TEvent, EventContext, Key> function)
     {
-        if (function is null) throw new ArgumentNullException(nameof(function));
+        ArgumentNullException.ThrowIfNull(function);
 
         return KeySelector.ByFunction(function);
     }

@@ -3,6 +3,7 @@
   <Import Project="../../default.props" />
 
   <PropertyGroup>
+    <RootNamespace>Dolittle.SDK.Microservices</RootNamespace>
     <AssemblyName>Dolittle.SDK.Microservices</AssemblyName>
   </PropertyGroup>
 

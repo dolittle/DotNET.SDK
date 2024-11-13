@@ -122,7 +122,7 @@ public class ProjectionBuilderForReadModel<TReadModel> : IProjectionBuilderForRe
             return false;
         }
 
-        if (eventTypesToMethods.Any())
+        if (eventTypesToMethods.Count != 0)
         {
             projection = new Projection<TReadModel>(identifier, eventTypesToMethods, _unloadTimeout);
             return true;    
