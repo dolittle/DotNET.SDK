@@ -25,7 +25,7 @@ public abstract class AnalyzerTest<TAnalyzer> where TAnalyzer : DiagnosticAnalyz
             TestState =
             {
                 Sources = { source },
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net90,
             },
         };
         test.TestState.ExpectedDiagnostics.AddRange(expected);

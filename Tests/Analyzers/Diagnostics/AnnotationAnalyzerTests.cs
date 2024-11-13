@@ -49,11 +49,11 @@ class SomeEvent
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(4, 2, 4, 15)
                 .WithArguments("EventType", "eventTypeId", "")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -68,11 +68,11 @@ class SomeEvent
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 35)
-                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", ""),
-        };
+                .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -143,11 +143,11 @@ class SomeEvent
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 80)
                 .WithArguments("Dolittle.SDK.Events.EventType", "eventTypeId", "c6f87322-be67-4aaf")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -175,11 +175,11 @@ class SomeEvent
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidIdentity)
                 .WithSpan(2, 2, 2, 47)
-                .WithArguments("Dolittle.SDK.Events.Handling.EventHandler", "eventHandlerId", ""),
-        };
+                .WithArguments("Dolittle.SDK.Events.Handling.EventHandler", "eventHandlerId", "")
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -195,11 +195,11 @@ class SomeAggregateRoot
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.MissingBaseClass)
                 .WithSpan(2, 1, 6, 2)
                 .WithArguments("SomeAggregateRoot", "Dolittle.SDK.Aggregates.AggregateRoot")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -214,11 +214,11 @@ class SomeProjection
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.MissingBaseClass)
                 .WithSpan(2, 1, 6, 2)
                 .WithArguments("SomeProjection", "Dolittle.SDK.Projections.ReadModel")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }
@@ -233,11 +233,11 @@ class SomeProjection: ReadModel
     public string Name {get; set;}
 }";
         DiagnosticResult[] expected =
-        {
+        [
             Diagnostic(DescriptorRules.InvalidTimespan)
                 .WithSpan(2, 2, 2, 89)
                 .WithArguments("Projection", "idleUnloadTimeout")
-        };
+        ];
 
         await VerifyAnalyzerAsync(test, expected);
     }

@@ -25,7 +25,7 @@ public abstract class DefaultAnalysisSuppressorTest<TSuppressor>
             TestState =
             {
                 Sources = { source },
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net90,
             },
             CompilerDiagnostics = CompilerDiagnostics.Suggestions
         };
