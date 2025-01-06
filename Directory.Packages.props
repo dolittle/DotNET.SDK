@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Dolittle.Contracts" Version="$(ContractsVersion)" />
-    <PackageVersion Include="Autofac" Version="8.1.1" />
+    <PackageVersion Include="Autofac" Version="8.2.0" />
     <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageVersion Include="ConsoleTables" Version="2.6.1" />
@@ -20,8 +20,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="Grpc.Net.Client" Version="2.67.0" />
-    <PackageVersion Include="Lamar" Version="13.1.0" />
-    <PackageVersion Include="Lamar.Microsoft.DependencyInjection" Version="13.1.0" />
+    <PackageVersion Include="Lamar" Version="14.0.1" />
+    <PackageVersion Include="Lamar.Microsoft.DependencyInjection" Version="14.0.1" />
     <PackageVersion Include="Machine.Specifications" Version="1.1.2" />
     <PackageVersion Include="Machine.Specifications.Should" Version="1.0.0" />
     <PackageVersion Include="Machine.Specifications.Runner.VisualStudio" Version="2.10.2" />
@@ -39,7 +39,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Reactive.Testing" Version="6.0.1" />
-    <PackageVersion Include="MongoDB.Driver" Version="3.0.0" />
+    <PackageVersion Include="MongoDB.Driver" Version="3.1.0" />
     <PackageVersion Include="MongoDB.Driver.Core.Extensions.DiagnosticSources" Version="2.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="FluentAssertions" Version="7.0.0" />
