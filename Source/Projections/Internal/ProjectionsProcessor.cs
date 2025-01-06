@@ -77,7 +77,7 @@ public class ProjectionsProcessor<TReadModel> : EventProcessor<ProjectionId, Eve
         CancellationToken cancellation)
     {
         var committedEvent = _eventConverter.ToSDK(request.Event).Event;
-        var eventContext = committedEvent.GetEventContext(executionContext);
+        var eventContext = committedEvent.GetEventContext(executionContext, request.Event.StreamPosition);
         using var activity = eventContext.CommittedExecutionContext.StartChildActivity(_activityName + committedEvent.Content.GetType().Name)
             ?.Tag(committedEvent.EventType);
         try

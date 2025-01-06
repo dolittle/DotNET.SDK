@@ -16,8 +16,10 @@ public class and_handler_does_not_fail : given.all_dependencies
     static EventContext event_context;
     static EventHandlerResponse response;
 
-    Establish context = () =>
+    private Establish context = () =>
     {
+
+        
         var stream_event = new Processing.StreamEvent(
             new CommittedEvent(
                 committed_event.EventLogSequenceNumber,
@@ -29,7 +31,8 @@ public class and_handler_does_not_fail : given.all_dependencies
                 committed_event.Public),
             partitioned,
             request.Event.PartitionId,
-            request.Event.ScopeId.To<ScopeId>());
+            request.Event.ScopeId.To<ScopeId>(),
+            stream_position);
         event_processing_converter
             .Setup(_ => _.ToSDK(request.Event))
             .Returns(stream_event);
@@ -39,7 +42,8 @@ public class and_handler_does_not_fail : given.all_dependencies
             committed_event.EventSourceId,
             committed_event.Occurred.ToDateTimeOffset(),
             execution_context,
-            execution_context);
+            execution_context,
+            stream_position);
         event_types.Setup(_ => _.HasTypeFor(event_type_to_handle)).Returns(true);
         event_types.Setup(_ => _.GetTypeFor(event_type_to_handle)).Returns(typeof(given.some_event));
         event_handler

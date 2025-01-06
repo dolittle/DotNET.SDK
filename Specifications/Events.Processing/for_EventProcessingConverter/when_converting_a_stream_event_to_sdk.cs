@@ -20,14 +20,17 @@ public class when_converting_a_stream_event_to_sdk : given.a_converter
     static string partition_id;
     static Uuid scope_id;
 
+    static StreamPosition stream_position;
+
     static PbCommittedEvent committed_event;
     static CommittedEvent committed_event_to_return;
 
     static PbStreamEvent stream_event;
     static StreamEvent converted_stream_event;
 
-    Establish context = () =>
+    private Establish context = () =>
     {
+        stream_position = 4400022;
         committed_event = new PbCommittedEvent();
         committed_event_to_return = new CommittedEvent(
             506549693,
@@ -60,6 +63,7 @@ public class when_converting_a_stream_event_to_sdk : given.a_converter
             Partitioned = partitioned,
             PartitionId = partition_id,
             ScopeId = scope_id,
+            StreamPosition = stream_position
         };
     };
 
@@ -70,4 +74,5 @@ public class when_converting_a_stream_event_to_sdk : given.a_converter
     It should_have_the_correct_partitioned = () => converted_stream_event.Partitioned.ShouldEqual(partitioned);
     It should_have_the_correct_partition = () => converted_stream_event.Partition.Value.ShouldEqual(partition_id);
     It should_have_the_correct_scope = () => converted_stream_event.Scope.ShouldEqual(scope_id.To<ScopeId>());
+    It should_have_the_correct_position = () => converted_stream_event.Position.ShouldEqual(stream_position.Value);
 }

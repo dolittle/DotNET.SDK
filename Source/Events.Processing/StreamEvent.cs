@@ -17,12 +17,14 @@ public class StreamEvent
     /// <param name="partitioned">Whether the Event comes from a partitioned Stream or not.</param>
     /// <param name="partition">The <see cref="PartitionId"/> assigned to the Event in the Stream.</param>
     /// <param name="scope">The <see cref="ScopeId"/> of the Stream.</param>
-    public StreamEvent(CommittedEvent @event, bool partitioned, PartitionId partition, ScopeId scope)
+    /// <param name="position">The position in the stream</param>
+    public StreamEvent(CommittedEvent @event, bool partitioned, PartitionId partition, ScopeId scope, ulong position)
     {
         Event = @event;
         Partitioned = partitioned;
         Partition = partition;
         Scope = scope;
+        Position = position;
     }
 
     /// <summary>
@@ -47,4 +49,9 @@ public class StreamEvent
     /// Gets the scope of the Stream the Event comes from.
     /// </summary>
     public ScopeId Scope { get; }
+
+    /// <summary>
+    /// Gets the position of the Event in the Stream.
+    /// </summary>
+    public ulong Position { get; }
 }

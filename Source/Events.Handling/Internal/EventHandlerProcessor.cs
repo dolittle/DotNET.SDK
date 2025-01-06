@@ -93,7 +93,7 @@ public class EventHandlerProcessor : EventProcessor<EventHandlerId, EventHandler
             .Handle(
                 committedEvent.Content,
                 committedEvent.EventType,
-                committedEvent.GetEventContext(executionContext),
+                committedEvent.GetEventContext(executionContext, request.Event.StreamPosition),
                 serviceProvider,
                 cancellation)
             .ConfigureAwait(false);

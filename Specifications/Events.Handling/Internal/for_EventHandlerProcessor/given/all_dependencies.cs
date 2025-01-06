@@ -26,7 +26,8 @@ public class all_dependencies : an_event_handler_processor
     protected static some_event event_to_handle;
     protected static EventType event_type_to_handle;
     protected static CancellationToken cancellation_token;
-    protected static Mock<IServiceProvider> service_provider; 
+    protected static Mock<IServiceProvider> service_provider;
+    protected static ulong stream_position = 2;
 
     Establish context = () =>
     {
@@ -58,7 +59,8 @@ public class all_dependencies : an_event_handler_processor
             Event = committed_event,
             Partitioned = partitioned,
             PartitionId = "a-partition-id",
-            ScopeId = event_handler_scope.ToProtobuf()
+            ScopeId = event_handler_scope.ToProtobuf(),
+            StreamPosition = stream_position
         };
         request = new HandleEventRequest
         {

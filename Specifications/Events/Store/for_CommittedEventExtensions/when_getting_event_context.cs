@@ -13,6 +13,7 @@ namespace Dolittle.SDK.Events.Store.for_CommittedEventExtensions;
 
 public class when_getting_event_context
 {
+    private static readonly StreamPosition StreamPosition = 5u;
     static CommittedEvent committed_event;
     static ExecutionContext current_execution_context;
 
@@ -52,9 +53,10 @@ public class when_getting_event_context
             ActivitySpanId.CreateFromString("b00cb00cb00cb00c"));
     };
 
-    Because of = () => event_context = committed_event.GetEventContext(current_execution_context);
+    Because of = () => event_context = committed_event.GetEventContext(current_execution_context, StreamPosition);
 
     It should_have_the_same_sequence_number = () => event_context.SequenceNumber.ShouldEqual(committed_event.EventLogSequenceNumber);
+    private It should_have_the_same_stream_position = () => event_context.StreamPosition.ShouldEqual(StreamPosition);
     It should_have_the_same_event_source = () => event_context.EventSourceId.ShouldEqual(committed_event.EventSource);
     It should_have_the_same_occured = () => event_context.Occurred.ShouldEqual(committed_event.Occurred);
     It should_have_the_correct_committed_execution_context = () => event_context.CommittedExecutionContext.ShouldEqual(committed_event.ExecutionContext);
