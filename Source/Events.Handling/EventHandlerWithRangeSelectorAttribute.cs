@@ -37,9 +37,6 @@ public class EventHandlerWithRangeSelectorAttribute<T> : Attribute, IDecoratedTy
     /// <param name="inScope">The scope that the event handler handles events in.</param>
     /// <param name="alias">The alias for the event handler.</param>
     /// <param name="concurrency">How many events can be processed simultaneously</param>
-    /// <param name="startFrom">Where in the event log to start processing if the event handler has not been used before. Defaults to the first event.</param>
-    /// <param name="startFromTimestamp">Determines a specific event timestamp to start at if set. Overrides startFrom when used. Format is ISO 8601</param>
-    /// <param name="stopAtTimestamp">Determines a specific event timestamp to stop processing at if set. Format is ISO 8601</param>
     public EventHandlerWithRangeSelectorAttribute(
         string eventHandlerId,
         bool partitioned = true,
@@ -54,9 +51,9 @@ public class EventHandlerWithRangeSelectorAttribute<T> : Attribute, IDecoratedTy
         var selector = new T();
         var range = selector.GetRange();
         StartFrom = range.Mode;
-        StartFromTimestamp = range.StartFrom;
-        StopAtTimestamp = range.StopAt;
-        if (StartFromTimestamp is not null && StopAtTimestamp is not null && StartFromTimestamp >= StopAtTimestamp)
+        StartAt = range.StartFrom;
+        StopAt = range.StopAt;
+        if (StartAt.HasValue && StopAt.HasValue && StartAt >= StopAt)
         {
             throw new ArgumentException("StartFromTimestamp must be before StopAtTimestamp");
         }
@@ -67,8 +64,8 @@ public class EventHandlerWithRangeSelectorAttribute<T> : Attribute, IDecoratedTy
 
     public int Concurrency { get; set; }
     public ProcessFrom StartFrom { get; }
-    public DateTimeOffset? StartFromTimestamp { get; }
-    public DateTimeOffset? StopAtTimestamp { get; }
+    public DateTimeOffset? StartAt { get; }
+    public DateTimeOffset? StopAt { get; }
 
     /// <summary>
     /// Gets a value indicating whether this event handler is partitioned.
@@ -85,6 +82,6 @@ public class EventHandlerWithRangeSelectorAttribute<T> : Attribute, IDecoratedTy
     public EventHandlerModelId GetIdentifier(Type decoratedType)
     {
         return new(_eventHandlerId, Partitioned, Scope, _alias ?? decoratedType.Name, Concurrency, StartFrom,
-            StartFromTimestamp, StopAtTimestamp);
+            StartAt, StopAt);
     }
 }
