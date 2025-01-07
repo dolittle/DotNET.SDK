@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../../tests.props" />
+
+    <PropertyGroup>
+        <RootNamespace>Dolittle.SDK.Events.Handling</RootNamespace>
+        <AssemblyName>Dolittle.SDK.Events.Handling.Tests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Source\Events.Handling\Events.Handling.csproj" />
+        <ProjectReference Include="..\..\Source\SDK\SDK.csproj" />
+    </ItemGroup>
+</Project>

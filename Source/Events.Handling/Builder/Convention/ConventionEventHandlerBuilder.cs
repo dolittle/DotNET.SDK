@@ -176,7 +176,7 @@ public abstract class ConventionEventHandlerBuilder : ICanTryBuildEventHandler, 
                 buildResults.AddFailure(_identifier, $"{method} has the signature of an event handler method, but is not public. Event handler methods needs to be public");
                 shouldAddHandler = false;
             }
-
+            
             switch (shouldAddHandler)
             {
                 case true when !eventTypesToMethods.TryAdd(eventType, createUntypedHandlerMethod(method)):

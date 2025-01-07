@@ -18,6 +18,6 @@ public class DishEater2
 
     public void Handle(DishEaten @event, EventContext ctx)
     {
-        _logger.LogInformation("{CtxEventSourceId} has eaten unpartitioned {EventDish}. Yummm!", ctx.EventSourceId, @event.Dish);
+        _logger.LogInformation("{CtxEventSourceId} has eaten unpartitioned {EventDish}. It was event offset {Offset} in the stream", ctx.EventSourceId, @event.Dish, ctx.StreamPosition);
     }
 }

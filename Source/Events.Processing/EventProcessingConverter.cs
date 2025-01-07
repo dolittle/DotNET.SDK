@@ -57,7 +57,8 @@ public class EventProcessingConverter : IEventProcessingConverter
             committedEvent,
             source.Partitioned,
             source.PartitionId,
-            scopeId);
+            scopeId,
+            source.StreamPosition);
         return true;
     }
 

@@ -45,7 +45,7 @@ public abstract class FilterEventProcessor<TRegisterArguments, TResponse> : Even
     protected override Task<TResponse> Process(FilterEventRequest request, ExecutionContext executionContext, IServiceProvider serviceProvider, CancellationToken cancellation)
     {
         var committedEvent = _converter.ToSDK(request.Event);
-        return Filter(committedEvent.Content, committedEvent.GetEventContext(executionContext), cancellation);
+        return Filter(committedEvent.Content, committedEvent.GetEventContext(executionContext, null), cancellation);
     }
 
     /// <summary>
