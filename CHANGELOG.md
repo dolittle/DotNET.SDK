@@ -1,3 +1,20 @@
+# [24.1.0] - 2025-1-7 [PR: #251](https://github.com/dolittle/DotNET.SDK/pull/251)
+## Summary
+
+Adds stream position metadata to event context, as well as adding the ability to programmatically decide the processing range of event handlers. 
+
+Stream position metadata requires runtime version 9.9.0 or newer.
+
+## Usage
+
+`EventHandlerWithRangeSelectorAttribute<T>` can be used instead of the `EventHandler` attribute, where T is an `IProcessRangeSelector`. The given range selector will be used to determine what time range will be processed by the handler.
+
+### Added
+
+- `EventContext`: Added StreamPosition
+- `EventHandlerWithRangeSelector`: New attribute that supports programmatic process range selection.
+
+
 # [24.0.0] - 2024-11-13 [PR: #250](https://github.com/dolittle/DotNET.SDK/pull/250)
 ## Summary
 This release adds support for .NET 9, while removing .NET 6 & 7, as they are no longer in support.
