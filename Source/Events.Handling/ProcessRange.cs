@@ -36,11 +36,4 @@ public record ProcessRange
 
     /// <summary>Do not process events that were committed after this (Optional)</summary>
     public DateTimeOffset? StopAt { get; init; }
-
-    public void Deconstruct(out ProcessFrom Mode, out DateTimeOffset? StartFrom, out DateTimeOffset? StopAt)
-    {
-        Mode = this.Mode;
-        StartFrom = this.StartFrom;
-        StopAt = this.StopAt;
-    }
 }
