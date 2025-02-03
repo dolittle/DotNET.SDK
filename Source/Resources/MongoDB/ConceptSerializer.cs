@@ -43,6 +43,7 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
         // It should be a Concept object
         if (bsonType == BsonType.Document)
         {
+            var bookmark = bsonReader.GetBookmark();
             bsonReader.ReadStartDocument();
             var keyName = bsonReader.ReadName(Utf8NameDecoder.Instance);
             if (keyName is "Value" or "value")
@@ -52,7 +53,8 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
             }
             else
             {
-                throw new FailedConceptSerialization("Expected a concept object, but no key named 'Value' or 'value' was found on the object");
+                bsonReader.ReturnToBookmark(bookmark);
+                value = BsonSerializer.Deserialize(bsonReader, valueType);
             }
         }
         else
@@ -73,6 +75,8 @@ public class ConceptSerializer<T> : IBsonSerializer<T>
         }
     }
 
+
+    
     /// <inheritdoc/>
     public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
     {
