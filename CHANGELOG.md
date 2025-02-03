@@ -1,3 +1,15 @@
+# [24.1.1] - 2025-2-3 [PR: #252](https://github.com/dolittle/DotNET.SDK/pull/252)
+## Summary
+Fixed a MongoDB serialization regression with ConceptAs in combination with DateTimeOffset and the MongoDB 3.0 driver.
+
+This version combines compatibility with older serialized documents, as well as MongoDB driver 3.0 and newer.
+
+In addition, this release upgrades Microsoft extensions, OpenTelemetry & Protobuf dependencies to the latest version
+
+### Fixed
+- ConceptAs<DateTimeOffset> serialization
+
+
 # [24.1.0] - 2025-1-7 [PR: #251](https://github.com/dolittle/DotNET.SDK/pull/251)
 ## Summary
 
