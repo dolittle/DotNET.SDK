@@ -13,11 +13,12 @@ namespace Dolittle.SDK.DependencyInversion;
 static class AssemblyFinder
 {
     static readonly AssemblyLoadContextWrapper _loader = new(AssemblyLoadContext.Default);
-    
+
     /// <summary>
     /// Find assemblies in the application's binary path
     /// </summary>
     /// <param name="logFailure">Take an action when an assembly file could not be loaded</param>
+    /// <param name="filter">Predicate to determine assembly inclusion</param>
     /// <param name="includeExeFiles">Optionally include *.exe files</param>
     /// <returns></returns>
     public static IEnumerable<Assembly> FindAssemblies(Action<string> logFailure, Func<Assembly, bool> filter,
@@ -39,6 +40,7 @@ static class AssemblyFinder
     /// <summary>
     /// Find assemblies in the given path
     /// </summary>
+    /// <param name="filter">Predicate to determine assembly inclusion</param>
     /// <param name="assemblyPath">The path to probe for assembly files</param>
     /// <param name="logFailure">Take an action when an assembly file could not be loaded</param>
     /// <param name="includeExeFiles">Optionally include *.exe files</param>
@@ -47,17 +49,18 @@ static class AssemblyFinder
         Action<string> logFailure, bool includeExeFiles)
     {
         var assemblies = FindAssemblies(assemblyPath, logFailure, includeExeFiles)
-            .Where(filter)
-            .OrderBy(x => x.GetName().Name)
+            .Where(it => filter(it.assembly))
+            .OrderBy(x => x.name)
+            .Select(it => it.assembly)
             .ToArray();
 
         return assemblies.TopologicalSort((Func<Assembly, Assembly[]>)FindDependencies, throwOnCycle: false);
 
         Assembly[] FindDependencies(Assembly a) => assemblies
-            .Where(x => a.GetReferencedAssemblies().Any(_ => _.Name == x.GetName().Name)).ToArray();
+            .Where(x => a.GetReferencedAssemblies().Any(it => it.Name == x.GetName().Name)).ToArray();
     }
 
-    static IEnumerable<Assembly> FindAssemblies(string assemblyPath, Action<string> logFailure,
+    static IEnumerable<(string name, Assembly assembly)> FindAssemblies(string assemblyPath, Action<string> logFailure,
         bool includeExeFiles)
     {
         var dllFiles = Directory.EnumerateFiles(assemblyPath, "*.dll", SearchOption.AllDirectories);
@@ -72,17 +75,21 @@ static class AssemblyFinder
         foreach (var file in files)
         {
             var name = Path.GetFileNameWithoutExtension(file);
-            Assembly assembly = null;
-
+            Assembly? assembly = null;
+            string? assemblyName = null;
             try
             {
                 assembly = _loader.LoadFromAssemblyName(new AssemblyName(name));
+                assemblyName = assembly.GetName().Name;
+
             }
             catch (Exception)
             {
                 try
                 {
                     assembly = _loader.LoadFromAssemblyPath(file);
+                    assemblyName = assembly.GetName().Name;
+
                 }
                 catch (Exception)
                 {
@@ -90,9 +97,9 @@ static class AssemblyFinder
                 }
             }
 
-            if (assembly != null)
+            if (assemblyName is not null && assembly is not null)
             {
-                yield return assembly;
+                yield return (assemblyName, assembly);
             }
         }
     }
@@ -101,17 +108,16 @@ static class AssemblyFinder
     /// <summary>
     /// Find assembly files matching a given filter
     /// </summary>
-    /// <param name="filter"></param>
+    /// <param name="filter">Predicate to determine assembly inclusion</param>
     /// <param name="includeExeFiles"></param>
     /// <returns></returns>
-    public static IEnumerable<Assembly> FindAssemblies(Func<Assembly, bool> filter, bool includeExeFiles = false)
+    public static IEnumerable<Assembly> FindAssemblies(Func<Assembly, bool>? filter, bool includeExeFiles = false)
     {
-        filter ??= a => true;
+        filter ??= _ => true;
 
-        return FindAssemblies(file => { }, filter, includeExeFiles: includeExeFiles);
+        return FindAssemblies(_ => { }, filter, includeExeFiles: includeExeFiles);
     }
 }
-
 
 sealed class AssemblyLoadContextWrapper
 {
@@ -169,7 +175,7 @@ static class TopologicalSortExtensions
         {
             if (throwOnCycle && !sorted.Contains(item))
             {
-                throw new Exception("Cyclic dependency found");
+                throw new CyclicDependencyFound("Cyclic dependency found for " + item);
             }
         }
         else
@@ -183,3 +189,8 @@ static class TopologicalSortExtensions
         }
     }
 }
+
+/// <summary>
+/// 
+/// </summary>
+public class CyclicDependencyFound(string message) : Exception(message);
