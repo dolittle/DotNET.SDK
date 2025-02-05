@@ -1,3 +1,13 @@
+# [24.1.2] - 2025-2-5 [PR: #253](https://github.com/dolittle/DotNET.SDK/pull/253)
+## Summary
+
+Hardened SDK assembly loading, and fixed an issue where analyzer DLL's were packaged with the application.
+
+### Fixed
+- Fixed issue where a failed assembly loading could prevent services from starting
+- Ensured the transitive roslyn DLL's are not packaged with applications
+
+
 # [24.1.1] - 2025-2-3 [PR: #252](https://github.com/dolittle/DotNET.SDK/pull/252)
 ## Summary
 Fixed a MongoDB serialization regression with ConceptAs in combination with DateTimeOffset and the MongoDB 3.0 driver.
